@@ -1,0 +1,14 @@
+@(title: String, ident: String)(content: Html)
+
+<div id="@ident" class="modal hide fade ajaxModal" tabindex="-1" role="dialog" aria-labelledby="@{ident + "Label"}" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+		<h3 id="@{ident + "Label"}">@title</h3>
+	</div>
+	
+	<div class="modal-body">
+	@content
+	
+	
+
+</div>

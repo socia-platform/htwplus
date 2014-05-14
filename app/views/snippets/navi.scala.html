@@ -1,0 +1,78 @@
+@defining(Component.currentAccount()) { user =>
+	<nav class="hp-navbar navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="hp-navbar-container">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			@defining(if(Navigation.getLevel() == Navigation.Level.STREAM){"active"} else {"deactive"}) { status =>
+				<a href="@Navigation.getLevelRoute(Navigation.Level.STREAM)">
+					<div class="visible-xs hp-logo @status">
+						<img id="normal" src="@routes.Assets.at("images/logos/logo-white-small.svg")">
+						<img id="hover" src="@routes.Assets.at("images/logos/logo-gray-small.svg")">
+					</div>
+					<div class="hidden-xs hp-logo @status">
+						<img id="normal" src="@routes.Assets.at("images/logos/logo-white.svg")">
+						<img id="hover" src="@routes.Assets.at("images/logos/logo-gray.svg")">
+					</div>
+				</a>
+			}
+		</div> <!-- /navbar-header -->
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="hp-nav nav navbar-nav">
+				@defining(if(Navigation.getLevel() == Navigation.Level.FRIENDS){"active"} else {"deactive"}) { status =>
+					<li class="@status">
+						<a class="visible-xs" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)"><span class="glyphicon glyphicon-user"></span></a>
+						<a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)">@Navigation.getLevelTitle(Navigation.Level.FRIENDS)</a>
+					</li>
+				}
+				@defining(if(Navigation.getLevel() == Navigation.Level.GROUPS){"active"} else {"deactive"}) { status =>
+					<li class="@status">
+						<a class="visible-xs" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)"><span class="glyphicon glyphicon-list"></span></a>
+						<a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)">@Navigation.getLevelTitle(Navigation.Level.GROUPS)</a>
+					</li>
+				}
+      				@controllers.NotificationController.view()
+	
+				
+				<li class="visible-xs dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span> <b class="caret"></b></a>
+					<ul class="hp-dropdown-search dropdown-menu">
+						<form class="hp-search-form navbar-form navbar-left" role="search" action="@routes.Application.search" method="GET">
+							<div class="form-group">
+								<input type="text" class="form-control" placeholder="EasySearch" id="searchQuery" type="text" name="keyword" >
+							</div>
+							<button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+						</form>
+					</ul>
+				</li>
+			</ul>
+			
+			<form class="hidden-xs hp-search-form navbar-form navbar-left" role="search" action="@routes.Application.search" method="GET">
+				<div class="form-group">
+					<input id="searchQuery" class="form-control hp-easy-search" rel="tooltip" data-placement="bottom" data-original-title="Sucht nach Personen, Gruppen und Kursen - gleichzeitig!" type="text" placeholder="EasySearch" name="keyword">
+				</div>
+				<button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+			</form>
+			
+			<ul class="nav navbar-nav pull-right">
+				<li class="dropdown">
+					<a href="#" class="hp-nav-user dropdown-toggle" data-toggle="dropdown">
+						<img class="hp-avatar" alt="avatar" src="@Component.currentAccount().getAvatarUrl()" />
+						<span class="hidden-xs hidden-sm">@user.name </span>
+						<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a href="@routes.ProfileController.stream(user.id)">Mein öffentlicher Newsstream</a></li>
+						<li><a href="@Navigation.getLevelRoute(Navigation.Level.PROFILE)">Mein Profil ansehen</a></li>
+						<li><a href="@routes.ProfileController.edit(user.id)">Mein Profil bearbeiten</a></li>
+						<li class="divider"></li>
+						<li><a href="@routes.AccountController.logout">Logout</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div><!-- /navbar-collapse -->
+		
+		</div>
+	</nav>
+}

@@ -1,0 +1,7 @@
+@(users: List[Account])
+
+@admin("Control Center") {
+	<br>
+	@views.html.snippets.listAccounts(users)
+
+}

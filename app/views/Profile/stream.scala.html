@@ -1,0 +1,27 @@
+@(user: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer)
+
+@main("Newsstream") {
+@defining(Component.currentAccount()) { curUser =>
+
+	<!-- confirmDeleteFriendModal -->
+	<div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog">@views.html.Friends.snippets.deleteFriendModal(user)</div>
+	<!-- Ende confirmDeleteFriendModal -->
+
+    @views.html.Profile.snippets.navTabs(user)
+	<h2>@user.name's Newsstream</h2>
+	
+	@if(curUser.equals(user)) {
+	<h5>(Das sehen deine Freunde)</h5>
+	}
+  	<br />
+}
+	@views.html.snippets.postForm(user.id, models.Post.PROFILE, postForm)
+		
+	@if(posts != null) {
+		@for(post <- posts) {
+			@views.html.snippets.postView(post, postForm, models.Post.PROFILE)
+		}
+	}
+	
+	@views.html.pagination(count, limit, currentPage, routes.ProfileController.stream(user.id).toString, "?")
+}

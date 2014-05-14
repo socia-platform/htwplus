@@ -1,0 +1,69 @@
+@(user: Account, postForm: Form[Post])
+@import helper._
+@import models.enums._
+
+@main("Profil") {
+@defining(Component.currentAccount()) { curUser =>
+
+	<!-- confirmDeleteFriendModal -->
+	<div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog">@views.html.Friends.snippets.deleteFriendModal(user)</div>
+	<!-- Ende confirmDeleteFriendModal -->
+	
+	@views.html.Profile.snippets.navTabs(user)
+	
+	<div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		@views.html.Friends.snippets.deleteFriendModal(user)
+	</div>
+
+	<h2>@user.name</h2>
+	<br />
+	<img alt="avatar" src="@user.getAvatarUrl()" class="img-thumbnail" />
+	<br />
+}
+
+<br />
+<table class="table">
+	<colgroup>
+		<col width="25%">
+		<col width="75%">
+	</colgroup>
+	<tr>
+		<th>E-Mail</th>
+		<td>@user.email</td>
+	</tr>
+	<tr>
+		<th>Studiengang</th>
+		@if(user.studycourse != null) {
+			<td>@user.studycourse.title</td>
+		} else {
+			<td>Keine Angabe</td>
+		}
+	</tr>
+	
+	@if(user.role == models.enums.AccountRole.STUDENT) {
+		<tr>
+			<th>Semester</th>
+			@if(user.semester != null) {
+				<td>@{user.semester + "."} Semester</td>
+			} else {
+				<td>Keine Angabe</td>
+			}
+		</tr>
+		<tr>
+			<th>Abschluss</th>
+			@if(user.degree != null) {
+				<td>@user.degree</td>
+			} else {
+				<td>Keine Angabe</td>
+			}
+		</tr>
+	}
+	<tr>
+		<th>Rolle</th>
+		<td>@user.role.getDisplayName()</td>
+
+	</tr>
+	
+</table>
+	
+}

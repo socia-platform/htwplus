@@ -1,0 +1,37 @@
+@(groupForm: Form[Group])
+@import helper._
+@import models.enums.GroupType
+
+@main("Gruppe erstellen	") {
+
+	@views.html.Group.snippets.navTabsAdd()
+	
+	<h2>Gruppe erstellen</h2>
+	<br>
+
+    @form(routes.GroupController.add()) {
+		<dl class="dl-horizontal">
+			@inputText(groupForm("title"), 'class -> "form-control", '_label -> "Titel")
+			@textarea(groupForm("description"), 'class -> "form-control", '_label -> "Beschreibung", 'rows -> "5")
+			
+			@if(Secured.createCourse()) {
+                @helper.inputGroupType(groupForm("type"),
+                                         options = options("0"->"Öffentliche Gruppe","1"->"Private Gruppe","2"->"Kurs"),
+                                   '_label -> "Typ")
+      		} else {
+                @helper.inputGroupType(groupForm("type"),
+                                         options = options("0"->"Öffentliche Gruppe","1"->"Private Gruppe"),
+                                   '_label -> "Typ")
+        	}
+			
+			<div id="token-input">
+				@inputText(groupForm("token"), 'class -> "form-control", '_label -> "Token")
+			</div>
+			
+		</dl>
+		<div class="pull-right">
+			<button type="submit" class="btn btn-warning">Gruppe erstellen</button>
+			<a href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)" class="btn btn-default">Abbrechen</a>
+		</div>
+	}
+}

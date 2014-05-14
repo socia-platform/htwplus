@@ -1,0 +1,19 @@
+@(postId: Long)
+<div class="modal fade" id="confirmModalDeletePost@postId" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="confirmModalLabel">Post löschen</h4>
+			</div>
+			<div class="modal-body">
+				Möchtest du diesen Post wirklich löschen?<br />
+				Alle dazugehörigen Kommentare werden ebenfalls gelöscht!
+			</div>
+			<div class="modal-footer">
+				<a type="button" href="@routes.PostController.deletePost(postId)" class="btn btn-warning">Ja</a>
+				<a type="button" class="btn btn-default" data-dismiss="modal">Nein</a>
+			</div>
+		</div>
+	</div>
+</div>

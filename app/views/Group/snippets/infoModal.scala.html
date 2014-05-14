@@ -1,0 +1,55 @@
+@(group: Group)
+@import helper._
+@import models.enums.GroupType
+@import models.enums.LinkType
+<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h4 class="modal-title hp-truncate" id="confirmModalLabel">
+				@if(group.groupType == GroupType.close) {
+					<span class="glyphicon glyphicon-lock"></span>
+				} 
+				@if(group.groupType == GroupType.open) {
+					<span class="glyphicon glyphicon-globe"></span>
+				}
+				@if(group.groupType == GroupType.course) {
+					<span class="glyphicon glyphicon-briefcase"></span>
+				}
+				Gruppen-Info
+			</h4>
+		</div>
+		<div class="modal-body">
+		    <dl>
+				<dt>Gründer</dt>
+				<dd>@views.html.snippets.userLink(group.owner)</dd>
+			</dl>
+			<dl>
+				<dt>Erstellt am</dt>
+				<dd>@group.createdAt.format("dd.MM.yyyy")</dd>
+			</dl>
+			@if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
+				<dl>
+					<dt>Token</dt>
+					<dd>@group.token</dd>
+				</dl>
+			}
+			
+			<dl>
+				<dt>Beschreibung</dt>
+				<dd>@group.description</dd>
+			</dl>
+			<dl>
+				<dt>Mitglieder</dt>
+				@defining(GroupAccount.findAccountsByGroup(group, LinkType.establish)) { accounts =>
+			    	@for(account <- accounts) {
+                    	<dd> @views.html.snippets.userLink(account)</dd>  
+                    }
+              	}
+			</dl>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Schließen</button>
+		</div>
+	</div>
+</div>

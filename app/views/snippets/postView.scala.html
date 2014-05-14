@@ -1,0 +1,59 @@
+@(post: Post, postForm: Form[Post], currentView: String)
+@import helper._
+
+@defining(Component.currentAccount()) { currentUser =>
+	<br />
+	@views.html.snippets.deletePostModal(post.id)
+
+	<div class="well">
+		<div class="media">
+			@views.html.snippets.userLinkAvatar(post.owner)
+			<div class="media-body">
+				<h4 class="media-heading">
+					@views.html.snippets.userLink(post.owner)
+					@if(post.belongsToGroup && currentView != "group"){schrieb in <a href="@routes.GroupController.view(post.group.id)">@truncate(post.group.title,50)</a>}
+					@if(post.belongsToAccount && currentUser != post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(post.account)} 
+					@if(post.belongsToAccount && currentUser == post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(currentUser)} 
+					@if(Secured.isAllowedToDeletePost(post, currentUser)){
+                			<a href="#confirmModalDeletePost@post.id" data-toggle="modal" rel="tooltip" data-original-title="Post löschen">
+                				<span class="glyphicon glyphicon-trash"></span>
+                			</a>
+                	}
+				</h4>
+				<small>@post.createdAt.format("dd.MM.yyyy HH:mm")</small>
+			</div>
+		</div>
+		<br />
+		<div class="hp-truncate hp-white-space" id="@post.id">@post.content</div>
+		<hr />
+		<div class="hp-comments" id="comments-@post.id">
+
+			@if(post.getCountComments() > 2) {
+				<a href="#collapse-@post.id" class="olderComments unloaded">Alle Kommentare anzeigen...</a>
+				<div id="collapse-@post.id" class="collapse"></div>
+			}
+			@defining(PostController.getCommentsForPostInGroup(post.id)) { comments => 
+	 			@for(comment <- comments){
+	 				@views.html.snippets.postComment(comment)
+	 			}
+	 		}
+	 		@if(Secured.addComment(post)) {
+	 			@form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form", 'id -> "addComment-@post.id") {
+				<div class="hp-horizontal-form col-xs-12">
+					<div class="input-group">
+						@textarea(postForm("Content"), 'class -> "form-control", 'id -> "hp-new-comment-content", 'placeholder -> "Erstelle ein Kommentar...")
+						<span class="input-group-btn">
+							<button type="submit" class="btn btn-sm btn-warning commentSubmit">Kommentieren</button> 
+						</span>
+					</div>
+				</div>
+			}
+	 		
+	 		}
+	 		
+
+		</div>
+		<div class="clear"></div>
+	</div>
+}
+

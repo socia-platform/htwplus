@@ -1,0 +1,9 @@
+@(text:String,max:Integer)
+@if(text != null) {
+	@if(text.length <= max){
+		@text
+	} else {
+		@{text.take(max-4) + "..."}
+	}
+}
+
