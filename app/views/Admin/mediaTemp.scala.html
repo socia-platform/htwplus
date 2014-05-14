@@ -1,0 +1,7 @@
+@(size: String)
+
+@admin("Control Center") {
+	<br>
+	<p>Aktuell: @size</p>
+	<a type="button" class="btn btn-warning" href="@routes.AdminController.cleanMediaTemp">Jetzt aufräumen!</a>
+}

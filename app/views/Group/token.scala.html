@@ -1,0 +1,21 @@
+@(group: Group, groupForm:Form[Group])
+@import helper._
+
+@main("Token eingeben") {
+
+	@form(routes.GroupController.validateToken(group.id)) {
+	
+	@inputText(
+		groupForm("token"),
+		'class -> "form-control",
+		'_label -> "Token: "
+    )
+
+	<button type="submit" class="btn btn-warning">Senden</button>
+
+	}
+
+
+}
+
+

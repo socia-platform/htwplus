@@ -1,0 +1,93 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                       			controllers.Application.index()
+GET     /stream                    			controllers.Application.stream(page: Integer ?= 1)
+GET		/search								controllers.Application.search()
+GET		/search/accounts					controllers.Application.searchForAccounts(keyword:String,page: Integer ?= 1)
+GET		/search/groups						controllers.Application.searchForGroups(keyword:String,page: Integer ?= 1)
+GET		/search/courses						controllers.Application.searchForCourses(keyword:String,page: Integer ?= 1)
+POST    /login                  			controllers.AccountController.authenticate()
+GET     /logout                 			controllers.AccountController.logout()
+GET     /help                 				controllers.Application.help()
+GET     /feedback              				controllers.Application.feedback()
+POST    /feedback/add          				controllers.Application.addFeedback()
+GET		/404								controllers.Application.error()
+
+# JavaScript Routes
+GET		/assets/javascripts/routes			controllers.Application.javascriptRoutes()
+
+#Group
+GET 	/groups								controllers.GroupController.index()
+POST	/group/create						controllers.GroupController.add()
+GET		/group/create						controllers.GroupController.create()
+GET		/group/:id/stream					controllers.GroupController.view(id:Long, page: Integer ?= 1)
+GET		/group/:id							controllers.GroupController.view(id:Long, page: Integer ?= 1)
+GET		/group/:id/media					controllers.GroupController.media(id:Long)
+GET		/group/:id/edit						controllers.GroupController.edit(id:Long)
+POST	/group/:id/update					controllers.GroupController.update(id:Long)
+GET		/group/:id/delete					controllers.GroupController.delete(id:Long)
+GET 	/group/:id/join						controllers.GroupController.join(id:Long)
+GET 	/group/:groupId/remove/:accountId	controllers.GroupController.removeMember(groupId:Long, accountId: Long)
+GET 	/group/:groupId/accept/:accountId	controllers.GroupController.acceptRequest(groupId:Long, accountId: Long)
+GET 	/group/:groupId/decline/:accountId	controllers.GroupController.declineRequest(groupId:Long, accountId: Long)
+GET		/group/:id/token					controllers.GroupController.token(id:Long)
+GET		/group/:id/invite					controllers.GroupController.invite(id:Long)
+POST	/group/:id/invite					controllers.GroupController.inviteMember(id:Long)
+GET		/group/:id/acceptInvite/:accountId	controllers.GroupController.acceptInvitation(id:Long, accountId: Long)
+GET		/group/:id/declineInvite/:accountId	controllers.GroupController.declineInvitation(id:Long, accountId: Long)
+POST	/group/:id/validate				    controllers.GroupController.validateToken(id:Long)
+
+#Post and Comments
+GET		/post/olderComments				    controllers.PostController.getOlderComments(id:Long,current:Integer)
+GET		/post/:id							controllers.PostController.view(id:Long)
+POST	/post/:id/addComment				controllers.PostController.addComment(id:Long)
+POST	/:target/:id/addPost				controllers.PostController.addPost(id:Long, target:String)
+GET		/post/:postId/deletePost			controllers.PostController.deletePost(postId:Long)
+
+
+#User
+GET		/profile							controllers.ProfileController.me()
+GET		/user/:id							controllers.ProfileController.view(id:Long)
+GET		/user/:id/edit						controllers.ProfileController.edit(id:Long)
+GET		/user/:id/editPassword				controllers.ProfileController.editPassword(id:Long)
+POST	/user/:id/updatePassword			controllers.ProfileController.updatePassword(id:Long)
+POST	/user/:id/edit						controllers.ProfileController.update(id:Long)
+GET		/user/:id/stream					controllers.ProfileController.stream(id:Long,page: Integer ?= 1)
+
+
+#Friends
+GET		/friends							controllers.FriendshipController.index()
+GET		/friend/:friendId/add				controllers.FriendshipController.requestFriend(friendId:Long)
+GET		/friend/:friendId/delete			controllers.FriendshipController.deleteFriend(friendId:Long)
+GET		/friend/:friendId/accept			controllers.FriendshipController.acceptFriendRequest(friendId:Long)
+GET		/friend/:friendshipId/decline		controllers.FriendshipController.declineFriendRequest(friendshipId:Long)
+GET		/friend/:friendshipId/cancel		controllers.FriendshipController.cancelFriendRequest(friendshipId:Long)
+
+
+# Media
+POST 	/media/:target/upload/:id			controllers.MediaController.upload(target:String,id:Long)
+POST	/media/multiple/:target/:id			controllers.MediaController.multiView(target:String,id:Long)
+GET		/media/:id							controllers.MediaController.view(id:Long)
+GET 	/media/:id/delete					controllers.MediaController.delete(id:Long)
+
+#Notification
+GET		/notification/delete				controllers.NotificationController.deleteAll()
+GET		/notification/view					controllers.NotificationController.viewAjax()
+GET		/notification/:id					controllers.NotificationController.forward(id:Long,url:String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               		controllers.Assets.at(path="/public", file)
+
+# Admin
+GET		/admin								controllers.AdminController.index()
+GET		/admin/user/create					controllers.AdminController.createAccountForm()
+POST	/admin/user/create					controllers.AdminController.createAccount()
+GET		/admin/user/list					controllers.AdminController.listAccounts()
+GET		/admin/media/						controllers.AdminController.viewMediaTemp()
+GET		/admin/media/clean					controllers.AdminController.cleanMediaTemp()
+
+# No route found? take this
+GET     /*path                  			controllers.Application.defaultRoute(path: String)

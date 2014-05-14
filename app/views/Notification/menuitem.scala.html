@@ -1,0 +1,27 @@
+@(notification:List[Notification])
+
+@defining(notification.size()) { countNotification =>
+<li class="dropdown" id="hp-notification-item">
+         <a href="#" class="visible-xs dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-bell"></span> 
+         
+         @if(countNotification > 0) {
+         	<span class="badge">@countNotification</span>
+         } 
+         
+         <b class="caret"></b></a>
+         <a href="#" class="hidden-xs dropdown-toggle" data-toggle="dropdown">Neuigkeiten 
+         
+         @if(countNotification > 0) {
+         	<span class="badge">@countNotification</span> 
+         }
+         
+         <b class="caret"></b></a>
+         <ul class="hp-dropdown-search dropdown-menu">
+          @if(countNotification > 0) {
+          			@list(notification)
+          } else {
+          			<li class="hp-notification">Nichts neues passiert</li>
+          }
+         </ul>
+</li>
+}

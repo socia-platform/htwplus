@@ -1,0 +1,90 @@
+@(group: Group, friendsToInvite: List[Account], alreadyInvitedFriends: List[Account])
+@import helper._
+@import models.enums._
+
+@main("Group Invite") {
+
+	<!-- Start infoModal -->
+	 <div id="infoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="false">
+	 	@views.html.Group.snippets.infoModal(group)    
+	 </div>
+	 <!-- Ende infoModal -->
+		
+	 <!-- Start confirmDeleteGroupModal -->
+	 <div id="confirmDeleteGroup" class="modal fade" tabindex="-1" role="dialog">
+	 	@views.html.Group.snippets.deleteGroupModal(group)   
+	 </div>
+	 <!-- End confirmDeleteGroupModal -->
+
+	
+		
+	@views.html.Group.snippets.navTabs(group)
+	<div class="clear">
+	<h2 class="hp-truncate">
+		@if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
+		@if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
+		@if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
+		@group.title
+	</h2>
+	<br />
+	<br />
+	
+	@if(!friendsToInvite.isEmpty() || !alreadyInvitedFriends.isEmpty()){
+		
+		@form(action = routes.GroupController.inviteMember(group.id)) {
+
+		<table class="table table-hover">
+			<colgroup>
+				<col width="5%">
+				<col width="36px">
+				<col width="76%">
+				<col width="15%">
+			</colgroup>
+			<thead>
+				<tr>
+		   			<th><input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body" onclick="toggleMediaSelection(this)"></th>
+					<th></th>
+					<th>Name</th>
+					<th>Optionen</th>
+				</tr>
+			</thead>
+    		<tbody id="mediaList" >
+				@for(friend <- friendsToInvite) {	
+				<tr>
+					<td><input type="checkbox" name="friends[]" value="@friend.id"></td>
+					<td>@views.html.snippets.userLinkAvatar(friend)</td>
+					<td>@views.html.snippets.userLink(friend)</td>
+					<td>
+						<a href="@routes.ProfileController.stream(friend.id)" data-toggle="modal" rel="tooltip" title="Newsstream ansehen" data-container="body"><span class="glyphicon glyphicon-comment"></span></a>
+						<a href="@routes.ProfileController.view(friend.id)" data-toggle="modal" rel="tooltip" title="Profil ansehen" data-container="body"><span class="glyphicon glyphicon-user"></span></a>
+						<a href="#confirmDeleteFriend@friend.id" data-toggle="modal" rel="tooltip" title="Freundschaft beenden" data-container="body"><span class="glyphicon glyphicon-remove"></span></a>
+					</td>
+				</tr>
+				}
+				
+				@for(friend <- alreadyInvitedFriends) {
+				<tr>
+					<td><input type="checkbox" disabled="disabled"></td>
+					<td>@views.html.snippets.userLinkAvatar(friend)</td>
+					<td>@views.html.snippets.userLink(friend)</td>
+					<td>
+						<a href="@routes.ProfileController.stream(friend.id)" data-toggle="modal" rel="tooltip" title="Newsstream ansehen" data-container="body"><span class="glyphicon glyphicon-comment"></span></a>
+						<a href="@routes.ProfileController.view(friend.id)" data-toggle="modal" rel="tooltip" title="Profil ansehen" data-container="body"><span class="glyphicon glyphicon-user"></span></a>
+						<a href="#confirmDeleteFriend@friend.id" data-toggle="modal" rel="tooltip" title="Freundschaft beenden" data-container="body"><span class="glyphicon glyphicon-remove"></span></a>
+					</td>
+				</tr>
+				}
+			</tbody>
+		</table>
+
+	    <input type="submit" value="Einladen" class="btn btn-success">
+		}
+		
+	} else {
+		<p><i>Du hast keine Freunde zum Einladen. Jetzt Freunde <b><a class="hp-focus-search">suchen</a></b>.</i></p>
+	}
+		
+	 		
+	</div>
+
+}

@@ -1,0 +1,99 @@
+@(profile: Account, profileForm: Form[Account])
+@import helper._
+@import models._
+@import models.enums._
+
+@main("Editieren") {
+
+@views.html.Profile.snippets.navTabs(profile)
+<h2>Profil bearbeiten</h2>
+<br>
+
+@form(routes.ProfileController.update(profile.id), 'class -> "ajaxForm") {
+	<dl class="dl-horizontal">
+		@inputText(
+			profileForm("email"),
+			'class -> "form-control",
+			'_label -> "Email",
+			'placeholder -> "max.mustermann@muster.de"
+		)
+		<dt>Studiengang</dt>
+		<dd>
+			<select class="form-control" name="studycourse">
+				@if(profile.studycourse == null) {
+				<option value="0" selected="selected">Keine Angabe</option>
+				} else {
+				<option value="0">Keine Angabe</option>
+				}
+				@for(studycourse <- Studycourse.getAll()){
+				<option value="@studycourse.id" @if(profile.studycourse !=null && profile.studycourse.equals(studycourse)){selected="selected"}>@studycourse.title</option>
+				}
+			</select>
+		</dd>
+		@if(profile.role == models.enums.AccountRole.STUDENT) {
+			<dt>Semester</dt>
+			<dd>
+				<select class="form-control" name="semester">
+					@if(profile.semester == null) {
+					<option value="0" selected="selected">Keine Angabe</option>
+					} else {
+					<option value="0">Keine Angabe</option>
+					}
+					<option value="1" @if(profile.semester !=null && profile.semester == 1){selected="selected"}>1. Semester</option>
+					<option value="2" @if(profile.semester !=null && profile.semester == 2){selected="selected"}>2. Semester</option>
+					<option value="3" @if(profile.semester !=null && profile.semester == 3){selected="selected"}>3. Semester</option>
+					<option value="4" @if(profile.semester !=null && profile.semester == 4){selected="selected"}>4. Semester</option>
+					<option value="5" @if(profile.semester !=null && profile.semester == 5){selected="selected"}>5. Semester</option>
+					<option value="6" @if(profile.semester !=null && profile.semester == 6){selected="selected"}>6. Semester</option>
+					<option value="7" @if(profile.semester !=null && profile.semester == 7){selected="selected"}>7. Semester</option>
+					<option value="8" @if(profile.semester !=null && profile.semester == 8){selected="selected"}>8. Semester</option>
+				</select>
+				</br>
+				<select class="form-control" name="degree">
+					@if(profile.degree == null) {
+					<option value="null" selected="selected">Keine Angabe</option>
+					} else {
+					<option value="null">Keine Angabe</option>
+					}
+					<option value="Bachelor" @if(profile.degree !=null && profile.degree.equals("Bachelor")){selected="selected"}>Bachelor</option>
+					<option value="Master" @if(profile.degree !=null && profile.degree.equals("Master")){selected="selected"}>Master</option>
+					<option value="Diplom" @if(profile.degree !=null && profile.degree.equals("Diplom")){selected="selected"}>Diplom</option>
+				</select>
+			</dd>
+		}
+		<dt>Avatar</dt>
+		<dd id="hp-avatars">
+			<img id="aDefault" class="img-thumbnail" src="@routes.Assets.at("images/avatars/aDefault.png")" alt="avatar" onclick="updateAvatar(this)" />
+			@for( i <- 0 to 29) {
+         		<img id="a@i" class="img-thumbnail" src="@routes.Assets.at("images/avatars/a"+i+".png")" alt="avatar" onclick="updateAvatar(this)" />
+      		}
+		</dd>
+	</dl>
+	<div class="pull-right">
+		<input type="hidden" id="avatar" name="avatar" value="">
+		<input type="submit" class="btn btn-warning" value="Speichern">
+		<a type="button" class="btn btn-default" href="@routes.ProfileController.me()">Abbrechen</a>
+	</div>
+	<div class="clearfix">
+	</div>
+	<script type="text/javascript">
+		var aID = "@profile.avatar";
+	
+		function updateAvatar(parent) {
+			var childs = document.getElementById("hp-avatars").getElementsByClassName("img-thumbnail");
+			for (i = 0; i < childs.length; i++) {
+				childs[i].className = "img-thumbnail";
+			}
+			parent.className = "img-thumbnail active";
+			document.getElementById("avatar").value = parent.id;
+		}
+		
+		function setAvatar(id) {
+			document.getElementById(id).className = "img-thumbnail active";
+			document.getElementById("avatar").value = id;
+		}
+		
+		setAvatar(aID);
+	</script>
+}
+}

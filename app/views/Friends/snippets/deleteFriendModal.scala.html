@@ -1,0 +1,19 @@
+@(user: Account)
+<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h4 class="modal-title" id="confirmModalLabel">Freundschaft beenden?</h4>
+		</div>
+		<div class="modal-body">
+			Möchtest Du die Freundschaft zu <b>@user.name</b> wirklich beenden?<br /><br />
+			
+			Vielleicht hattet ihr nur eine kleine Meinungsverschiedenheit, die mit<br /> einer <a href="@routes.ProfileController.view(user.id)/stream">Nachricht</a> aus der Welt geschafft werden kann?
+			
+		</div>
+		<div class="modal-footer">
+			<a type="button"  class="btn btn-warning" href="@routes.FriendshipController.deleteFriend(user.id)">Ja, beenden!</a>
+			<button type="button" class="btn btn-default" data-dismiss="modal">Ne, hab' mich verklickt</button>
+		</div>
+	</div>
+</div>

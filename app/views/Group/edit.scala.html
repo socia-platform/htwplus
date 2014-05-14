@@ -1,0 +1,88 @@
+@(group: Group, groupForm: Form[Group])
+@import helper._
+@import models.enums.GroupType
+@import models.enums.LinkType
+
+
+@main("Gruppe bearbeiten") {
+
+	<!-- Start infoModal -->
+	 <div id="infoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="false">
+	 	@views.html.Group.snippets.infoModal(group)    
+	 </div>
+	 <!-- Ende infoModal -->
+		
+	 <!-- Start confirmDeleteGroupModal -->
+	 <div id="confirmDeleteGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+	 	@views.html.Group.snippets.deleteGroupModal(group)   
+	 </div>
+	 <!-- End confirmDeleteGroupModal -->
+	 
+	 @views.html.Group.snippets.navTabs(group)
+	<h2 class="hp-truncate">
+		@if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
+		@if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
+		@if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
+		@group.title
+	</h2>		
+	</br>
+    </br>
+	@form(routes.GroupController.update(group.id), 'id -> "editGroupForm") {
+		<dl class="dl-horizontal">
+			<dt>Gruppengründer</dt>
+			<dd>@group.owner.firstname @group.owner.lastname</dd>
+			<dt>Erstellt am</dt>
+			<dd>@group.createdAt.format("dd.MM.yyyy")</dd>
+			@textarea(groupForm("description"), 'class -> "form-control", '_label -> "Beschreibung", 'rows -> "5")
+			@if(Secured.createCourse()) {
+                @helper.inputGroupType(groupForm("type"),
+                                         options = options("0"->"Öffentliche Gruppe","1"->"Private Gruppe","2"->"Kurs"),
+                                   '_label -> "Typ")
+      		} else {
+                @helper.inputGroupType(groupForm("type"),
+                                         options = options("0"->"Öffentliche Gruppe","1"->"Private Gruppe"),
+                                   '_label -> "Typ")
+        	}
+        	<div id="token-input">
+				@inputText(groupForm("token"), 'class -> "form-control", '_label -> "Token")
+			</div>
+			<dt>Mitglieder</dt>
+			<dd>
+				<table class="table table-hover table-condensed">
+					<colgroup>
+						<col width="70%">
+						<col width="30%">
+					</colgroup>
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Optionen</th>
+						</tr>
+					</thead>
+					<tbody>
+						@defining(GroupAccount.findAccountsByGroup(group, LinkType.establish)) { accounts =>
+				             @for(account <- accounts) {              
+	                            <tr>
+	                                <td>
+	                                	<a data-placement="top" data-original-title="@account.name" data-content="Rolle: Student &lt;br /&gt; Studiengang: Angewandte Informatik" data-delay="500" data-trigger="hover" data-html="true" rel="popover" href="@routes.ProfileController.view(account.id)">@account.name</a>
+	                                </td>
+	                                @if(account.id != group.owner.id){
+	                                <td>
+	                                	<a href="@routes.GroupController.removeMember(group.id,account.id)" rel="tooltip" title="Löschen">
+	                                		<span class="glyphicon glyphicon-remove"></span>
+	                                	</a>
+	                                </td>
+	                                }
+	                            </tr>
+	                         }
+	              		}
+					</tbody>
+				</table>
+			</dd>
+		</dl>
+		<div class="pull-right">
+			<button type="submit" class="btn btn-warning">Speichern</button>
+			<a type="button" class="btn btn-default" href="@routes.GroupController.view(group.id)">Abbrechen</a>
+		</div>
+	}
+}

@@ -1,0 +1,31 @@
+@(group: Group)
+@import helper._
+
+<ul class="nav nav-tabs hp-nav-tabs pull-right">
+	@defining(if(Navigation.getTitle().equals("Newsstream")){"active"} else {"deactive"}) { status =>
+		<li class="@status"><a href="@routes.GroupController.view(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Newsstream" data-container="body"><span class="glyphicon glyphicon-comment"></span></a></li>
+	}
+	@defining(if(Navigation.getTitle().equals("Media")){"active"} else {"deactive"}) { status =>
+		<li class="@status"><a href="@routes.GroupController.media(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Medien" data-container="body"><span class="glyphicon glyphicon-file"></span></a></li>
+	}
+	@defining(if(Navigation.getTitle().equals("Freunde einladen")){"active"} else {"deactive"}) { status =>
+		@if(Secured.editGroup(group)) {
+			<li class="@status"><a href="@routes.GroupController.invite(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Freunde einladen" data-container="body"><span class="glyphicon glyphicon-collapse-down"></span></a></li>
+		}
+	}
+	@defining(if(Navigation.getTitle().equals("Bearbeiten")){"active"} else {"deactive"}) { status =>
+		@if(Secured.editGroup(group)) {
+			<li class="@status"><a href="@routes.GroupController.edit(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Bearbeiten" data-container="body"><span class="glyphicon glyphicon-pencil"></span></a></li>
+		}
+	}
+	<li><a href="#infoModal" role="button" class="btn btn-default active" data-toggle="modal" rel="tooltip" data-original-title="Info" data-container="body"><span class="glyphicon glyphicon-info-sign"></span></a></li>
+	@if(Secured.deleteGroup(group)) {
+		<li><a href="#confirmDeleteGroup" role="button" class="btn btn-default active" rel="tooltip" data-toggle="modal" data-original-title="Löschen" data-container="body"><span class="glyphicon glyphicon-trash"></span></a></li>
+	}
+	@if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
+		<li><a href="@routes.GroupController.join(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Beitreten" data-container="body"><span class="glyphicon glyphicon-ok"></span></a></li>
+	}
+	@if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
+		<li><a href="@routes.GroupController.removeMember(group.id, Component.currentAccount.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Verlassen" data-container="body"><span class="glyphicon glyphicon-remove"></span></a></li>
+	}
+</ul>

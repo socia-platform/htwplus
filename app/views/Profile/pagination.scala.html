@@ -1,0 +1,11 @@
+@(count: Integer, limit: Integer, userId: Long, currentPage: Integer)
+
+<div class="hp-pagination">
+	<ul class="pagination">
+       @for(i <- 0 until count){
+           @if(i % 10 == 0){
+           	<li><a class="@if(currentPage == i/limit+1) {active}" href="@routes.ProfileController.stream(userId,i/limit+1)">@{i/limit+1}</a></li>
+           }            
+       }
+	</ul>
+</div>

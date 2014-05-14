@@ -1,0 +1,15 @@
+@(user: Account, place: String = "top")
+@import helper._
+@import models.enums.AccountRole;
+
+<a href="@if(Secured.isFriend(user)) { @routes.ProfileController.stream(user.id) } else { @routes.ProfileController.view(user.id) }" data-placement="@place" data-original-title="@user.name"
+        @if(user.role == AccountRole.STUDENT) {
+        data-content="Rolle: Student @if(user.studycourse != null){<br />Studiengang: @user.studycourse.title<br />}@if(user.semester != null){@user.semester. Semester }@if(user.degree != null){@user.degree}"
+        } else { @if(user.role == AccountRole.TUTOR) {
+        data-content="Rolle: Dozent<br />Fachbereich: "
+        } else {
+        data-content="<i>Komisch, diese Person ist unbekannt!</i>"
+        }}
+        data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+        @user.name
+</a>

@@ -1,0 +1,51 @@
+@(accountForm: Form[Account])
+@import helper._
+@import models.enums.AccountRole
+
+@admin("Control Center") {
+	<br>
+	@form(routes.AdminController.createAccount) {
+		<dl class="dl-horizontal">
+			@inputText(
+				accountForm("firstname"),
+				'class -> "form-control", 
+				'_label -> "Vorname *"
+	        )
+			@inputText(
+				accountForm("lastname"),
+				'class -> "form-control",
+				'_label -> "Nachname *",
+				'_error -> accountForm.globalError
+			)
+			@inputText(
+				accountForm("email"),
+				'class -> "form-control",
+				'_label -> "Email *",
+				'_error -> accountForm.globalError
+			)
+			@select(
+				accountForm("role"),
+				options(AccountRole.selectOptions()),
+				'class -> "form-control",
+				'_label -> "Rolle *"
+			)
+			
+			@inputPassword(
+				accountForm("password"),
+				'class -> "form-control",
+				'_label -> "Passwort *",
+				'_help -> "A password must be at least 6 characters."
+			)
+			@inputPassword(
+				accountForm("repeatPassword"),
+				'class -> "form-control", 
+				'_label -> "Passwort wiederholen *",
+				'_error -> accountForm.error("password")
+			)	
+		</dl>
+		<div class="pull-right">
+			<button type="submit" id="submitSignup" class="btn btn-warning">Speichern</button>
+		</div>
+	}
+
+}

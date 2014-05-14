@@ -1,0 +1,24 @@
+.loading {
+	background-image: url(../images/loading.gif);
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+	margin-right: 8px;
+	background-size: 100%;
+	display: none;
+}
+
+.loading#loadingMedia{
+	vertical-align: top;
+}
+
+#loading-active {
+	background-image: url(../images/loading.gif);
+	width: 16px;
+	height: 16px;
+	background-size: 100%;
+}
+
+#fileupload-status {
+	display: none;
+}

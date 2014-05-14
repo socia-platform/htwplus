@@ -1,0 +1,11 @@
+.prettyFile > input {
+    display: none !important;
+}
+
+.prettyFile .form-control {
+    cursor: pointer;
+}
+
+.prettyFile {
+    width:100%;
+}

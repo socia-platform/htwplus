@@ -1,0 +1,124 @@
+@(title: String)(content: Html)
+@defining(Component.currentAccount()) { user =>
+
+<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<title>HTWplus | @title</title>
+		<!-- Bootstrap -->
+		<link rel="stylesheet" href="@routes.Assets.at("bootstrap/css/bootstrap.min.css")">
+		<!-- Own -->
+		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/background.css")">
+		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/bootstrap-prettyfile.css")">
+		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/ajax.css")">
+		<link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.ico")">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	</head>
+	
+@if(user == null){
+	<body id="hp-landingpage">
+} else {
+	<body>
+}
+	
+	@if(user != null){
+		@views.html.snippets.navi()
+	}
+
+		<div class="container">
+		
+			<div class="row">
+				<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
+				@if(user != null){
+						@views.html.snippets.breadcrumb()
+				}
+				@if(flash.containsKey("success")) {
+					<div class="alert alert-success fade in">
+						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+						@flash.get("success")
+					</div>
+				} 
+				@if(flash.containsKey("info")) {
+					<div class="alert alert-info fade in">
+						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+						@flash.get("info")
+					</div>
+				} 
+				@if(flash.containsKey("error")) {
+					<div class="alert alert-danger fade in">
+						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+						@flash.get("error")
+					</div>
+				}
+					<div id="hp-right">
+						<div id="hp-topRight"></div>
+						<div id="hp-bottomRight"></div>
+						<div id="hp-left">
+							<div id="hp-topLeft"></div>
+							<div id="hp-bottomLeft"></div>
+							<div id="hp-top">
+								<div id="hp-bottom">
+									<div id="hp-content">
+										<a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
+											<span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
+											<div class="hp-easy-feedback">Feedback</div>
+										</a>
+			                  				@content
+									</div> <!-- /content -->
+								</div> <!-- /bottom -->
+							</div> <!-- /top -->
+						</div> <!-- /left -->
+					</div> <!-- /right -->
+				</div> <!-- /col-xs-9 -->
+			</div> <!-- /row -->
+		</div> <!-- /container -->
+	
+		<footer>
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
+						<div id="hp-footer">
+							<div id="hp-footer-links">
+								<a href="@routes.Application.index()" data-toggle="modal">Home</a> |
+								<a href="#impressumModal" data-toggle="modal">Impressum</a> |
+								<a href="#datenschutzModal" data-toggle="modal">Datenschutz</a> |
+								<a href="@routes.Application.feedback()">Feedback</a> |
+								<a href="@routes.Application.feedback()">Kontakt</a> |
+								<a href="@routes.Application.help()">Hilfe</a>
+							</div>
+							<div id="hp-footer-logo"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			@views.html.snippets.impressumModal()
+			@views.html.snippets.datenschutzModal()
+		</footer>
+	
+		<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.js")"></script>
+		<script type="text/javascript" src="@routes.Assets.at("bootstrap/js/bootstrap.min.js")"></script>
+		<script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+	    <script type="text/javascript" src="@routes.Assets.at("javascripts/ajax.js")"></script>
+	    
+	    @if(user != null){
+	    	<script type="text/javascript" src="@routes.Assets.at("javascripts/notification.js")"></script>
+	    }
+	    
+		<script type="text/javascript" src="@routes.Assets.at("javascripts/application.js")"></script>
+		<script type="text/javascript" src="@routes.Assets.at("javascripts/bootstrap-prettyfile.js")"></script>
+
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+			
+			ga('create', 'UA-46901154-1', 'htw-berlin.de');
+			ga('send', 'pageview');
+		</script>
+
+	</body>
+</html>
+
+}

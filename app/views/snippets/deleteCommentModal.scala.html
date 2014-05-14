@@ -1,0 +1,18 @@
+@(commentId: Long)
+<div class="modal fade" id="confirmModalDeleteComment@commentId" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="confirmModalLabel">Kommentar löschen</h4>
+			</div>
+			<div class="modal-body">
+				Möchtest du diesen Kommentar wirklich löschen?
+			</div>
+			<div class="modal-footer">
+				<a type="button" href="@routes.PostController.deletePost(commentId)" class="btn btn-warning">Ja</a>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Nein</button>
+			</div>
+		</div>
+	</div>
+</div>
