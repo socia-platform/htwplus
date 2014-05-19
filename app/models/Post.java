@@ -40,8 +40,7 @@ public class Post extends BaseModel {
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
-
+		updatedAt();
 	}
 
 	@Override
@@ -102,7 +101,7 @@ public class Post extends BaseModel {
 	@SuppressWarnings("unchecked")
 	public static List<Post> findStreamForAccount(Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor, int limit, int offset){
 		
-		Query query = streamForAccount("SELECT p ", account, groupList, friendList, isVisitor, " ORDER BY p.id DESC");
+		Query query = streamForAccount("SELECT p ", account, groupList, friendList, isVisitor, " ORDER BY p.updatedAt DESC");
 
 		// set limit and offset
 		query = limit(query, limit, offset);

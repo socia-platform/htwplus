@@ -22,12 +22,12 @@ public abstract class BaseModel{
 	public Date updatedAt;
 		
 	@PrePersist
-	void createdAt() {
+	protected void createdAt() {
 		this.createdAt = this.updatedAt = new Date();
 	}
 
 	@PreUpdate
-	void updatedAt() {
+	protected void updatedAt() {
 		this.updatedAt = new Date();
 	}
 	
