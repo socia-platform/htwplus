@@ -159,10 +159,10 @@ public class Notification extends BaseModel {
 		
     	try{
     		note = (Notification) JPA.em()
-					.createQuery("from Notification n where n.noteType = :type AND n.account.id = :account AND n.objectId = :object")
+					.createQuery("from Notification n where n.noteType = :type AND n.account.id = :account AND n.objectId = :object_id")
 					.setParameter("type", type)
 					.setParameter("account", account.id)
-					.setParameter("object", objectId)
+					.setParameter("object_id", objectId)
 					.getSingleResult();
     		note.updatedAt = new Date();
     		note.update();
