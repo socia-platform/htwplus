@@ -1,14 +1,14 @@
 HTWplus
 =====================================
 
-How to start a local instance
+**How to start a local instance**
 
-preparations
+**preparations**
 - install git
 - install play 2.2.3
-- install postgresql oder mysql database
+- install postgresql or mysql database
 
-setup
+**setup**
 - clone htwplus repository
 - rename conf/application.sample.conf to application.conf
 - rename conf/META-INF/persistence.sample.xml to persistence.xml
@@ -17,7 +17,7 @@ setup
 - edit persistence.xml
   - if you are running a unix based OS, change 'hibernate.search.default.indexBase' value to an absolute path
 
-start htwplus
+**start htwplus**
 - open a shell
 - navigate to repository
 - type 'play run'
