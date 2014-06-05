@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.Date;
 import java.util.List;
 
 import controllers.Navigation.Level;
@@ -132,6 +133,9 @@ public class PostController extends BaseController {
 			post.owner = account;
 			post.parent = parent;
 			post.create();
+			// update parent to move it to the top
+			parent.update();
+			
 			if(parent.belongsToGroup()) {
 				Notification.newPostNotification(NotificationType.POST_GROUP_NEW_COMMENT, parent, account);
 			}
@@ -143,6 +147,7 @@ public class PostController extends BaseController {
 					Notification.newNotification(NotificationType.POST_MY_PROFILE_NEW_COMMENT, parent.id, parent.account);
 				}				
 			}
+			
 			return ok(views.html.snippets.postComment.render(post));
 		}
 	}
