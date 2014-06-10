@@ -169,7 +169,8 @@ $(document).ready(function () {
 	 */
 	
 	$('.hp-truncate').each(function(){
-		$(this).html(Autolinker.link($(this).text(),{ twitter: false }));
+		var postContent = document.getElementById( $(this).attr('id') );
+		postContent.innerHTML = Autolinker.link(postContent.innerHTML, {twitter: false});
 	});
 	
 });
