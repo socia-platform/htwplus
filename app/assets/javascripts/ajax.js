@@ -164,12 +164,4 @@ $(document).ready(function () {
 	 * END GROUP COMMENTS
 	 */
 	
-	/*
-	 * generate clickable links from post.content
-	 */
-	$('.hp-truncate').each(function(){
-		$(this).html(Autolinker.link($(this).text(),{ twitter: false }));
-	});
-
-	
 });
