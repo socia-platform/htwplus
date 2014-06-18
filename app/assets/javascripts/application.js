@@ -58,5 +58,15 @@ $(document).ready(function () {
 		
 	});
 	
+	/*
+	 * generate clickable links for post and comments
+	 */
+	
+	$('.hp-truncate').each(function(){
+		var postContent = document.getElementById( $(this).attr('id') );
+		postContent.innerHTML = Autolinker.link(postContent.innerHTML, { twitter: false, email: true, className: "hp-postLink", stripPrefix: false, truncate: 50 });
+	});
+
+	
 });
 
