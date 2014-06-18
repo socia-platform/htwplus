@@ -52,9 +52,8 @@ public class Media extends BaseModel {
 		if(media == null) {
 			return null;
 		}
-	    String path = Play.application().path().toString();
-	    String relPath = Play.application().configuration().getString("media.relativePath");
-		media.file = new File(path + "/" + relPath + "/" + media.url);
+        String path = Play.application().configuration().getString("media.path");
+		media.file = new File(path + "/" + media.url);
 		if(media.file.exists()) {
 			return media;
 		} else {
@@ -109,9 +108,8 @@ public class Media extends BaseModel {
 	}
 	
 	private void deleteFile() throws FileNotFoundException{
-		String path = Play.application().path().toString();
-		String relPath = Play.application().configuration().getString("media.relativePath");
-		File file = new File(path + "/" + relPath + "/" + this.url);
+        String path = Play.application().configuration().getString("media.path");
+		File file = new File(path + "/" + this.url);
 		if (file.exists()) {
 			file.delete();
 		} else {
@@ -120,9 +118,8 @@ public class Media extends BaseModel {
 	}
 	
 	private void createFile() throws Exception {
-	    String path = Play.application().path().toString();
-	    String relPath = Play.application().configuration().getString("media.relativePath");
-	    File newFile = new File(path + "/" + relPath + "/" + this.url);
+        String path = Play.application().configuration().getString("media.path");
+	    File newFile = new File(path + "/" + this.url);
 	    if(newFile.exists()){
 	    	throw new Exception("File exists already");
 	    }
