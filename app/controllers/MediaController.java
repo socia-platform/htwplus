@@ -124,9 +124,8 @@ public class MediaController extends BaseController {
     private static File createZIP(List<Media> media, String fileName) throws IOException {
     	
        	//cleanUpTemp(); // JUST FOR DEVELOPMENT, DO NOT USE IN PRODUCTION
-	    String path = Play.application().path().toString();
 	    String tmpPath = Play.application().configuration().getString("media.tempPath");
-    	File file = File.createTempFile(tempPrefix, ".tmp", new File(path + "/" + tmpPath));
+    	File file = File.createTempFile(tempPrefix, ".tmp", new File(tmpPath));
     	
     	ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(file));
     	zipOut.setLevel(Deflater.NO_COMPRESSION);
@@ -154,9 +153,8 @@ public class MediaController extends BaseController {
      * Size of temporary media directoy used for ZIP Downloads
      */
     public static long sizeTemp() {
-	    String path = Play.application().path().toString();
 	    String tmpPath = Play.application().configuration().getString("media.tempPath");
-	    File dir = new File(path + "/" + tmpPath);
+	    File dir = new File(tmpPath);
 	    return FileUtils.sizeOfDirectory(dir);
     }
     
@@ -165,10 +163,9 @@ public class MediaController extends BaseController {
      */
     public static void cleanUpTemp() {
 	    Logger.info("Cleaning the Tempory Media Directory");
-    	
-	    String path = Play.application().path().toString();
+
 	    String tmpPath = Play.application().configuration().getString("media.tempPath");
-	    File dir = new File(path + "/" + tmpPath);
+	    File dir = new File(tmpPath);
 	    Logger.info("Directory: " + dir.toString());
 	    File[] files = dir.listFiles();
 	    Logger.info("Absolut Path: " + dir.getAbsolutePath());
