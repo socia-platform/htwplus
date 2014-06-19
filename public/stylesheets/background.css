@@ -489,6 +489,12 @@ div.hp-pagination {
 	color: #0082D1;
 }
 
+.hp-postLink .glyphicon {
+    color: inherit;
+    text-decoration: inherit;
+    top: 0;
+}
+
 /*============================== Avatare ==============================*/
 
 #hp-avatars img {
