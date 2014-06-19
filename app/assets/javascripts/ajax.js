@@ -1,5 +1,5 @@
 $(document).ready(function () {
-	
+
 	/*
 	 * AJAX loading indicator
 	 */
@@ -111,6 +111,7 @@ $(document).ready(function () {
 					success: function(data){
 						context.before(data);
 						context[0].reset();
+						autolinkUrls();
 					}
 				});
 			}
