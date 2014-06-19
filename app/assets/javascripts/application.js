@@ -26,6 +26,23 @@ function toggleMediaSelection(parent) {
 	}
 }
 
+function autolinkUrls() {
+    $('.hp-truncate').each(function(){
+		var postContent = document.getElementById( $(this).attr('id') );
+		postContent.innerHTML = Autolinker.link(postContent.innerHTML, {
+		    twitter: false,
+		    email: true,
+		    className: "hp-postLink",
+		    stripPrefix: false,
+		    truncate: 50
+		});
+	});
+	$('.hp-postLink').each(function(){
+        if (!$(this).find("span").length)
+    	    $(this).append(" <span class='glyphicon glyphicon-share-alt'></span>");
+	})
+}
+
 $(window).resize(function() {
 	resizeRings();
 });
@@ -62,10 +79,7 @@ $(document).ready(function () {
 	 * generate clickable links for post and comments
 	 */
 	
-	$('.hp-truncate').each(function(){
-		var postContent = document.getElementById( $(this).attr('id') );
-		postContent.innerHTML = Autolinker.link(postContent.innerHTML, { twitter: false, email: true, className: "hp-postLink", stripPrefix: false, truncate: 50 });
-	});
+	autolinkUrls();
 
 	
 });
