@@ -568,3 +568,41 @@ table .hp-avatar {
 #fileupload-status {
 	display: none;
 }
+
+/*============================== Options Menu ==============================*/
+
+.hp-optionsMenu {
+    overflow: visible;
+}
+
+.hp-optionsMenu .dropdown-menu {
+    background-color: #5a5858;
+    color: white;
+    opacity: 0.93;
+    padding: 8px 13px;
+}
+
+.hp-optionsMenu .dropdown-menu a {
+    background-color: #5a5858;
+    color: white;
+    text-align: center;
+    font-size: 11px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.hp-optionsMenu .dropdown-menu a>.glyphicon {
+    font-size: 15px;
+    color: inherit;
+}
+
+.hp-optionsMenu .dropdown-menu a:hover,
+.hp-optionsMenu .dropdown-menu a:focus {
+    background-color: inherit;
+    color: #76B900;
+}
+
+.hp-optionsMenu .open>.dropdown-menu {
+    display: flex;
+}
+

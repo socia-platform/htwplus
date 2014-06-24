@@ -7,14 +7,14 @@
 		<col width="28px">
 		<col width="52%">
 		<col width="30%">
-		<col width="15%">
+		<col width="28px">
 	</colgroup>
 	<thead>
 		<tr>
 			<th></th>
 			<th>Gruppenname</th>
 			<th>Erstellt von</th>
-			<th>Optionen</th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -38,7 +38,8 @@
 			<td>
 				@views.html.snippets.userLink(group.owner)
 			</td>
-			<td>
+			<td class="hp-optionsMenu">
+                <!--
 				<a href="#infoModal@group.id" rel="tooltip" data-toggle="modal" data-original-title="Info ansehen" data-container="body">
 					<i class="glyphicon glyphicon-info-sign"></i>
 				</a>
@@ -67,7 +68,50 @@
 							<a href="@routes.GroupController.join(group.id)" rel="tooltip" data-original-title="Anfrage zum Beitritt senden" data-container="body"> <span class="glyphicon glyphicon-envelope"></span>
 						}
 					</a>
-				  }
+				}
+				-->
+                <div class="dropdown">
+                    <a class="dropdown-toggle" type="button" id="dropdownMenu" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-collapse-down"></span>
+                    </a>
+                    <ul class="dropdown-menu pull-right nav-pills" role="menu" aria-labelledby="dropdownMenu">
+                        <li><a href="#infoModal@group.id" data-toggle="modal">
+                            <span class="glyphicon glyphicon-info-sign"></span><br>Info
+                        </a></li>
+                        @if(Secured.isMemberOfGroup(group, Component.currentAccount)) {
+                            <li><a href="@routes.GroupController.view(group.id)" data-toggle="modal">
+                                <span class="glyphicon glyphicon-comment"></span><br>Newsstream
+                            </a></li>
+                            <li><a href="@routes.GroupController.media(group.id)" data-toggle="modal">
+                                <span class="glyphicon glyphicon-file"></span><br>Medien
+                            </a></li>
+                        }
+                        @if(Secured.isOwnerOfGroup(group, user)) {
+                            <li><a href="@routes.GroupController.edit(group.id)" data-toggle="modal">
+                                <span class="glyphicon glyphicon-pencil"></span><br>Bearbeiten
+                            </a></li>
+                            <li><a href="#confirmDeleteGroup@group.id" data-toggle="modal">
+                                <span class="glyphicon glyphicon-trash"></span><br>Löschen
+                            </a></li>
+                        }
+                        @if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
+                            <li><a href="@routes.GroupController.removeMember(group.id, user.id)" data-toggle="modal">
+                                <span class="glyphicon glyphicon-remove"></span><br>Verlassen
+                            </a></li>
+                        }
+                        @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
+                            @if(group.groupType.equals(GroupType.open)) {
+                                <li><a href="@routes.GroupController.join(group.id)">
+                                    <span class="glyphicon glyphicon-ok"></span><br>Beitreten
+                                </a></li>
+                            } else {
+                                <li><a href="@routes.GroupController.join(group.id)">
+                                    <span class="glyphicon glyphicon-envelope"></span>Beitrittsanfrage
+                                </a></li>
+                            }
+                        }
+                    </ul>
+                </div>
 			</td>
 		</tr>
 		}
