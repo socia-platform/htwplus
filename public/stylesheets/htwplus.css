@@ -213,6 +213,14 @@ h1 {
 	color: #5a5858;
 }
 
+.hp-nav-tabs li.active>a {
+    box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.125);
+}
+
+.hp-nav-tabs li.deactive>a {
+    border-bottom-color: #dddddd;
+}
+
 /*============================== Logo ==============================*/
 
 .hp-logo {
@@ -606,3 +614,6 @@ table .hp-avatar {
     display: flex;
 }
 
+.hp-optionsMenu .dropdown-toggle {
+    cursor: pointer;
+}
