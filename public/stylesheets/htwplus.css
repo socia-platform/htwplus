@@ -581,6 +581,7 @@ table .hp-avatar {
 
 .hp-optionsMenu {
     overflow: visible;
+    padding: 0!important;
 }
 
 .hp-optionsMenu .dropdown-menu {
@@ -616,4 +617,10 @@ table .hp-avatar {
 
 .hp-optionsMenu .dropdown-toggle {
     cursor: pointer;
+}
+
+.hp-optionsMenu .dropdown-toggle > span {
+    width: 100%;
+    text-align: center;
+    line-height: 31px;
 }
