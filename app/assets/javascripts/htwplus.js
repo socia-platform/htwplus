@@ -50,10 +50,15 @@ $(window).resize(function() {
 
 // toggle options menu glyphicon
 $('.hp-optionsMenu>div').on('shown.bs.dropdown', function() {
-    $(this).find('.dropdown-toggle>span').removeClass('glyphicon-collapse-down').addClass('glyphicon-collapse-up');
+    $(this).find('.dropdown-toggle>span').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
 });
 $('.hp-optionsMenu>div').on('hidden.bs.dropdown', function() {
-    $(this).find('.dropdown-toggle>span').removeClass('glyphicon-collapse-up').addClass('glyphicon-collapse-down');
+    $(this).find('.dropdown-toggle>span').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+});
+//$(".hp-optionsTable>tr").on("mouseup", function(e) {
+$(".hp-optionsTable>tr").bind("contextmenu", function (e) {
+    e.preventDefault();
+    $(this).find('.hp-optionsMenu .dropdown-toggle').trigger("click");
 });
 
 $(document).ready(function () {
