@@ -489,6 +489,13 @@ div.hp-pagination {
 	color: #0082D1;
 }
 
+.hp-postLink .glyphicon,
+.hp-postLink .glyphicon:hover {
+    color: inherit;
+    text-decoration: inherit;
+    top: 0;
+}
+
 /*============================== Avatare ==============================*/
 
 #hp-avatars img {
@@ -533,4 +540,31 @@ table .hp-avatar {
 
 #token-input {
 	display:none;
+}
+
+/*============================== Ajax ==============================*/
+
+.loading {
+	background-image: url(../images/loading.gif);
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+	margin-right: 8px;
+	background-size: 100%;
+	display: none;
+}
+
+.loading#loadingMedia{
+	vertical-align: top;
+}
+
+#loading-active {
+	background-image: url(../images/loading.gif);
+	width: 16px;
+	height: 16px;
+	background-size: 100%;
+}
+
+#fileupload-status {
+	display: none;
 }

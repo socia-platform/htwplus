@@ -5,12 +5,9 @@
 <html lang="de">
 	<head>
 		<title>HTWplus | @title</title>
-		<!-- Bootstrap -->
 		<link rel="stylesheet" href="@routes.Assets.at("bootstrap/css/bootstrap.min.css")">
-		<!-- Own -->
-		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/background.css")">
+		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/htwplus.css")">
 		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/bootstrap-prettyfile.css")">
-		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/ajax.css")">
 		<link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.ico")">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -96,19 +93,16 @@
 			@views.html.snippets.datenschutzModal()
 		</footer>
 	
-		<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.js")"></script>
-		<script type="text/javascript" src="@routes.Assets.at("bootstrap/js/bootstrap.min.js")"></script>
 		<script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+        <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.js")"></script>
+        <script type="text/javascript" src="@routes.Assets.at("bootstrap/js/bootstrap.min.js")"></script>
 		<script type="text/javascript" src="@routes.Assets.at("javascripts/Autolinker.min.js")"></script>
-	    <script type="text/javascript" src="@routes.Assets.at("javascripts/ajax.js")"></script>
-	    
-	    @if(user != null){
-	    	<script type="text/javascript" src="@routes.Assets.at("javascripts/notification.js")"></script>
-	    }
-	    
-		<script type="text/javascript" src="@routes.Assets.at("javascripts/application.js")"></script>
-		<script type="text/javascript" src="@routes.Assets.at("javascripts/bootstrap-prettyfile.js")"></script>
+		<script type="text/javascript" src="@routes.Assets.at("javascripts/htwplus.js")"></script>
+        <script type="text/javascript" src="@routes.Assets.at("javascripts/bootstrap-prettyfile.js")"></script>
 
+        @if(user != null){
+            <script type="text/javascript" src="@routes.Assets.at("javascripts/notification.js")"></script>
+        }
 		<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
