@@ -55,10 +55,14 @@ $('.hp-optionsMenu>div').on('shown.bs.dropdown', function() {
 $('.hp-optionsMenu>div').on('hidden.bs.dropdown', function() {
     $(this).find('.dropdown-toggle>span').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
 });
-//$(".hp-optionsTable>tr").on("mouseup", function(e) {
 $(".hp-optionsTable>tr").bind("contextmenu", function (e) {
     e.preventDefault();
     $(this).find('.hp-optionsMenu .dropdown-toggle').trigger("click");
+});
+$(".hp-optionsTable>tr>td:not(.hp-optionsMenu)").on("click", function(e) {
+    e.preventDefault();
+    $(this).parent().trigger('contextmenu');
+    return false;
 });
 
 $(document).ready(function () {
