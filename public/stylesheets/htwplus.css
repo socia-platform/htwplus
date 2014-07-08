@@ -4,7 +4,7 @@
 
 body {
 	margin-top: 70px;
-	overflow-y: scroll;
+	overflow-x: hidden;
 }
 
 body#hp-landingpage {
@@ -614,6 +614,7 @@ table .hp-avatar {
     background-color: #5a5858;
     color: white;
     opacity: 0.93;
+    margin-top: -2px;
     padding: 8px 13px;
     float: none;
     right: 54px;

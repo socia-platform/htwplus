@@ -46,16 +46,12 @@ function autolinkUrls() {
 /*
  *  Options Menu
  */
-function positionOptionsMenu(parent) {
-    var menu = $(parent).find('ul.dropdown-menu');
-    var top = $(parent).offset().top + $(parent).height() - $('#hp-right').offset().top;
-    menu.css('top', top + 'px');
-}
-
-$('.hp-optionsMenu>div').one('shown.bs.dropdown', positionOptionsMenu('.hp-optionsMenu>div'));
-
 $('.hp-optionsMenu>div').on('shown.bs.dropdown', function() {
     $(this).find('.dropdown-toggle>span').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+    var menu = $(this).find('ul.dropdown-menu');
+    var row = $(this).parents('tr');
+    var top = row.offset().top + row.height() - $('#hp-right').offset().top;
+    menu.css('top', top + 'px');
 });
 
 $('.hp-optionsMenu>div').on('hidden.bs.dropdown', function() {
@@ -177,7 +173,6 @@ $(document).ready(function () {
 
 $(window).resize(function() {
 	resizeRings();
-	$('.hp-optionsMenu>div').one('shown.bs.dropdown', positionOptionsMenu('.hp-optionsMenu>div'));
 });
 
 resizeRings();
