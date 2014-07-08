@@ -48,7 +48,12 @@ $(window).resize(function() {
 });
 
 
-// toggle options menu glyphicon
+// options menu
+$('.hp-optionsMenu>div').one('shown.bs.dropdown', function() {
+    var menu = $(this).find('ul.dropdown-menu');
+    var top = $(this).offset().top + $(this).height() - $('#hp-right').offset().top;
+    menu.css('top', top + 'px');
+});
 $('.hp-optionsMenu>div').on('shown.bs.dropdown', function() {
     $(this).find('.dropdown-toggle>span').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
 });
