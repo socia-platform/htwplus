@@ -483,6 +483,7 @@ div.hp-pagination {
 
 .hp-comments {
 	margin-left: 50px;
+	margin-bottom: -15px;
 }
 
 .hp-comment-form {
@@ -614,11 +615,15 @@ table .hp-avatar {
     background-color: #5a5858;
     color: white;
     opacity: 0.93;
-    margin-top: -2px;
+    margin-top: 0;
     padding: 8px 13px;
     float: none;
     right: 54px;
     left: auto;
+}
+
+.hp-optionsMenu .dropdown {
+    position: inherit;          /* dropdown-menu must be positioned absolute to the content */
 }
 
 .hp-optionsMenu .open>.dropdown-menu {
@@ -649,7 +654,7 @@ table .hp-avatar {
     padding-right: 10px;
 }
 
-.hp-optionsMenu .dropdown-menu a>.glyphicon {
+.hp-optionsMenu .dropdown-menu a > .glyphicon {
     font-size: 15px;
     color: inherit;
 }
@@ -664,12 +669,16 @@ table .hp-avatar {
     cursor: pointer;
 }
 
-.hp-optionsMenu .dropdown-toggle > span {
+.hp-optionsMenu .dropdown-toggle > .glyphicon {
     width: 100%;
     text-align: center;
     line-height: 31px;
 }
 
-.hp-optionsMenu .dropdown {
-    position: inherit;          /* dropdown-menu must be positioned absolute to the content */
+.hp-optionsMenu .dropdown-toggle > .glyphicon-chevron-up {
+    color: #76B900;
+}
+
+.hp-optionsTable > tr:hover .dropdown-toggle > .glyphicon {
+    color: #76B900
 }
