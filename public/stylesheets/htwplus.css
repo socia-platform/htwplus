@@ -376,8 +376,8 @@ div#hp-content {
 
 @media (max-width: 767px) {
     div#hp-content {
-        padding-right: 0;
-        padding-left: 0;
+        padding-right: 5px;
+        padding-left: 5px;
     }
 }
 
@@ -484,6 +484,12 @@ div.hp-pagination {
 .hp-comments {
 	margin-left: 50px;
 	margin-bottom: -15px;
+}
+
+@media (max-width: 767px) {
+    .hp-comments {
+        margin-left: 15px;
+    }
 }
 
 .hp-comment-form {
