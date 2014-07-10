@@ -29,13 +29,15 @@ function toggleMediaSelection(parent) {
 function autolinkUrls() {
     $('.hp-truncate').each(function(){
 		var postContent = document.getElementById( $(this).attr('id') );
-		postContent.innerHTML = Autolinker.link(postContent.innerHTML, {
-		    twitter: false,
-		    email: true,
-		    className: "hp-postLink",
-		    stripPrefix: false,
-		    truncate: 50
-		});
+        if (postContent != undefined) {
+            postContent.innerHTML = Autolinker.link(postContent.innerHTML, {
+                twitter: false,
+                email: true,
+                className: "hp-postLink",
+                stripPrefix: false,
+                truncate: 50
+            });
+        }
 	});
 	$('.hp-postLink').each(function(){
         if (!$(this).find("span").length)

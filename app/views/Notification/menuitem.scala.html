@@ -1,4 +1,4 @@
-@(notification:List[Notification])
+@(notification:List[Notification], inclHistory: Boolean = false)
 
 @defining(notification.size()) { countNotification =>
 <li class="dropdown" id="hp-notification-item">
@@ -20,7 +20,12 @@
           @if(countNotification > 0) {
           			@list(notification)
           } else {
-          			<li class="hp-notification">Nichts neues passiert</li>
+             <li class="hp-notification">Nichts neues passiert</li>
+          }
+          @if(inclHistory) {
+             <li><a href="#" id="hp-show-notification-unread"><b>Zeige nur neue Nachrichten</b></a></li>
+          } else {
+             <li><a href="#" id="hp-show-notification-history"><b>Zeige alle Nachrichten</b></a></li>
           }
          </ul>
 </li>

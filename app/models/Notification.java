@@ -3,12 +3,7 @@ package models;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NoResultException;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 import models.base.BaseModel;
 import models.enums.GroupType;
@@ -57,6 +52,9 @@ public class Notification extends BaseModel {
 	
 	@Column(name = "object_id")
 	public Long objectId;
+
+    @Column(name = "read")
+    public boolean notificationRead;
 	
 	public static Notification findById(Long id) {
 		return JPA.em().find(Notification.class, id);
@@ -69,8 +67,9 @@ public class Notification extends BaseModel {
 			notf.account = recipient;
 			notf.noteType = type;
 			notf.objectId = objectId;
-			notf.create();
-			Logger.info("Created new Notification for User: " + recipient.id.toString());
+            notf.notificationRead = false;
+            notf.create();
+            Logger.info("Created new Notification for User: " + recipient.id.toString());
 		}
 	}
 	
@@ -112,8 +111,9 @@ public class Notification extends BaseModel {
 					notf.account = account;
 					notf.noteType = type;
 					notf.objectId = group.id;
-					notf.create();
-					Logger.info("Created new Notification for User: " + account.id.toString());
+                    notf.notificationRead = false;
+                    notf.create();
+                    Logger.info("Created new Notification for User: " + account.id.toString());
 				}
 			}
 		}
@@ -123,14 +123,13 @@ public class Notification extends BaseModel {
 	public static void newPostNotification(NotificationType noteType, Post post, Account sender){
 		Group group = post.group;
 		List<Account> accounts =  GroupAccount.findAccountsByGroup(group, LinkType.establish);
-		NotificationType type = noteType;
 		
 		for (Account account : accounts) {
 			if(!account.equals(sender)){
-				if(Notification.findUnique(type, account, post.id) == null) {
+				if(Notification.findUnique(noteType, account, post.id) == null) {
 					Notification notf = new Notification();
 					notf.account = account;
-					notf.noteType = type;
+					notf.noteType = noteType;
 					notf.objectId = post.id;
 					notf.create();
 					Logger.info("Created new Notification for User: " + account.id.toString());
@@ -141,10 +140,10 @@ public class Notification extends BaseModel {
 		// Inform Author of Post, even when not in Group
 		if(group.groupType == GroupType.open && !Group.isMember(group, post.owner)) {
 			if(!post.owner.equals(sender)){
-				if(Notification.findUnique(type, post.owner, post.id) == null) {
+				if(Notification.findUnique(noteType, post.owner, post.id) == null) {
 					Notification notf = new Notification();
 					notf.account = post.owner;
-					notf.noteType = type;
+					notf.noteType = noteType;
 					notf.objectId = post.id;
 					notf.create();
 					Logger.info("Created new Notification for User: " + post.owner.id.toString());
@@ -155,8 +154,7 @@ public class Notification extends BaseModel {
 	}
 	
 	public static Notification findUnique(NotificationType type, Account account, Long objectId) {
-		Notification note = null;
-		
+		Notification note;
     	try{
     		note = (Notification) JPA.em()
 					.createQuery("from Notification n where n.noteType = :type AND n.account.id = :account AND n.objectId = :object_id")
@@ -165,6 +163,7 @@ public class Notification extends BaseModel {
 					.setParameter("object_id", objectId)
 					.getSingleResult();
     		note.updatedAt = new Date();
+            note.notificationRead = false;
     		note.update();
 	    } catch (NoResultException exp) {
 	    	return null;
@@ -180,11 +179,25 @@ public class Notification extends BaseModel {
 				.setParameter("account", account.id)
 				.getResultList();
 	}
-	
+
+    @SuppressWarnings("unchecked")
+    public static List<Notification> findUnreadByUser(Account account) {
+        return (List<Notification>) JPA.em()
+                .createQuery("FROM Notification n WHERE n.account.id = :account AND n.notificationRead = false ORDER BY n.updatedAt DESC")
+                .setParameter("account", account.id)
+                .getResultList();
+    }
+
+    @SuppressWarnings("unused")
 	public static void deleteByUser(Account account) {
 		JPA.em().createQuery("DELETE FROM Notification n WHERE n.account.id = :account")
 				.setParameter("account", account.id).executeUpdate();
 	}
+
+    public static void markAllAsReadByUser(Account account) {
+        JPA.em().createQuery("UPDATE Notification n SET notificationRead = true WHERE n.account.id = :account")
+                .setParameter("account", account.id).executeUpdate();
+    }
 	
 	public static void deleteByObject(Long objectId) {
 		JPA.em().createQuery("DELETE FROM Notification n WHERE n.objectId = :object_id")
@@ -205,13 +218,12 @@ public class Notification extends BaseModel {
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
-		
+        JPA.em().persist(this);
 	}
 
 	@Override
 	public void delete() {
 		JPA.em().remove(this);
 	}
-	
+
 }

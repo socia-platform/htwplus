@@ -9,7 +9,7 @@ $(document).ready(function () {
 				if($("#hp-notification-item").hasClass("open")){
 					setOpen = true;
 				}
-				$("#hp-notification-item").replaceWith(data)
+				$("#hp-notification-item").replaceWith(data);
 				
 				if(setOpen == true) {
 					$("#hp-notification-item").addClass("open");
@@ -18,6 +18,25 @@ $(document).ready(function () {
 			}
 		});
 	}
+
+    function loadHistoryNotifications()  {
+        $.ajax({
+            url: "/notification/view_history",
+            type: "GET",
+            success: function(data){
+                var setOpen = false;
+                if($("#hp-notification-item").hasClass("open")){
+                    setOpen = true;
+                }
+                $("#hp-notification-item").replaceWith(data);
+
+                if(setOpen == true) {
+                    $("#hp-notification-item").addClass("open");
+                }
+
+            }
+        });
+    }
 	
 	function deleteNotifications() {
 		$.ajax({
@@ -34,6 +53,18 @@ $(document).ready(function () {
 		deleteNotifications();
 		return false;
 	});
+
+    $('body').on("click", "#hp-show-notification-history", function() {
+            loadHistoryNotifications();
+            return false;
+        }
+    );
+
+    $('body').on("click", "#hp-show-notification-unread", function() {
+            reloadNotifications();
+            return false;
+        }
+    );
 	
 	setInterval( reloadNotifications, 30000 );
 	

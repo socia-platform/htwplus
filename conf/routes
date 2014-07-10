@@ -76,6 +76,7 @@ GET 	/media/:id/delete					controllers.MediaController.delete(id:Long)
 #Notification
 GET		/notification/delete				controllers.NotificationController.deleteAll()
 GET		/notification/view					controllers.NotificationController.viewAjax()
+GET		/notification/view_history			controllers.NotificationController.viewHistoryAjax()
 GET		/notification/:id					controllers.NotificationController.forward(id:Long,url:String)
 
 # Map static resources from the /public folder to the /assets URL path
