@@ -6,9 +6,7 @@ import java.util.Set;
 
 import models.Account;
 import models.Group;
-import models.Notification;
 import models.Post;
-import models.Notification.NotificationType;
 import play.Logger;
 import play.Play;
 import play.Routes;
@@ -34,10 +32,13 @@ public class Application extends BaseController {
 	
 	public static Result javascriptRoutes() {
 		response().setContentType("text/javascript");
-		return ok(Routes.javascriptRouter("jsRoutes",
-				controllers.routes.javascript.GroupController.create(),
-				controllers.routes.javascript.GroupController.update()
-				));
+
+		return ok(
+                Routes.javascriptRouter("jsRoutes",
+				    controllers.routes.javascript.GroupController.create(),
+				    controllers.routes.javascript.GroupController.update()
+				)
+        );
 	}
 	
 	@Security.Authenticated(Secured.class)
@@ -84,8 +85,7 @@ public class Application extends BaseController {
 	@Security.Authenticated(Secured.class)
 	public static Result searchForCourses(final String keyword, int page){
 		Navigation.set("Suchergebnisse für Kurse");
-		List<Group> courses = null;
-		courses = Group.courseSearch(keyword, SEARCH_LIMIT, page);
+		List<Group> courses = Group.courseSearch(keyword, SEARCH_LIMIT, page);
 		return ok(searchresult.render(null, courses, null, keyword, Group.countCourseSearch(keyword), 0, 0, SEARCH_LIMIT, page));
 	}
 
@@ -93,16 +93,14 @@ public class Application extends BaseController {
 	public static Result searchForGroups(final String keyword, int page){
 		Navigation.set("Suchergebnisse für Gruppen");
 		Logger.info("Keyword: " +keyword);
-		List<Group> groups = null;
-		groups = Group.groupSearch(keyword, SEARCH_LIMIT, page);
+		List<Group> groups = Group.groupSearch(keyword, SEARCH_LIMIT, page);
 		return ok(searchresult.render(groups, null, null, keyword, 0, Group.countGroupSearch(keyword), 0, SEARCH_LIMIT, page));
 	}
 	
 	@Security.Authenticated(Secured.class)
 	public static Result searchForAccounts(final String keyword, int page){
 		Navigation.set("Suchergebnisse für Personen");
-		List<Account> accounts = null;
-		accounts = Account.accountSearch(keyword, SEARCH_LIMIT, page);
+		List<Account> accounts = Account.accountSearch(keyword, SEARCH_LIMIT, page);
 		return ok(searchresult.render(null, null, accounts, keyword, 0, 0, Account.countAccountSearch(keyword), SEARCH_LIMIT, page));
 	}
 	
@@ -130,7 +128,7 @@ public class Application extends BaseController {
 		Form<Post> filledForm = postForm.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			flash("error", "Jo, fast. Probiere es noch einmal mit Inhalt ;-)");
-			return redirect(routes.Application.feedback());
+			return redirect(controllers.routes.Application.feedback());
 		} else {
 			Post p = filledForm.get();
 			p.owner = account;
@@ -139,14 +137,14 @@ public class Application extends BaseController {
 			flash("success","Vielen Dank für Dein Feedback!");
 		}
 
-		return redirect(routes.Application.index());
+		return redirect(controllers.routes.Application.index());
 	}
 	
 		
 		
 	public static Result defaultRoute(String path) {
 		Logger.info(path+" nicht gefunden");
-		return redirect(routes.Application.index());
+		return redirect(controllers.routes.Application.index());
 	}
 
 }

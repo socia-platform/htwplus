@@ -7,13 +7,13 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Query;
 
-import models.base.BaseModel;
+import models.base.BaseNotifiable;
+import models.base.INotifiable;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 
 @Entity
-public class Post extends BaseModel {
-	
+public class Post extends BaseNotifiable implements INotifiable {
 	public static String GROUP = "group";
 	public static String PROFILE = "profile";
 	public static String STREAM = "stream";
@@ -77,9 +77,8 @@ public class Post extends BaseModel {
 		
 		int offset = (page * limit) - limit;
 		query = limit(query, limit, offset);
-		
-		List<Post> posts = query.getResultList();
-		return posts;
+
+		return query.getResultList();
 	}
 	
 	public static int countPostsForGroup(Group group) {
@@ -105,21 +104,17 @@ public class Post extends BaseModel {
 
 		// set limit and offset
 		query = limit(query, limit, offset);
-		List<Post> posts = query.getResultList();
-		return posts;
+
+		return query.getResultList();
 	}
 	
-	public static int countStreamForAccount(Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor){
-		
+	public static int countStreamForAccount(Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor) {
 		Query query = streamForAccount("SELECT COUNT(p)", account, groupList, friendList, isVisitor,"");
-		
-		int count = ((Number) query.getSingleResult()).intValue();
-		
-		return count;
+
+		return ((Number) query.getSingleResult()).intValue();
 	}
 	
 	/**
-	 * @author Iven
 	 * @param account - Account (current user, profile or a friend)
 	 * @param groupList - a list containing all groups we want to search in
 	 * @param friendList - a list containing all friends we want to search in
@@ -128,7 +123,7 @@ public class Post extends BaseModel {
 	public static Query streamForAccount(String selectClause, Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor, String orderByClause){
 		
 		// since JPA is unable to handle empty lists (eg. groupList, friendList) we need to assemble our query.
-		String myPostsClause = "";
+		String myPostsClause;
 		String groupListClause = "";
 		String friendListClause = "";
 		String visitorClause = "";
@@ -201,19 +196,16 @@ public class Post extends BaseModel {
 		return Post.countCommentsForPost(this.id);
 	}
 	
-	public boolean belongsToGroup(){
-		if(this.group != null) return true;
-		return false;
+	public boolean belongsToGroup() {
+		return this.group != null;
 	}
 		
-	public boolean belongsToAccount(){
-		if(this.account != null) return true;
-		return false;
+	public boolean belongsToAccount() {
+		return this.account != null;
 	}
 
 	/**
-	 * @author Iven
-	 * @param currentUser - Account (current user)
+	 * @param account Account (current user)
 	 * @return List of Posts
 	 */
 	public static List<Post> getStream(Account account, int limit, int page) {
@@ -227,9 +219,7 @@ public class Post extends BaseModel {
 	
 	
 	/**
-	 * @author Iven
-	 * @param currentUser - Account (current user)
-	 * @return 
+	 * @param account Account (current user)
 	 * @return Number of Posts
 	 */
 	public static int countStream(Account account){
@@ -241,7 +231,6 @@ public class Post extends BaseModel {
 	}
 	
 	/**
-	 * @author Iven
 	 * @param friend - Account (a friends account)
 	 * @return List of Posts
 	 */
@@ -254,9 +243,7 @@ public class Post extends BaseModel {
 	}
 	
 	/**
-	 * @author Iven
 	 * @param friend - Account (a friends account)
-	 * @return 
 	 * @return Number of Posts
 	 */
 	public static int countFriendStream(Account friend){
@@ -265,6 +252,17 @@ public class Post extends BaseModel {
 		
 		return countStreamForAccount(friend, groupList, null, true);
 	}
-	
-	
+
+    @Override
+    public Account getSender() {
+        return this.owner;
+    }
+
+    @Override
+    public List<Account> getRecipients() {
+        // return account if not null, otherwise group
+        return this.belongsToAccount()
+                ? this.getAsAccountList(this.account)
+                : this.getGroupAsAccountList(this.group);
+    }
 }

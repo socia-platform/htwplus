@@ -28,3 +28,12 @@ error.minLength=Minimum length is {0}
 error.maxLength=Maximum length is {0}
 error.email=Bitte eine gültige Adresse eingeben
 error.pattern=Must satisfy {0}
+
+# base model messages
+post.try_with_content=Yeah, close. Try again with content ;-)
+post.join_group_first=Please join a group first.
+post.post_on_stream_only=You can post on your friends stream only!
+post.profile_new_post=New post by <span class="hp-green">{0}</span> on your news stream
+post.profile_read_post=Read post by <span class="hp-green">{0}</span> on your news stream
+post.group_new_post=New message on the news stream of the group <span class="hp-green">{0}</span>
+post.group_read_post=Read message on the news stream of the group <span class="hp-green">{0}</span>

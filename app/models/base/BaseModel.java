@@ -2,17 +2,13 @@ package models.base;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.*;
 
 /**
  * Provides a base model with standard attributes like ID, creation/modification date for all persistence models.
  */
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class BaseModel {
     /**
      * Model ID.

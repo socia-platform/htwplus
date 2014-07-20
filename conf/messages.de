@@ -1,0 +1,7 @@
+post.try_with_content=Jo, fast. Probiere es noch einmal mit Inhalt ;-)
+post.join_group_first=Bitte tritt der Gruppe erst bei.
+post.post_on_stream_only=Du kannst nur Freunden auf den Stream schreiben!
+post.profile_new_post=Neuer Post von <span class="hp-green">{0}</span> auf deinem Newsstream
+post.profile_read_post=Gelesener Post von <span class="hp-green">{0}</span> auf deinem Newsstream
+post.group_new_post=Neues auf dem Newsstream der Gruppe <span class="hp-green">{0}</span>
+post.group_read_post=Gelesene Nachricht im Newsstream der Gruppe <span class="hp-green">{0}</span>
