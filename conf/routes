@@ -78,6 +78,7 @@ GET		/notification/delete				controllers.NotificationController.deleteAll()
 GET		/notification/view					controllers.NotificationController.viewAjax()
 GET		/notification/view_history			controllers.NotificationController.viewHistoryAjax()
 GET		/notification/:id					controllers.NotificationController.forward(id:Long,url:String)
+GET     /websocket/notification             controllers.NotificationController.wsNotifications()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               		controllers.Assets.at(path="/public", file)
@@ -90,8 +91,6 @@ GET		/admin/user/list					controllers.AdminController.listAccounts()
 GET		/admin/media/						controllers.AdminController.viewMediaTemp()
 GET		/admin/media/clean					controllers.AdminController.cleanMediaTemp()
 
-# WebSocket route for NewNotification
-GET     /websocket/notification             controllers.NewNotificationController.notifications()
 
 # No route found? take this
 GET     /*path                  			controllers.Application.defaultRoute(path: String)

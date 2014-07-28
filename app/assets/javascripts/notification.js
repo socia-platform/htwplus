@@ -66,7 +66,7 @@ $(document).ready(function () {
         }
     );
 	
-	setInterval( reloadNotifications, 30000 );
+	//setInterval( reloadNotifications, 30000 );
 
     /********************************************************************
      * New notification WebSocket system                                *
@@ -80,8 +80,12 @@ $(document).ready(function () {
     }
 
     // initiates the notification WebSocket channel
+    var wsDebug = true;
     function wsNotificationInit() {
-        console.log('Initiate Notification WS');
+        if (wsDebug) {
+            console.log('Initiate Notification WS');
+        }
+
         var ws = window['MozWebSocket'] ? MozWebSocket : WebSocket;
         var notificationWebSocket = new ws(getWsNotificationUrl());
         notificationWebSocket.onmessage = function(event) { wsNotificationOnMessage(event) };
@@ -91,6 +95,10 @@ $(document).ready(function () {
     // notification WebSocket on message listener
     function wsNotificationOnMessage(event) {
         try {
+            if (wsDebug) {
+                console.log(event.data);
+            }
+
             var notifications = JSON.parse(event.data);
             var notificationDropDownLayer = $('#hp-notification-item');
 
@@ -117,14 +125,18 @@ $(document).ready(function () {
                 notificationDropDownLayer.addClass('open');
             }
         } catch (exception) {
-            console.log('Client exception: ' + exception);
-            console.log('Data from server: ' + event.data);
+            if (wsDebug) {
+                console.log('Client exception: ' + exception);
+                console.log('Data from server: ' + event.data);
+            }
         }
     }
 
     // notification WebSocket on error listener
     function wsNotificationOnError(event) {
-        console.log('Error: ' + event.data);
+        if (wsDebug) {
+            console.log('Error: ' + event.data);
+        }
     }
 
     // now init the WebSocket

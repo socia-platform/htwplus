@@ -1,32 +1,31 @@
-@(notification:List[Notification], inclHistory: Boolean = false)
+@(notifications:List[NewNotification])
 
-@defining(notification.size()) { countNotification =>
-<li class="dropdown" id="hp-notification-item">
+@defining(notifications.size()) { countNotifications =>
+<li class="dropdown" id="hp-notifications-item">
          <a href="#" class="visible-xs dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-bell"></span> 
          
-         @if(countNotification > 0) {
-         	<span class="badge">@countNotification</span>
+         @if(countNotifications > 0) {
+         	<span class="badge">@countNotifications</span>
          } 
          
          <b class="caret"></b></a>
-         <a href="#" class="hidden-xs dropdown-toggle" data-toggle="dropdown">Neuigkeiten 
+         <a href="#" class="hidden-xs dropdown-toggle" data-toggle="dropdown">@Messages("notification.news")
          
-         @if(countNotification > 0) {
-         	<span class="badge">@countNotification</span> 
+         @if(countNotifications > 0) {
+         	<span class="badge">@countNotifications</span> 
          }
          
          <b class="caret"></b></a>
          <ul class="hp-dropdown-search dropdown-menu">
-          @if(countNotification > 0) {
-          			@list(notification)
+          @if(countNotifications > 0) {
+             @for(notification <- notifications) {
+                <li class='@{if(notification.isRead){"read"}else{"unread"}}'>@Html(notification.rendered)</li>
+             }
           } else {
-             <li class="hp-notification">Nichts neues passiert</li>
+             <li class="hp-notifications">@Messages("notification.nothing_new")</li>
           }
-          @if(inclHistory) {
-             <li><a href="#" id="hp-show-notification-unread"><b>Zeige nur neue Nachrichten</b></a></li>
-          } else {
-             <li><a href="#" id="hp-show-notification-history"><b>Zeige alle Nachrichten</b></a></li>
-          }
+
+            <li><a href="#" id="hp-show-notifications-history"><b>@Messages("notification.show_everything")</b></a></li>
          </ul>
 </li>
 }

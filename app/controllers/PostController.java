@@ -144,7 +144,9 @@ public class PostController extends BaseController {
 			parent.update();
 			
 			if (parent.belongsToGroup()) {
-				Notification.newPostNotification(NotificationType.POST_GROUP_NEW_COMMENT, parent, account);
+				// this is a comment in a group post
+                post.type = Post.COMMENT_GROUP;
+                NotificationHandler.getInstance().createNotification(post);
 			}
 
 			if (parent.belongsToAccount()) {
@@ -152,7 +154,9 @@ public class PostController extends BaseController {
 					Notification.newNotification(NotificationType.POST_PROFILE_NEW_COMMENT, parent.id, parent.owner);
                 }
 				if (!account.equals(parent.account)) {
-					Notification.newNotification(NotificationType.POST_MY_PROFILE_NEW_COMMENT, parent.id, parent.account);
+                    // this is a comment on a foreigns newsstream post
+                    post.type = Post.COMMENT_PROFILE;
+                    NotificationHandler.getInstance().createNotification(post);
 				}				
 			}
 			

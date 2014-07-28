@@ -51,18 +51,65 @@ public class NewNotification extends BaseModel {
      * by a specific user account.
      *
      * @param accountId User account ID
+     * @param maxResults Maximum results
      * @return List of strings
+     * @throws Throwable
      */
     @SuppressWarnings("unchecked")
-    public static List<String> findRenderedContentByAccount(final Long accountId) throws Throwable {
+    public static List<String> findRenderedContentByAccount(final Long accountId, final int maxResults) throws Throwable {
         return JPA.withTransaction(new F.Function0<List<String>>() {
             @Override
             public List<String> apply() throws Throwable {
                 return (List<String>) JPA.em()
                         .createQuery("SELECT n.rendered FROM NewNotification n WHERE n.recipient.id = :accountId ORDER BY n.updatedAt DESC")
                         .setParameter("accountId", accountId)
+                        .setMaxResults(maxResults)
                         .getResultList();
             }
         });
+    }
+
+    /**
+     * Overloaded method findRenderedContentByAccount() with default max results of 10
+     *
+     * @param accountId User account ID
+     * @return List of strings
+     * @throws Throwable
+     */
+    public static List<String> findRenderedContentByAccount(final Long accountId) throws Throwable {
+        return NewNotification.findRenderedContentByAccount(accountId, 10);
+    }
+
+    /**
+     * Returns a list of notifications by a specific user account.
+     *
+     * @param accountId User account ID
+     * @param maxResults Maximum results
+     * @return List of notifications
+     * @throws Throwable
+     */
+    @SuppressWarnings("unchecked")
+    public static List<NewNotification> findByAccount(final Long accountId, final int maxResults) throws Throwable {
+        return JPA.withTransaction(new F.Function0<List<NewNotification>>() {
+            @Override
+            public List<NewNotification> apply() throws Throwable {
+                return (List<NewNotification>) JPA.em()
+                        .createQuery("FROM NewNotification n WHERE n.recipient.id = :accountId ORDER BY n.updatedAt DESC")
+                        .setParameter("accountId", accountId)
+                        .setMaxResults(maxResults)
+                        .getResultList();
+            }
+        });
+    }
+
+    /**
+     * Overloaded method findByAccount() with default max results of 10
+     *
+     * @param accountId User account ID
+     * @return List of notifications
+     * @throws Throwable
+     */
+    public static List<NewNotification> findByAccount(final Long accountId) throws Throwable {
+        return NewNotification.findByAccount(accountId, 10);
     }
 }

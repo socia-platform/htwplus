@@ -1,0 +1,9 @@
+@(notification: NewNotification, notifiable: Post)
+
+@import helper._
+
+@if(!notification.isRead) {
+<a href="@routes.GroupController.view(notifiable.parent.group.id)"><span class="glyphicon glyphicon-list"></span>@Html(Messages("post.comment_group", truncate(notifiable.content, 20), truncate(notifiable.parent.group.title, 20)))</a>
+} else {
+<a href="@routes.GroupController.view(notifiable.parent.group.id)"><span class="glyphicon glyphicon-list"></span>@Html(Messages("post.comment_group_read", truncate(notifiable.content, 20), truncate(notifiable.parent.group.title, 20)))</a>
+}

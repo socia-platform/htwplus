@@ -29,11 +29,20 @@ error.maxLength=Maximum length is {0}
 error.email=Bitte eine gültige Adresse eingeben
 error.pattern=Must satisfy {0}
 
+# notifications
+notification.news=Neuigkeiten
+notification.nothing_new=Nichts neues passiert
+notification.show_everything=Zeige alle Nachrichten
+
 # base model messages
-post.try_with_content=Yeah, close. Try again with content ;-)
-post.join_group_first=Please join a group first.
-post.post_on_stream_only=You can post on your friends stream only!
-post.profile_new_post=New post by <span class="hp-green">{0}</span> on your news stream
-post.profile_read_post=Read post by <span class="hp-green">{0}</span> on your news stream
-post.group_new_post=New message on the news stream of the group <span class="hp-green">{0}</span>
-post.group_read_post=Read message on the news stream of the group <span class="hp-green">{0}</span>
+post.try_with_content=Jo, fast. Probiere es noch einmal mit Inhalt ;-)
+post.join_group_first=Bitte tritt der Gruppe erst bei.
+post.post_on_stream_only=Du kannst nur Freunden auf den Stream schreiben!
+post.profile_new_post=Neuer Post von <span class="hp-green">{0}</span> auf deinem Newsstream
+post.profile_read_post=Gelesener Post von <span class="hp-green">{0}</span> auf deinem Newsstream
+post.group_new_post=Neues auf dem Newsstream der Gruppe <span class="hp-green">{0}</span>
+post.group_read_post=Gelesene Nachricht im Newsstream der Gruppe <span class="hp-green">{0}</span>
+post.comment_profile=Neuer Kommentar zum Post <span class="hp-green">{0}</span> auf deinem Newsstream
+post.comment_profile_read=Gelesener Kommentar zum Post <span class="hp-green">{0}</span> auf deinem Newsstream
+post.comment_group=Neuer Kommentar zum Post <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>
+post.comment_group_read=Gelesener Kommentar zum Post <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>

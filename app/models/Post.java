@@ -14,9 +14,11 @@ import play.db.jpa.JPA;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
-	public static String GROUP = "group";
-	public static String PROFILE = "profile";
-	public static String STREAM = "stream";
+	public final static String GROUP = "group";                         // post to group news stream
+	public final static String PROFILE = "profile";                     // post to own news stream
+	public final static String STREAM = "stream";                       // post to a foreign news stream
+    public final static String COMMENT_PROFILE = "comment_profile";     // comment on a profile post
+    public final static String COMMENT_GROUP = "comment_group";         // comment on a group post
 
 	@Required
 	@Column(length=2000)
@@ -260,6 +262,13 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     @Override
     public List<Account> getRecipients() {
+        // if this is a comment, return the parent information
+        if (this.parent != null) {
+            return this.parent.belongsToAccount()
+                    ? this.parent.getAsAccountList(this.parent.account)
+                    : this.parent.getGroupAsAccountList(this.parent.group);
+        }
+
         // return account if not null, otherwise group
         return this.belongsToAccount()
                 ? this.getAsAccountList(this.account)

@@ -1,0 +1,9 @@
+@(notification: NewNotification, notifiable: Post)
+
+@import helper._
+
+@if(!notification.isRead) {
+<a href="@routes.ProfileController.stream(notifiable.parent.account.id)"><span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.comment_profile", truncate(notifiable.content, 20)))</a>
+} else {
+<a href="@routes.ProfileController.stream(notifiable.parent.account.id)"><span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.comment_profile_read", truncate(notifiable.content, 20)))</a>
+}

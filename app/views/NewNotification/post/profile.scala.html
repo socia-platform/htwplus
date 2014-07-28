@@ -1,14 +1,10 @@
 @(notification: NewNotification, notifiable: Post)
 
-
 @import routes._
+@import helper._
 
 @if(!notification.isRead) {
-    <a href="@routes.ProfileController.stream(notifiable.account.id)">
-        @Html(Messages("post.profile_new_post", notifiable.getSender().name))
-    </a>
+<a href="@routes.ProfileController.stream(notifiable.account.id)"><span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.profile_new_post", fullTrim(notifiable.getSender().name)))</a>
 } else {
-    <a href="@routes.ProfileController.stream(notifiable.account.id)">
-        @Html(Messages("post.profile_read_post", notifiable.getSender().name))
-    </a>
+<a href="@routes.ProfileController.stream(notifiable.account.id)"><span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.profile_read_post", fullTrim(notifiable.getSender().name)))</a>
 }
