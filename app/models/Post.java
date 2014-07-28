@@ -14,11 +14,12 @@ import play.db.jpa.JPA;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
-	public final static String GROUP = "group";                         // post to group news stream
-	public final static String PROFILE = "profile";                     // post to own news stream
-	public final static String STREAM = "stream";                       // post to a foreign news stream
-    public final static String COMMENT_PROFILE = "comment_profile";     // comment on a profile post
-    public final static String COMMENT_GROUP = "comment_group";         // comment on a group post
+	public final static String GROUP = "group";                             // post to group news stream
+	public final static String PROFILE = "profile";                         // post to own news stream
+	public final static String STREAM = "stream";                           // post to a foreign news stream
+    public final static String COMMENT_PROFILE = "comment_profile";         // comment on a profile post
+    public final static String COMMENT_GROUP = "comment_group";             // comment on a group post
+    public final static String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
 
 	@Required
 	@Column(length=2000)
@@ -50,10 +51,11 @@ public class Post extends BaseNotifiable implements INotifiable {
 		// delete all comments first
 		List<Post> comments = getCommentsForPost(this.id, 0, 0);
 		
-		for(Post comment : comments){
+		for (Post comment : comments) {
 			comment.delete();
 		}
-		Notification.deleteByObject(this.id);
+
+        NewNotification.deleteReferences(this);
 		JPA.em().remove(this);
 	}
 	
@@ -264,6 +266,11 @@ public class Post extends BaseNotifiable implements INotifiable {
     public List<Account> getRecipients() {
         // if this is a comment, return the parent information
         if (this.parent != null) {
+            // if this is a comment on own news stream, send notification to the initial poster
+            if (this.type.equals(Post.COMMENT_OWN_PROFILE)) {
+                return this.parent.getAsAccountList(this.parent.owner);
+            }
+
             return this.parent.belongsToAccount()
                     ? this.parent.getAsAccountList(this.parent.account)
                     : this.parent.getGroupAsAccountList(this.parent.group);

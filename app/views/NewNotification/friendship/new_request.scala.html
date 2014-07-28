@@ -1,0 +1,9 @@
+@(notification: NewNotification, notifiable: Friendship)
+
+@import helper._
+
+@if(!notification.isRead) {
+<a href="@routes.FriendshipController.index()"><span class="glyphicon glyphicon-user"></span>@Html(Messages("friendship.new_request", notifiable.account.name))</a>
+} else {
+<a href="@routes.FriendshipController.index()"><span class="glyphicon glyphicon-user"></span>@Html(Messages("friendship.new_request_read", notifiable.account.name))</a>
+}

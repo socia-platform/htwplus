@@ -31,7 +31,7 @@ error.pattern=Must satisfy {0}
 
 # notifications
 notification.news=Neuigkeiten
-notification.nothing_new=Nichts neues passiert
+notification.nothing_new=Es ist noch nichts passiert...
 notification.show_everything=Zeige alle Nachrichten
 
 # base model messages
@@ -46,3 +46,11 @@ post.comment_profile=Neuer Kommentar zum Post <span class="hp-green">{0}</span> 
 post.comment_profile_read=Gelesener Kommentar zum Post <span class="hp-green">{0}</span> auf deinem Newsstream
 post.comment_group=Neuer Kommentar zum Post <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>
 post.comment_group_read=Gelesener Kommentar zum Post <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>
+post.comment_profile_own=Neuer Kommentar zu deinem Post <span class="hp-green">{0}</span> auf dem Newstream von <span class="hp-green">{1}</span>
+post.comment_profile_own_read=Gelesener Kommentar zu deinem Post <span class="hp-green">{0}</span> auf dem Newstream von <span class="hp-green">{1}</span>
+friendship.new_request=Neue Freundschaftsanfrage von <span class="hp-green">{0}</span>
+friendship.new_request_read=Gelesene Annahme deiner Freundschaftsanfrage an <span class="hp-green">{0}</span>
+friendship.request_decline=<span class="hp-green">{0}</span> hat deine Freundschaftsanfrage abgelehnt
+friendship.request_decline_read=Gelesene Ablehnung deiner Freundschaftsanfrage an <span class="hp-green">{0}</span>
+friendship.request_successful=<span class="hp-green">{0}</span> hat deine Freundschaftsanfrage angenommen
+friendship.request_successful_read=Gelesene Annahme deiner Freundschaftsanfrage an <span class="hp-green">{0}</span>

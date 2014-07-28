@@ -2,30 +2,29 @@
 
 @defining(notifications.size()) { countNotifications =>
 <li class="dropdown" id="hp-notifications-item">
-         <a href="#" class="visible-xs dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-bell"></span> 
-         
+         <a href="#" class="visible-xs dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-bell"></span>
+
          @if(countNotifications > 0) {
          	<span class="badge">@countNotifications</span>
-         } 
-         
+         }
+
          <b class="caret"></b></a>
          <a href="#" class="hidden-xs dropdown-toggle" data-toggle="dropdown">@Messages("notification.news")
-         
+
          @if(countNotifications > 0) {
-         	<span class="badge">@countNotifications</span> 
+         	<span class="badge">@countNotifications</span>
          }
-         
+
          <b class="caret"></b></a>
          <ul class="hp-dropdown-search dropdown-menu">
           @if(countNotifications > 0) {
              @for(notification <- notifications) {
-                <li class='@{if(notification.isRead){"read"}else{"unread"}}'>@Html(notification.rendered)</li>
+                <li class='@{if(notification.isRead){"read"}else{"unread"}}'><div>@Html(notification.rendered)</div></li>
              }
+             <li><a href="#" id="hp-show-notifications-history"><b>@Messages("notification.show_everything")</b></a></li>
           } else {
              <li class="hp-notifications">@Messages("notification.nothing_new")</li>
           }
-
-            <li><a href="#" id="hp-show-notifications-history"><b>@Messages("notification.show_everything")</b></a></li>
          </ul>
 </li>
 }

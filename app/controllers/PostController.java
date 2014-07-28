@@ -4,7 +4,6 @@ import java.util.List;
 
 import controllers.Navigation.Level;
 import models.*;
-import models.Notification.NotificationType;
 import play.Play;
 import play.api.mvc.Call;
 import play.data.Form;
@@ -89,7 +88,6 @@ public class PostController extends BaseController {
 					post.owner = account;
 					post.create();
 					if (!account.equals(profile)) {
-						// Notification.newNotification(NotificationType.PROFILE_NEW_POST, account.id, profile);
                         post.type = Post.PROFILE;
                         NotificationHandler.getInstance().createNotification(post);
 					}
@@ -150,11 +148,13 @@ public class PostController extends BaseController {
 			}
 
 			if (parent.belongsToAccount()) {
-				if (!account.equals(parent.owner) && !parent.account.equals(parent.owner) ) {
-					Notification.newNotification(NotificationType.POST_PROFILE_NEW_COMMENT, parent.id, parent.owner);
+				if (!account.equals(parent.owner) && !parent.account.equals(parent.owner)) {
+					// this is a comment on a news stream post from another person
+                    post.type = Post.COMMENT_OWN_PROFILE;
+                    NotificationHandler.getInstance().createNotification(post);
                 }
 				if (!account.equals(parent.account)) {
-                    // this is a comment on a foreigns newsstream post
+                    // this is a comment on a foreign news stream post
                     post.type = Post.COMMENT_PROFILE;
                     NotificationHandler.getInstance().createNotification(post);
 				}				

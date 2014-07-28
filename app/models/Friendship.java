@@ -6,17 +6,19 @@ import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-import controllers.Secured;
-
+import models.base.BaseNotifiable;
+import models.base.INotifiable;
 import play.db.jpa.JPA;
 
-import models.base.BaseModel;
 import models.enums.LinkType;
 
 @Entity
 @Table(uniqueConstraints=
 @UniqueConstraint(columnNames = {"account_id", "friend_id"})) 
-public class Friendship extends BaseModel {
+public class Friendship extends BaseNotifiable implements INotifiable {
+    public final static String FRIEND_REQUEST_SUCCESS = "request_successful";
+    public final static String FRIEND_REQUEST_DECLINE = "request_decline";
+    public final static String FRIEND_NEW_REQUEST = "new_request";
 	
 	@ManyToOne
 	@NotNull
@@ -30,8 +32,7 @@ public class Friendship extends BaseModel {
 	@NotNull
 	public LinkType linkType;
 	
-	public Friendship(){
-		
+	public Friendship() {
 	}
 	
 	public Friendship(Account account, Account friend, LinkType type) {
@@ -46,19 +47,17 @@ public class Friendship extends BaseModel {
 
 	@Override
 	public void create() {
-		
 		JPA.em().persist(this);
-		
 	}
 
 	@Override
 	public void update() {
 		JPA.em().merge(this);
-		
 	}
 
 	@Override
 	public void delete() {
+        NewNotification.deleteReferences(this);
 		JPA.em().remove(this);
 	}
 
@@ -128,24 +127,36 @@ public class Friendship extends BaseModel {
 	}
 	
 	public static List<Account> friendsToInvite(Account account, Group group) {
-		List<Account> inviteableFriends = findFriends(account);
+		List<Account> inevitableFriends = findFriends(account);
 		
-		if(inviteableFriends != null) {
-		
-			Iterator<Account> it = inviteableFriends.iterator();
-			Account friend = null;
+		if (inevitableFriends != null) {
+			Iterator<Account> it = inevitableFriends.iterator();
+			Account friend;
 			
 			while(it.hasNext()) {
 				friend = it.next();
 				
 				//remove account from list if there is any type of link (requests, invite, already member)
-				if(GroupAccount.hasLinkTypes(friend, group)){
+				if (GroupAccount.hasLinkTypes(friend, group)) {
 					it.remove();
 				}
 			}	        
 		}
 		
-		return inviteableFriends;
+		return inevitableFriends;
 	}
-	
+
+    @Override
+    public Account getSender() {
+        return this.type.equals(Friendship.FRIEND_REQUEST_DECLINE)
+                ? this.friend
+                : this.account;
+    }
+
+    @Override
+    public List<Account> getRecipients() {
+        return this.type.equals(Friendship.FRIEND_REQUEST_DECLINE)
+                ? this.getAsAccountList(this.account)
+                : this.getAsAccountList(this.friend);
+    }
 }

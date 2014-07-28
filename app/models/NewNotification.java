@@ -112,4 +112,15 @@ public class NewNotification extends BaseModel {
     public static List<NewNotification> findByAccount(final Long accountId) throws Throwable {
         return NewNotification.findByAccount(accountId, 10);
     }
+
+    /**
+     * Deletes a notification with containing a specific reference.
+     *
+     * @param reference BaseModel reference
+     */
+    public static void deleteReferences(final BaseModel reference) {
+        JPA.em().createQuery("DELETE FROM NewNotification n WHERE n.reference = :reference")
+                .setParameter("reference", reference)
+                .executeUpdate();
+    }
 }
