@@ -38,46 +38,12 @@ public class NewNotification extends BaseModel {
 
     @Override
     public void update() {
-        JPA.em().persist(this);
+        JPA.em().merge(this);
     }
 
     @Override
     public void delete() {
         JPA.em().remove(this);
-    }
-
-    /**
-     * Returns a list of string containing already rendered content of notifications
-     * by a specific user account.
-     *
-     * @param accountId User account ID
-     * @param maxResults Maximum results
-     * @return List of strings
-     * @throws Throwable
-     */
-    @SuppressWarnings("unchecked")
-    public static List<String> findRenderedContentByAccount(final Long accountId, final int maxResults) throws Throwable {
-        return JPA.withTransaction(new F.Function0<List<String>>() {
-            @Override
-            public List<String> apply() throws Throwable {
-                return (List<String>) JPA.em()
-                        .createQuery("SELECT n.rendered FROM NewNotification n WHERE n.recipient.id = :accountId ORDER BY n.updatedAt DESC")
-                        .setParameter("accountId", accountId)
-                        .setMaxResults(maxResults)
-                        .getResultList();
-            }
-        });
-    }
-
-    /**
-     * Overloaded method findRenderedContentByAccount() with default max results of 10
-     *
-     * @param accountId User account ID
-     * @return List of strings
-     * @throws Throwable
-     */
-    public static List<String> findRenderedContentByAccount(final Long accountId) throws Throwable {
-        return NewNotification.findRenderedContentByAccount(accountId, 10);
     }
 
     /**

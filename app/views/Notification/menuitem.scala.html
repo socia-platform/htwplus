@@ -19,7 +19,7 @@
          <ul class="hp-dropdown-search dropdown-menu">
           @if(countNotifications > 0) {
              @for(notification <- notifications) {
-                <li class='@{if(notification.isRead){"read"}else{"unread"}}'><div>@Html(notification.rendered)</div></li>
+                <li class='@{if(notification.isRead){"read"}else{"unread"}}' id="notification_@{notification.id}"><div>@Html(notification.rendered)</div></li>
              }
              <li><a href="#" id="hp-show-notifications-history"><b>@Messages("notification.show_everything")</b></a></li>
           } else {

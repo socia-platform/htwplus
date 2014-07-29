@@ -142,7 +142,7 @@ h1 {
 .hp-dropdown-news,
 .hp-dropdown-search {
 	width: 600px;
-	max-height: 180px;
+	max-height: 450px;
 	left: -150px;
 	overflow-y: auto;
 }

@@ -1,73 +1,4 @@
 $(document).ready(function () {
-	
-	function reloadNotifications()  {
-		$.ajax({
-			url: "/notification/view",
-			type: "GET",
-			success: function(data){
-				var setOpen = false;
-				if($("#hp-notification-item").hasClass("open")){
-					setOpen = true;
-				}
-				$("#hp-notification-item").replaceWith(data);
-				
-				if(setOpen == true) {
-					$("#hp-notification-item").addClass("open");
-				}
-
-			}
-		});
-	}
-
-    function loadHistoryNotifications()  {
-        $.ajax({
-            url: "/notification/view_history",
-            type: "GET",
-            success: function(data){
-                var setOpen = false;
-                if($("#hp-notification-item").hasClass("open")){
-                    setOpen = true;
-                }
-                $("#hp-notification-item").replaceWith(data);
-
-                if(setOpen == true) {
-                    $("#hp-notification-item").addClass("open");
-                }
-
-            }
-        });
-    }
-	
-	function deleteNotifications() {
-		$.ajax({
-			url: "/notification/delete",
-			type: "GET",
-			success: function(data){
-				reloadNotifications(); 		
-			}
-		});
-		
-	}
-	
-	$('body').on("click", "#hp-delete-notifications", function(){
-		deleteNotifications();
-		return false;
-	});
-
-    $('body').on("click", "#hp-show-notification-history", function() {
-            loadHistoryNotifications();
-            return false;
-        }
-    );
-
-    $('body').on("click", "#hp-show-notification-unread", function() {
-            reloadNotifications();
-            return false;
-        }
-    );
-	
-	//setInterval( reloadNotifications, 30000 );
-
     /********************************************************************
      * New notification WebSocket system                                *
      ********************************************************************/
@@ -95,25 +26,48 @@ $(document).ready(function () {
     // notification WebSocket on message listener
     function wsNotificationOnMessage(event) {
         try {
-            if (wsDebug) {
-                console.log(event.data);
-            }
-
             var notifications = JSON.parse(event.data);
-            var notificationDropDownLayer = $('#hp-notification-item');
+            var notificationDropDownLayer = $('#hp-notifications-item');
 
-            // remove previous new notifications
-            $('.new-notification').remove();
+            if (wsDebug) {
+                console.log(notifications);
+            }
 
             // create new elements for each new notification, append them before last list
             // element (like "show all notifications")
             for (var notificationIndex in notifications) {
                 if (notifications.hasOwnProperty(notificationIndex)) {
+                    var currentNotification = notifications[notificationIndex];
+                    var notificationListElement = $('#notification_' + currentNotification.id);
+
+                    // check, if the li element is already available
+                    if (notificationListElement.length) {
+                        // li element available, do nothing
+                        continue;
+                    }
+
+                    // li element not available, create new li element and append
                     var newNotification = document.createElement('li');
-                    newNotification.className = 'hp-notification new-notification';
-                    newNotification.innerHTML = notifications[notificationIndex];
-                    notificationDropDownLayer.find('li:last').before(newNotification);
+                    newNotification.className = currentNotification.is_read ? 'read' : 'unread';
+                    newNotification.innerHTML = '<div>' + currentNotification.content + '</div>';
+                    newNotification.id = 'notification_' + currentNotification.id;
+                    notificationDropDownLayer.find('li:first').before(newNotification);
                 }
+            }
+
+            // if badges are available, increase counter
+            var notificationCounters = notificationDropDownLayer.find('.badge');
+            if (notificationCounters.length) {
+                for (var counterIndex in notificationCounters) {
+                    if (notificationCounters.hasOwnProperty(counterIndex)) {
+                        notificationCounters[counterIndex].innerHTML = notifications.length;
+                    }
+                }
+            }
+
+            // delete obsolete notifications, if number of opened notifications bigger than numbers of new notifications
+            while (notificationDropDownLayer.find('li').length > notifications.length + 1) {
+                notificationDropDownLayer.find('li:nth-last-child(2)').remove();
             }
 
             var setOpen = false;

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.NewNotification;
 import play.libs.Json;
 import play.mvc.WebSocket;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,8 +35,21 @@ public class NewNotificationActor extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         try {
             if (message.equals("getNotifications")) {
-                JsonNode jsonResult = Json.toJson(NewNotification.findRenderedContentByAccount(this.accountId));
-                this.out.write(jsonResult);
+                // get notification list and build up JSON list containing JSON objects (with notification data)
+                List<NewNotification> notifications = NewNotification.findByAccount(this.accountId);
+                List<ObjectNode> jsonList = new ArrayList<ObjectNode>(notifications.size());
+
+                for (NewNotification notification : notifications) {
+                    ObjectNode jsonListElement = Json.newObject();
+                    jsonListElement.put("is_read", notification.isRead);
+                    jsonListElement.put("content", notification.rendered);
+                    jsonListElement.put("id", notification.id);
+                    jsonListElement.put("updated", notification.updatedAt.getTime());
+                    jsonListElement.put("created", notification.createdAt.getTime());
+                    jsonList.add(jsonListElement);
+                }
+
+                this.out.write(Json.toJson(jsonList));
             } else {
                 unhandled(message);
                 this.context().stop(this.self());
