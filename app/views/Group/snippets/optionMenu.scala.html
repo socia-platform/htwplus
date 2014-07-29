@@ -1,0 +1,55 @@
+@(group: Group, user: Account)
+@import models.enums.GroupType
+@import helper._
+
+<div class="dropdown">
+    <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-chevron-down"></span>
+    </a>
+
+    <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+
+        <li><a href="#infoModal@group.id" data-toggle="modal">
+            <span class="glyphicon glyphicon-info-sign"></span><br>Info
+        </a></li>
+
+        @if(Secured.isMemberOfGroup(group, user)) {
+        <li><a href="@routes.GroupController.view(group.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-comment"></span><br>Newsstream
+        </a></li>
+
+        <li><a href="@routes.GroupController.media(group.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-file"></span><br>Medien
+        </a></li>
+        }
+
+        @if(Secured.isOwnerOfGroup(group, user)) {
+        <li><a href="@routes.GroupController.edit(group.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-pencil"></span><br>Bearbeiten
+        </a></li>
+
+        <li><a href="#confirmDeleteGroup@group.id" data-toggle="modal">
+            <span class="glyphicon glyphicon-trash"></span><br>Löschen
+        </a></li>
+        }
+
+        @if(Secured.isMemberOfGroup(group, user) && !Secured.isOwnerOfGroup(group, user)) {
+        <li><a href="@routes.GroupController.removeMember(group.id, user.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-remove"></span><br>Verlassen
+        </a></li>
+        }
+
+        @if(!Secured.isMemberOfGroup(group, user)) {
+            @if(group.groupType.equals(GroupType.open)) {
+            <li><a href="@routes.GroupController.join(group.id)">
+                <span class="glyphicon glyphicon-ok"></span><br>Beitreten
+            </a></li>
+            } else {
+            <li><a href="@routes.GroupController.join(group.id)">
+                <span class="glyphicon glyphicon-envelope"></span><br>Beitrittsanfrage
+            </a></li>
+            }
+        }
+
+    </ul>
+</div>
