@@ -3,7 +3,7 @@
 @import helper._
 
 @if(!notification.isRead) {
-<a href="@routes.ProfileController.stream(notifiable.account.id)"><span class="glyphicon glyphicon-ok"></span>@Html(Messages("friendship.request_successful", notifiable.account.name))</a>
+<span class="glyphicon glyphicon-ok"></span>@Html(Messages("friendship.request_successful", notifiable.account.name))
 } else {
-<a href="@routes.ProfileController.stream(notifiable.account.id)"><span class="glyphicon glyphicon-ok"></span>@Html(Messages("friendship.request_successful_read", notifiable.account.name))</a>
+<span class="glyphicon glyphicon-ok"></span>@Html(Messages("friendship.request_successful_read", notifiable.account.name))
 }

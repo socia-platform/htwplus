@@ -3,7 +3,7 @@
 @import helper._
 
 @if(!notification.isRead) {
-<a href="@routes.GroupController.view(notifiable.group.id)"><span class="glyphicon glyphicon-list"></span>@Html(Messages("post.group_new_post", truncate(notifiable.group.title, 20)))</a>
+<span class="glyphicon glyphicon-list"></span>@Html(Messages("post.group_new_post", truncate(notifiable.group.title, 20)))
 } else {
-<a href="@routes.GroupController.view(notifiable.group.id)"><span class="glyphicon glyphicon-list"></span>@Html(Messages("post.group_read_post", truncate(notifiable.group.title, 20)))</a>
+<span class="glyphicon glyphicon-list"></span>@Html(Messages("post.group_read_post", truncate(notifiable.group.title, 20)))
 }

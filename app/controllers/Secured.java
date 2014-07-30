@@ -1,13 +1,7 @@
 package controllers;
 
 
-import models.Account;
-import models.Friendship;
-import models.Group;
-import models.GroupAccount;
-import models.Media;
-import models.Notification;
-import models.Post;
+import models.*;
 import models.enums.AccountRole;
 import models.enums.GroupType;
 import play.Logger;
@@ -471,14 +465,16 @@ public class Secured extends Security.Authenticator {
 	/*
 	 * Notification
 	 */
-	
 
-	public static boolean deleteNotification(Notification note) {
-		if(note.account.equals(Component.currentAccount())) {
-			return true;
-		} else {
-			return false;
-		}
+
+    /**
+     * Returns true, if the current user has access to a notification.
+     *
+     * @param notification Notification to be checked
+     * @return True, if user has access
+     */
+	public static boolean hasAccessToNotification(NewNotification notification) {
+		return notification.recipient.equals(Component.currentAccount());
 	}
-	
+
 }

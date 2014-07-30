@@ -19,6 +19,7 @@ public class Friendship extends BaseNotifiable implements INotifiable {
     public final static String FRIEND_REQUEST_SUCCESS = "request_successful";
     public final static String FRIEND_REQUEST_DECLINE = "request_decline";
     public final static String FRIEND_NEW_REQUEST = "new_request";
+    public static final int PAGE = 1;
 	
 	@ManyToOne
 	@NotNull
@@ -158,5 +159,18 @@ public class Friendship extends BaseNotifiable implements INotifiable {
         return this.type.equals(Friendship.FRIEND_REQUEST_DECLINE)
                 ? this.getAsAccountList(this.account)
                 : this.getAsAccountList(this.friend);
+    }
+
+    @Override
+    public String getTargetUrl() {
+        if (this.type.equals(Friendship.FRIEND_NEW_REQUEST) || this.type.equals(Friendship.FRIEND_REQUEST_DECLINE)) {
+            return controllers.routes.FriendshipController.index().toString();
+        }
+
+        if (this.type.equals(Friendship.FRIEND_REQUEST_SUCCESS)) {
+            return controllers.routes.ProfileController.stream(this.account.id, Friendship.PAGE).toString();
+        }
+
+        return super.getTargetUrl();
     }
 }

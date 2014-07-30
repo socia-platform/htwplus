@@ -31,6 +31,9 @@ public class NewNotification extends BaseModel {
     @ManyToOne
     public BaseModel reference;
 
+    @Column(name = "target_url")
+    public String targetUrl;
+
     @Override
     public void create() {
         JPA.em().persist(this);
@@ -47,36 +50,61 @@ public class NewNotification extends BaseModel {
     }
 
     /**
-     * Returns a list of notifications by a specific user account.
+     * Returns a list of notifications by a specific user account ID.
      *
      * @param accountId User account ID
      * @param maxResults Maximum results
+     * @param offsetResults Offset of results
      * @return List of notifications
      * @throws Throwable
      */
     @SuppressWarnings("unchecked")
-    public static List<NewNotification> findByAccount(final Long accountId, final int maxResults) throws Throwable {
+    public static List<NewNotification> findByAccountId(final Long accountId, final int maxResults, final int offsetResults) throws Throwable {
         return JPA.withTransaction(new F.Function0<List<NewNotification>>() {
             @Override
             public List<NewNotification> apply() throws Throwable {
                 return (List<NewNotification>) JPA.em()
-                        .createQuery("FROM NewNotification n WHERE n.recipient.id = :accountId ORDER BY n.updatedAt DESC")
+                        .createQuery("FROM NewNotification n WHERE n.recipient.id = :accountId ORDER BY n.createdAt DESC")
                         .setParameter("accountId", accountId)
                         .setMaxResults(maxResults)
+                        .setFirstResult(offsetResults)
                         .getResultList();
             }
         });
     }
 
     /**
-     * Overloaded method findByAccount() with default max results of 10
+     * Overloaded method findByAccountId() with default offset 0
      *
      * @param accountId User account ID
      * @return List of notifications
      * @throws Throwable
      */
-    public static List<NewNotification> findByAccount(final Long accountId) throws Throwable {
-        return NewNotification.findByAccount(accountId, 10);
+    public static List<NewNotification> findByAccountId(final Long accountId, final int maxResults) throws Throwable {
+        return NewNotification.findByAccountId(accountId, maxResults, 0);
+    }
+
+    /**
+     * Overloaded method findByAccountId() with default max results of 10 and offset 0
+     *
+     * @param accountId User account ID
+     * @return List of notifications
+     * @throws Throwable
+     */
+    public static List<NewNotification> findByAccountId(final Long accountId) throws Throwable {
+        return NewNotification.findByAccountId(accountId, 10);
+    }
+
+    /**
+     * Returns a list of notifications by a specific user account ID for a specific page.
+     *
+     * @param accountId User account ID
+     * @param currentPage Current page
+     * @return List of notifications
+     * @throws Throwable
+     */
+    public static List<NewNotification> findByAccountIdForPage(final Long accountId, int maxResults, int currentPage) throws Throwable {
+        return NewNotification.findByAccountId(accountId, maxResults, (currentPage * maxResults) - maxResults);
     }
 
     /**
@@ -88,5 +116,15 @@ public class NewNotification extends BaseModel {
         JPA.em().createQuery("DELETE FROM NewNotification n WHERE n.reference = :reference")
                 .setParameter("reference", reference)
                 .executeUpdate();
+    }
+
+    /**
+     * Returns a specific notification by its ID.
+     *
+     * @param id Notification ID
+     * @return Notification instance
+     */
+    public static NewNotification findById(Long id) {
+        return JPA.em().find(NewNotification.class, id);
     }
 }

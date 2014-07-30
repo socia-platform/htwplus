@@ -83,7 +83,7 @@ public class AccountController extends BaseController {
 
 		session().clear();
 		session("id", account.id.toString());
-		return redirect(routes.Application.index());
+		return redirect(controllers.routes.Application.index());
 	}
 
 	private static Result defaultAuthenticate() {
@@ -99,7 +99,7 @@ public class AccountController extends BaseController {
 					Account.findByEmail(loginForm.get().email).id.toString());
 			session("firstname",
 					Account.findByEmail(loginForm.get().email).firstname);
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		}
 	}
 
@@ -109,7 +109,7 @@ public class AccountController extends BaseController {
 	public static Result logout() {
 		session().clear();
 		flash("success", "Du bist nun ausgeloggt");
-		return redirect(routes.Application.index());
+		return redirect(controllers.routes.Application.index());
 	}
 
 }

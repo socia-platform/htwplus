@@ -36,7 +36,7 @@ public class NewNotificationActor extends UntypedActor {
         try {
             if (message.equals("getNotifications")) {
                 // get notification list and build up JSON list containing JSON objects (with notification data)
-                List<NewNotification> notifications = NewNotification.findByAccount(this.accountId);
+                List<NewNotification> notifications = NewNotification.findByAccountId(this.accountId);
                 List<ObjectNode> jsonList = new ArrayList<ObjectNode>(notifications.size());
 
                 for (NewNotification notification : notifications) {

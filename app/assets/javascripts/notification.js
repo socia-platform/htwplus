@@ -2,16 +2,27 @@ $(document).ready(function () {
     /********************************************************************
      * New notification WebSocket system                                *
      ********************************************************************/
+    /**
+     * If true, various debug information is printed to console.
+     *
+     * @type {boolean}
+     */
+    var wsDebug = true;
 
-    // returns the correct WebSocket target URL respecting un-/encrypted context
+    /**
+     * Returns the correct WebSocket target URL respecting un-/encrypted context.
+     *
+     * @returns {string}
+     */
     function getWsNotificationUrl() {
         return window.location.protocol === 'https:'
             ? 'wss://' + window.location.host + '/websocket/notification'
             : 'ws://' + window.location.host + '/websocket/notification';
     }
 
-    // initiates the notification WebSocket channel
-    var wsDebug = true;
+    /**
+     * Initiates the notification WebSocket channel.
+     */
     function wsNotificationInit() {
         if (wsDebug) {
             console.log('Initiate Notification WS');
@@ -23,61 +34,133 @@ $(document).ready(function () {
         notificationWebSocket.onerror = function(event) { wsNotificationOnError(event) };
     }
 
-    // notification WebSocket on message listener
+    /**
+     * Creates a new li element with a new notification.
+     *
+     * @param notification
+     * @returns {HTMLElement}
+     */
+    function createNotificationElement(notification) {
+        var notificationElement = document.createElement('li');
+        var parentDiv = document.createElement('div');
+        var notificationLink = document.createElement('a');
+
+        notificationElement.className = 'notification-element ' + (notification.is_read ? 'read' : 'unread');
+        notificationElement.id = 'notification_' + notification.id;
+        notificationElement.style.display = 'none';
+        notificationElement.appendChild(parentDiv);
+        notificationLink.href = '/notification/' + notification.id;
+        notificationLink.innerHTML = notification.content;
+        parentDiv.appendChild(notificationLink);
+
+        return notificationElement;
+    }
+
+    /**
+     * Updates the notifications, if necessary.
+     *
+     * @param notifications
+     */
+    function updateNotifications(notifications) {
+        // create new elements for each new notification, append them before last list element (like "show all notifications")
+        for (var notificationIndex in notifications) {
+            if (notifications.hasOwnProperty(notificationIndex)) {
+                var notification = notifications[notificationIndex];
+                var notificationListElement = $('#notification_' + notification.id);
+
+                // check, if the li element is already available
+                if (notificationListElement.length) {
+                    // li element available, check, if status changed
+                    if (notificationListElement.hasClass((notification.is_read ? 'read' : 'unread'))) {
+                        // status did not change, just go on...
+                        continue;
+                    } else {
+                        // status changed, we must recreate this element with new content
+                        notificationListElement.remove();
+                    }
+                }
+
+                // li element not available, create new element and append
+                var newNotificationElement = createNotificationElement(notification);
+                $('#hp-notifications-item').find('li:first').before(newNotificationElement);
+                $(newNotificationElement).fadeIn('slow');
+            }
+        }
+
+        // update counter and eventually delete obsolete previous notifications
+        updateNewNotificationCounter(notifications);
+        deleteObsoleteNotifications(notifications);
+    }
+
+    /**
+     * Updates the new notification counter.
+     *
+     * @param notifications
+     */
+    function updateNewNotificationCounter(notifications) {
+        // count new/unread notifications
+        var unreadNotifications = 0;
+        for (var notificationIndex in notifications) {
+            if (notifications.hasOwnProperty(notificationIndex)) {
+                if (!notifications[notificationIndex].is_read) {
+                    unreadNotifications++;
+                }
+            }
+        }
+
+        var notificationCounters = $('#hp-notifications-item').find('.badge');
+        // if update counters
+        for (var counterIndex = 0; counterIndex < notificationCounters.size(); counterIndex++) {
+            if (notificationCounters.hasOwnProperty(counterIndex)) {
+                notificationCounters[counterIndex].innerHTML = unreadNotifications;
+                if (unreadNotifications > 0) {
+                    // if counter is hidden, show it
+                    if (notificationCounters[counterIndex].style.display == 'none') {
+                        $(notificationCounters[counterIndex]).fadeIn('slow');
+                    }
+                } else {
+                    // we have zero unread notifications, hide counter
+                    if (notificationCounters[counterIndex].style.display != 'none') {
+                        $(notificationCounters[counterIndex]).fadeOut('slow');
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Deletes obsolete notifications, if number of opened notifications bigger than numbers of notifications.
+     */
+    function deleteObsoleteNotifications(notifications) {
+        var notificationDropDownLayer = $('#hp-notifications-item');
+        while (notificationDropDownLayer.find('li').length > notifications.length + 1) { // length + 1 because the last li element is no notification
+            notificationDropDownLayer.find('li:nth-last-child(2)').remove();
+        }
+    }
+
+    /**
+     * Notification WebSocket on message listener. If wsDebug=true, WebSocket communication is logged.
+     *
+     * @param event
+     */
     function wsNotificationOnMessage(event) {
         try {
             var notifications = JSON.parse(event.data);
-            var notificationDropDownLayer = $('#hp-notifications-item');
 
             if (wsDebug) {
                 console.log(notifications);
             }
 
-            // create new elements for each new notification, append them before last list
-            // element (like "show all notifications")
-            for (var notificationIndex in notifications) {
-                if (notifications.hasOwnProperty(notificationIndex)) {
-                    var currentNotification = notifications[notificationIndex];
-                    var notificationListElement = $('#notification_' + currentNotification.id);
+            updateNotifications(notifications);
 
-                    // check, if the li element is already available
-                    if (notificationListElement.length) {
-                        // li element available, do nothing
-                        continue;
-                    }
-
-                    // li element not available, create new li element and append
-                    var newNotification = document.createElement('li');
-                    newNotification.className = currentNotification.is_read ? 'read' : 'unread';
-                    newNotification.innerHTML = '<div>' + currentNotification.content + '</div>';
-                    newNotification.id = 'notification_' + currentNotification.id;
-                    notificationDropDownLayer.find('li:first').before(newNotification);
-                }
-            }
-
-            // if badges are available, increase counter
-            var notificationCounters = notificationDropDownLayer.find('.badge');
-            if (notificationCounters.length) {
-                for (var counterIndex in notificationCounters) {
-                    if (notificationCounters.hasOwnProperty(counterIndex)) {
-                        notificationCounters[counterIndex].innerHTML = notifications.length;
-                    }
-                }
-            }
-
-            // delete obsolete notifications, if number of opened notifications bigger than numbers of new notifications
-            while (notificationDropDownLayer.find('li').length > notifications.length + 1) {
-                notificationDropDownLayer.find('li:nth-last-child(2)').remove();
-            }
-
-            var setOpen = false;
-            if (notificationDropDownLayer.hasClass('open')) {
-                setOpen = true;
-            }
-
-            if (setOpen == true) {
-                notificationDropDownLayer.addClass('open');
-            }
+//            var setOpen = false;
+//            if (notificationDropDownLayer.hasClass('open')) {
+//                setOpen = true;
+//            }
+//
+//            if (setOpen == true) {
+//                notificationDropDownLayer.addClass('open');
+//            }
         } catch (exception) {
             if (wsDebug) {
                 console.log('Client exception: ' + exception);
@@ -86,7 +169,11 @@ $(document).ready(function () {
         }
     }
 
-    // notification WebSocket on error listener
+    /**
+     * Notification WebSocket on error listener. Errors are logged on wsDebug=true only.
+     *
+     * @param event
+     */
     function wsNotificationOnError(event) {
         if (wsDebug) {
             console.log('Error: ' + event.data);

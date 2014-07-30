@@ -1,0 +1,14 @@
+@(notifications: List[NewNotification], limit: Integer, currentPage: Integer)
+@import helper._
+
+@main("Newsstream") {
+@if(notifications != null) {
+    @for(notification <- notifications) {
+        <div>
+            <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>
+        </div>
+    }
+} else {
+    <div>@Messages("notification.nothing_new")</div>
+}
+}

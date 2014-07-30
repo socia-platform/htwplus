@@ -12,6 +12,7 @@ import models.NewNotification;
 import models.Notification;
 import models.actors.NewNotificationActor;
 import play.Logger;
+import play.Play;
 import play.api.templates.Html;
 import play.db.jpa.Transactional;
 import play.libs.Akka;
@@ -22,23 +23,43 @@ import play.mvc.Security;
 import play.mvc.WebSocket;
 import scala.collection.mutable.StringBuilder;
 import scala.concurrent.duration.Duration;
+import views.html.Notification.view;
 
 @Transactional
 @Security.Authenticated(Secured.class)
-public class NotificationController extends BaseController{
-	
+public class NotificationController extends BaseController {
+    static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.notification.limit"));
+
+    /**
+     * @deprecated Deprecated since refactor of notification system
+     * @return Html
+     */
 	public static Html view() {
 		return getNotifications();
 	}
-	
+
+    /**
+     * @deprecated Deprecated since refactor of notification system
+     * @return Result
+     */
 	public static Result viewAjax() {
 		return ok(NotificationController.getNotifications());
 	}
 
+    /**
+     * @deprecated Deprecated since refactor of notification system
+     * @return Result
+     */
     public static Result viewHistoryAjax() {
         return ok(NotificationController.getNotifications());
     }
-	
+
+    /**
+     * Returns all notifications for current user.
+     *
+     * @return Html rendered instance
+     */
+    @Transactional(readOnly = true)
 	private static Html getNotifications() {
 		Account account = Component.currentAccount();
 		
@@ -48,30 +69,56 @@ public class NotificationController extends BaseController{
 
         List<NewNotification> list = null;
         try {
-            list = NewNotification.findByAccount(account.id);
+            list = NewNotification.findByAccountId(account.id);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
         return views.html.Notification.menuitem.render(list);
 	}
-	
-	public static Result forward(Long notificationId, String url) {
-		Notification note = Notification.findById(notificationId);
-		Logger.info(url);
 
-		if (note == null) {
+    /**
+     * Redirects to the target URL of the notification, if user has access.
+     *
+     * @param notificationId ID of the notification
+     * @return SimpleResult with redirection
+     */
+    @Transactional
+	public static Result forward(Long notificationId) {
+		NewNotification notification = NewNotification.findById(notificationId);
+
+		if (notification == null) {
 			return badRequest("Das gibts doch garnicht!");
 		}
 		
-		if (!Secured.deleteNotification(note)) {
+		if (!Secured.hasAccessToNotification(notification)) {
 			return redirect(controllers.routes.Application.index());
 		}
 
-        note.notificationRead = true;
-        note.update();
+        notification.isRead = true;
+        notification.update();
 
-		return redirect(url);
+		return redirect(notification.targetUrl);
 	}
-	
+
+    /**
+     * Shows all notifications.
+     *
+     * @param page Current page
+     * @return Result
+     */
+    @Transactional(readOnly = true)
+    public static Result showAll(int page) {
+        List<NewNotification> notifications = null;
+        try {
+            notifications = NewNotification.findByAccountIdForPage(Component.currentAccount().id, NotificationController.LIMIT, page);
+        } catch (Throwable throwable) { throwable.printStackTrace(); }
+
+        return ok(view.render(notifications, LIMIT, page));
+    }
+
+    /**
+     * @deprecated Deprecated since refactor of notification system
+     * @return Result
+     */
 	public static Result deleteAll() {
         Notification.markAllAsReadByUser(Component.currentAccount());
         flash("success", "Alle Neuigkeiten wurden als gelesen markiert.");
@@ -96,6 +143,7 @@ public class NotificationController extends BaseController{
      *
      * @return Web socket instance including JSON nodes
      */
+    @Transactional(readOnly = true)
     public static WebSocket<JsonNode> wsNotifications() {
         final Long accountId = NotificationController.getCurrentAccountId();
 

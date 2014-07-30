@@ -12,6 +12,7 @@ import play.api.templates.Html;
 import play.db.jpa.JPA;
 import play.libs.F;
 
+import javax.persistence.Transient;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      * between more than one possible states of this notifiable object (e.g. a post can be profile, stream
      * or group post).
      */
+    @Transient
     public String type;
 
     @Override
@@ -64,16 +66,15 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
     }
 
     @Override
-    public String render(NewNotification notification) {
-        try {
-            Content html = this.getRendered(notification);
+    public String render(NewNotification notification) throws Exception {
+        Content html = this.getRendered(notification);
 
-            return html.toString().trim();
-        } catch (Exception e) {
-            Logger.error(e.getMessage());
+        return html.toString().trim();
+    }
 
-            return "";
-        }
+    @Override
+    public String getTargetUrl() {
+        return controllers.Application.index().toString();
     }
 
     /**

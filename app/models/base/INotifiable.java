@@ -29,7 +29,7 @@ public interface INotifiable {
      * @param notification The notification which is rendered
      * @return Rendered HTML
      */
-    public String render(NewNotification notification);
+    public String render(NewNotification notification) throws Exception;
 
     /**
      * Returns the reference, this notification is about (e.g. when posting the actual Post)
@@ -37,4 +37,11 @@ public interface INotifiable {
      * @return BaseModel of the reference
      */
     public BaseModel getReference();
+
+    /**
+     * Returns the target URL, to redirect to, after the user clicks this notification.
+     *
+     * @return Target URL
+     */
+    public String getTargetUrl();
 }

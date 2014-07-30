@@ -3,7 +3,7 @@
 @import helper._
 
 @if(!notification.isRead) {
-<a href="@routes.ProfileController.stream(notifiable.parent.account.id)"><span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.comment_profile_own", truncate(notifiable.parent.content, 20), notifiable.parent.account.name))</a>
+<span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.comment_profile_own", truncate(notifiable.parent.content, 20), notifiable.parent.account.name))
 } else {
-<a href="@routes.ProfileController.stream(notifiable.parent.account.id)"><span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.comment_profile_own_read", truncate(notifiable.parent.content, 20), notifiable.parent.account.name))</a>
+<span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.comment_profile_own_read", truncate(notifiable.parent.content, 20), notifiable.parent.account.name))
 }

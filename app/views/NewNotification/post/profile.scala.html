@@ -4,7 +4,7 @@
 @import helper._
 
 @if(!notification.isRead) {
-<a href="@routes.ProfileController.stream(notifiable.account.id)"><span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.profile_new_post", fullTrim(notifiable.getSender().name)))</a>
+<span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.profile_new_post", fullTrim(notifiable.getSender().name)))
 } else {
-<a href="@routes.ProfileController.stream(notifiable.account.id)"><span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.profile_read_post", fullTrim(notifiable.getSender().name)))</a>
+<span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.profile_read_post", fullTrim(notifiable.getSender().name)))
 }

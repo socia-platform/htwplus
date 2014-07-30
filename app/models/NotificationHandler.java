@@ -62,18 +62,27 @@ public class NotificationHandler {
                             notification.recipient = recipient;
                             notification.sender = notifiable.getSender();
                             notification.reference = notifiable.getReference();
-                            notification.rendered = notifiable.render(notification);
+                            notification.targetUrl = notifiable.getTargetUrl();
 
-                            // persist notification using JPA.withTransaction, as we are not in the main
-                            // execution context of play, but in Akka sub-system
-                            JPA.withTransaction(new F.Callback0() {
-                                @Override
-                                public void invoke() throws Throwable {
-                                    notification.create();
-                                }
-                            });
-                            Logger.info("Created new async Notification for User: " + recipient.id.toString());
-                            this.handleMail(notification);
+                            try {
+                                notification.rendered = notifiable.render(notification);
+
+                                // persist notification using JPA.withTransaction, as we are not in the main
+                                // execution context of play, but in Akka sub-system
+                                JPA.withTransaction(new F.Callback0() {
+                                    @Override
+                                    public void invoke() throws Throwable {
+                                        notification.create();
+                                    }
+                                });
+
+                                Logger.info("Created new async Notification for User: " + recipient.id.toString());
+                                this.handleMail(notification);
+                            } catch (Exception e) {
+                                Logger.error("Could not render notification. Notification will not be stored in DB" +
+                                                " nor will the user be notified in any way." + e.getMessage()
+                                );
+                            }
                         }
                     }
                     // sends mail to recipient, if he wishes to be notified by mail

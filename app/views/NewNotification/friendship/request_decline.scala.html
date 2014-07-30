@@ -3,7 +3,7 @@
 @import helper._
 
 @if(!notification.isRead) {
-<a href="@routes.FriendshipController.index()"><span class="glyphicon glyphicon-remove"></span>@Html(Messages("friendship.request_decline", notifiable.friend.name))</a>
+<span class="glyphicon glyphicon-remove"></span>@Html(Messages("friendship.request_decline", notifiable.friend.name))
 } else {
-<a href="@routes.FriendshipController.index()"><span class="glyphicon glyphicon-remove"></span>@Html(Messages("friendship.request_decline_read", notifiable.friend.name))</a>
+<span class="glyphicon glyphicon-remove"></span>@Html(Messages("friendship.request_decline_read", notifiable.friend.name))
 }

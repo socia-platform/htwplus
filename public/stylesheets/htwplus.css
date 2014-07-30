@@ -183,6 +183,41 @@ h1 {
 	color: #76B900 !important;
 }
 
+.hp-dropdown-search li.notification-show-all {
+    font-weight: bold;
+}
+
+.hp-dropdown-search li.notification-element div {
+    display: table;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.hp-dropdown-search li.notification-element:hover {
+    background-color: #ededed;
+}
+
+.hp-dropdown-search li.notification-element div a {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 7px 10px 7px 10px;
+    width: 100%;
+}
+
+.hp-dropdown-search li.read div a {
+    color: #bcbcbc;
+}
+
+.hp-dropdown-search li.unread div a {
+    color: black;
+}
+
+.hp-dropdown-search li.notification-element div div {
+    display: table-cell;
+    vertical-align: middle;
+}
+
 .hp-nav .dropdown {
 	height: 50px;
 }

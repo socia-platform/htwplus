@@ -14,14 +14,15 @@ import play.db.jpa.JPA;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
-	public final static String GROUP = "group";                             // post to group news stream
-	public final static String PROFILE = "profile";                         // post to own news stream
-	public final static String STREAM = "stream";                           // post to a foreign news stream
-    public final static String COMMENT_PROFILE = "comment_profile";         // comment on a profile post
-    public final static String COMMENT_GROUP = "comment_group";             // comment on a group post
-    public final static String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
+	public static final String GROUP = "group";                             // post to group news stream
+	public static final String PROFILE = "profile";                         // post to own news stream
+	public static final String STREAM = "stream";                           // post to a foreign news stream
+    public static final String COMMENT_PROFILE = "comment_profile";         // comment on a profile post
+    public static final String COMMENT_GROUP = "comment_group";             // comment on a group post
+    public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
+    public static final int PAGE = 1;
 
-	@Required
+    @Required
 	@Column(length=2000)
 	public String content;
 
@@ -280,5 +281,30 @@ public class Post extends BaseNotifiable implements INotifiable {
         return this.belongsToAccount()
                 ? this.getAsAccountList(this.account)
                 : this.getGroupAsAccountList(this.group);
+    }
+
+    @Override
+    public String getTargetUrl() {
+        if (this.type.equals(Post.GROUP)) {
+            return controllers.routes.GroupController.view(this.group.id, Post.PAGE).toString();
+        }
+
+        if (this.type.equals(Post.PROFILE)) {
+            return controllers.routes.ProfileController.stream(this.account.id, Post.PAGE).toString();
+        }
+
+        if (this.type.equals(Post.COMMENT_PROFILE)) {
+            return controllers.routes.ProfileController.stream(this.parent.account.id, Post.PAGE).toString();
+        }
+
+        if (this.type.equals(Post.COMMENT_GROUP)) {
+            return controllers.routes.GroupController.view(this.parent.group.id, Post.PAGE).toString();
+        }
+
+        if (this.type.equals(Post.COMMENT_OWN_PROFILE)) {
+            return controllers.routes.ProfileController.stream(this.parent.account.id, Post.PAGE).toString();
+        }
+
+        return super.getTargetUrl();
     }
 }
