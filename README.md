@@ -14,6 +14,7 @@ HTWplus
 - rename conf/META-INF/persistence.sample.xml to persistence.xml
 - edit application.conf 
   - change database settings
+  - change media.path and media.tempPath
 - edit persistence.xml
   - if you are running a unix based OS, change 'hibernate.search.default.indexBase' value to an absolute path
 
