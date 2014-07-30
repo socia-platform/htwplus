@@ -631,6 +631,7 @@ table .hp-avatar {
     float: none;
     right: 54px;
     left: auto;
+    min-width: initial;
 }
 
 .hp-optionsMenu .dropdown {
