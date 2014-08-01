@@ -69,6 +69,10 @@ $(".hp-optionsTable>tr>td:not(.hp-optionsMenu)").on("click", function(e) {
     return false;
 });
 
+$(".hp-optionsTable>tr>td>a").on("click", function(e) {
+    e.stopPropagation();
+});
+
 
 
 $(document).ready(function () {
