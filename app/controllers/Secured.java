@@ -36,7 +36,7 @@ public class Secured extends Security.Authenticator {
             long currentT = new Date().getTime();
             long timeout = Long.valueOf(Play.application().configuration().getString("sessionTimeout")) * 1000 * 60;
             long passedT = currentT - previousT;
-            if (passedT > timeout && ctx.session().get("rememberMe").equals("0")) {
+            if (passedT > timeout && !ctx.session().containsKey("rememberMe")) {
                 // session expired
             	ctx.session().clear();
                 return null;
