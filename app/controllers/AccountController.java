@@ -83,6 +83,9 @@ public class AccountController extends BaseController {
 
 		session().clear();
 		session("id", account.id.toString());
+		if(form.get().rememberMe != null){
+			session("rememberMe", "1");
+		}
 		return redirect(routes.Application.index());
 	}
 
