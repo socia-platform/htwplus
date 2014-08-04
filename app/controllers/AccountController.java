@@ -99,6 +99,10 @@ public class AccountController extends BaseController {
 					Account.findByEmail(loginForm.get().email).id.toString());
 			session("firstname",
 					Account.findByEmail(loginForm.get().email).firstname);
+			if(loginForm.get().rememberMe != null){
+				session("rememberMe", "1");
+			}
+			
 			return redirect(routes.Application.index());
 		}
 	}

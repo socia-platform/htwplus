@@ -1,6 +1,8 @@
 package controllers;
 
 
+import java.util.Date;
+
 import models.Account;
 import models.Friendship;
 import models.Group;
@@ -11,6 +13,7 @@ import models.Post;
 import models.enums.AccountRole;
 import models.enums.GroupType;
 import play.Logger;
+import play.Play;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -21,7 +24,29 @@ public class Secured extends Security.Authenticator {
 
 	@Override
     public String getUsername(Context ctx) {
-        return ctx.session().get("id");
+		
+		// see if user is logged in
+        if (ctx.session().get("id") == null)
+            return null;
+ 
+        // see if the session is expired
+        String previousTick = ctx.session().get("userTime");
+        if (previousTick != null && !previousTick.equals("")) {
+            long previousT = Long.valueOf(previousTick);
+            long currentT = new Date().getTime();
+            long timeout = Long.valueOf(Play.application().configuration().getString("sessionTimeout")) * 1000 * 60;
+            long passedT = currentT - previousT;
+            if (passedT > timeout && ctx.session().get("rememberMe").equals("0")) {
+                // session expired
+            	ctx.session().clear();
+                return null;
+            } 
+        }
+ 
+        // update time in session
+        String tickString = Long.toString(new Date().getTime());
+        ctx.session().put("userTime", tickString);
+		return ctx.session().get("id");
     }
 	
 	@Override
