@@ -571,6 +571,13 @@ div.hp-pagination {
 	width: 32px;
 }
 
+@media (max-width: 350px) {
+    .hp-nav li > a {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
 dl .hp-avatar {
 	width: 80px;
 	height: 80px;
