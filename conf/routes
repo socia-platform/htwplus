@@ -75,9 +75,6 @@ GET 	/media/:id/delete					controllers.MediaController.delete(id:Long)
 
 #Notification
 GET     /notification                       controllers.NotificationController.showAll(page: Integer ?= 1)
-GET		/notification/delete				controllers.NotificationController.deleteAll()
-GET		/notification/view					controllers.NotificationController.viewAjax()
-GET		/notification/view_history			controllers.NotificationController.viewHistoryAjax()
 GET		/notification/:id					controllers.NotificationController.forward(id:Long)
 GET     /websocket/notification             controllers.NotificationController.wsNotifications()
 

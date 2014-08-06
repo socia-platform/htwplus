@@ -7,6 +7,7 @@ import play.libs.Akka;
 import play.libs.F;
 import scala.concurrent.duration.Duration;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,8 +50,15 @@ public class NotificationHandler {
                 new Runnable() {
                     // runs the Akka schedule
                     public void run() {
+                        List<Account> recipients = notifiable.getRecipients();
+
+                        // if no recipients, abort
+                        if (recipients == null || recipients.size() == 0) {
+                            return;
+                        }
+
                         // run through all recipients
-                        for (Account recipient : notifiable.getRecipients()) {
+                        for (Account recipient : recipients) {
                             // if sender == recipient, it is not necessary to create a notification -> continue
                             if (recipient.equals(notifiable.getSender())) {
                                 continue;

@@ -50,6 +50,7 @@ import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import controllers.Component;
 import controllers.routes;
+import play.libs.F;
 
 @Entity
 @Indexed
@@ -99,10 +100,32 @@ public class Account extends BaseModel {
 
 	public Boolean approved;
 
+    /**
+     * Returns an account by account ID.
+     *
+     * @param id Account ID
+     * @return Account instance
+     * @throws Throwable
+     */
 	public static Account findById(Long id) {
 		return JPA.em().find(Account.class, id);
 	}
-	
+
+    /**
+     * Returns an account by account ID (transactional).
+     *
+     * @param id Account ID
+     * @return Account instance
+     * @throws Throwable
+     */
+    public static Account findByIdTransactional(final Long id) throws Throwable {
+        return JPA.withTransaction(new F.Function0<Account>() {
+            @Override
+            public Account apply() throws Throwable {
+                return Account.findById(id);
+            }
+        });
+    }
 	
 	@SuppressWarnings("unchecked")
 	public static List<Account> findAll(){

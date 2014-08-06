@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -72,7 +73,9 @@ public class NotificationController extends BaseController {
             list = NewNotification.findByAccountId(account.id);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
-        return views.html.Notification.menuitem.render(list);
+        List<Integer> countedNotifications = NotificationController.countNotifications(list);
+
+        return views.html.Notification.menuitem.render(list, countedNotifications.get(0), countedNotifications.get(1));
 	}
 
     /**
@@ -182,5 +185,38 @@ public class NotificationController extends BaseController {
                 });
             }
         };
+    }
+
+    /**
+     * Loops over a notification list and counts:
+     * 1st element (index 0): All notifications
+     * 2nd element (index 1): Unread notifications
+     * 3rd element (index 2): Read notifications
+     *
+     * @param notifications List of notifications
+     * @return List with count of all, unread and read notifications
+     */
+    public static List<Integer> countNotifications(List<NewNotification> notifications) {
+        int countAll = 0;
+        int countUnread = 0;
+        int countRead = 0;
+        List<Integer> count = new LinkedList<Integer>();
+
+        if (notifications != null) {
+            countAll = notifications.size();
+            for (NewNotification notification : notifications) {
+                if (notification.isRead) {
+                    countRead++;
+                }
+            }
+            countUnread = countAll - countRead;
+        }
+
+        // add counted elements to list
+        count.add(0, countAll);
+        count.add(1, countUnread);
+        count.add(2, countRead);
+
+        return count;
     }
 }

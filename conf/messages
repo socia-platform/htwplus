@@ -58,3 +58,7 @@ group.group_invitation=Du wurdest von {0} in die Gruppe <span class="hp-green">{
 group.group_new_request=Neue Anfrage für die Gruppe <span class="hp-green">{0}</span>
 group.group_request_success=Deine Anfrage für die Gruppe <span class="hp-green">{0}</span> wurde akzeptiert
 group.group_request_decline=Deine Anfrage für die Gruppe <span class="hp-green">{0}</span> wurde abgelehnt
+group.invite_no_invite=Bitte mindestens eine Person einladen
+group.invite_invited=Einladungen verschickt!
+group.group_request_sent=Deine Anfrage wurde erfolgreich übermittelt!
+group.group_not_found=Gruppe wurde nicht gefunden!

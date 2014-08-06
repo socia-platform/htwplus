@@ -87,7 +87,7 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
 
     @Override
     public String getTargetUrl() {
-        return controllers.Application.index().toString();
+        return controllers.routes.Application.index().toString();
     }
 
     /**

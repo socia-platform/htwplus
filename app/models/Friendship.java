@@ -11,6 +11,7 @@ import models.base.INotifiable;
 import play.db.jpa.JPA;
 
 import models.enums.LinkType;
+import play.libs.F;
 
 @Entity
 @Table(uniqueConstraints=
@@ -88,7 +89,14 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 			return null;
 		}
 	}
-	
+
+    /**
+     * Returns true, if two accounts have a friendly relationship.
+     *
+     * @param me Account instance
+     * @param potentialFriend Account instance
+     * @return True, if both accounts are friends
+     */
 	public static boolean alreadyFriendly(Account me, Account potentialFriend) {
 		try {
 			JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 and fs.friend.id = ?2 AND fs.linkType = ?3")
@@ -98,6 +106,22 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 		}
 		return true;
 	}
+
+    /**
+     * Returns true, if two accounts have a friendly relationship (transactional).
+     *
+     * @param me Account instance
+     * @param potentialFriend Account instance
+     * @return True, if both accounts are friends
+     */
+    public static boolean alreadyFriendlyTransactional(final Account me, final Account potentialFriend) throws Throwable {
+        return JPA.withTransaction(new F.Function0<Boolean>() {
+            @Override
+            public Boolean apply() throws Throwable {
+                return Friendship.alreadyFriendly(me, potentialFriend);
+            }
+        });
+    }
 	
 	public static boolean alreadyRejected(Account me, Account potentialFriend) {
 		try {

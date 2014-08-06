@@ -1,20 +1,12 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-import models.base.BaseModel;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.GroupType;
@@ -57,6 +49,7 @@ import play.Logger;
 import play.data.validation.ValidationError;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
+import play.libs.F;
 
 @Indexed
 @Entity
@@ -94,7 +87,13 @@ public class Group extends BaseNotifiable implements INotifiable {
 	@OrderBy("createdAt DESC")
 	public List<Media> media;
 
-	// GETTER & SETTER
+    /**
+     * Possible invitation list
+     */
+    @Transient
+    public Collection<String> inviteList = null;
+
+    // GETTER & SETTER
 
 	public String getTitle() {
 		return title;
@@ -138,11 +137,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 	}
 	
 	public static boolean validateToken(String token) {
-		if(token.equals("") || token.length() < 4 || token.length() > 45){
-			return false;
-		} else {
-			return true;
-		}
+        return !(token.equals("") || token.length() < 4 || token.length() > 45);
 	}
 
 	public void createWithGroupAccount(Account account) {
@@ -181,7 +176,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 		}
 		
 		// Delete Notifications
-		Notification.deleteByObject(this.id);
+        NewNotification.deleteReferences(this);
 		JPA.em().remove(this);
 	}
 
@@ -204,10 +199,16 @@ public class Group extends BaseNotifiable implements INotifiable {
 
 	@SuppressWarnings("unchecked")
 	public static List<Group> all() {
-		List<Group> groups = JPA.em().createQuery("FROM Group").getResultList();
-		return groups;
+        return JPA.em().createQuery("FROM Group").getResultList();
 	}
 
+    /**
+     * Returns true, if an account is member of a group.
+     *
+     * @param group Group instance
+     * @param account Account instance
+     * @return True, if account is member of group
+     */
 	public static boolean isMember(Group group, Account account) {
 		@SuppressWarnings("unchecked")
 		List<GroupAccount> groupAccounts = (List<GroupAccount>) JPA
@@ -217,18 +218,30 @@ public class Group extends BaseNotifiable implements INotifiable {
 				.setParameter(1, account.id).setParameter(2, group.id)
 				.setParameter(3, LinkType.establish).getResultList();
 
-		if (groupAccounts.isEmpty()) {
-			return false;
-		} else {
-			return true;
-		}
-
+        return !groupAccounts.isEmpty();
 	}
+
+    /**
+     * Returns true, if an account is member of a group (transactional).
+     *
+     * @param group Group instance
+     * @param account Account instance
+     * @return True, if account is member of group
+     * @throws Throwable
+     */
+    public static boolean isMemberTransactional(final Group group, final Account account) throws Throwable {
+        return JPA.withTransaction(new F.Function0<Boolean>() {
+            @Override
+            public Boolean apply() throws Throwable {
+                return Group.isMember(group, account);
+            }
+        });
+    }
 
 	/**
 	 * Search for a group with a given keyword.
 	 * 
-	 * @param keyword
+	 * @param keyword Keyword to search for
 	 * @return List of groups wich matches with the keyword
 	 */
 
@@ -309,8 +322,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 		int offset = (page * limit) - limit;
 				
 		FullTextQuery fullTextQuery = searchForGroupByKeyword(keyword, limit, offset);
-		List<Group> groups = fullTextQuery.getResultList(); // The result...
-		return groups;
+        return fullTextQuery.getResultList();
 	}
 	
 	public static int countGroupSearch(String keyword) {
@@ -318,8 +330,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 		FullTextQuery fullTextQuery = searchForGroupByKeyword(keyword, 0, 0);
 		
 		// SearchException: HSEARCH000105: Cannot safely compute getResultSize() when a Criteria with restriction is used.
-		int count = fullTextQuery.getResultList().size();
-		return count;
+        return fullTextQuery.getResultList().size();
 	}
 
 	public static FullTextQuery searchForCourseByKeyword(String keyword, int limit, int offset) {
@@ -394,8 +405,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 		int offset = (page * limit) - limit;
 				
 		FullTextQuery fullTextQuery = searchForCourseByKeyword(keyword, limit, offset);
-		List<Group> courses = fullTextQuery.getResultList(); // The result...
-		return courses;
+        return fullTextQuery.getResultList();
 	}
 	
 	public static int countCourseSearch(String keyword) {
@@ -403,8 +413,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 		FullTextQuery fullTextQuery = searchForCourseByKeyword(keyword, 0, 0);
 		
 		// SearchException: HSEARCH000105: Cannot safely compute getResultSize() when a Criteria with restriction is used.
-		int count = fullTextQuery.getResultList().size();
-		return count;
+        return fullTextQuery.getResultList().size();
 	}
 	
 	
@@ -425,6 +434,42 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     @Override
     public List<Account> getRecipients() {
+        List<Account> recipients = new ArrayList<Account>();
+        if (this.type.equals(Group.GROUP_INVITATION)) {
+            // this is a group invitation, all selected people will be notified
+            for (String accountId : inviteList) {
+                try {
+                    final Account account = Account.findByIdTransactional(Long.parseLong(accountId));
+                    GroupAccount groupAccount = GroupAccount.findTransactional(account, this);
+                    if (!Group.isMemberTransactional(this, account) && Friendship.alreadyFriendlyTransactional(this.getSender(), account) && groupAccount == null) {
+                        final Group thisGroup = this;
+                        JPA.withTransaction(new F.Callback0() {
+                            @Override
+                            public void invoke() throws Throwable {
+                                (new GroupAccount(account, thisGroup, LinkType.invite)).create();
+                            }
+                        });
+                        recipients.add(account);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+
+            return recipients;
+        } else if (this.type.equals(Group.GROUP_NEW_REQUEST)) {
+            // group entry request notification, notify the owner of the group
+            return this.getAsAccountList(this.owner);
+        }
+
+        // this is a request accept or decline notification, notify the requester
         return this.temporaryRecipients;
+    }
+
+    @Override
+    public String getTargetUrl() {
+        return controllers.routes.GroupController.index().toString();
     }
 }
