@@ -40,9 +40,9 @@ public class AccountController extends BaseController {
 
 	private static Result LDAPAuthenticate() {
 		Form<Login> form = form(Login.class).bindFromRequest();
-
 		String username = form.field("email").value();
 		String password = form.field("password").value();
+		String rememberMe = form.field("rememberMe").value();
 		
 		// Clean the username
 		username = username.trim().toLowerCase();
@@ -83,6 +83,10 @@ public class AccountController extends BaseController {
 
 		session().clear();
 		session("id", account.id.toString());
+		if(rememberMe != null){
+			session("rememberMe", "1");
+		}
+
 		return redirect(routes.Application.index());
 	}
 
@@ -99,6 +103,10 @@ public class AccountController extends BaseController {
 					Account.findByEmail(loginForm.get().email).id.toString());
 			session("firstname",
 					Account.findByEmail(loginForm.get().email).firstname);
+			if(loginForm.get().rememberMe != null){
+				session("rememberMe", "1");
+			}
+			
 			return redirect(routes.Application.index());
 		}
 	}
