@@ -16,9 +16,9 @@ import models.enums.LinkType;
 @Table(uniqueConstraints=
 @UniqueConstraint(columnNames = {"account_id", "friend_id"})) 
 public class Friendship extends BaseNotifiable implements INotifiable {
-    public final static String FRIEND_REQUEST_SUCCESS = "request_successful";
-    public final static String FRIEND_REQUEST_DECLINE = "request_decline";
-    public final static String FRIEND_NEW_REQUEST = "new_request";
+    public static final String FRIEND_REQUEST_SUCCESS = "request_successful";
+    public static final String FRIEND_REQUEST_DECLINE = "request_decline";
+    public static final String FRIEND_NEW_REQUEST = "new_request";
     public static final int PAGE = 1;
 	
 	@ManyToOne

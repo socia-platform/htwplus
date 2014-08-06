@@ -4,14 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 import controllers.Navigation.Level;
-import models.Account;
-import models.Friendship;
-import models.Group;
-import models.GroupAccount;
-import models.Media;
-import models.Notification;
+import models.*;
 import models.Notification.NotificationType;
-import models.Post;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import play.Logger;
@@ -373,16 +367,20 @@ public class GroupController extends BaseController {
 		Group group = Group.findById(groupId);
 		Account currentUser = Component.currentAccount();
 		
-		if(Secured.inviteMember(group)) {
+		if (Secured.inviteMember(group)) {
 			DynamicForm form = Form.form().bindFromRequest();
 			Collection<String> inviteList = form.data().values();	
 			for (String accountId : inviteList) {
 				try {
 					Account account = Account.findById(Long.parseLong(accountId));
 					GroupAccount groupAccount = GroupAccount.find(account, group);
-					if(!Secured.isMemberOfGroup(group, account) && Friendship.alreadyFriendly(currentUser, account) && groupAccount == null) {
+					if (!Secured.isMemberOfGroup(group, account) && Friendship.alreadyFriendly(currentUser, account) && groupAccount == null) {
 						new GroupAccount(account, group, LinkType.invite).create();
-						Notification.newNotification(NotificationType.GROUP_INVITATION, group.id, account);
+						//Notification.newNotification(NotificationType.GROUP_INVITATION, group.id, account);
+                        group.type = Group.GROUP_INVITATION;
+                        group.addTemporaryRecipient(account);
+                        group.temporarySender = currentUser;
+                        NotificationHandler.getInstance().createNotification(group);
 					}
 				} catch (Exception e) {
 					flash("error","Etwas ist schief gelaufen.");

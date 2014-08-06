@@ -29,6 +29,19 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
     @Transient
     public String type;
 
+    /**
+     * This list can be used as a temporary recipient list, if the notifiable object does not save the recipient list
+     * in the model.
+     */
+    @Transient
+    public List<Account> temporaryRecipients;
+
+    /**
+     * This attribute can be used as a temporary sender, if the notifiable object does not save the sender in the model.
+     */
+    @Transient
+    public Account temporarySender;
+
     @Override
     public BaseModel getReference() {
         return this;
@@ -110,5 +123,18 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
                     + "\", returning empty list: " + ex.getMessage());
             return new ArrayList<Account>();
         }
+    }
+
+    /**
+     * Adds an account to the temporary recipient list.
+     *
+     * @param recipient One of the temporary recipients
+     */
+    public void addTemporaryRecipient(Account recipient) {
+        if (this.temporaryRecipients == null) {
+            this.temporaryRecipients = new ArrayList<Account>();
+        }
+
+        this.temporaryRecipients.add(recipient);
     }
 }

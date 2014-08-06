@@ -15,6 +15,8 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import models.base.BaseModel;
+import models.base.BaseNotifiable;
+import models.base.INotifiable;
 import models.enums.GroupType;
 import models.enums.LinkType;
 
@@ -64,9 +66,13 @@ import play.db.jpa.JPA;
 		@TokenFilterDef(factory = LowerCaseFilterFactory.class),
 		@TokenFilterDef(factory = StopFilterFactory.class, params = { @Parameter(name = "ignoreCase", value = "true") }) })
 @org.hibernate.search.annotations.Analyzer(definition = "searchtokenanalyzer")
-public class Group extends BaseModel {
+public class Group extends BaseNotifiable implements INotifiable {
+    public static final String GROUP_INVITATION = "group_invitation";
+    public static final String GROUP_NEW_REQUEST = "group_new_request";
+    public static final String GROUP_REQUEST_SUCCESS = "group_request_success";
+    public static final String GROUP_REQUEST_DECLINE = "group_request_decline";
 
-	@Required
+    @Required
 	@Column(unique = true)
 	@Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
 	public String title;
@@ -411,4 +417,14 @@ public class Group extends BaseModel {
 		}
 		return criteria;
 	}
+
+    @Override
+    public Account getSender() {
+        return this.temporarySender;
+    }
+
+    @Override
+    public List<Account> getRecipients() {
+        return this.temporaryRecipients;
+    }
 }
