@@ -13,7 +13,7 @@
 	<tbody class="hp-optionsTable">
 		@for(user <- users) {	
 			<tr>
-				<td style="padding:4px;">@views.html.snippets.userLinkAvatar(user)</td>
+				<td>@views.html.snippets.userLinkAvatar(user)</td>
 				<td>@views.html.snippets.userLink(user)</td>
 				<td class="hp-optionsMenu">
                     @if(user != Component.currentAccount) {
