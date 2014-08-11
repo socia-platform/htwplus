@@ -1,0 +1,27 @@
+@(accountGroup: GroupAccount)
+@import models.enums._
+@import helper._
+
+<div class="dropdown">
+    <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-chevron-down"></span>
+    </a>
+
+    <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+
+        @if(accountGroup.linkType.equals(models.enums.LinkType.invite)) {
+        <li><a href="@routes.GroupController.acceptInvitation(accountGroup.group.id, accountGroup.account.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-ok"></span><br>Einladung akzeptieren
+        </a></li>
+
+        <li><a href="@routes.GroupController.declineInvitation(accountGroup.group.id, accountGroup.account.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-remove"></span><br>Einladung ablehnen
+        </a></li>
+        } else {
+        <li><a href="@routes.GroupController.removeMember(accountGroup.group.id, accountGroup.account.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-remove"></span><br>@if(accountGroup.linkType.equals(models.enums.LinkType.reject)) {löschen} else {Anfrage löschen}
+        </a></li>
+        }
+
+    </ul>
+</div>
