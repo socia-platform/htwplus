@@ -49,30 +49,24 @@
 			<dt>Mitglieder</dt>
 			<dd>
 				<table class="table table-hover table-condensed">
-					<colgroup>
-						<col width="70%">
-						<col width="30%">
-					</colgroup>
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Optionen</th>
-						</tr>
-					</thead>
-					<tbody>
+                    <thead>
+                        <tr>
+                            <th style="width:36px"></th>
+                            <th>Name</th>
+                            <th style="width:35px"></th>
+                        </tr>
+                    </thead>
+					<tbody class="hp-optionsTable">
 						@defining(GroupAccount.findAccountsByGroup(group, LinkType.establish)) { accounts =>
 				             @for(account <- accounts) {              
 	                            <tr>
-	                                <td>
-	                                	<a data-placement="top" data-original-title="@account.name" data-content="Rolle: Student &lt;br /&gt; Studiengang: Angewandte Informatik" data-delay="500" data-trigger="hover" data-html="true" rel="popover" href="@routes.ProfileController.view(account.id)">@account.name</a>
-	                                </td>
-	                                @if(account.id != group.owner.id){
-	                                <td>
-	                                	<a href="@routes.GroupController.removeMember(group.id,account.id)" rel="tooltip" title="Löschen">
-	                                		<span class="glyphicon glyphicon-remove"></span>
-	                                	</a>
-	                                </td>
-	                                }
+                                    <td>@views.html.snippets.userLinkAvatar(account)</td>
+                                    <td>@views.html.snippets.userLink(account)</td>
+                                    <td class="hp-optionsMenu">
+                                        @if(account.id != group.owner.id){
+                                            @views.html.Group.snippets.memberOptionMenu(group, account)
+                                        }
+                                    </td>
 	                            </tr>
 	                         }
 	              		}

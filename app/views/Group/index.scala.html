@@ -32,24 +32,16 @@
 		
 		@if(!unapprovedGroups.isEmpty){
 		<table class="table table-hover">
-			<colgroup>
-				<col width="28px">
-				<col width="27%">
-				<col width="30%">
-				<col width="20%">
-				<col width="20%">
-			</colgroup>
 			<thead>
 				<tr>
-					<th></th>
-					<th>Gruppenname</th>
-					<th>Von</th>
+					<th style="width:28px"></th>
+					<th style="width:30%">Gruppenname</th>
+					<th style="width:30%">Von</th>
 					<th>Status</th>
-					<th>Optionen</th>
+					<th style="width:35px"></th>
 				</tr>
 			</thead>
-		
-			<tbody>
+			<tbody class="hp-optionsTable">
 				@for(accountGroup <- unapprovedGroups) {
 				<tr>
 					@if(accountGroup.account.equals(user)) {
@@ -69,22 +61,17 @@
 							}
 						</td>
 						<td>@if(accountGroup.linkType.equals(models.enums.LinkType.reject)) {abgelehnt} else {in Bearbeitung}</td>
-						<td>
-							@if(accountGroup.linkType.equals(models.enums.LinkType.invite)) { 
-								<a href="@routes.GroupController.acceptInvitation(accountGroup.group.id, accountGroup.account.id)" rel="tooltip" data-original-title="Einladung akzeptieren" data-container="body"><span class="glyphicon glyphicon-ok"></span></a>
-								<a href="@routes.GroupController.declineInvitation(accountGroup.group.id, accountGroup.account.id)" rel="tooltip" data-original-title="Einladung ablehnen" data-container="body"><span class="glyphicon glyphicon-remove"></span></a>
-							} else {
-								<a href="@routes.GroupController.removeMember(accountGroup.group.id, accountGroup.account.id)" rel="tooltip" data-original-title="@if(accountGroup.linkType.equals(models.enums.LinkType.reject)) {löschen} else {Anfrage löschen}" data-container="body"><span class="glyphicon glyphicon-remove"></span></a></td>
-							}
+						<td class="hp-optionsMenu">
+                            @views.html.Group.snippets.inviteOptionMenu(accountGroup)
+                        </td>
 					} else {
 						<td><span class="glyphicon glyphicon-lock"></span></td>
 						<td><a href="@routes.GroupController.view(accountGroup.group.id)">@truncate(accountGroup.group.title,30)</a></td>
 						<td>@views.html.snippets.userLink(accountGroup.account)</td>
 						<td>zu bearbeiten</td>
-						<td>
-							<a href="@routes.GroupController.acceptRequest(accountGroup.group.id, accountGroup.account.id)" rel="tooltip" data-original-title="Anfrage akzeptieren" data-container="body"><span class="glyphicon glyphicon-ok"></span></a>
-						    <a href="@routes.GroupController.declineRequest(accountGroup.group.id, accountGroup.account.id)" rel="tooltip" data-original-title="Anfrage zurückweisen" data-container="body"><span class="glyphicon glyphicon-remove"></span></a>
-						</td>
+						<td class="hp-optionsMenu">
+                            @views.html.Group.snippets.inviteOptionMenu(accountGroup)
+                        </td>
 					}
 				</tr>
 				}

@@ -596,6 +596,11 @@ table .hp-avatar {
 	height: 25px;
 }
 
+table .hp-avatar {
+	margin-bottom: -4px;
+    margin-top: -4px;
+}
+
 /*============================== Token ==============================*/
 
 #token-input {

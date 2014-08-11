@@ -14,8 +14,8 @@
            <th style="width:35px"></th>
        </tr>
 	</thead>
+    @form(action = routes.MediaController.multiView(target,id)) {
     <tbody id="mediaList" class="hp-optionsTable">
-	@form(action = routes.MediaController.multiView(target,id)) {
 		@for(m <- mediaList) {
 		<tr>
 			<td><input name="selection" value="@m.id" type="checkbox"></td>
@@ -35,5 +35,5 @@
             </td>
         </tr>
     </tfoot>
+    }
 </table>
-}

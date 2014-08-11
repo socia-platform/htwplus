@@ -1,0 +1,17 @@
+@(group: Group, account: Account)
+@import models.enums._
+@import helper._
+
+<div class="dropdown">
+    <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-chevron-down"></span>
+    </a>
+
+    <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+
+        <li><a href="@routes.GroupController.removeMember(group.id,account.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-remove"></span><br>Mitglied entfernen
+        </a></li>
+
+    </ul>
+</div>
