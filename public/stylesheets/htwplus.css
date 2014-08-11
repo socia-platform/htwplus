@@ -16,8 +16,15 @@ body#hp-landingpage {
 	margin-top: 0px !important;
 }
 
+div.alert {
+	margin-left: -10px;
+    margin-right: -10px;
+}
+
 body#hp-landingpage div.alert {
 	margin-top: 15px !important;
+	margin-left: -10px;
+    margin-right: -10px;
 }
 
 a {

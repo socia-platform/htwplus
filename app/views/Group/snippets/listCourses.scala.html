@@ -3,21 +3,15 @@
 @import helper._
 
 <table class="table table-hover">
-	<colgroup>
-		<col width="28px">
-		<col width="52%">
-		<col width="30%">
-		<col width="15%">
-	</colgroup>
 	<thead>
-		<tr>
-			<th></th>
-			<th>Kursname</th>
-			<th>Erstellt von</th>
-			<th>Optionen</th>
-		</tr>
+        <tr>
+            <th style="width:28px"></th>
+            <th style="width:auto">Kursname</th>
+            <th style="width:35%">Erstellt von</th>
+            <th style="width:35px"></th>
+        </tr>
 	</thead>
-	<tbody>
+	<tbody class="hp-optionsTable">
 		@for(course <- courses) {
 		<tr>
 			<td>
@@ -37,32 +31,8 @@
 			<td>
 				@views.html.snippets.userLink(course.owner)
 			</td>
-			<td>
-				<a href="#infoModal@course.id" rel="tooltip" data-toggle="modal" data-original-title="Kursinfo" data-container="body">
-					<span class="glyphicon glyphicon-info-sign"></span>
-				</a>
-				@if(Secured.isOwnerOfGroup(course, user) || Secured.isMemberOfGroup(course, Component.currentAccount)) {
-					<a href="@routes.GroupController.view(course.id)" rel="tooltip" data-toggle="modal" data-original-title="Newsstream" data-container="body">
-						<span class="glyphicon glyphicon-comment"></span>
-					</a>
-					<a href="@routes.GroupController.media(course.id)" rel="tooltip" data-toggle="modal" data-original-title="Medien" data-container="body">
-						<span class="glyphicon glyphicon-file"></span>
-					</a>
-				}
-				@if(Secured.isOwnerOfGroup(course, user)) {
-					<a href="@routes.GroupController.edit(course.id)" rel="tooltip" data-toggle="modal" data-original-title="Kurs bearbeiten" data-container="body"><i class="glyphicon glyphicon-pencil"></i></a>
-					<a href="#confirmDeleteGroup@course.id" rel="tooltip" data-toggle="modal" data-original-title="Kurs löschen" data-container="body"><i class="glyphicon glyphicon-trash"></i></a>
-				} 
-				@if(Secured.isMemberOfGroup(course, Component.currentAccount) && !Secured.isOwnerOfGroup(course,Component.currentAccount)) {
-					<a href="@routes.GroupController.removeMember(course.id, user.id)" rel="tooltip" data-toggle="modal" data-original-title="Kurs verlassen" data-container="body">
-						<span class="glyphicon glyphicon-remove"></span>
-					</a>
-				} 
-				@if(!Secured.isMemberOfGroup(course, Component.currentAccount)){
-					<a href="@routes.GroupController.join(course.id)" rel="tooltip" data-original-title="Kurs beitreten" data-container="body">
-						<span class="glyphicon glyphicon-ok"></span>
-					</a>
-				  }
+			<td class="hp-optionsMenu">
+                @views.html.Group.snippets.optionMenu(course, user)
 			</td>
 		</tr>
 		}
