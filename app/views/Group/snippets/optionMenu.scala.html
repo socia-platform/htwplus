@@ -24,6 +24,10 @@
         }
 
         @if(Secured.isOwnerOfGroup(group, user)) {
+        <li><a href="@routes.GroupController.invite(group.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-collapse-down"></span><br>Freunde einladen
+        </a></li>
+
         <li><a href="@routes.GroupController.edit(group.id)" data-toggle="modal">
             <span class="glyphicon glyphicon-pencil"></span><br>Bearbeiten
         </a></li>
