@@ -1,0 +1,31 @@
+@(media: Media)
+@import helper._
+@import models._
+
+<!-- Start confirmDeleteMediaModal -->
+<div class="modal fade" id="confirmDeleteMedia@media.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    @views.html.Media.snippets.deleteMediaModal(media)
+</div>
+<!-- End confirmDeleteMediaModal -->
+
+<div class="dropdown">
+    <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-chevron-down"></span>
+    </a>
+
+    <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+
+        <li><a href="@routes.MediaController.view(media.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-download"></span><br>Herunterladen
+        </a></li>
+
+        @if(Secured.deleteMedia(media)) {
+
+        <li><a href="#confirmDeleteMedia@media.id" data-toggle="modal">
+            <span class="glyphicon glyphicon-trash"></span><br>Löschen
+        </a></li>
+
+        }
+
+    </ul>
+</div>

@@ -70,6 +70,12 @@ $(".hp-optionsTable>tr>td:not(.hp-optionsMenu)").on("click", function(e) {
 });
 
 $(".hp-optionsTable>tr>td>a").on("click", function(e) {
+    // links in tables
+    e.stopPropagation();
+});
+
+$(".hp-optionsTable>tr>td>input").on("click", function(e) {
+    // checkbox in media list
     e.stopPropagation();
 });
 

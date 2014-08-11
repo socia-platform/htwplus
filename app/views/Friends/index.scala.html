@@ -4,24 +4,20 @@
 @main("Freunde") {
 
 	<h2><span rel="tooltip" data-original-title="Hier findest du den aktuellen Status deiner Freundschafts-Anfragen." data-delay="500">
-		Offene Anfragen</span></h2>
-	@if(!requests.isEmpty) {
+		Offene Anfragen</span>
+    </h2>
+
+    @if(!requests.isEmpty) {
 	<table class="table table-hover">
-		<colgroup>
-			<col width="30%">
-			<col width="30%">
-			<col width="25%">
-			<col width="15%">
-		</colgroup>
 		<thead>
 			<tr>
-				<th>Von</th>
-				<th>An</th>
+				<th style="width:30%">Von</th>
+				<th style="width:30%">An</th>
 				<th>Status</th>
-				<th>Optionen</th>
+				<th style="width:35px"></th>
 			</tr>
 		</thead>
-		<tbody>
+		<tbody class="hp-optionsTable">
 		@for(request <- requests){
 			<tr>
 			@if(request.account.equals(Component.currentAccount())){
@@ -35,11 +31,6 @@
 					@if(request.linkType.equals(models.enums.LinkType.reject)){ abgelehnt } 
 					@if(request.linkType.equals(models.enums.LinkType.request)){ in Bearbeitung } 
 				</td>
-				<td>
-					<a href="@routes.FriendshipController.cancelFriendRequest(request.id)" data-toggle="modal" rel="tooltip" title="@if(request.linkType.equals(models.enums.LinkType.reject)) {löschen} else {Anfrage zurückziehen}">
-						<span class="glyphicon glyphicon-remove"></span>
-					</a>
-				</td>
 			} else {
 				<td>
 					@views.html.snippets.userLink(request.account)
@@ -50,16 +41,11 @@
 				<td>
 					zu bearbeiten
 				</td>
-				<td>
-					<a href="@routes.FriendshipController.acceptFriendRequest(request.account.id)" rel="tooltip" title="Anfrage akzeptieren">
-						<span class="glyphicon glyphicon-ok"></span>
-					</a> 
-					<a href="@routes.FriendshipController.declineFriendRequest(request.id)" data-toggle="modal" rel="tooltip" title="Anfrage ablehnen">
-						<span class="glyphicon glyphicon-trash"></span>
-					</a>
-				</td>
 			}
-			</tr>
+                <td class="hp-optionsMenu">
+                    @views.html.Friends.snippets.optionMenu(request)
+                </td>
+            </tr>
 		}
 		</tbody>
 	</table>
