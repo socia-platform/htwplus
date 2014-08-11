@@ -2,33 +2,19 @@
 @import helper._
 @import models._
 
-<!-- Start confirmDeleteMediaModal -->
-@for(m <- mediaList) {
-	<div class="modal fade" id="confirmDeleteMedia@m.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-		@views.html.Media.snippets.deleteMediaModal(m)
-	</div>
-}
-<!-- End confirmDeleteMediaModal -->
-<br />
-<br />
 <table class="table table-hover table-condensed">
-	<colgroup>
-       <col width="5%">
-       <col width="45%">
-       <col width="20%">
-       <col width="15%">
-       <col width="15%">
-	</colgroup>
 	<thead>
        <tr>
-		   <th><input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body" onclick="toggleMediaSelection(this)"></th>
+		   <th style="width:23px">
+               <input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body" onclick="toggleMediaSelection(this)">
+           </th>
            <th>Dateiname</th>
-           <th>Datum</th>
-           <th>Dateigröße</th>
-           <th>Optionen</th>
+           <th style="width:20%">Datum</th>
+           <th style="width:15%">Dateigröße</th>
+           <th style="width:35px"></th>
        </tr>
 	</thead>
-    <tbody id="mediaList" >
+    <tbody id="mediaList" class="hp-optionsTable">
 	@form(action = routes.MediaController.multiView(target,id)) {
 		@for(m <- mediaList) {
 		<tr>
@@ -36,11 +22,8 @@
 	        <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500" data-original-title="von @m.owner.name">@m.title</a></td>
 	        <td>@m.createdAt.format("dd.MM.yyyy")</td>
 	        <td>@{MediaController.bytesToString(m.size, false)}</td>
-	        <td>
-	        <a href="@routes.MediaController.view(m.id)" rel="tooltip" data-toggle="modal" data-original-title="Datei herunterladen"><span class="glyphicon glyphicon-download"></span></a>
-	        @if(Secured.deleteMedia(m)) {
-	          <a href="#confirmDeleteMedia@m.id" rel="tooltip" data-toggle="modal" data-original-title="Datei entfernen"><span class="glyphicon glyphicon-trash"></span></a>
-	        }
+	        <td class="hp-optionsMenu">
+                @views.html.Media.snippets.optionMenu(m)
 	        </td>
 	    </tr>
 		}
