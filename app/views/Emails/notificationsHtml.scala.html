@@ -1,0 +1,28 @@
+@(notifications: List[NewNotification], count: Integer, name: String)
+@import helper._
+<html lang="de">
+<head>
+    <title>HTWplus | @Messages("notification.news")</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        @if(count > 1) {
+            <h1>@Messages("notification.email_notifications.collected.intro_text", name)</h1>
+        } else {
+            <h1>@Messages("notification.email_notifications.single.intro_text", name)</h1>
+        }
+    </div>
+    @if(notifications != null) {
+        @for(notification <- notifications) {
+            <div class="row">
+                <div class="notification-date">@Messages("notification.date", notification.createdAt.date.format("dd.MM.YYYY"), notification.createdAt.date.format("HH:mm"))</div>
+                <div class="hp-truncate hp-white-space" id="@notification.id">
+                    <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>
+                </div>
+            </div>
+        }
+    }
+</div>
+</body>
+</html>

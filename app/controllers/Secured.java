@@ -1,21 +1,45 @@
 package controllers;
 
 
+import java.util.Date;
+
 import models.*;
 import models.enums.AccountRole;
-import models.enums.GroupType;
 import play.Logger;
+import play.Play;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.index;
 import views.html.login;
 
 public class Secured extends Security.Authenticator {
 
 	@Override
     public String getUsername(Context ctx) {
-        return ctx.session().get("id");
+		
+		// see if user is logged in
+        if (ctx.session().get("id") == null)
+            return null;
+ 
+        // see if the session is expired
+        String previousTick = ctx.session().get("userTime");
+        if (previousTick != null && !previousTick.equals("")) {
+            long previousT = Long.valueOf(previousTick);
+            long currentT = new Date().getTime();
+            long timeout = Long.valueOf(Play.application().configuration().getString("sessionTimeout")) * 1000 * 60;
+            long passedT = currentT - previousT;
+            if (passedT > timeout && !ctx.session().containsKey("rememberMe")) {
+                // session expired
+            	ctx.session().clear();
+                return null;
+            } 
+        }
+ 
+        // update time in session
+        String tickString = Long.toString(new Date().getTime());
+        ctx.session().put("userTime", tickString);
+		return ctx.session().get("id");
+
     }
 	
 	@Override
@@ -353,11 +377,7 @@ public class Secured extends Security.Authenticator {
 		}
 		
 		if(post.belongsToGroup()) {
-			if(Secured.isMemberOfGroup(post.group, current)) {
-				return true;
-			} else {
-				return false;
-			}
+            return Secured.isMemberOfGroup(post.group, current);
 		}
 		
 		if(post.belongsToAccount()) {
@@ -437,35 +457,15 @@ public class Secured extends Security.Authenticator {
 	}
 
 	public static boolean viewMedia(Media media) {
-		if(media == null){
-			return false;
-		} else {
-			return Secured.viewGroup(media.group);
-		}
+        return media != null && Secured.viewGroup(media.group);
 	}
 
 	public static boolean deleteMedia(Media media) {
 		Account current = Component.currentAccount();
 		Group group = media.group;
-		if (Secured.isAdmin()) {
-			return true;
-		}
-
-		if (Secured.isOwnerOfGroup(group, current)) {
-			return true;
-		}
-
-		if (media.owner.equals(current)) {
-			return true;
-		}
-
-		return false;
-	}
-	
-	/*
-	 * Notification
-	 */
-
+        
+        return Secured.isAdmin() || Secured.isOwnerOfGroup(group, current) || media.owner.equals(current);
+    }
 
     /**
      * Returns true, if the current user has access to a notification.
@@ -476,5 +476,4 @@ public class Secured extends Security.Authenticator {
 	public static boolean hasAccessToNotification(NewNotification notification) {
 		return notification.recipient.equals(Component.currentAccount());
 	}
-
 }
