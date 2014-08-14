@@ -1,7 +1,10 @@
 package models.enums;
 
 /**
- * Created by rel on 13.08.2014.
+ * Enumeration of how many emails of notifications should be sent for each account.
  */
-public class EmailNotifications {
+public enum EmailNotifications {
+    NONE,
+    COLLECTED_DAILY,
+    IMMEDIATELY_ALL
 }

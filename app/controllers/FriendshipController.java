@@ -4,7 +4,6 @@ import java.util.List;
 
 import controllers.Navigation.Level;
 import models.*;
-import models.Notification.NotificationType;
 import models.enums.LinkType;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
@@ -42,9 +41,8 @@ public class FriendshipController extends BaseController {
 		}
 		
 		Friendship friendship = new Friendship(currentUser, potentialFriend, LinkType.request);
-        friendship.type = Friendship.FRIEND_NEW_REQUEST;
 		friendship.create();
-        NotificationHandler.getInstance().createNotification(friendship);
+        NotificationHandler.getInstance().createNotification(friendship, Friendship.FRIEND_NEW_REQUEST);
 
         flash("success","Deine Einladung wurde verschickt!");
 		return redirect(controllers.routes.FriendshipController.index());
@@ -99,8 +97,7 @@ public class FriendshipController extends BaseController {
 			// and create new friend-connection between currentAccount and requester
             Friendship friendship = new Friendship(currentUser, potentialFriend, LinkType.establish);
             friendship.create();
-            friendship.type = Friendship.FRIEND_REQUEST_SUCCESS;
-            NotificationHandler.getInstance().createNotification(friendship);
+            NotificationHandler.getInstance().createNotification(friendship, Friendship.FRIEND_REQUEST_SUCCESS);
 
             flash("success", "Freundschaft erfolgreich hergestellt!");
 		}
@@ -118,9 +115,8 @@ public class FriendshipController extends BaseController {
 		Friendship requestLink = Friendship.findById(friendshipId);
 		if (requestLink != null && requestLink.friend.equals(Component.currentAccount())) {
 			requestLink.linkType = LinkType.reject;
-            requestLink.type = Friendship.FRIEND_REQUEST_DECLINE;
             requestLink.update();
-            NotificationHandler.getInstance().createNotification(requestLink);
+            NotificationHandler.getInstance().createNotification(requestLink, Friendship.FRIEND_REQUEST_DECLINE);
 		}
 
 		return redirect(controllers.routes.FriendshipController.index());

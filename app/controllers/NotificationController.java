@@ -10,12 +10,12 @@ import akka.actor.Props;
 import com.fasterxml.jackson.databind.JsonNode;
 import models.Account;
 import models.NewNotification;
-import models.Notification;
 import models.actors.NewNotificationActor;
 import play.Logger;
 import play.Play;
 import play.api.templates.Html;
 import play.db.jpa.Transactional;
+import play.i18n.Messages;
 import play.libs.Akka;
 import play.libs.F;
 import play.mvc.Http;
@@ -38,22 +38,6 @@ public class NotificationController extends BaseController {
 	public static Html view() {
 		return getNotifications();
 	}
-
-    /**
-     * @deprecated Deprecated since refactor of notification system
-     * @return Result
-     */
-	public static Result viewAjax() {
-		return ok(NotificationController.getNotifications());
-	}
-
-    /**
-     * @deprecated Deprecated since refactor of notification system
-     * @return Result
-     */
-    public static Result viewHistoryAjax() {
-        return ok(NotificationController.getNotifications());
-    }
 
     /**
      * Returns all notifications for current user.
@@ -115,18 +99,9 @@ public class NotificationController extends BaseController {
             notifications = NewNotification.findByAccountIdForPage(Component.currentAccount().id, NotificationController.LIMIT, page);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
-        return ok(view.render(notifications, LIMIT, page));
+        Navigation.set(Navigation.Level.NOTIFICATIONS, Messages.get("notification.news"));
+        return ok(view.render(notifications, LIMIT, page, NewNotification.countNotificationsForAccountId(Component.currentAccount().id)));
     }
-
-    /**
-     * @deprecated Deprecated since refactor of notification system
-     * @return Result
-     */
-	public static Result deleteAll() {
-        Notification.markAllAsReadByUser(Component.currentAccount());
-        flash("success", "Alle Neuigkeiten wurden als gelesen markiert.");
-		return ok();
-	}
 
     /**
      * Returns the current account ID from current HTTP context.

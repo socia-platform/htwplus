@@ -12,6 +12,9 @@ import play.Logger;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 
+/**
+ * @deprecated As of refactoring of notification system, replaced by class NewNotification
+ */
 @Entity
 @Table(uniqueConstraints=
 @UniqueConstraint(columnNames = {
@@ -19,6 +22,7 @@ import play.db.jpa.JPA;
 		"noteType", 
 		"object_id"
 		}))
+@Deprecated
 public class Notification extends BaseModel {
 	
 	/**

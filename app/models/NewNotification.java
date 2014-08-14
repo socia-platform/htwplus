@@ -14,10 +14,16 @@ import java.util.List;
 @Entity
 @Table
 public class NewNotification extends BaseModel {
+    /**
+     * The sender of this notification.
+     */
     @Required
     @OneToOne
     public Account sender;
 
+    /**
+     * The recipient of this notification.
+     */
     @Required
     @OneToOne
     public Account recipient;
@@ -25,12 +31,27 @@ public class NewNotification extends BaseModel {
     @Column(name = "rendered")
     public String rendered;
 
-    @Column(name = "is_read")
+    /**
+     * True, if this notification is read by its recipient.
+     */
+    @Column(name = "is_read", nullable = false, columnDefinition = "boolean default false")
     public boolean isRead;
 
+    /**
+     * True, if this notification is sent already via email.
+     */
+    @Column(name = "is_sent", nullable = false, columnDefinition = "boolean default false")
+    public boolean isSent;
+
+    /**
+     * An object, this notification has a reference to (e.g. when notified after posting the post).
+     */
     @ManyToOne
     public BaseModel reference;
 
+    /**
+     * The target URL, this notification refers to.
+     */
     @Column(name = "target_url")
     public String targetUrl;
 
@@ -126,5 +147,29 @@ public class NewNotification extends BaseModel {
      */
     public static NewNotification findById(Long id) {
         return JPA.em().find(NewNotification.class, id);
+    }
+
+    /**
+     * Counts all notifications for an account ID.
+     *
+     * @param accountId User account ID
+     * @return Number of notifications
+     */
+    public static int countNotificationsForAccountId(final Long accountId) {
+        try {
+            return JPA.withTransaction(new F.Function0<Integer>() {
+                @Override
+                public Integer apply() throws Throwable {
+                    return ((Number)JPA.em()
+                            .createQuery("SELECT COUNT(n) FROM NewNotification n WHERE n.recipient.id = :accountId")
+                            .setParameter("accountId", accountId)
+                            .getSingleResult()).intValue();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
+        return 0;
     }
 }

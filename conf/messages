@@ -33,6 +33,17 @@ error.pattern=Must satisfy {0}
 notification.news=Neuigkeiten
 notification.nothing_new=Es ist noch nichts passiert...
 notification.show_everything=Zeige alle Nachrichten
+notification.date=Neuigkeit erhalten am {0} um {1} Uhr
+notification.date_read=Gelesen am {0} um {1} Uhr
+notification.not_read=Du hast diese Neuigkeit noch nicht angeklickt bzw. gelesen
+notification.email_notifications=Neuigkeiten per E-Mail
+notification.email_notifications.none=Keine
+notification.email_notifications.collected_daily=Täglich gesammelt
+notification.email_notifications.immediately_all=Sofort einzeln
+notification.email_notifications.single.subject=HTWplus | Eine neue Nachricht
+notification.email_notifications.collected.subject=HTWplus | {0} neue Nachrichten
+notification.email_notifications.single.intro_text=Hallo {0}, du hast folgende neue Nachricht auf HTWplus erhalten
+notification.email_notifications.collected.intro_text=Hallo {0}, du hast heute folgende neue Nachrichten auf HTWplus erhalten
 
 # base model messages
 post.try_with_content=Jo, fast. Probiere es noch einmal mit Inhalt ;-)

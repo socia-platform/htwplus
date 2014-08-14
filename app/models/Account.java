@@ -14,6 +14,7 @@ import javax.persistence.PersistenceException;
 import models.base.BaseModel;
 import models.enums.AccountRole;
 
+import models.enums.EmailNotifications;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
@@ -97,6 +98,8 @@ public class Account extends BaseModel {
 	public Integer semester;
 
 	public AccountRole role;
+
+    public EmailNotifications emailNotifications;
 
 	public Boolean approved;
 
@@ -204,7 +207,7 @@ public class Account extends BaseModel {
 	//
 	
 	public String getAvatarUrl() {
-		String url = routes.Assets.at("images/avatars/" + this.avatar + ".png").toString();
+		String url = controllers.routes.Assets.at("images/avatars/" + this.avatar + ".png").toString();
 		return url;
 	}
 	

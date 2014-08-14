@@ -65,10 +65,8 @@ public class PostController extends BaseController {
 					Post post = filledForm.get();
 					post.owner = Component.currentAccount();
 					post.group = group;
-                    post.type = Post.GROUP;
 					post.create();
-					//Notification.newGroupNotification(NotificationType.GROUP_NEW_POST, group, account);
-                    NotificationHandler.getInstance().createNotification(post);
+                    NotificationHandler.getInstance().createNotification(post, Post.GROUP);
 				}
 			} else {
 				flash("info", Messages.get("post.join_group_first"));
@@ -88,8 +86,7 @@ public class PostController extends BaseController {
 					post.owner = account;
 					post.create();
 					if (!account.equals(profile)) {
-                        post.type = Post.PROFILE;
-                        NotificationHandler.getInstance().createNotification(post);
+                        NotificationHandler.getInstance().createNotification(post, Post.PROFILE);
 					}
 				}
 
@@ -143,20 +140,17 @@ public class PostController extends BaseController {
 			
 			if (parent.belongsToGroup()) {
 				// this is a comment in a group post
-                post.type = Post.COMMENT_GROUP;
-                NotificationHandler.getInstance().createNotification(post);
+                NotificationHandler.getInstance().createNotification(post, Post.COMMENT_GROUP);
 			}
 
 			if (parent.belongsToAccount()) {
 				if (!account.equals(parent.owner) && !parent.account.equals(parent.owner)) {
 					// this is a comment on a news stream post from another person
-                    post.type = Post.COMMENT_OWN_PROFILE;
-                    NotificationHandler.getInstance().createNotification(post);
+                    NotificationHandler.getInstance().createNotification(post, Post.COMMENT_OWN_PROFILE);
                 }
 				if (!account.equals(parent.account)) {
                     // this is a comment on a foreign news stream post
-                    post.type = Post.COMMENT_PROFILE;
-                    NotificationHandler.getInstance().createNotification(post);
+                    NotificationHandler.getInstance().createNotification(post, Post.COMMENT_PROFILE);
 				}				
 			}
 			

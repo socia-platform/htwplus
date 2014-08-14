@@ -238,14 +238,13 @@ public class GroupController extends BaseController {
 			return badRequest(token.render(group, filledForm));
 		}
 	}
-	
-	
-	public static Result join(long id){
+
+	public static Result join(long id) {
 		Account account = Component.currentAccount();
 		Group group = Group.findById(id);
 		GroupAccount groupAccount;
 				
-		if(Secured.isMemberOfGroup(group, account)){
+		if (Secured.isMemberOfGroup(group, account)) {
 			Logger.debug("User is already member of group or course");
 			flash("error", "Du bist bereits Mitglied dieser Gruppe!");
 			return redirect(controllers.routes.GroupController.view(id, PAGE));
@@ -253,43 +252,36 @@ public class GroupController extends BaseController {
 		
 		// is already requested?
 		groupAccount = GroupAccount.find(account, group);
-		if(groupAccount != null && groupAccount.linkType.equals(LinkType.request) ){
+		if (groupAccount != null && groupAccount.linkType.equals(LinkType.request)) {
 			flash("info", "Deine Beitrittsanfrage wurde bereits verschickt!");
 			return redirect(controllers.routes.GroupController.index());
 		}
 		
-		if(groupAccount != null && groupAccount.linkType.equals(LinkType.reject)){
+		if (groupAccount != null && groupAccount.linkType.equals(LinkType.reject)) {
 			flash("error", "Deine Beitrittsanfrage wurde bereits abgelehnt!");
 			return redirect(controllers.routes.GroupController.index());
 		}
 		
 		// invitation?
-		if(groupAccount != null && groupAccount.linkType.equals(LinkType.invite)){
+		if (groupAccount != null && groupAccount.linkType.equals(LinkType.invite)) {
 			groupAccount.linkType = LinkType.establish;
 			groupAccount.update();
 			
 			flash("success", "'" + group.title + "' erfolgreich beigetreten!");
 			return redirect(controllers.routes.GroupController.index());
-		}
-		
-		else if(group.groupType.equals(GroupType.open)){
+		} else if (group.groupType.equals(GroupType.open)) {
 			groupAccount = new GroupAccount(account, group, LinkType.establish);
 			groupAccount.create();
 			flash("success", "'" + group.title + "' erfolgreich beigetreten!");
 			return redirect(controllers.routes.GroupController.view(id,  PAGE));
-		}
-		
-		else if(group.groupType.equals(GroupType.close)){
+		} else if (group.groupType.equals(GroupType.close)) {
 			groupAccount = new GroupAccount(account, group, LinkType.request);
 			groupAccount.create();
             group.temporarySender = account;
-            group.type = Group.GROUP_NEW_REQUEST;
-			NotificationHandler.getInstance().createNotification(group);
+			NotificationHandler.getInstance().createNotification(group, Group.GROUP_NEW_REQUEST);
             flash("success", Messages.get("group.group_request_sent"));
 			return redirect(controllers.routes.GroupController.index());
-		}
-		
-		else if(group.groupType.equals(GroupType.course)){
+		} else if (group.groupType.equals(GroupType.course)) {
 			return redirect(controllers.routes.GroupController.token(id));
 		}
 						
@@ -354,10 +346,9 @@ public class GroupController extends BaseController {
             return redirect(controllers.routes.GroupController.index());
         }
 
-        group.type = Group.GROUP_REQUEST_SUCCESS;
         group.temporarySender = group.owner;
         group.addTemporaryRecipient(account);
-        NotificationHandler.getInstance().createNotification(group);
+        NotificationHandler.getInstance().createNotification(group, Group.GROUP_REQUEST_SUCCESS);
 
 		return redirect(controllers.routes.GroupController.index());
 	}
@@ -384,10 +375,9 @@ public class GroupController extends BaseController {
 				groupAccount.linkType = LinkType.reject;
 			}
 		}
-        group.type = Group.GROUP_REQUEST_DECLINE;
         group.temporarySender = group.owner;
         group.addTemporaryRecipient(account);
-        NotificationHandler.getInstance().createNotification(group);
+        NotificationHandler.getInstance().createNotification(group, Group.GROUP_REQUEST_DECLINE);
 
 		return redirect(controllers.routes.GroupController.index());
 	}
@@ -411,9 +401,8 @@ public class GroupController extends BaseController {
                 return redirect(controllers.routes.GroupController.invite(groupId));
             }
 
-            group.type = Group.GROUP_INVITATION;
             group.temporarySender = currentUser;
-            NotificationHandler.getInstance().createNotification(group);
+            NotificationHandler.getInstance().createNotification(group, Group.GROUP_INVITATION);
 		}
 		
 		flash("success", Messages.get("group.invite_invited"));

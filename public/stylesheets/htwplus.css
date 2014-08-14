@@ -230,6 +230,35 @@ h1 {
     padding: 7px;
 }
 
+div.well.notification span {
+    margin-right: 10px;
+}
+
+div.well.notification a:hover {
+    text-decoration: none;
+}
+
+div.well.notification div.notification-date {
+    font-size: smaller;
+}
+
+div.well.notification div.notification-read {
+    font-size: smaller;
+    font-style: italic;
+}
+
+div.well.notification div.notification-read.read {
+    color: #76b900;
+}
+
+div.well.notification div.notification-read.unread {
+    color: #ff5f00;
+}
+
+dt.email-notifications {
+    white-space: normal;
+}
+
 .dropdown-menu li {
     border: 1px solid #e3e3e3;
     border-radius: 4px;

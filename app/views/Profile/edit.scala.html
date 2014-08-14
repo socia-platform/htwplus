@@ -61,6 +61,14 @@
 				</select>
 			</dd>
 		}
+        <dt>@Messages("notification.email_notifications")</dt>
+        <dd id="email-notifications">
+            <select class="form-control" name="emailNotifications">
+                <option value="@models.enums.EmailNotifications.NONE"@if(profile.emailNotifications == null || profile.emailNotifications == models.enums.EmailNotifications.NONE) { selected="selected"}>@Messages("notification.email_notifications.none")</option>
+                <option value="@models.enums.EmailNotifications.COLLECTED_DAILY"@if(profile.emailNotifications !=null && profile.emailNotifications == models.enums.EmailNotifications.COLLECTED_DAILY){ selected="selected"}>@Messages("notification.email_notifications.collected_daily")</option>
+                <option value="@models.enums.EmailNotifications.IMMEDIATELY_ALL"@if(profile.emailNotifications !=null && profile.emailNotifications == models.enums.EmailNotifications.IMMEDIATELY_ALL){ selected="selected"}>@Messages("notification.email_notifications.immediately_all")</option>
+            </select>
+        </dd>
 		<dt>Avatar</dt>
 		<dd id="hp-avatars">
 			<img id="aDefault" class="img-thumbnail" src="@routes.Assets.at("images/avatars/aDefault.png")" alt="avatar" onclick="updateAvatar(this)" />

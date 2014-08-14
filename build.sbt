@@ -13,7 +13,8 @@ libraryDependencies ++= Seq(
   "org.hibernate" % "hibernate-core" % "4.3.5.Final",
   "org.hibernate" % "hibernate-commons-annotations" % "3.2.0.Final",
   "org.apache.directory.api" % "api-all" % "1.0.0-M20",
-  "commons-io" % "commons-io" % "2.4"
+  "commons-io" % "commons-io" % "2.4",
+  "com.typesafe" %% "play-plugins-mailer" % "2.2.0"
 )     
 
 play.Project.playJavaSettings
