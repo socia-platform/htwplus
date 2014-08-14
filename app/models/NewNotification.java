@@ -1,12 +1,16 @@
 package models;
 
 import models.base.BaseModel;
+import models.enums.EmailNotifications;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import play.libs.F;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Notification class as entity. Will replace the current Notification class in future.
@@ -140,6 +144,19 @@ public class NewNotification extends BaseModel {
     }
 
     /**
+     * Deletes a notification for a specific account ID containing a specific reference.
+     *
+     * @param reference BaseModel reference
+     * @param accountId User account ID
+     */
+    public static void deleteReferencesForAccountId(final BaseModel reference, final long accountId) {
+        JPA.em().createQuery("DELETE FROM NewNotification n WHERE n.reference = :reference AND n.recipient.id = :accountId")
+                .setParameter("reference", reference)
+                .setParameter("accountId", accountId)
+                .executeUpdate();
+    }
+
+    /**
      * Returns a specific notification by its ID.
      *
      * @param id Notification ID
@@ -171,5 +188,48 @@ public class NewNotification extends BaseModel {
         }
 
         return 0;
+    }
+
+    /**
+     * Returns a map with recipients as a key and a list of unsent and unread notifications
+     * as value.
+     * Example: {<Account>: <List<NewNotification>, <Account>: <List<NewNotification>, ...}
+     *
+     * @return Map of accounts containing list of unsent and unread notifications
+     * @throws Throwable
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<Account, List<NewNotification>> findUsersWithDailyEmailNotifications() throws Throwable {
+        List<Object[]> notificationsRecipients = JPA.withTransaction(new F.Function0<List<Object[]>>() {
+            @Override
+            public List<Object[]> apply() throws Throwable {
+                return (List<Object[]>) JPA.em()
+                        .createQuery("FROM NewNotification n JOIN n.recipient a WHERE n.isSent = false AND "
+                                + "n.isRead = false AND a.emailNotifications = :daily ORDER BY n.recipient DESC")
+                        .setParameter("daily", EmailNotifications.COLLECTED_DAILY)
+                        .getResultList();
+            }
+        });
+
+        // translate list of notifications and accounts into map
+        Map<Account, List<NewNotification>> accountMap = new HashMap<Account, List<NewNotification>>();
+        for (Object[] entry : notificationsRecipients) {
+            NewNotification notification = (NewNotification)entry[0];
+            Account account = (Account)entry[1];
+            List<NewNotification> listForAccount;
+
+            // add account and new list of notifications, if not set already, otherwise load list
+            if (!accountMap.containsKey(account)) {
+                listForAccount = new ArrayList<NewNotification>();
+                accountMap.put(account, listForAccount);
+            } else {
+                listForAccount = accountMap.get(account);
+            }
+
+            // add notification to list for account
+            listForAccount.add(notification);
+        }
+
+        return accountMap;
     }
 }

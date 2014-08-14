@@ -98,10 +98,12 @@ public class NotificationHandler {
                 }
 
                 // sends mail to recipient, if he wishes to be notified via mail immediately
-                // and notification is currently unsent
+                // and notification is currently unsent/unread
                 protected void handleMail(final NewNotification notification) {
                     if (notification.recipient.emailNotifications == EmailNotifications.IMMEDIATELY_ALL
-                            && !notification.isSent) {
+                            && !notification.isSent
+                            && !notification.isRead
+                    ) {
                         // schedule another for email handling async process in 0 second from now on
                         Akka.system().scheduler().scheduleOnce(
                             Duration.create(0, TimeUnit.SECONDS),

@@ -2,8 +2,4 @@
 
 @import helper._
 
-@if(!notification.isRead) {
 <span class="glyphicon glyphicon-user"></span>@Html(Messages("friendship.new_request", notifiable.account.name))
-} else {
-<span class="glyphicon glyphicon-user"></span>@Html(Messages("friendship.new_request_read", notifiable.account.name))
-}

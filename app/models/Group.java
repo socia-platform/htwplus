@@ -64,6 +64,7 @@ public class Group extends BaseNotifiable implements INotifiable {
     public static final String GROUP_NEW_REQUEST = "group_new_request";
     public static final String GROUP_REQUEST_SUCCESS = "group_request_success";
     public static final String GROUP_REQUEST_DECLINE = "group_request_decline";
+    public static final String GROUP_NEW_MEDIA = "group_new_media";
 
     @Required
 	@Column(unique = true)
@@ -462,6 +463,20 @@ public class Group extends BaseNotifiable implements INotifiable {
         } else if (this.type.equals(Group.GROUP_NEW_REQUEST)) {
             // group entry request notification, notify the owner of the group
             return this.getAsAccountList(this.owner);
+        } else if (this.type.equals(Group.GROUP_NEW_MEDIA)) {
+            // new media available in group, whole group must be notified
+            final Group currentGroup = this;
+            try {
+                return JPA.withTransaction(new F.Function0<List<Account>>() {
+                    @Override
+                    public List<Account> apply() throws Throwable {
+                        return GroupAccount.findAccountsByGroup(currentGroup, LinkType.establish);
+                    }
+                });
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                return null;
+            }
         }
 
         // this is a request accept or decline notification, notify the requester
@@ -470,6 +485,13 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     @Override
     public String getTargetUrl() {
+        if (this.type.equals(Group.GROUP_REQUEST_SUCCESS)
+                || this.type.equals(Group.GROUP_NEW_MEDIA)
+                || this.type.equals(Group.GROUP_NEW_REQUEST)
+        ) {
+            return controllers.routes.GroupController.view(this.id, 1).toString();
+        }
+
         return controllers.routes.GroupController.index().toString();
     }
 }

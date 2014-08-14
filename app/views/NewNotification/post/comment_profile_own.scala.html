@@ -2,8 +2,4 @@
 
 @import helper._
 
-@if(!notification.isRead) {
 <span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.comment_profile_own", truncate(notifiable.parent.content, 20), notifiable.parent.account.name))
-} else {
-<span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.comment_profile_own_read", truncate(notifiable.parent.content, 20), notifiable.parent.account.name))
-}

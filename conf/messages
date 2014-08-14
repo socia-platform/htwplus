@@ -43,28 +43,20 @@ notification.email_notifications.immediately_all=Sofort einzeln
 notification.email_notifications.single.subject=HTWplus | Eine neue Nachricht
 notification.email_notifications.collected.subject=HTWplus | {0} neue Nachrichten
 notification.email_notifications.single.intro_text=Hallo {0}, du hast folgende neue Nachricht auf HTWplus erhalten
-notification.email_notifications.collected.intro_text=Hallo {0}, du hast heute folgende neue Nachrichten auf HTWplus erhalten
+notification.email_notifications.collected.intro_text=Hallo {0}, du hast heute {1} neue Nachrichten auf HTWplus erhalten
 
 # base model messages
 post.try_with_content=Jo, fast. Probiere es noch einmal mit Inhalt ;-)
 post.join_group_first=Bitte tritt der Gruppe erst bei.
 post.post_on_stream_only=Du kannst nur Freunden auf den Stream schreiben!
 post.profile_new_post=Neuer Post von <span class="hp-green">{0}</span> auf deinem Newsstream
-post.profile_read_post=Gelesener Post von <span class="hp-green">{0}</span> auf deinem Newsstream
 post.group_new_post=Neues auf dem Newsstream der Gruppe <span class="hp-green">{0}</span>
-post.group_read_post=Gelesene Nachricht im Newsstream der Gruppe <span class="hp-green">{0}</span>
 post.comment_profile=Neuer Kommentar zum Post <span class="hp-green">{0}</span> auf deinem Newsstream
-post.comment_profile_read=Gelesener Kommentar zum Post <span class="hp-green">{0}</span> auf deinem Newsstream
 post.comment_group=Neuer Kommentar zum Post <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>
-post.comment_group_read=Gelesener Kommentar zum Post <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>
 post.comment_profile_own=Neuer Kommentar zu deinem Post <span class="hp-green">{0}</span> auf dem Newstream von <span class="hp-green">{1}</span>
-post.comment_profile_own_read=Gelesener Kommentar zu deinem Post <span class="hp-green">{0}</span> auf dem Newstream von <span class="hp-green">{1}</span>
 friendship.new_request=Neue Freundschaftsanfrage von <span class="hp-green">{0}</span>
-friendship.new_request_read=Gelesene Annahme deiner Freundschaftsanfrage an <span class="hp-green">{0}</span>
 friendship.request_decline=<span class="hp-green">{0}</span> hat deine Freundschaftsanfrage abgelehnt
-friendship.request_decline_read=Gelesene Ablehnung deiner Freundschaftsanfrage an <span class="hp-green">{0}</span>
 friendship.request_successful=<span class="hp-green">{0}</span> hat deine Freundschaftsanfrage angenommen
-friendship.request_successful_read=Gelesene Annahme deiner Freundschaftsanfrage an <span class="hp-green">{0}</span>
 group.group_invitation=Du wurdest von {0} in die Gruppe <span class="hp-green">{1}</span> eingeladen
 group.group_new_request=Neue Anfrage für die Gruppe <span class="hp-green">{0}</span>
 group.group_request_success=Deine Anfrage für die Gruppe <span class="hp-green">{0}</span> wurde akzeptiert
@@ -73,3 +65,4 @@ group.invite_no_invite=Bitte mindestens eine Person einladen
 group.invite_invited=Einladungen verschickt!
 group.group_request_sent=Deine Anfrage wurde erfolgreich übermittelt!
 group.group_not_found=Gruppe wurde nicht gefunden!
+group.group_new_media=Neues bei den Medien der Gruppe <span class="hp-green">{0}</span>

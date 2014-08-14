@@ -295,22 +295,22 @@ public class GroupController extends BaseController {
 		
 		Call defaultRedirect = controllers.routes.GroupController.index();
 		
-		if(!Secured.removeGroupMember(group, account)) {
+		if (!Secured.removeGroupMember(group, account)) {
 			return redirect(controllers.routes.GroupController.index());
 		}
 		
-		if(groupAccount != null){
+		if (groupAccount != null) {
 			groupAccount.delete();
-			if(account.equals(Component.currentAccount())){
+			if (account.equals(Component.currentAccount())) {
 				flash("info", "Gruppe erfolgreich verlassen!");
 			} else {
 				flash("info", "Mitglied erfolgreich entfernt!");
 				defaultRedirect = controllers.routes.GroupController.edit(groupId);
 			}
-			if(groupAccount.linkType.equals(LinkType.request)){
+			if (groupAccount.linkType.equals(LinkType.request)) {
 				flash("info", "Anfrage zurückgezogen!");			
 			}
-			if(groupAccount.linkType.equals(LinkType.reject)){
+			if (groupAccount.linkType.equals(LinkType.reject)) {
 				flash("info", "Anfrage gelöscht!");			
 			}
 		} else {

@@ -1,10 +1,5 @@
 @(notification: NewNotification, notifiable: Post)
 
-@import routes._
 @import helper._
 
-@if(!notification.isRead) {
 <span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.profile_new_post", fullTrim(notifiable.getSender().name)))
-} else {
-<span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.profile_read_post", fullTrim(notifiable.getSender().name)))
-}

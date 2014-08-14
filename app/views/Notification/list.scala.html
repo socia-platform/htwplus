@@ -1,3 +1,4 @@
+@****************************
 @(notification:List[Notification])
 
 @import models.Notification.NotificationType
@@ -7,7 +8,6 @@
 @import routes._
 @import helper._
 
-@****************************
 @for(note <- notification){
 
 	@note.noteType match {

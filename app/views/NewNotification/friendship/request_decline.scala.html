@@ -2,8 +2,4 @@
 
 @import helper._
 
-@if(!notification.isRead) {
 <span class="glyphicon glyphicon-remove"></span>@Html(Messages("friendship.request_decline", notifiable.friend.name))
-} else {
-<span class="glyphicon glyphicon-remove"></span>@Html(Messages("friendship.request_decline_read", notifiable.friend.name))
-}

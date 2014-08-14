@@ -11,6 +11,7 @@ import play.libs.F;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class handles sending of emails, e.g. for notification mails.
@@ -99,9 +100,12 @@ public class EmailHandler {
      */
     public void sendNotificationsEmail(final List<NewNotification> notifications, Account recipient) {
         try {
+            String subject = notifications.size() > 1
+                    ? Messages.get("notification.email_notifications.single.subject")
+                    : Messages.get("notification.email_notifications.collected.subject", notifications.size());
             // send the email
             this.sendEmail(
-                    Messages.get("notification.email_notifications.single.subject"),
+                    subject,
                     recipient.name + " <" + recipient.email + ">",
                     this.getRenderedNotification(notifications, recipient, EmailHandler.PLAIN_TEXT_TEMPLATE),
                     this.getRenderedNotification(notifications, recipient, EmailHandler.HTML_TEMPLATE)
@@ -123,7 +127,7 @@ public class EmailHandler {
                     + " via email."
             );
         } catch (Exception e) {
-            Logger.error("Could not send notification(s) to recipient." + e.getMessage());
+            Logger.error("Could not send notification(s) to recipient. " + e.getMessage());
         }
     }
 
@@ -137,5 +141,21 @@ public class EmailHandler {
         notifications.add(notification);
 
         this.sendNotificationsEmail(notifications, notification.recipient);
+    }
+
+    /**
+     * Finds all users, who wants to receive daily notifications and sends them one
+     * email with all the new notifications (if any).
+     */
+    public void sendDailyNotificationsEmails() {
+        try {
+            // load map with recipients containing list of unread notifications and iterate over the map
+            Map<Account, List<NewNotification>> notificationsRecipients = NewNotification.findUsersWithDailyEmailNotifications();
+            for (Map.Entry<Account, List<NewNotification>> entry : notificationsRecipients.entrySet()) {
+                this.sendNotificationsEmail(entry.getValue(), entry.getKey());
+            }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 }
