@@ -3,21 +3,15 @@
 @import helper._
 
 <table class="table table-hover">
-	<colgroup>
-		<col width="28px">
-		<col width="52%">
-		<col width="30%">
-		<col width="15%">
-	</colgroup>
 	<thead>
 		<tr>
-			<th></th>
-			<th>Gruppenname</th>
-			<th>Erstellt von</th>
-			<th>Optionen</th>
+			<th style="width:28px"></th>
+			<th style="width:auto">Gruppenname</th>
+			<th style="width:35%">Erstellt von</th>
+			<th style="width:35px"></th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody class="hp-optionsTable">
 		@for(group <- groups) {
 		<tr>
 			<td>
@@ -38,36 +32,8 @@
 			<td>
 				@views.html.snippets.userLink(group.owner)
 			</td>
-			<td>
-				<a href="#infoModal@group.id" rel="tooltip" data-toggle="modal" data-original-title="Info ansehen" data-container="body">
-					<i class="glyphicon glyphicon-info-sign"></i>
-				</a>
-				@if(Secured.isMemberOfGroup(group, Component.currentAccount)) {
-					<a href="@routes.GroupController.view(group.id)" rel="tooltip" data-toggle="modal" data-original-title="Newsstream ansehen" data-container="body">
-						<span class="glyphicon glyphicon-comment"></span>
-					</a>
-					<a href="@routes.GroupController.media(group.id)" rel="tooltip" data-toggle="modal" data-original-title="Medien ansehen" data-container="body">
-						<span class="glyphicon glyphicon-file"></span>
-					</a>
-				}
-				@if(Secured.isOwnerOfGroup(group, user)) {
-					<a href="@routes.GroupController.edit(group.id)" rel="tooltip" data-toggle="modal" data-original-title="Gruppe bearbeiten" data-container="body"><i class="glyphicon glyphicon-pencil"></i></a>
-					<a href="#confirmDeleteGroup@group.id" rel="tooltip" data-toggle="modal" data-original-title="Gruppe löschen" data-container="body"><i class="glyphicon glyphicon-trash"></i></a>
-				} 
-				@if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
-					<a href="@routes.GroupController.removeMember(group.id, user.id)" rel="tooltip" data-toggle="modal" data-original-title="Gruppe verlassen" data-container="body">
-						<span class="glyphicon glyphicon-remove"></span>
-					</a>
-				} 
-				@if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
-					
-						@if(group.groupType.equals(GroupType.open)) {
-							<a href="@routes.GroupController.join(group.id)" rel="tooltip" data-original-title="Gruppe beitreten" data-container="body"> <span class="glyphicon glyphicon-ok"></span>
-						} else { 
-							<a href="@routes.GroupController.join(group.id)" rel="tooltip" data-original-title="Anfrage zum Beitritt senden" data-container="body"> <span class="glyphicon glyphicon-envelope"></span>
-						}
-					</a>
-				  }
+			<td class="hp-optionsMenu">
+                @views.html.Group.snippets.optionMenu(group, user)
 			</td>
 		</tr>
 		}

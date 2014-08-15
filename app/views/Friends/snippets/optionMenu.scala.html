@@ -1,0 +1,27 @@
+@(request: Friendship)
+@import helper._
+
+
+<div class="dropdown">
+    <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-chevron-down"></span>
+    </a>
+
+    <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+
+        @if(request.account.equals(Component.currentAccount())){
+        <li><a href="@routes.FriendshipController.cancelFriendRequest(request.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-remove"></span><br>@if(request.linkType.equals(models.enums.LinkType.reject)) {Löschen} else {Anfrage zurückziehen}
+        </a></li>
+        } else {
+        <li><a href="@routes.FriendshipController.acceptFriendRequest(request.account.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-ok"></span><br>Anfrage akzeptieren
+        </a></li>
+
+        <li><a href="@routes.FriendshipController.declineFriendRequest(request.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-trash"></span><br>Anfrage ablehnen
+        </a></li>
+        }
+
+    </ul>
+</div>

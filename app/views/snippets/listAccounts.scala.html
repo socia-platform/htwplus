@@ -1,44 +1,24 @@
 @(users: List[Account])
 @import models.enums.GroupType
 @import helper._
-
-<!-- confirmDeleteFriendModal -->
-@for(user <- users){
-<div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-	@views.html.Friends.snippets.deleteFriendModal(user)
-</div>
-}
-<!-- Ende confirmDeleteFriendModal -->
 	
 <table class="table table-hover">
-	<colgroup>
-		<col width="36px">
-		<col width="81%">
-		<col width="15%">
-	</colgroup>
 	<thead>
 		<tr>
-			<th></th>
+			<th style="width:36px"></th>
 			<th>Name</th>
-			<th>Optionen</th>
+			<th style="width:35px"></th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody class="hp-optionsTable">
 		@for(user <- users) {	
 			<tr>
 				<td>@views.html.snippets.userLinkAvatar(user)</td>
 				<td>@views.html.snippets.userLink(user)</td>
-				<td>
-				@if(user != Component.currentAccount) {
-					@if(Friendship.alreadyFriendly(Component.currentAccount, user)) {
-						<a href="@routes.ProfileController.stream(user.id)" data-toggle="modal" rel="tooltip" title="Newsstream ansehen" data-container="body"><span class="glyphicon glyphicon-comment"></span></a>
-						<a href="@routes.ProfileController.view(user.id)" data-toggle="modal" rel="tooltip" title="Profil ansehen" data-container="body"><span class="glyphicon glyphicon-user"></span></a>
-						<a href="#confirmDeleteFriend@user.id" data-toggle="modal" rel="tooltip" title="Freundschaft beenden" data-container="body"><span class="glyphicon glyphicon-remove"></span></a>
-					} else {
-						<a href="@routes.FriendshipController.requestFriend(user.id)" rel="tooltip" title="Freundschaftsanfrage senden" data-container="body"><i class="glyphicon glyphicon-envelope"></i></a>
-						<a href="@routes.ProfileController.view(user.id)" data-toggle="modal" rel="tooltip" title="Profil ansehen" data-container="body"><span class="glyphicon glyphicon-user"></span></a>
-					}
-				}
+				<td class="hp-optionsMenu">
+                    @if(user != Component.currentAccount) {
+                        @views.html.snippets.accountOptionMenu(user)
+                    }
 				</td>
 			</tr>
 		}

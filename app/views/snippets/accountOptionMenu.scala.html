@@ -1,0 +1,44 @@
+@(user: Account)
+@import helper._
+
+<!-- confirmDeleteFriendModal -->
+<div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    @views.html.Friends.snippets.deleteFriendModal(user)
+</div>
+<!-- Ende confirmDeleteFriendModal -->
+
+<div class="dropdown">
+    <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-chevron-down"></span>
+    </a>
+
+    <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+
+        @if(Friendship.alreadyFriendly(Component.currentAccount, user)) {
+
+        <li><a href="@routes.ProfileController.stream(user.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-comment"></span><br>Newsstream
+        </a></li>
+
+        <li><a href="@routes.ProfileController.view(user.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-user"></span><br>Profil
+        </a></li>
+
+        <li><a href="#confirmDeleteFriend@user.id" data-toggle="modal">
+            <span class="glyphicon glyphicon-remove"></span><br>Freundschaft beenden
+        </a></li>
+
+        } else {
+
+        <li><a href="@routes.FriendshipController.requestFriend(user.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-envelope"></span><br>Freundschaftsanfrage
+        </a></li>
+
+        <li><a href="@routes.ProfileController.view(user.id)" data-toggle="modal">
+            <span class="glyphicon glyphicon-user"></span><br>Profil
+        </a></li>
+
+        }
+
+    </ul>
+</div>

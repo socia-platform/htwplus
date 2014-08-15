@@ -16,9 +16,8 @@
 	 </div>
 	 <!-- End confirmDeleteGroupModal -->
 
-	
-		
 	@views.html.Group.snippets.navTabs(group)
+
 	<div class="clear">
 	<h2 class="hp-truncate">
 		@if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
@@ -34,30 +33,24 @@
 		@form(action = routes.GroupController.inviteMember(group.id)) {
 
 		<table class="table table-hover">
-			<colgroup>
-				<col width="5%">
-				<col width="36px">
-				<col width="76%">
-				<col width="15%">
-			</colgroup>
 			<thead>
 				<tr>
-		   			<th><input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body" onclick="toggleMediaSelection(this)"></th>
-					<th></th>
+		   			<th style="width:23px">
+                        <input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body" onclick="toggleMediaSelection(this)">
+                    </th>
+					<th style="width:36px"></th>
 					<th>Name</th>
-					<th>Optionen</th>
+					<th style="width:35px"></th>
 				</tr>
 			</thead>
-    		<tbody id="mediaList" >
+    		<tbody id="mediaList" class="hp-optionsTable">
 				@for(friend <- friendsToInvite) {	
 				<tr>
 					<td><input type="checkbox" name="friends[]" value="@friend.id"></td>
 					<td>@views.html.snippets.userLinkAvatar(friend)</td>
 					<td>@views.html.snippets.userLink(friend)</td>
-					<td>
-						<a href="@routes.ProfileController.stream(friend.id)" data-toggle="modal" rel="tooltip" title="Newsstream ansehen" data-container="body"><span class="glyphicon glyphicon-comment"></span></a>
-						<a href="@routes.ProfileController.view(friend.id)" data-toggle="modal" rel="tooltip" title="Profil ansehen" data-container="body"><span class="glyphicon glyphicon-user"></span></a>
-						<a href="#confirmDeleteFriend@friend.id" data-toggle="modal" rel="tooltip" title="Freundschaft beenden" data-container="body"><span class="glyphicon glyphicon-remove"></span></a>
+					<td class="hp-optionsMenu">
+                        @views.html.snippets.accountOptionMenu(friend)
 					</td>
 				</tr>
 				}
@@ -67,17 +60,21 @@
 					<td><input type="checkbox" disabled="disabled"></td>
 					<td>@views.html.snippets.userLinkAvatar(friend)</td>
 					<td>@views.html.snippets.userLink(friend)</td>
-					<td>
-						<a href="@routes.ProfileController.stream(friend.id)" data-toggle="modal" rel="tooltip" title="Newsstream ansehen" data-container="body"><span class="glyphicon glyphicon-comment"></span></a>
-						<a href="@routes.ProfileController.view(friend.id)" data-toggle="modal" rel="tooltip" title="Profil ansehen" data-container="body"><span class="glyphicon glyphicon-user"></span></a>
-						<a href="#confirmDeleteFriend@friend.id" data-toggle="modal" rel="tooltip" title="Freundschaft beenden" data-container="body"><span class="glyphicon glyphicon-remove"></span></a>
+					<td class="hp-optionsMenu">
+                        @views.html.snippets.accountOptionMenu(friend)
 					</td>
 				</tr>
 				}
 			</tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4">
+                        <input type="submit" class="btn btn-warning btn-sm" value="Freunde einladen">
+                    </td>
+                </tr>
+            </tfoot>
 		</table>
 
-	    <input type="submit" value="Einladen" class="btn btn-success">
 		}
 		
 	} else {

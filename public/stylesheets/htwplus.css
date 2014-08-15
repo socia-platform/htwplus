@@ -2,17 +2,29 @@
 
 /*============================== General ==============================*/
 
+html {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
 body {
 	margin-top: 70px;
-	overflow-y: scroll;
+	overflow-x: hidden;
 }
 
 body#hp-landingpage {
 	margin-top: 0px !important;
 }
 
+div.alert {
+	margin-left: -10px;
+    margin-right: -10px;
+}
+
 body#hp-landingpage div.alert {
 	margin-top: 15px !important;
+	margin-left: -10px;
+    margin-right: -10px;
 }
 
 a {
@@ -191,6 +203,18 @@ h1 {
 	padding: 3px 20px;
 }
 
+.hp-breadcrumb {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+@media (max-width: 767px) {
+    .hp-breadcrumb {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
 /*============================== Nav-Tabs ==============================*/
 
 .hp-nav-tabs {
@@ -211,6 +235,14 @@ h1 {
 
 .hp-nav-tabs .glyphicon:hover {
 	color: #5a5858;
+}
+
+.hp-nav-tabs li.active>a {
+    box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.125);
+}
+
+.hp-nav-tabs li.deactive>a {
+    border-bottom-color: #dddddd;
 }
 
 /*============================== Logo ==============================*/
@@ -262,13 +294,20 @@ h1 {
 
 /*============================== Notepad ==============================*/
 
-div#hp-right  {
+div#hp-right {
 	position: relative;
 	background-image: url(../images/vertical.png);
 	background-repeat: repeat-y;
 	background-position: right 0px;
 	margin: 0 -10px;
 	margin-top: 40px;
+}
+
+@media (max-width: 767px) {
+    div#hp-right  {
+        margin-right: -25px;
+        margin-left: -49px;
+    }
 }
 
 div#hp-topRight {
@@ -293,7 +332,7 @@ div#hp-bottomRight {
 	background-position: -50px -30px;
 }
 
-div#hp-left  {
+div#hp-left {
 	margin-right: 24px;
 	background-image: url(../images/vertical.png);
 	background-repeat: repeat-y;
@@ -338,13 +377,20 @@ div#hp-bottom {
 	background-position: 0px bottom;
 }
 
-div#hp-content  {
+div#hp-content {
 	min-height: 500px;
 	padding: 5px 30px 0;
 	background-color: white;
 	box-sizing: content-box;
 	-moz-box-sizing: content-box;
 	-webkit-box-sizing: content-box;
+}
+
+@media (max-width: 767px) {
+    div#hp-content {
+        padding-right: 5px;
+        padding-left: 5px;
+    }
 }
 
 div#hp-footer {
@@ -449,6 +495,13 @@ div.hp-pagination {
 
 .hp-comments {
 	margin-left: 50px;
+	margin-bottom: -15px;
+}
+
+@media (max-width: 767px) {
+    .hp-comments {
+        margin-left: 15px;
+    }
 }
 
 .hp-comment-form {
@@ -525,6 +578,13 @@ div.hp-pagination {
 	width: 32px;
 }
 
+@media (max-width: 350px) {
+    .hp-nav li > a {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
 dl .hp-avatar {
 	width: 80px;
 	height: 80px;
@@ -534,6 +594,11 @@ dl .hp-avatar {
 table .hp-avatar {
 	width: 25px;
 	height: 25px;
+}
+
+table .hp-avatar {
+	margin-bottom: -4px;
+    margin-top: -4px;
 }
 
 /*============================== Token ==============================*/
@@ -567,4 +632,84 @@ table .hp-avatar {
 
 #fileupload-status {
 	display: none;
+}
+
+/*============================== Options Menu ==============================*/
+
+.hp-optionsMenu {
+    overflow: visible;
+    padding: 0!important;
+}
+
+.hp-optionsMenu .dropdown-menu {
+    background-color: #5a5858;
+    color: white;
+    opacity: 0.93;
+    margin-top: 0;
+    padding: 8px 13px;
+    float: none;
+    right: 54px;
+    left: auto;
+    min-width: initial;
+}
+
+.hp-optionsMenu .dropdown {
+    position: inherit;          /* dropdown-menu must be positioned absolute to the content */
+}
+
+.hp-optionsMenu .open>.dropdown-menu {
+    display: flex;
+}
+
+@media (max-width: 767px) {
+    .hp-optionsMenu .open>.dropdown-menu {
+        display: block;
+        right: 14px;
+        left: 38px;
+        text-align: center;
+        border-radius: 0;
+    }
+
+    .hp-optionsMenu .open>.dropdown-menu li{
+        display: inline-block;
+        float: none;
+    }
+}
+
+.hp-optionsMenu .dropdown-menu a {
+    background-color: #5a5858;
+    color: white;
+    text-align: center;
+    font-size: 11px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.hp-optionsMenu .dropdown-menu a > .glyphicon {
+    font-size: 15px;
+    color: inherit;
+}
+
+.hp-optionsMenu .dropdown-menu a:hover,
+.hp-optionsMenu .dropdown-menu a:focus {
+    background-color: inherit;
+    color: #76B900;
+}
+
+.hp-optionsMenu .dropdown-toggle {
+    cursor: pointer;
+}
+
+.hp-optionsMenu .dropdown-toggle > .glyphicon {
+    width: 100%;
+    text-align: center;
+    line-height: 31px;
+}
+
+.hp-optionsMenu .dropdown-toggle > .glyphicon-chevron-up {
+    color: #76B900;
+}
+
+.hp-optionsTable > tr:hover .dropdown-toggle > .glyphicon {
+    color: #76B900
 }
