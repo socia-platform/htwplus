@@ -2,7 +2,6 @@ package controllers;
 
 
 import java.util.Date;
-
 import models.Account;
 import models.Friendship;
 import models.Group;
@@ -11,13 +10,11 @@ import models.Media;
 import models.Notification;
 import models.Post;
 import models.enums.AccountRole;
-import models.enums.GroupType;
 import play.Logger;
 import play.Play;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.index;
 import views.html.login;
 
 public class Secured extends Security.Authenticator {
@@ -47,6 +44,7 @@ public class Secured extends Security.Authenticator {
         String tickString = Long.toString(new Date().getTime());
         ctx.session().put("userTime", tickString);
 		return ctx.session().get("id");
+
     }
 	
 	@Override

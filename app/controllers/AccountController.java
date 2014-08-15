@@ -86,6 +86,7 @@ public class AccountController extends BaseController {
 		if(rememberMe != null){
 			session("rememberMe", "1");
 		}
+
 		return redirect(routes.Application.index());
 	}
 
