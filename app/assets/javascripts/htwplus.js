@@ -28,13 +28,12 @@ function toggleMediaSelection(parent) {
 
 function autolinkUrls() {
     $('.hp-truncate').each(function(){
-		var postContent = document.getElementById( $(this).attr('id') );
-		postContent.innerHTML = Autolinker.link(postContent.innerHTML, {
-		    twitter: false,
-		    email: true,
-		    className: "hp-postLink",
-		    stripPrefix: false,
-		    truncate: 50
+    	$(this).linkify({
+		  tagName: 'a',
+		  target: '_blank',
+		  newLine: '\n',
+		  linkClass: 'hp-postLink',
+		  linkAttributes: null
 		});
 	});
 	$('.hp-postLink').each(function(){
