@@ -1,14 +1,15 @@
-package models;
+package models.services;
 
 import com.typesafe.plugin.MailerAPI;
 import com.typesafe.plugin.MailerPlugin;
+import models.Account;
+import models.NewNotification;
 import play.Logger;
 import play.Play;
 import play.db.jpa.JPA;
 import play.i18n.Messages;
 import play.libs.F;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.Map;
 /**
  * This class handles sending of emails, e.g. for notification mails.
  */
-public class EmailHandler {
+public class EmailService {
     static final String EMAIL_SENDER = Play.application().configuration().getString("htwplus.email.sender");
     static final String PLAIN_TEXT_TEMPLATE = "views.html.Emails.notificationsPlainText";
     static final String HTML_TEMPLATE = "views.html.Emails.notificationsHtml";
@@ -24,46 +25,24 @@ public class EmailHandler {
     /**
      * Singleton instance
      */
-    private static EmailHandler instance = null;
+    private static EmailService instance = null;
 
     /**
      * Private constructor for singleton instance
      */
-    private EmailHandler() { }
+    private EmailService() { }
 
     /**
      * Returns the singleton instance.
      *
      * @return EmailHandler instance
      */
-    public static EmailHandler getInstance() {
-        if (EmailHandler.instance == null) {
-            EmailHandler.instance = new EmailHandler();
+    public static EmailService getInstance() {
+        if (EmailService.instance == null) {
+            EmailService.instance = new EmailService();
         }
 
-        return EmailHandler.instance;
-    }
-
-    /**
-     * Determines the fully qualified path to the rendered template class,
-     * invokes the static render() method and returns the rendered content.
-     *
-     * @param notifications List of notifications
-     * @param recipient Recipient of the email notification
-     * @param templatePath Template path
-     * @return Rendered content
-     * @throws Exception
-     */
-    protected String getRenderedNotification(List<NewNotification> notifications, Account recipient, String templatePath)
-            throws Exception {
-        Class<?> templateClass = Class.forName(templatePath);
-        Class[] parameterClasses = { List.class, Integer.class, String.class };
-
-        Method renderMethod = templateClass.getDeclaredMethod("render", parameterClasses);
-
-        return renderMethod
-                .invoke(null, notifications, notifications.size(), recipient.name)
-                .toString();
+        return EmailService.instance;
     }
 
     /**
@@ -78,7 +57,7 @@ public class EmailHandler {
         MailerAPI mail = play.Play.application().plugin(MailerPlugin.class).email();
         mail.setSubject(subject);
         mail.setRecipient(recipient);
-        mail.setFrom(EmailHandler.EMAIL_SENDER);
+        mail.setFrom(EmailService.EMAIL_SENDER);
 
         // send email either in plain text, HTML or both
         if (mailPlainText != null) {
@@ -101,14 +80,12 @@ public class EmailHandler {
     public void sendNotificationsEmail(final List<NewNotification> notifications, Account recipient) {
         try {
             String subject = notifications.size() > 1
-                    ? Messages.get("notification.email_notifications.single.subject")
-                    : Messages.get("notification.email_notifications.collected.subject", notifications.size());
+                    ? Messages.get("notification.email_notifications.collected.subject", notifications.size())
+                    : Messages.get("notification.email_notifications.single.subject");
             // send the email
-            this.sendEmail(
-                    subject,
-                    recipient.name + " <" + recipient.email + ">",
-                    this.getRenderedNotification(notifications, recipient, EmailHandler.PLAIN_TEXT_TEMPLATE),
-                    this.getRenderedNotification(notifications, recipient, EmailHandler.HTML_TEMPLATE)
+            this.sendEmail(subject, recipient.name + " <" + recipient.email + ">",
+                    TemplateService.getInstance().getRenderedTemplate(EmailService.PLAIN_TEXT_TEMPLATE, notifications, recipient),
+                    TemplateService.getInstance().getRenderedTemplate(EmailService.HTML_TEMPLATE, notifications, recipient)
             );
 
             // mark notifications to be sent (JPA transaction required, as this is a async process)
@@ -137,7 +114,7 @@ public class EmailHandler {
      * @param notification Notification instance
      */
     public void sendNotificationEmail(NewNotification notification) {
-        List<NewNotification> notifications = new ArrayList<NewNotification>();
+        List<NewNotification> notifications = new ArrayList<>();
         notifications.add(notification);
 
         this.sendNotificationsEmail(notifications, notification.recipient);
@@ -149,6 +126,8 @@ public class EmailHandler {
      */
     public void sendDailyNotificationsEmails() {
         try {
+            Logger.info("Start sending of daily email notifications...");
+
             // load map with recipients containing list of unread notifications and iterate over the map
             Map<Account, List<NewNotification>> notificationsRecipients = NewNotification.findUsersWithDailyEmailNotifications();
             for (Map.Entry<Account, List<NewNotification>> entry : notificationsRecipients.entrySet()) {

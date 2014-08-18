@@ -1,11 +1,9 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Query;
+import javax.persistence.*;
 
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
@@ -20,6 +18,7 @@ public class Post extends BaseNotifiable implements INotifiable {
     public static final String COMMENT_PROFILE = "comment_profile";         // comment on a profile post
     public static final String COMMENT_GROUP = "comment_group";             // comment on a group post
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
+    public static final String BROADCAST = "broadcast";                     // broadcast post from admin control center
     public static final int PAGE = 1;
 
     @Required
@@ -37,6 +36,17 @@ public class Post extends BaseNotifiable implements INotifiable {
 
 	@ManyToOne
 	public Account owner;
+
+    @Column(name = "is_broadcast", nullable = false, columnDefinition = "boolean default false")
+    public boolean isBroadcastMessage;
+
+    @ManyToMany
+    @JoinTable(
+            name = "broadcast_account",
+            joinColumns = { @JoinColumn(name = "post_id", referencedColumnName = "id") },
+            inverseJoinColumns = { @JoinColumn(name = "account_id", referencedColumnName = "id") }
+    )
+    public List<Account> broadcastPostRecipients;
 		
 	public void create() {
 		JPA.em().persist(this);
@@ -105,7 +115,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	@SuppressWarnings("unchecked")
 	public static List<Post> findStreamForAccount(Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor, int limit, int offset){
 		
-		Query query = streamForAccount("SELECT p ", account, groupList, friendList, isVisitor, " ORDER BY p.updatedAt DESC");
+		Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, isVisitor, " ORDER BY p.updatedAt DESC");
 
 		// set limit and offset
 		query = limit(query, limit, offset);
@@ -114,7 +124,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 	
 	public static int countStreamForAccount(Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor) {
-		Query query = streamForAccount("SELECT COUNT(p)", account, groupList, friendList, isVisitor,"");
+		Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, isVisitor,"");
 
 		return ((Number) query.getSingleResult()).intValue();
 	}
@@ -132,6 +142,8 @@ public class Post extends BaseNotifiable implements INotifiable {
 		String groupListClause = "";
 		String friendListClause = "";
 		String visitorClause = "";
+        String broadcastJoin = "";
+        String broadcastClause = "";
 		
 		/**
 		 *  finds all stream-post for account. 
@@ -144,7 +156,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 		
 		// add additional clauses if not null or empty
 		
-		if(friendList != null && !friendList.isEmpty()){
+		if (friendList != null && !friendList.isEmpty()) {
 			/**
 			 *  finds all own stream-posts of my friends.
 			 *  e.g account = a friend of mine
@@ -154,12 +166,12 @@ public class Post extends BaseNotifiable implements INotifiable {
 			friendListClause = " OR p.account IN :friendList AND p.account = p.owner";
 		}
 		
-		if(groupList != null && !groupList.isEmpty()){
+		if (groupList != null && !groupList.isEmpty()) {
 			// finds all stream-post of groups
 			groupListClause = " OR p.group IN :groupList ";
 		}
 		
-		if(isVisitor){
+		if (isVisitor) {
 			/**
 			 * since 'myPostsClause' includes posts where the given account posted to someone ('OR (p.owner = :account AND p.parent = NULL)').
 			 * we have to modify it for the friends-stream (cut it out).
@@ -170,27 +182,31 @@ public class Post extends BaseNotifiable implements INotifiable {
 			 * groupListClause includes all posts where my friend is member/owner of.
 			 * but we only need those posts where he/she is owner of.
 			 */
-			if(groupList != null && !groupList.isEmpty()){
+			if (groupList != null && !groupList.isEmpty()) {
 				visitorClause = " AND p.owner = :account ";
 			}
-			
-		}
-		
-		// create Query. 
-		Query query = JPA.em().createQuery(selectClause+" FROM Post p WHERE "+myPostsClause+groupListClause+friendListClause+visitorClause+orderByClause);
+		} else {
+            // its the origin user, show also broadcast messages
+            broadcastJoin = " LEFT JOIN p.broadcastPostRecipients bc_recipients";
+            broadcastClause = " OR bc_recipients = :account ";
+        }
+
+		// create Query.
+        String completeQuery = selectClause + " FROM Post p" + broadcastJoin + " WHERE " + myPostsClause
+                + groupListClause + friendListClause + visitorClause + broadcastClause + orderByClause;
+		Query query = JPA.em().createQuery(completeQuery);
 		query.setParameter("account", account);
 		
 		
 		// add parameter as needed
-		if(groupList != null && !groupList.isEmpty()){
+		if (groupList != null && !groupList.isEmpty()) {
 			query.setParameter("groupList", groupList);
 		}
-		if(friendList != null && !friendList.isEmpty()){
+		if (friendList != null && !friendList.isEmpty()) {
 			query.setParameter("friendList", friendList);
 		}
 		
 		return query;
-		
 	}
 	
 	public static int countCommentsForPost(Long id) {
@@ -265,6 +281,10 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     @Override
     public List<Account> getRecipients() {
+        if (this.type.equals(Post.BROADCAST)) {
+            return this.broadcastPostRecipients;
+        }
+
         // if this is a comment, return the parent information
         if (this.parent != null) {
             // if this is a comment on own news stream, send notification to the initial poster
@@ -281,6 +301,21 @@ public class Post extends BaseNotifiable implements INotifiable {
         return this.belongsToAccount()
                 ? this.getAsAccountList(this.account)
                 : this.getGroupAsAccountList(this.group);
+    }
+
+    /**
+     * Adds an account to the persistent recipient list.
+     *
+     * @param recipient One of the recipients
+     */
+    public void addRecipient(Account recipient) {
+        if (this.broadcastPostRecipients == null) {
+            this.broadcastPostRecipients = new ArrayList<>();
+        }
+
+        if (!this.broadcastPostRecipients.contains(recipient)) {
+            this.broadcastPostRecipients.add(recipient);
+        }
     }
 
     @Override
@@ -303,6 +338,10 @@ public class Post extends BaseNotifiable implements INotifiable {
 
         if (this.type.equals(Post.COMMENT_OWN_PROFILE)) {
             return controllers.routes.ProfileController.stream(this.parent.account.id, Post.PAGE).toString();
+        }
+
+        if (this.type.equals(Post.BROADCAST)) {
+            return controllers.routes.Application.stream(Post.PAGE).toString();
         }
 
         return super.getTargetUrl();

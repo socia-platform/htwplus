@@ -5,6 +5,7 @@ import java.util.List;
 import controllers.Navigation.Level;
 import models.*;
 import models.enums.LinkType;
+import models.services.NotificationService;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -42,7 +43,7 @@ public class FriendshipController extends BaseController {
 		
 		Friendship friendship = new Friendship(currentUser, potentialFriend, LinkType.request);
 		friendship.create();
-        NotificationHandler.getInstance().createNotification(friendship, Friendship.FRIEND_NEW_REQUEST);
+        NotificationService.getInstance().createNotification(friendship, Friendship.FRIEND_NEW_REQUEST);
 
         flash("success","Deine Einladung wurde verschickt!");
 		return redirect(controllers.routes.FriendshipController.index());
@@ -97,7 +98,7 @@ public class FriendshipController extends BaseController {
 			// and create new friend-connection between currentAccount and requester
             Friendship friendship = new Friendship(currentUser, potentialFriend, LinkType.establish);
             friendship.create();
-            NotificationHandler.getInstance().createNotification(friendship, Friendship.FRIEND_REQUEST_SUCCESS);
+            NotificationService.getInstance().createNotification(friendship, Friendship.FRIEND_REQUEST_SUCCESS);
 
             flash("success", "Freundschaft erfolgreich hergestellt!");
 		}
@@ -116,7 +117,7 @@ public class FriendshipController extends BaseController {
 		if (requestLink != null && requestLink.friend.equals(Component.currentAccount())) {
 			requestLink.linkType = LinkType.reject;
             requestLink.update();
-            NotificationHandler.getInstance().createNotification(requestLink, Friendship.FRIEND_REQUEST_DECLINE);
+            NotificationService.getInstance().createNotification(requestLink, Friendship.FRIEND_REQUEST_DECLINE);
 		}
 
 		return redirect(controllers.routes.FriendshipController.index());

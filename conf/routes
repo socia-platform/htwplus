@@ -88,6 +88,8 @@ POST	/admin/user/create					controllers.AdminController.createAccount()
 GET		/admin/user/list					controllers.AdminController.listAccounts()
 GET		/admin/media/						controllers.AdminController.viewMediaTemp()
 GET		/admin/media/clean					controllers.AdminController.cleanMediaTemp()
+GET     /admin/broadcast_notification       controllers.AdminController.broadcastNotificationForm()
+POST    /admin/broadcast_notification       controllers.AdminController.broadcastNotification()
 
 
 # No route found? take this

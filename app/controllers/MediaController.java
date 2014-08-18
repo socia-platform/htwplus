@@ -12,7 +12,7 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import models.NotificationHandler;
+import models.services.NotificationService;
 import org.apache.commons.io.FileUtils;
 
 import models.Group;
@@ -211,7 +211,7 @@ public class MediaController extends BaseController {
 				return redirect(controllers.routes.Application.index());
 			}
 			group.temporarySender = Component.currentAccount();
-            NotificationHandler.getInstance().createNotification(group, Group.GROUP_NEW_MEDIA);
+            NotificationService.getInstance().createNotification(group, Group.GROUP_NEW_MEDIA);
 			ret = controllers.routes.GroupController.media(id);
 		} else {
 			return redirect(ret);

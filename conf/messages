@@ -54,6 +54,7 @@ post.group_new_post=Neues auf dem Newsstream der Gruppe <span class="hp-green">{
 post.comment_profile=Neuer Kommentar zum Post <span class="hp-green">{0}</span> auf deinem Newsstream
 post.comment_group=Neuer Kommentar zum Post <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>
 post.comment_profile_own=Neuer Kommentar zu deinem Post <span class="hp-green">{0}</span> auf dem Newstream von <span class="hp-green">{1}</span>
+post.broadcast_post=Neue Broadcast Nachricht von <span class="hp-green">{0}</span> auf deinem Newsstream
 friendship.new_request=Neue Freundschaftsanfrage von <span class="hp-green">{0}</span>
 friendship.request_decline=<span class="hp-green">{0}</span> hat deine Freundschaftsanfrage abgelehnt
 friendship.request_successful=<span class="hp-green">{0}</span> hat deine Freundschaftsanfrage angenommen
@@ -66,3 +67,13 @@ group.invite_invited=Einladungen verschickt!
 group.group_request_sent=Deine Anfrage wurde erfolgreich übermittelt!
 group.group_not_found=Gruppe wurde nicht gefunden!
 group.group_new_media=Neues bei den Medien der Gruppe <span class="hp-green">{0}</span>
+
+# admin control center
+admin.admin_control_center=HTWplus Control Center EasyAdmin™
+admin.create_account=User anlegen
+admin.list_accounts=User verwalten
+admin.media_temp=MediaTemp
+admin.broadcast_notification=Broadcast Nachricht
+admin.broadcast_notification.write=Schreibe eine Broadcast Nachricht und wähle die Empfänger aus
+admin.broadcast_notification.send=Broadcast Nachricht senden
+admin.broadcast_notification.success=Broadcast Nachrichten werden erzeugt und den Empfängern zugestellt

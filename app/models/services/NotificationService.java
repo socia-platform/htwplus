@@ -1,5 +1,7 @@
-package models;
+package models.services;
 
+import models.Account;
+import models.NewNotification;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.EmailNotifications;
@@ -15,28 +17,28 @@ import java.util.concurrent.TimeUnit;
 /**
  * This class handles the notification system.
  */
-public class NotificationHandler {
+public class NotificationService {
     /**
      * Singleton instance
      */
-    private static NotificationHandler instance = null;
+    private static NotificationService instance = null;
 
     /**
      * Private constructor for singleton instance
      */
-    private NotificationHandler() { }
+    private NotificationService() { }
 
     /**
      * Returns the singleton instance.
      *
      * @return NotificationHandler instance
      */
-    public static NotificationHandler getInstance() {
-        if (NotificationHandler.instance == null) {
-            NotificationHandler.instance = new NotificationHandler();
+    public static NotificationService getInstance() {
+        if (NotificationService.instance == null) {
+            NotificationService.instance = new NotificationService();
         }
 
-        return NotificationHandler.instance;
+        return NotificationService.instance;
     }
 
     /**
@@ -110,7 +112,7 @@ public class NotificationHandler {
                             new Runnable() {
                                 // runs the Akka schedule
                                 public void run() {
-                                    EmailHandler.getInstance().sendNotificationEmail(notification);
+                                    EmailService.getInstance().sendNotificationEmail(notification);
                                 }
                             },
                             Akka.system().dispatcher()

@@ -1,6 +1,6 @@
-@(notifications: List[NewNotification], count: Integer, name: String)
+@(notifications: List[NewNotification], recipient: Account)
 @import helper._
-@if(count > 1) {@Messages("notification.email_notifications.collected.intro_text", name, count)} else {@Messages("notification.email_notifications.single.intro_text", name)}
+@if(notifications.size() > 1) {@Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size())} else {@Messages("notification.email_notifications.single.intro_text", recipient.name)}
 @if(notifications != null) {
 @for(notification <- notifications) {
 @Messages("notification.date", notification.createdAt.date.format("dd.MM.YYYY"), notification.createdAt.date.format("HH:mm"))

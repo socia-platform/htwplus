@@ -6,6 +6,7 @@ import controllers.Navigation.Level;
 import models.*;
 import models.enums.GroupType;
 import models.enums.LinkType;
+import models.services.NotificationService;
 import play.Logger;
 import play.Play;
 import play.data.DynamicForm;
@@ -278,7 +279,7 @@ public class GroupController extends BaseController {
 			groupAccount = new GroupAccount(account, group, LinkType.request);
 			groupAccount.create();
             group.temporarySender = account;
-			NotificationHandler.getInstance().createNotification(group, Group.GROUP_NEW_REQUEST);
+			NotificationService.getInstance().createNotification(group, Group.GROUP_NEW_REQUEST);
             flash("success", Messages.get("group.group_request_sent"));
 			return redirect(controllers.routes.GroupController.index());
 		} else if (group.groupType.equals(GroupType.course)) {
@@ -348,7 +349,7 @@ public class GroupController extends BaseController {
 
         group.temporarySender = group.owner;
         group.addTemporaryRecipient(account);
-        NotificationHandler.getInstance().createNotification(group, Group.GROUP_REQUEST_SUCCESS);
+        NotificationService.getInstance().createNotification(group, Group.GROUP_REQUEST_SUCCESS);
 
 		return redirect(controllers.routes.GroupController.index());
 	}
@@ -377,7 +378,7 @@ public class GroupController extends BaseController {
 		}
         group.temporarySender = group.owner;
         group.addTemporaryRecipient(account);
-        NotificationHandler.getInstance().createNotification(group, Group.GROUP_REQUEST_DECLINE);
+        NotificationService.getInstance().createNotification(group, Group.GROUP_REQUEST_DECLINE);
 
 		return redirect(controllers.routes.GroupController.index());
 	}
@@ -402,7 +403,7 @@ public class GroupController extends BaseController {
             }
 
             group.temporarySender = currentUser;
-            NotificationHandler.getInstance().createNotification(group, Group.GROUP_INVITATION);
+            NotificationService.getInstance().createNotification(group, Group.GROUP_INVITATION);
 		}
 		
 		flash("success", Messages.get("group.invite_invited"));

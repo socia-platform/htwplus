@@ -1,4 +1,4 @@
-@(notifications: List[NewNotification], count: Integer, name: String)
+@(notifications: List[NewNotification], recipient: Account)
 @import helper._
 <html lang="de">
 <head>
@@ -7,10 +7,10 @@
 <body>
 <div class="container">
     <div class="row">
-        @if(count > 1) {
-            <h1>@Messages("notification.email_notifications.collected.intro_text", name, count)</h1>
+        @if(notifications.size() > 1) {
+            <h1>@Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size())</h1>
         } else {
-            <h1>@Messages("notification.email_notifications.single.intro_text", name)</h1>
+            <h1>@Messages("notification.email_notifications.single.intro_text", recipient.name)</h1>
         }
     </div>
     @if(notifications != null) {

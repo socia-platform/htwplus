@@ -4,6 +4,7 @@ import java.util.List;
 
 import controllers.Navigation.Level;
 import models.*;
+import models.services.NotificationService;
 import play.Play;
 import play.api.mvc.Call;
 import play.data.Form;
@@ -66,7 +67,7 @@ public class PostController extends BaseController {
 					post.owner = Component.currentAccount();
 					post.group = group;
 					post.create();
-                    NotificationHandler.getInstance().createNotification(post, Post.GROUP);
+                    NotificationService.getInstance().createNotification(post, Post.GROUP);
 				}
 			} else {
 				flash("info", Messages.get("post.join_group_first"));
@@ -86,7 +87,7 @@ public class PostController extends BaseController {
 					post.owner = account;
 					post.create();
 					if (!account.equals(profile)) {
-                        NotificationHandler.getInstance().createNotification(post, Post.PROFILE);
+                        NotificationService.getInstance().createNotification(post, Post.PROFILE);
 					}
 				}
 
@@ -140,17 +141,17 @@ public class PostController extends BaseController {
 			
 			if (parent.belongsToGroup()) {
 				// this is a comment in a group post
-                NotificationHandler.getInstance().createNotification(post, Post.COMMENT_GROUP);
+                NotificationService.getInstance().createNotification(post, Post.COMMENT_GROUP);
 			}
 
 			if (parent.belongsToAccount()) {
 				if (!account.equals(parent.owner) && !parent.account.equals(parent.owner)) {
 					// this is a comment on a news stream post from another person
-                    NotificationHandler.getInstance().createNotification(post, Post.COMMENT_OWN_PROFILE);
+                    NotificationService.getInstance().createNotification(post, Post.COMMENT_OWN_PROFILE);
                 }
 				if (!account.equals(parent.account)) {
                     // this is a comment on a foreign news stream post
-                    NotificationHandler.getInstance().createNotification(post, Post.COMMENT_PROFILE);
+                    NotificationService.getInstance().createNotification(post, Post.COMMENT_PROFILE);
 				}				
 			}
 			
@@ -201,17 +202,16 @@ public class PostController extends BaseController {
 		final Post post = Post.findById(postId);
 		// verify redirect after deletion
 		Call routesTo = null;
-		if(post.group != null){
+		if (post.group != null) {
 			routesTo = controllers.routes.GroupController.view(post.group.id, PAGE);
 		}
-		else if(post.account != null){
+		else if (post.account != null) {
 			routesTo = controllers.routes.Application.index();
 		}
-		else if(post.parent != null)
-		{
-			if(post.parent.group != null){
+		else if (post.parent != null) {
+			if (post.parent.group != null) {
 				routesTo = controllers.routes.GroupController.view(post.parent.group.id, PAGE);
-			}else if(post.parent.account != null) {
+			} else if (post.parent.account != null) {
 				routesTo = controllers.routes.Application.index();
 			}
 		}
@@ -223,7 +223,10 @@ public class PostController extends BaseController {
 			flash("error", "Konnte nicht gelöscht werden!");
 		}
 
+        if (routesTo == null) {
+            routesTo = controllers.routes.Application.index();
+        }
+
 		return redirect(routesTo);
 	}
-	
 }

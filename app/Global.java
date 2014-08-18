@@ -1,6 +1,6 @@
 import java.util.concurrent.TimeUnit;
 
-import models.EmailHandler;
+import models.services.EmailService;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 
@@ -12,6 +12,8 @@ import models.Group;
 import models.Post;
 import models.enums.AccountRole;
 import models.enums.GroupType;
+import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 import play.Application;
 import play.GlobalSettings;
 import play.Logger;
@@ -49,13 +51,13 @@ public class Global extends GlobalSettings {
             Akka.system().dispatcher()
         );
 
-        // set the email schedule for sending daily emails
+        // set the email schedule at 18:00 o'clock for sending daily emails
         Akka.system().scheduler().schedule(
-                Duration.create(0, TimeUnit.MILLISECONDS),
+                Duration.create(nextExecutionInSeconds(18, 0), TimeUnit.SECONDS),
                 Duration.create(24, TimeUnit.HOURS),
                 new Runnable() {
                     public void run() {
-                        EmailHandler.getInstance().sendDailyNotificationsEmails();
+                        EmailService.getInstance().sendDailyNotificationsEmails();
                     }
                 },
                 Akka.system().dispatcher()
@@ -75,6 +77,39 @@ public class Global extends GlobalSettings {
 		});
 		InitialData.insert(app);
 	}
+
+    /**
+     * Calculates seconds between now and a time for hour and minute.
+     *
+     * @param hour Hour
+     * @param minute Minute
+     * @return Seconds
+     */
+    public static int nextExecutionInSeconds(int hour, int minute) {
+        return Seconds.secondsBetween(
+                new DateTime(),
+                nextExecution(hour, minute)
+        ).getSeconds();
+    }
+
+    /**
+     * Returns a DateTime for hour and minute.
+     *
+     * @param hour Hour
+     * @param minute Minute
+     * @return DateTime
+     */
+    public static DateTime nextExecution(int hour, int minute) {
+        DateTime next = new DateTime()
+                .withHourOfDay(hour)
+                .withMinuteOfHour(minute)
+                .withSecondOfMinute(0)
+                .withMillisOfSecond(0);
+
+        return (next.isBeforeNow())
+                ? next.plusHours(24)
+                : next;
+    }
 	
 	@Override
 	public Promise<SimpleResult> onError(final RequestHeader rh, final Throwable t) {

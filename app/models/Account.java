@@ -1,15 +1,11 @@
 package models;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NoResultException;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PersistenceException;
+import javax.persistence.*;
 
 import models.base.BaseModel;
 import models.enums.AccountRole;
@@ -345,6 +341,28 @@ public class Account extends BaseModel {
 		session.clear();
 		return fullTextQuery;
 	}
+
+    /**
+     * Returns a list of account instances by an ID collection of Strings.
+     *
+     * @param accountIds String array of account IDs
+     * @return List of accounts
+     */
+    public static List<Account> getAccountListByIdCollection(final List<String> accountIds) {
+        try {
+            return JPA.withTransaction(new F.Function0<List<Account>>() {
+                @Override
+                public List<Account> apply() throws Throwable {
+                    return JPA.em()
+                            .createQuery("FROM Account a WHERE a.id IN (" + String.join(",", accountIds) + ")", Account.class)
+                            .getResultList();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
 	
 	@SuppressWarnings("unchecked")
 	public static List<Account> accountSearch(String keyword, int limit, int page) {

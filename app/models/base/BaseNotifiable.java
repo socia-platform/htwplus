@@ -6,14 +6,12 @@ import models.Group;
 import models.GroupAccount;
 import models.NewNotification;
 import models.enums.LinkType;
+import models.services.TemplateService;
 import play.Logger;
-import play.api.mvc.Content;
-import play.api.templates.Html;
 import play.db.jpa.JPA;
 import play.libs.F;
 
 import javax.persistence.Transient;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,27 +60,9 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
                 + this.type.toLowerCase();
     }
 
-    /**
-     * Determines the fully qualified path to the rendered template class,
-     * invokes the static render() method and returns the rendered content.
-     *
-     * @return Rendered HTML content
-     * @throws Exception
-     */
-    protected Html getRendered(NewNotification notification) throws Exception {
-        Class<?> templateClass = Class.forName(this.getTemplateClass());
-        Class[] parameterClasses = { NewNotification.class, this.getClass() };
-
-        Method renderMethod = templateClass.getDeclaredMethod("render", parameterClasses);
-
-        return (Html)renderMethod.invoke(null, notification, this);
-    }
-
     @Override
-    public String render(NewNotification notification) throws Exception {
-        Content html = this.getRendered(notification);
-
-        return html.toString().trim();
+    public String render(NewNotification notification) {
+        return TemplateService.getInstance().getRenderedTemplate(this.getTemplateClass(), notification, this);
     }
 
     @Override
@@ -135,6 +115,8 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
             this.temporaryRecipients = new ArrayList<Account>();
         }
 
-        this.temporaryRecipients.add(recipient);
+        if (!this.temporaryRecipients.contains(recipient)) {
+            this.temporaryRecipients.add(recipient);
+        }
     }
 }
