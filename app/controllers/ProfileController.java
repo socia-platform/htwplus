@@ -1,9 +1,6 @@
 package controllers;
 
-import models.Account;
-import models.Friendship;
-import models.Post;
-import models.Studycourse;
+import models.*;
 import models.enums.EmailNotifications;
 import play.Play;
 import play.data.Form;
@@ -174,8 +171,14 @@ public class ProfileController extends BaseController {
 		if(!Secured.editAccount(account)) {
 			return redirect(controllers.routes.Application.index());
 		}
-		
-		Navigation.set(Level.PROFILE, "Editieren");
+
+        try {
+            NewNotification.findUsersWithDailyHourlyEmailNotifications();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
+        Navigation.set(Level.PROFILE, "Editieren");
 		return ok(edit.render(account, accountForm.fill(account)));
 	}
 
@@ -243,6 +246,12 @@ public class ProfileController extends BaseController {
 
             if (filledForm.data().containsKey("emailNotifications")) {
                 account.emailNotifications = EmailNotifications.valueOf(filledForm.field("emailNotifications").value());
+                if (account.emailNotifications.equals(EmailNotifications.COLLECTED_DAILY)
+                        && filledForm.data().containsKey("dailyEmailNotificationHour")) {
+                    account.dailyEmailNotificationHour = Integer.valueOf(
+                            filledForm.field("dailyEmailNotificationHour").value()
+                    );
+                }
             }
 
 			Long studycourseId = Long.parseLong(filledForm.field("studycourse").value());

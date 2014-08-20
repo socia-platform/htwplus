@@ -402,11 +402,11 @@ public class Secured extends Security.Authenticator {
 	
 	
 	public static boolean isOwnerOfAccount(final Long accountId) {
-		return Account.isOwner(accountId, Component.currentAccount());
+		return Account.isOwnerTransactional(accountId, Component.currentAccount());
 	}
 
 	public static boolean isFriend(Account account) {
-		return Friendship.alreadyFriendly(Component.currentAccount(), account);
+		return Friendship.alreadyFriendlyTransactional(Component.currentAccount(), account);
 	}
 
 	public static boolean editAccount(Account account) {

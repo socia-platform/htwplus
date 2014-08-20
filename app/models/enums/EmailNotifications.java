@@ -6,5 +6,6 @@ package models.enums;
 public enum EmailNotifications {
     NONE,
     COLLECTED_DAILY,
-    IMMEDIATELY_ALL
+    IMMEDIATELY_ALL,
+    HOURLY
 }

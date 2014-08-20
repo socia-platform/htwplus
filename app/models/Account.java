@@ -1,6 +1,5 @@
 package models;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -46,7 +45,6 @@ import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import controllers.Component;
-import controllers.routes;
 import play.libs.F;
 
 @Entity
@@ -96,6 +94,8 @@ public class Account extends BaseModel {
 	public AccountRole role;
 
     public EmailNotifications emailNotifications;
+
+    public Integer dailyEmailNotificationHour;
 
 	public Boolean approved;
 
@@ -255,6 +255,27 @@ public class Account extends BaseModel {
 			return false;
 		}
 	}
+
+    /**
+     * Method isOwner with JPA transaction.
+     *
+     * @param accountId Account ID
+     * @param currentUser Current User
+     * @return True, if an account ID is of current user
+     */
+    public static boolean isOwnerTransactional(final Long accountId, final Account currentUser) {
+        try {
+            return JPA.withTransaction(new F.Function0<Boolean>() {
+                @Override
+                public Boolean apply() throws Throwable {
+                    return Account.isOwner(accountId, currentUser);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return false;
+        }
+    }
 	
 	
 	/**

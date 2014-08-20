@@ -25,7 +25,7 @@ import play.mvc.Http.RequestHeader;
 import play.mvc.SimpleResult;
 import scala.concurrent.duration.Duration;
 
-
+@SuppressWarnings("unused")
 public class Global extends GlobalSettings {
 	
 	@Override
@@ -51,16 +51,16 @@ public class Global extends GlobalSettings {
             Akka.system().dispatcher()
         );
 
-        // set the email schedule at 18:00 o'clock for sending daily emails
+        // set the email schedule to next full hour clock for sending daily and hourly emails
         Akka.system().scheduler().schedule(
-                Duration.create(nextExecutionInSeconds(18, 0), TimeUnit.SECONDS),
-                Duration.create(24, TimeUnit.HOURS),
-                new Runnable() {
-                    public void run() {
-                        EmailService.getInstance().sendDailyNotificationsEmails();
-                    }
-                },
-                Akka.system().dispatcher()
+            Duration.create(nextExecutionInSeconds(getNextHour(), 0), TimeUnit.SECONDS),
+            Duration.create(1, TimeUnit.HOURS),
+            new Runnable() {
+                public void run() {
+                    EmailService.getInstance().sendDailyHourlyNotificationsEmails();
+                }
+            },
+            Akka.system().dispatcher()
         );
 		
 		JPA.withTransaction(new play.libs.F.Callback0() {
@@ -77,6 +77,15 @@ public class Global extends GlobalSettings {
 		});
 		InitialData.insert(app);
 	}
+
+    /**
+     * Returns the next full hour of the current time
+     *
+     * @return Next hour of current time
+     */
+    public static int getNextHour() {
+        return (new DateTime()).getHourOfDay() + 1;
+    }
 
     /**
      * Calculates seconds between now and a time for hour and minute.

@@ -121,15 +121,15 @@ public class EmailService {
     }
 
     /**
-     * Finds all users, who wants to receive daily notifications and sends them one
+     * Finds all users, who wants to receive daily or hourly notifications and sends them one
      * email with all the new notifications (if any).
      */
-    public void sendDailyNotificationsEmails() {
+    public void sendDailyHourlyNotificationsEmails() {
         try {
             Logger.info("Start sending of daily email notifications...");
 
             // load map with recipients containing list of unread notifications and iterate over the map
-            Map<Account, List<NewNotification>> notificationsRecipients = NewNotification.findUsersWithDailyEmailNotifications();
+            Map<Account, List<NewNotification>> notificationsRecipients = NewNotification.findUsersWithDailyHourlyEmailNotifications();
             for (Map.Entry<Account, List<NewNotification>> entry : notificationsRecipients.entrySet()) {
                 this.sendNotificationsEmail(entry.getValue(), entry.getKey());
             }

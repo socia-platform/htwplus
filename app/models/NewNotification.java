@@ -192,27 +192,32 @@ public class NewNotification extends BaseModel {
 
     /**
      * Returns a map with recipients as a key and a list of unsent and unread notifications
-     * as value.
+     * as value. The map contains recipients, who wish to receive either hourly emails or
+     * daily, if the current hour is equal the desired receiving hour.
+     *
      * Example: {<Account>: <List<NewNotification>, <Account>: <List<NewNotification>, ...}
      *
      * @return Map of accounts containing list of unsent and unread notifications
      * @throws Throwable
      */
     @SuppressWarnings("unchecked")
-    public static Map<Account, List<NewNotification>> findUsersWithDailyEmailNotifications() throws Throwable {
+    public static Map<Account, List<NewNotification>> findUsersWithDailyHourlyEmailNotifications() throws Throwable {
         List<Object[]> notificationsRecipients = JPA.withTransaction(new F.Function0<List<Object[]>>() {
             @Override
             public List<Object[]> apply() throws Throwable {
                 return (List<Object[]>) JPA.em()
-                        .createQuery("FROM NewNotification n JOIN n.recipient a WHERE n.isSent = false AND "
-                                + "n.isRead = false AND a.emailNotifications = :daily ORDER BY n.recipient DESC")
-                        .setParameter("daily", EmailNotifications.COLLECTED_DAILY)
-                        .getResultList();
+                    .createQuery("FROM NewNotification n JOIN n.recipient a WHERE n.isSent = false AND n.isRead = false "
+                        + "AND ((a.emailNotifications = :daily AND HOUR(CURRENT_TIME) = a.dailyEmailNotificationHour) "
+                        + "OR a.emailNotifications = :hourly) ORDER BY n.recipient.id DESC"
+                    )
+                    .setParameter("daily", EmailNotifications.COLLECTED_DAILY)
+                    .setParameter("hourly", EmailNotifications.HOURLY)
+                    .getResultList();
             }
         });
 
         // translate list of notifications and accounts into map
-        Map<Account, List<NewNotification>> accountMap = new HashMap<Account, List<NewNotification>>();
+        Map<Account, List<NewNotification>> accountMap = new HashMap<>();
         for (Object[] entry : notificationsRecipients) {
             NewNotification notification = (NewNotification)entry[0];
             Account account = (Account)entry[1];
@@ -220,7 +225,7 @@ public class NewNotification extends BaseModel {
 
             // add account and new list of notifications, if not set already, otherwise load list
             if (!accountMap.containsKey(account)) {
-                listForAccount = new ArrayList<NewNotification>();
+                listForAccount = new ArrayList<>();
                 accountMap.put(account, listForAccount);
             } else {
                 listForAccount = accountMap.get(account);
