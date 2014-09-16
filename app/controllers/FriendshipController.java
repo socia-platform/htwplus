@@ -14,7 +14,7 @@ import views.html.Friends.*;
 @Security.Authenticated(Secured.class)
 @Transactional
 public class FriendshipController extends BaseController {
-	
+
 	public static Result index() {
 		Navigation.set(Level.FRIENDS, "Übersicht");
 		Account currentUser = Component.currentAccount();
@@ -150,7 +150,7 @@ public class FriendshipController extends BaseController {
 			return true;
 		}
 		
-		if (Friendship.alreadyFriendly(currentUser,potentialFriend)) {
+		if (Friendship.alreadyFriendlyTransactional(currentUser,potentialFriend)) {
 			flash("info","Ihr seid bereits Freunde!");
 			return true;
 		}

@@ -155,15 +155,35 @@ public class Friendship extends BaseNotifiable implements INotifiable {
     }
 	
 	@SuppressWarnings("unchecked")
-	public static List<Friendship> findRequests(Account account) {
-		return (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE (fs.friend.id = ?1 OR fs.account.id = ?1) AND fs.linkType = ?2")
-				.setParameter(1, account.id).setParameter(2, LinkType.request).getResultList();
+	public static List<Friendship> findRequests(final Account account) {
+        try {
+            return JPA.withTransaction(new F.Function0<List<Friendship>>() {
+                @Override
+                public List<Friendship> apply() throws Throwable {
+                    return (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE (fs.friend.id = ?1 OR fs.account.id = ?1) AND fs.linkType = ?2")
+                            .setParameter(1, account.id).setParameter(2, LinkType.request).getResultList();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static List<Friendship> findRejects(Account account) {
-		return (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
-				.setParameter(1, account.id).setParameter(2, LinkType.reject).getResultList();
+	public static List<Friendship> findRejects(final Account account) {
+        try {
+            return JPA.withTransaction(new F.Function0<List<Friendship>>() {
+                @Override
+                public List<Friendship> apply() throws Throwable {
+                    return (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
+                            .setParameter(1, account.id).setParameter(2, LinkType.reject).getResultList();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
 	}
 	
 	public static List<Account> friendsToInvite(Account account, Group group) {

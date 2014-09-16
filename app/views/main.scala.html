@@ -24,7 +24,7 @@
 	}
 
 		<div class="container">
-		
+
 			<div class="row">
 				<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
 				@if(user != null){
@@ -35,13 +35,13 @@
 						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
 						@flash.get("success")
 					</div>
-				} 
+				}
 				@if(flash.containsKey("info")) {
 					<div class="alert alert-info fade in">
 						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
 						@flash.get("info")
 					</div>
-				} 
+				}
 				@if(flash.containsKey("error")) {
 					<div class="alert alert-danger fade in">
 						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>

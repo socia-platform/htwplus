@@ -11,26 +11,26 @@
 		}
 		
 		
-		@if(nav("first") == true) {
+		@if(nav.get("first") == true) {
 			<li><a class="@if(currentPage == 1) {active}" href="@{route}">1</a></li>
-			@if(nav("firstDots") == true) {
+			@if(nav.get("firstDots") == true) {
 						<li><a href="#">...</a></li>
 			}
 		}
 				
-		@for(p <- nav("pages").asInstanceOf[List[Integer]]) {
+		@for(p <- nav.get("pages").asInstanceOf[List[Integer]]) {
 			<li><a class="@if(currentPage == p) {active}" href="@{route + et+"page=" + p}">@p</a></li>
 		
 		}
 		
-		@if(nav("last") == true) {
-			@if(nav("lastDots") == true) {
+		@if(nav.get("last") == true) {
+			@if(nav.get("lastDots") == true) {
 						<li><a href="#">...</a></li>
 			}
-			<li><a class="@if(currentPage == nav("lastPage")) {active}" href="@{route + et+"page=" + (nav("lastPage").asInstanceOf[Integer])}">@nav("lastPage")</a></li>	
+			<li><a class="@if(currentPage == nav.get("lastPage")) {active}" href="@{route + et+"page=" + (nav.get("lastPage").asInstanceOf[Integer])}">@nav.get("lastPage")</a></li>
 		}
 		
-		@if(currentPage != nav("lastPage")) {
+		@if(currentPage != nav.get("lastPage")) {
 			<li><a href="@{route + et+"page=" + (currentPage+1).toString}">>></a></li>
 		}
 		

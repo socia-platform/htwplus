@@ -6,7 +6,9 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.base.BaseModel;
+import models.base.IJsonNodeSerializable;
 import models.enums.AccountRole;
 
 import models.enums.EmailNotifications;
@@ -46,6 +48,7 @@ import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import controllers.Component;
 import play.libs.F;
+import play.libs.Json;
 
 @Entity
 @Indexed
@@ -54,7 +57,7 @@ import play.libs.F;
 		@TokenFilterDef(factory = LowerCaseFilterFactory.class),
 		@TokenFilterDef(factory = StopFilterFactory.class, params = { @Parameter(name = "ignoreCase", value = "true") }) })
 @org.hibernate.search.annotations.Analyzer(definition = "searchtokenanalyzerAcc")
-public class Account extends BaseModel {
+public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	public String loginname;
 	
@@ -104,7 +107,6 @@ public class Account extends BaseModel {
      *
      * @param id Account ID
      * @return Account instance
-     * @throws Throwable
      */
 	public static Account findById(Long id) {
 		return JPA.em().find(Account.class, id);
@@ -115,15 +117,19 @@ public class Account extends BaseModel {
      *
      * @param id Account ID
      * @return Account instance
-     * @throws Throwable
      */
-    public static Account findByIdTransactional(final Long id) throws Throwable {
-        return JPA.withTransaction(new F.Function0<Account>() {
-            @Override
-            public Account apply() throws Throwable {
-                return Account.findById(id);
-            }
-        });
+    public static Account findByIdTransactional(final Long id) {
+        try {
+            return JPA.withTransaction(new F.Function0<Account>() {
+                @Override
+                public Account apply() throws Throwable {
+                    return Account.findById(id);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
     }
 	
 	@SuppressWarnings("unchecked")
@@ -414,4 +420,13 @@ public class Account extends BaseModel {
 		}
 		return criteria;
 	}
+
+    @Override
+    public ObjectNode getAsJson() {
+        ObjectNode node = Json.newObject();
+        node.put("id", this.id);
+        node.put("name", this.name);
+
+        return node;
+    }
 }

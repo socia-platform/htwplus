@@ -1,38 +1,66 @@
-$(document).ready(function () {
-    /********************************************************************
-     * New notification WebSocket system                                *
-     ********************************************************************/
-    /**
-     * If true, various debug information is printed to console.
-     *
-     * @type {boolean}
-     */
-    var wsDebug = true;
+function WS() {
+    this.debug = true;
+    this.targetUrl = window.location.protocol === 'https:'
+        ? 'wss://' + window.location.host + '/websocket'
+        : 'ws://' + window.location.host + '/websocket';
+    this.socket = window.MozWebSocket ? new window.MozWebSocket(this.targetUrl) : new window.WebSocket(this.targetUrl);
+
+    var ws = this;
 
     /**
-     * Returns the correct WebSocket target URL respecting un-/encrypted context.
+     * WebSocket on message listener. If this.debug=true, WebSocket communication is logged.
      *
-     * @returns {string}
+     * @param e Event
      */
-    function getWsNotificationUrl() {
-        return window.location.protocol === 'https:'
-            ? 'wss://' + window.location.host + '/websocket/notification'
-            : 'ws://' + window.location.host + '/websocket/notification';
-    }
+    this.socket.onmessage = function(e) {
+        try {
+            var data = JSON.parse(e.data);
+
+            if (ws.debug) {
+                console.log(data);
+            }
+
+            if (data.code == "OK" && data.method == "ReceiveNotification" && data.notification) {
+                ws.updateNotifications([data.notification]);
+            }
+        } catch (exception) {
+            if (ws.debug) {
+                console.log('Client exception while receiving from WS: ' + exception);
+                console.log('Data from server: ' + e.data);
+            }
+        }
+    };
 
     /**
-     * Initiates the notification WebSocket channel.
+     * WebSocket on error listener. Errors are logged on this.debug=true only.
+     *
+     * @param e Event
      */
-    function wsNotificationInit() {
-        if (wsDebug) {
-            console.log('Initiate Notification WS');
+    this.socket.onerror = function(e) {
+        if (ws.debug) {
+            console.log('Error: ' + e.data);
+        }
+    };
+
+    /**
+     * Sends a message to the WebSocket.
+     *
+     * @param data The message to send
+     */
+    this.send = function(data) {
+        if (ws.debug) {
+            var sendingJson = JSON.stringify(data);
+            console.log('WS Send: ' + sendingJson);
         }
 
-        var ws = window['MozWebSocket'] ? MozWebSocket : WebSocket;
-        var notificationWebSocket = new ws(getWsNotificationUrl());
-        notificationWebSocket.onmessage = function(event) { wsNotificationOnMessage(event) };
-        notificationWebSocket.onerror = function(event) { wsNotificationOnError(event) };
-    }
+        try {
+            this.socket.send(sendingJson);
+        } catch (exception) {
+            if (ws.debug) {
+                console.log('Client exception while sending to WS: ' + exception);
+            }
+        }
+    };
 
     /**
      * Creates a new li element with a new notification.
@@ -40,7 +68,7 @@ $(document).ready(function () {
      * @param notification
      * @returns {HTMLElement}
      */
-    function createNotificationElement(notification) {
+    this.createNotificationElement = function(notification) {
         var notificationElement = document.createElement('li');
         var parentDiv = document.createElement('div');
         var notificationLink = document.createElement('a');
@@ -54,14 +82,14 @@ $(document).ready(function () {
         parentDiv.appendChild(notificationLink);
 
         return notificationElement;
-    }
+    };
 
     /**
      * Updates the notifications, if necessary.
      *
      * @param notifications
      */
-    function updateNotifications(notifications) {
+    this.updateNotifications = function(notifications) {
         // create new elements for each new notification, append them before last list element (like "show all notifications")
         for (var notificationIndex in notifications) {
             if (notifications.hasOwnProperty(notificationIndex)) {
@@ -70,34 +98,28 @@ $(document).ready(function () {
 
                 // check, if the li element is already available
                 if (notificationListElement.length) {
-                    // li element available, check, if status changed
-                    if (notificationListElement.hasClass((notification.is_read ? 'read' : 'unread'))) {
-                        // status did not change, just go on...
-                        continue;
-                    } else {
-                        // status changed, we must recreate this element with new content
-                        notificationListElement.remove();
-                    }
+                    // status changed, we must recreate this element with new content
+                    notificationListElement.remove();
                 }
 
                 // li element not available, create new element and append
-                var newNotificationElement = createNotificationElement(notification);
+                var newNotificationElement = this.createNotificationElement(notification);
                 $('#hp-notifications-item').find('li:first').before(newNotificationElement);
                 $(newNotificationElement).fadeIn('slow');
             }
         }
 
         // update counter and eventually delete obsolete previous notifications
-        updateNewNotificationCounter(notifications);
-        deleteObsoleteNotifications(notifications);
-    }
+        this.updateNewNotificationCounter(notifications);
+        this.deleteObsoleteNotifications(notifications);
+    };
 
     /**
      * Updates the new notification counter.
      *
      * @param notifications
      */
-    function updateNewNotificationCounter(notifications) {
+    this.updateNewNotificationCounter = function(notifications) {
         // count new/unread notifications
         var unreadNotifications = 0;
         for (var notificationIndex in notifications) {
@@ -126,60 +148,21 @@ $(document).ready(function () {
                 }
             }
         }
-    }
+    };
 
     /**
      * Deletes obsolete notifications, if number of opened notifications bigger than numbers of notifications.
      */
-    function deleteObsoleteNotifications(notifications) {
+    this.deleteObsoleteNotifications = function() {
+        var maxLiElements = 11; // 11 because 10 notifications + last li element (show all)
         var notificationDropDownLayer = $('#hp-notifications-item');
-        while (notificationDropDownLayer.find('li').length > notifications.length + 1) { // length + 1 because the last li element is no notification
+        while (notificationDropDownLayer.find('li').length > maxLiElements) {
             notificationDropDownLayer.find('li:nth-last-child(2)').remove();
         }
-    }
+    };
+}
 
-    /**
-     * Notification WebSocket on message listener. If wsDebug=true, WebSocket communication is logged.
-     *
-     * @param event
-     */
-    function wsNotificationOnMessage(event) {
-        try {
-            var notifications = JSON.parse(event.data);
-
-            if (wsDebug) {
-                console.log(notifications);
-            }
-
-            updateNotifications(notifications);
-
-//            var setOpen = false;
-//            if (notificationDropDownLayer.hasClass('open')) {
-//                setOpen = true;
-//            }
-//
-//            if (setOpen == true) {
-//                notificationDropDownLayer.addClass('open');
-//            }
-        } catch (exception) {
-            if (wsDebug) {
-                console.log('Client exception: ' + exception);
-                console.log('Data from server: ' + event.data);
-            }
-        }
-    }
-
-    /**
-     * Notification WebSocket on error listener. Errors are logged on wsDebug=true only.
-     *
-     * @param event
-     */
-    function wsNotificationOnError(event) {
-        if (wsDebug) {
-            console.log('Error: ' + event.data);
-        }
-    }
-
-    // now init the WebSocket
-    wsNotificationInit();
+var webSocket;
+$(document).ready(function () {
+    webSocket = new WS();
 });

@@ -14,7 +14,7 @@
 
     <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
 
-        @if(Friendship.alreadyFriendly(Component.currentAccount, user)) {
+        @if(Friendship.alreadyFriendlyTransactional(Component.currentAccount, user)) {
 
         <li><a href="@routes.ProfileController.stream(user.id)" data-toggle="modal">
             <span class="glyphicon glyphicon-comment"></span><br>Newsstream

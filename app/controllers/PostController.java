@@ -8,8 +8,10 @@ import models.services.NotificationService;
 import play.Play;
 import play.api.mvc.Call;
 import play.data.Form;
+import play.db.jpa.JPA;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
+import play.libs.F;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Post.view;
@@ -121,23 +123,28 @@ public class PostController extends BaseController {
 	
 	@Transactional
 	public static Result addComment(long postId) {
-		Post parent = Post.findById(postId);
-		Account account = Component.currentAccount();
+		final Post parent = Post.findById(postId);
+		final Account account = Component.currentAccount();
 		
 		if(!Secured.addComment(parent)){
 			return badRequest();
 		}
 		
-		Form<Post> filledForm = postForm.bindFromRequest();
+		final Form<Post> filledForm = postForm.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest();
 		} else {
-			Post post = filledForm.get();
+			final Post post = filledForm.get();
 			post.owner = account;
 			post.parent = parent;
-			post.create();
-			// update parent to move it to the top
-			parent.update();
+            JPA.withTransaction(new F.Callback0() {
+                @Override
+                public void invoke() throws Throwable {
+                    post.create();
+                    // update parent to move it to the top
+                    parent.update();
+                }
+            });
 			
 			if (parent.belongsToGroup()) {
 				// this is a comment in a group post
@@ -167,9 +174,9 @@ public class PostController extends BaseController {
 		int max = Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
 		int count = Post.countCommentsForPost(id);
 		if(count <= max){
-			return Post.getCommentsForPost(id, 0, count);
+			return Post.getCommentsForPostTransactional(id, 0, count);
 		} else {
-			return Post.getCommentsForPost(id, count-max, count);
+			return Post.getCommentsForPostTransactional(id, count-max, count);
 		}
 	}
 	
@@ -189,7 +196,7 @@ public class PostController extends BaseController {
 		if(count <= max){
 			return ok(result);	
 		} else {
-			comments = Post.getCommentsForPost(id, 0, count-max);
+			comments = Post.getCommentsForPostTransactional(id, 0, count-max);
 			for (Post post : comments) {
 				result = result.concat(views.html.snippets.postComment.render(post).toString());
 			}

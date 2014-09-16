@@ -1,10 +1,13 @@
 package models;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.base.BaseModel;
+import models.base.IJsonNodeSerializable;
 import models.enums.EmailNotifications;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import play.libs.F;
+import play.libs.Json;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,7 +20,7 @@ import java.util.Map;
  */
 @Entity
 @Table
-public class NewNotification extends BaseModel {
+public class NewNotification extends BaseModel implements IJsonNodeSerializable {
     /**
      * The sender of this notification.
      */
@@ -236,5 +239,17 @@ public class NewNotification extends BaseModel {
         }
 
         return accountMap;
+    }
+
+    @Override
+    public ObjectNode getAsJson() {
+        ObjectNode node = Json.newObject();
+        node.put("id", this.id);
+        node.put("is_read", this.isRead);
+        node.put("content", this.rendered);
+        node.put("created", this.createdAt.getTime());
+        node.put("updated", this.updatedAt.getTime());
+
+        return node;
     }
 }

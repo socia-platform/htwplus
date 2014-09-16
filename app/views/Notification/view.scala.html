@@ -6,9 +6,9 @@
     @if(notifications != null) {
         @for(notification <- notifications) {
             <div class="well notification">
-                <div class="notification-date">@Messages("notification.date", notification.createdAt.date.format("dd.MM.YYYY"), notification.createdAt.date.format("HH:mm"))</div>
+                <div class="notification-date">@Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"))</div>
                 @if(notification.isRead){
-                <div class="notification-read read">@Messages("notification.date_read", notification.updatedAt.date.format("dd.MM.YYYY"), notification.updatedAt.date.format("HH:mm"))</div>
+                <div class="notification-read read">@Messages("notification.date_read", notification.updatedAt.format("dd.MM.YYYY"), notification.updatedAt.format("HH:mm"))</div>
                 }else{
                 <div class="notification-read unread">@Messages("notification.not_read")</div>
                 }

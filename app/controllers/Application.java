@@ -40,7 +40,7 @@ public class Application extends BaseController {
 				)
         );
 	}
-	
+
 	@Security.Authenticated(Secured.class)
 	public static Result index() {
 		Navigation.set(Level.STREAM);

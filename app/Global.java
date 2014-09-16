@@ -22,7 +22,7 @@ import play.db.jpa.JPA;
 import play.libs.Akka;
 import play.libs.F.*;
 import play.mvc.Http.RequestHeader;
-import play.mvc.SimpleResult;
+import play.mvc.Result;
 import scala.concurrent.duration.Duration;
 
 @SuppressWarnings("unused")
@@ -121,7 +121,7 @@ public class Global extends GlobalSettings {
     }
 	
 	@Override
-	public Promise<SimpleResult> onError(final RequestHeader rh, final Throwable t) {
+	public Promise<Result> onError(final RequestHeader rh, final Throwable t) {
 		Logger.error("onError "+ rh + " " + t);
 				
 		JPA.withTransaction(new play.libs.F.Callback0() {

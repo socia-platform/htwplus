@@ -1,5 +1,7 @@
 package models.services;
 
+import akka.actor.ActorRef;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.Account;
 import models.NewNotification;
 import models.base.BaseNotifiable;
@@ -9,6 +11,7 @@ import play.Logger;
 import play.db.jpa.JPA;
 import play.libs.Akka;
 import play.libs.F;
+import play.libs.Json;
 import scala.concurrent.duration.Duration;
 
 import java.util.List;
@@ -90,6 +93,7 @@ public class NotificationService {
                             });
 
                             Logger.info("Created new async Notification for User: " + recipient.id.toString());
+                            this.webSocketPush(notification);
                             this.handleMail(notification);
                         } catch (Exception e) {
                             Logger.error("Could not render notification. Notification will not be stored in DB" +
@@ -99,9 +103,30 @@ public class NotificationService {
                     }
                 }
 
-                // sends mail to recipient, if he wishes to be notified via mail immediately
-                // and notification is currently unsent/unread
-                protected void handleMail(final NewNotification notification) {
+                /**
+                 * Pushes the new notification to the recipient if he is currently online.
+                 *
+                 * @param notification Notification
+                 */
+                private void webSocketPush(final NewNotification notification) {
+                    ActorRef recipientActor = WebSocketService.getInstance().getActorForAccountId(notification.recipient.id);
+
+                    // continue if recipientActor is instance (he is currently online)
+                    if (recipientActor != null) {
+                        ObjectNode node = WebSocketService.getInstance()
+                                .successResponseTemplate(WebSocketService.WS_METHOD_RECEIVE_NOTIFICATION);
+                        node.put("notification", notification.getAsJson());
+                        recipientActor.tell(Json.toJson(node), null);
+                    }
+                }
+
+                /**
+                 * Sends mail to recipient, if he wishes to be notified via mail immediately
+                 * and notification is currently unsent/unread.
+                 *
+                 * @param notification Notification
+                 */
+                private void handleMail(final NewNotification notification) {
                     if (notification.recipient.emailNotifications == EmailNotifications.IMMEDIATELY_ALL
                             && !notification.isSent
                             && !notification.isRead

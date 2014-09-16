@@ -76,7 +76,9 @@ GET 	/media/:id/delete					controllers.MediaController.delete(id:Long)
 #Notification
 GET     /notification                       controllers.NotificationController.showAll(page: Integer ?= 1)
 GET		/notification/:id					controllers.NotificationController.forward(id:Long)
-GET     /websocket/notification             controllers.NotificationController.wsNotifications()
+
+# WebSocket
+GET     /websocket                          controllers.WebSocketController.webSocket()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               		controllers.Assets.at(path="/public", file)

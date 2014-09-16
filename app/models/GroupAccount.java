@@ -71,6 +71,26 @@ public class GroupAccount extends BaseModel {
 		return groupAccounts;
 	}
 
+    /**
+     * Method findEstablished() JPA transactional.
+     *
+     * @param account Account instance
+     * @return List of Group instances
+     */
+    public static List<Group> findEstablishedTransactional(final Account account) {
+        try {
+            return JPA.withTransaction(new F.Function0<List<Group>>() {
+                @Override
+                public List<Group> apply() throws Throwable {
+                    return GroupAccount.findEstablished(account);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
+
 	/**
 	 * Find all groups where given account is owner or member
 	 */
@@ -104,16 +124,25 @@ public class GroupAccount extends BaseModel {
 	/**
 	 * Find all open groups where given account is owner or member 
 	 */
-	public static List<Group> findPublicEstablished(Account account) {
-		@SuppressWarnings("unchecked")
-		List<Group> groupAccounts = JPA
-				.em()
-				.createQuery(
-						"SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType = ?3")
-				.setParameter(1, account.id)
-				.setParameter(2, LinkType.establish)
-				.setParameter(3, GroupType.open).getResultList();
-		return groupAccounts;
+    @SuppressWarnings("unchecked")
+	public static List<Group> findPublicEstablished(final Account account) {
+        try {
+            return JPA.withTransaction(new F.Function0<List<Group>>() {
+                @Override
+                public List<Group> apply() throws Throwable {
+                return JPA
+                    .em()
+                    .createQuery(
+                            "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType = ?3")
+                    .setParameter(1, account.id)
+                    .setParameter(2, LinkType.establish)
+                    .setParameter(3, GroupType.open).getResultList();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
 	}
 
 	/**

@@ -9,6 +9,7 @@ import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
+import play.libs.F;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
@@ -110,23 +111,65 @@ public class Post extends BaseNotifiable implements INotifiable {
 				.setMaxResults(max)
 				.getResultList();
 	}
-	
-	
-	@SuppressWarnings("unchecked")
+
+    /**
+     * Method getCommentsForPostTransactional() JPA transactional.
+     *
+     * @param id ID of parent post
+     * @param start Comment start
+     * @param max Max comments
+     * @return List of Posts
+     */
+    public static List<Post> getCommentsForPostTransactional(final Long id, final int start, final int max) {
+        try {
+            return JPA.withTransaction(new F.Function0<List<Post>>() {
+                @Override
+                public List<Post> apply() throws Throwable {
+                    return Post.getCommentsForPost(id, start, max);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
+
+        @SuppressWarnings("unchecked")
 	public static List<Post> findStreamForAccount(Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor, int limit, int offset){
 		
 		Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, isVisitor, " ORDER BY p.updatedAt DESC");
 
 		// set limit and offset
 		query = limit(query, limit, offset);
+        final Query finalQuery = query;
 
-		return query.getResultList();
+        try {
+            return JPA.withTransaction(new F.Function0<List>() {
+                @Override
+                public List apply() throws Throwable {
+                    return finalQuery.getResultList();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
 	}
 	
-	public static int countStreamForAccount(Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor) {
-		Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, isVisitor,"");
+	public static int countStreamForAccount(final Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor) {
+		final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, isVisitor,"");
 
-		return ((Number) query.getSingleResult()).intValue();
+        try {
+            return JPA.withTransaction(new F.Function0<Integer>() {
+                @Override
+                public Integer apply() throws Throwable {
+                    return ((Number) query.getSingleResult()).intValue();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return 0;
+        }
 	}
 	
 	/**
@@ -136,7 +179,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	 * @return List of Posts
 	 */
 	public static Query streamForAccount(String selectClause, Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor, String orderByClause){
-		
+
 		// since JPA is unable to handle empty lists (eg. groupList, friendList) we need to assemble our query.
 		String myPostsClause;
 		String groupListClause = "";
@@ -144,18 +187,18 @@ public class Post extends BaseNotifiable implements INotifiable {
 		String visitorClause = "";
         String broadcastJoin = "";
         String broadcastClause = "";
-		
+
 		/**
-		 *  finds all stream-post for account. 
+		 *  finds all stream-post for account.
 		 *  e.g account = myself
-		 *  1. if i'm mentioned in post.account, somebody posted me. (yep, we want this => 'p.account = :account') 
+		 *  1. if i'm mentioned in post.account, somebody posted me. (yep, we want this => 'p.account = :account')
 		 *  2. if i'm post.owner, i posted somewhere (yep, we want this too => 'p.owner = :account')
 		 *  BUT, if i'm the owner and post.parent is set, it's only a comment. so => 'p.parent = NULL'
 		 */
 		myPostsClause = " p.account = :account OR (p.owner = :account AND p.parent = NULL) ";
-		
+
 		// add additional clauses if not null or empty
-		
+
 		if (friendList != null && !friendList.isEmpty()) {
 			/**
 			 *  finds all own stream-posts of my friends.
@@ -165,19 +208,19 @@ public class Post extends BaseNotifiable implements INotifiable {
 			 */
 			friendListClause = " OR p.account IN :friendList AND p.account = p.owner";
 		}
-		
+
 		if (groupList != null && !groupList.isEmpty()) {
 			// finds all stream-post of groups
 			groupListClause = " OR p.group IN :groupList ";
 		}
-		
+
 		if (isVisitor) {
 			/**
 			 * since 'myPostsClause' includes posts where the given account posted to someone ('OR (p.owner = :account AND p.parent = NULL)').
 			 * we have to modify it for the friends-stream (cut it out).
 			 */
 			myPostsClause = " p.account = :account ";
-			
+
 			/**
 			 * groupListClause includes all posts where my friend is member/owner of.
 			 * but we only need those posts where he/she is owner of.
@@ -194,10 +237,10 @@ public class Post extends BaseNotifiable implements INotifiable {
 		// create Query.
         String completeQuery = selectClause + " FROM Post p" + broadcastJoin + " WHERE " + myPostsClause
                 + groupListClause + friendListClause + visitorClause + broadcastClause + orderByClause;
-		Query query = JPA.em().createQuery(completeQuery);
+		Query query = JPA.em("default").createQuery(completeQuery);
 		query.setParameter("account", account);
-		
-		
+
+
 		// add parameter as needed
 		if (groupList != null && !groupList.isEmpty()) {
 			query.setParameter("groupList", groupList);
@@ -205,12 +248,12 @@ public class Post extends BaseNotifiable implements INotifiable {
 		if (friendList != null && !friendList.isEmpty()) {
 			query.setParameter("friendList", friendList);
 		}
-		
+
 		return query;
 	}
 	
 	public static int countCommentsForPost(Long id) {
-		return ((Number)JPA.em().createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
+		return ((Number)JPA.em("default").createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
 	}
 	
 	public int getCountComments() {
@@ -232,7 +275,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	public static List<Post> getStream(Account account, int limit, int page) {
 		// find friends and groups of given account
 		List<Account> friendList = Friendship.findFriends(account);
-		List<Group> groupList = GroupAccount.findEstablished(account);
+		List<Group> groupList = GroupAccount.findEstablishedTransactional(account);
 		
 		int offset = (page * limit) - limit;
 		return findStreamForAccount(account, groupList, friendList, false, limit, offset);
@@ -246,7 +289,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	public static int countStream(Account account){
 		// find friends and groups of given account
 		List<Account> friendList = Friendship.findFriends(account);
-		List<Group> groupList = GroupAccount.findEstablished(account);
+		List<Group> groupList = GroupAccount.findEstablishedTransactional(account);
 			
 		return countStreamForAccount(account, groupList, friendList, false);
 	}
