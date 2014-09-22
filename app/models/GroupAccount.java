@@ -53,7 +53,7 @@ public class GroupAccount extends BaseModel {
 
 	@Override
 	public void delete() {
-        NewNotification.deleteReferencesForAccountId(this.group, this.account.id);
+        Notification.deleteReferencesForAccountId(this.group, this.account.id);
 		JPA.em().remove(this);
 	}
 	

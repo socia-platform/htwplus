@@ -3,7 +3,7 @@ package models.services;
 import akka.actor.ActorRef;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.Account;
-import models.NewNotification;
+import models.Notification;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.EmailNotifications;
@@ -72,7 +72,7 @@ public class NotificationService {
                         }
 
                         // create new notification and persist in database
-                        final NewNotification notification = new NewNotification();
+                        final Notification notification = new Notification();
                         notification.isRead = false;
                         notification.isSent = false;
                         notification.recipient = recipient;
@@ -108,7 +108,7 @@ public class NotificationService {
                  *
                  * @param notification Notification
                  */
-                private void webSocketPush(final NewNotification notification) {
+                private void webSocketPush(final Notification notification) {
                     ActorRef recipientActor = WebSocketService.getInstance().getActorForAccountId(notification.recipient.id);
 
                     // continue if recipientActor is instance (he is currently online)
@@ -126,7 +126,7 @@ public class NotificationService {
                  *
                  * @param notification Notification
                  */
-                private void handleMail(final NewNotification notification) {
+                private void handleMail(final Notification notification) {
                     if (notification.recipient.emailNotifications == EmailNotifications.IMMEDIATELY_ALL
                             && !notification.isSent
                             && !notification.isRead

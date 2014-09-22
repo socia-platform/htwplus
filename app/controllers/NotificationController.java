@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import models.Account;
-import models.NewNotification;
+import models.Notification;
 import play.Play;
 import play.twirl.api.Html;
 import play.db.jpa.Transactional;
@@ -39,9 +39,9 @@ public class NotificationController extends BaseController {
 			return new Html("Das wird nichts");
 		}
 
-        List<NewNotification> list = null;
+        List<Notification> list = null;
         try {
-            list = NewNotification.findByAccountId(account.id);
+            list = Notification.findByAccountId(account.id);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
         List<Integer> countedNotifications = NotificationController.countNotifications(list);
@@ -57,7 +57,7 @@ public class NotificationController extends BaseController {
      */
     @Transactional
 	public static Result forward(Long notificationId) {
-		NewNotification notification = NewNotification.findById(notificationId);
+		Notification notification = Notification.findById(notificationId);
 
 		if (notification == null) {
 			return badRequest("Das gibts doch garnicht!");
@@ -81,13 +81,13 @@ public class NotificationController extends BaseController {
      */
     @Transactional(readOnly = true)
     public static Result showAll(int page) {
-        List<NewNotification> notifications = null;
+        List<Notification> notifications = null;
         try {
-            notifications = NewNotification.findByAccountIdForPage(Component.currentAccount().id, NotificationController.LIMIT, page);
+            notifications = Notification.findByAccountIdForPage(Component.currentAccount().id, NotificationController.LIMIT, page);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
         Navigation.set(Navigation.Level.NOTIFICATIONS, Messages.get("notification.news"));
-        return ok(view.render(notifications, LIMIT, page, NewNotification.countNotificationsForAccountId(Component.currentAccount().id)));
+        return ok(view.render(notifications, LIMIT, page, Notification.countNotificationsForAccountId(Component.currentAccount().id)));
     }
 
     /**
@@ -99,7 +99,7 @@ public class NotificationController extends BaseController {
      * @param notifications List of notifications
      * @return List with count of all, unread and read notifications
      */
-    public static List<Integer> countNotifications(List<NewNotification> notifications) {
+    public static List<Integer> countNotifications(List<Notification> notifications) {
         int countAll = 0;
         int countUnread = 0;
         int countRead = 0;
@@ -107,7 +107,7 @@ public class NotificationController extends BaseController {
 
         if (notifications != null) {
             countAll = notifications.size();
-            for (NewNotification notification : notifications) {
+            for (Notification notification : notifications) {
                 if (notification.isRead) {
                     countRead++;
                 }

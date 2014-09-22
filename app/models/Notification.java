@@ -1,233 +1,255 @@
 package models;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.*;
-
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.base.BaseModel;
-import models.enums.GroupType;
-import models.enums.LinkType;
-import play.Logger;
+import models.base.IJsonNodeSerializable;
+import models.enums.EmailNotifications;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
+import play.libs.F;
+import play.libs.Json;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @deprecated As of refactoring of notification system, replaced by class NewNotification
+ * Notification class as entity. Will replace the current Notification class in future.
  */
 @Entity
-@Table(uniqueConstraints=
-@UniqueConstraint(columnNames = {
-		"account_id", 
-		"noteType", 
-		"object_id"
-		}))
-@Deprecated
-public class Notification extends BaseModel {
-	
-	/**
-	 * Each notification type is associated with a model,
-	 * which ID is the objectId. Query the right entity by
-	 * using the objectID for the corresponding model. 
-	 * ALWAYS INSERT NEW ONES AT THE END!!!
-	 */
-	public enum NotificationType {
-		GROUP_NEW_POST, // Group Model
-		GROUP_NEW_MEDIA, // Group Model
-		GROUP_NEW_REQUEST, // Group Model
-		GROUP_REQUEST_SUCCESS, // Group Model
-		GROUP_REQUEST_DECLINE, // Group Model
-		POST_GROUP_NEW_COMMENT, // Post Model
-		PROFILE_NEW_POST, // Account Model
-		POST_PROFILE_NEW_COMMENT, // Post Model
-		FRIEND_NEW_REQUEST, // Account Model
-		FRIEND_REQUEST_SUCCESS, // Account Model
-		FRIEND_REQUEST_DECLINE, // Account Model
-		POST_MY_PROFILE_NEW_COMMENT, // Post Model
-		GROUP_INVITATION, // Group Model
-	}
-	
-	@Required
-	@OneToOne
-	public Account account;
-	
-	@Required
-	public NotificationType noteType;
-	
-	@Column(name = "object_id")
-	public Long objectId;
+@Table
+public class Notification extends BaseModel implements IJsonNodeSerializable {
+    /**
+     * The sender of this notification.
+     */
+    @Required
+    @OneToOne
+    public Account sender;
 
-    @Column(name = "read")
-    public boolean notificationRead;
-	
-	public static Notification findById(Long id) {
-		return JPA.em().find(Notification.class, id);
-	}
-	
-	//SINGLE NOTIFICATION
-	public static void newNotification(NotificationType type, Long objectId, Account recipient) {
-		if(Notification.findUnique(type, recipient, objectId) == null) {
-			Notification notf = new Notification();
-			notf.account = recipient;
-			notf.noteType = type;
-			notf.objectId = objectId;
-            notf.notificationRead = false;
-            notf.create();
-            Logger.info("Created new Notification for User: " + recipient.id.toString());
-		}
-	}
-	
-	// GROUP NOTIFICATIONS
-	public static void newGroupNotification(NotificationType type, Group group, Account sender) {
-		// Get all accounts for that group
-    	List<Account> accounts =  GroupAccount.findAccountsByGroup(group, LinkType.establish);
-	
-//		Akka.future(
-//		  new Callable<Void>() {
-//		    public Void call() {
-//		    	Logger.info("Async test");
-//		    	Notification.newNotification(NotificationType.FRIEND_NEW_REQUEST, (long) 123, sender);
-//		    	List<Account> accounts =  GroupAccount.findAccountsByGroup(group);
-//		    	Logger.info("Size:" + String.valueOf(accounts.size()));
-//				NotificationType type = noteType;
-//
-//		    	for (Account account : accounts) {
-//					if(!account.equals(sender)){
-//						if(Notification.findUnique(type, account, group.id) == null) {
-//							Notification notf = new Notification();
-//							notf.account = account;
-//							notf.noteType = type;
-//							notf.objectId = group.id;
-//							notf.create();
-//							Logger.info("Created new Notification for User: " + account.id.toString());
-//						}
-//					}
-//				}
-//				return null;
-//		    }
-//		  }
-//		);
-		
-		for (Account account : accounts) {
-			if(!account.equals(sender)){
-				if(Notification.findUnique(type, account, group.id) == null) {
-					Notification notf = new Notification();
-					notf.account = account;
-					notf.noteType = type;
-					notf.objectId = group.id;
-                    notf.notificationRead = false;
-                    notf.create();
-                    Logger.info("Created new Notification for User: " + account.id.toString());
-				}
-			}
-		}
-	}
-	
-	// GROUP POST NOTIFICATIONS
-	public static void newPostNotification(NotificationType noteType, Post post, Account sender){
-		Group group = post.group;
-		List<Account> accounts =  GroupAccount.findAccountsByGroup(group, LinkType.establish);
-		
-		for (Account account : accounts) {
-			if(!account.equals(sender)){
-				if(Notification.findUnique(noteType, account, post.id) == null) {
-					Notification notf = new Notification();
-					notf.account = account;
-					notf.noteType = noteType;
-					notf.objectId = post.id;
-					notf.create();
-					Logger.info("Created new Notification for User: " + account.id.toString());
-				}
-			}
-		}
-		
-		// Inform Author of Post, even when not in Group
-		if(group.groupType == GroupType.open && !Group.isMember(group, post.owner)) {
-			if(!post.owner.equals(sender)){
-				if(Notification.findUnique(noteType, post.owner, post.id) == null) {
-					Notification notf = new Notification();
-					notf.account = post.owner;
-					notf.noteType = noteType;
-					notf.objectId = post.id;
-					notf.create();
-					Logger.info("Created new Notification for User: " + post.owner.id.toString());
-				}
-			}
-		}
+    /**
+     * The recipient of this notification.
+     */
+    @Required
+    @OneToOne
+    public Account recipient;
 
-	}
-	
-	public static Notification findUnique(NotificationType type, Account account, Long objectId) {
-		Notification note;
-    	try{
-    		note = (Notification) JPA.em()
-					.createQuery("from Notification n where n.noteType = :type AND n.account.id = :account AND n.objectId = :object_id")
-					.setParameter("type", type)
-					.setParameter("account", account.id)
-					.setParameter("object_id", objectId)
-					.getSingleResult();
-    		note.updatedAt = new Date();
-            note.notificationRead = false;
-    		note.update();
-	    } catch (NoResultException exp) {
-	    	return null;
-		}
-    	
-    	return note;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public static List<Notification> findByUser(Account account) {
-		return (List<Notification>) JPA.em()
-				.createQuery("FROM Notification n WHERE n.account.id = :account ORDER BY n.updatedAt DESC")
-				.setParameter("account", account.id)
-				.getResultList();
-	}
+    @Column(name = "rendered")
+    public String rendered;
 
-    @SuppressWarnings("unchecked")
-    public static List<Notification> findUnreadByUser(Account account) {
-        return (List<Notification>) JPA.em()
-                .createQuery("FROM Notification n WHERE n.account.id = :account AND n.notificationRead = false ORDER BY n.updatedAt DESC")
-                .setParameter("account", account.id)
-                .getResultList();
-    }
+    /**
+     * True, if this notification is read by its recipient.
+     */
+    @Column(name = "is_read", nullable = false, columnDefinition = "boolean default false")
+    public boolean isRead;
 
-    @SuppressWarnings("unused")
-	public static void deleteByUser(Account account) {
-		JPA.em().createQuery("DELETE FROM Notification n WHERE n.account.id = :account")
-				.setParameter("account", account.id).executeUpdate();
-	}
+    /**
+     * True, if this notification is sent already via email.
+     */
+    @Column(name = "is_sent", nullable = false, columnDefinition = "boolean default false")
+    public boolean isSent;
 
-    public static void markAllAsReadByUser(Account account) {
-        JPA.em().createQuery("UPDATE Notification n SET notificationRead = true WHERE n.account.id = :account")
-                .setParameter("account", account.id).executeUpdate();
-    }
-	
-	public static void deleteByObject(Long objectId) {
-		JPA.em().createQuery("DELETE FROM Notification n WHERE n.objectId = :object_id")
-				.setParameter("object_id", objectId).executeUpdate();
-	}
-	
-	public static int countForAccount(Account account){
-		return ((Number)JPA.em()
-				.createQuery("SELECT COUNT(n.id) FROM Notification n WHERE n.account = :account")
-				.setParameter("account", account)
-				.getSingleResult()).intValue();
-	}
-		
-	@Override
-	public void create() {
-		JPA.em().persist(this);
-	}
+    /**
+     * An object, this notification has a reference to (e.g. when notified after posting the post).
+     */
+    @ManyToOne
+    public BaseModel reference;
 
-	@Override
-	public void update() {
+    /**
+     * The target URL, this notification refers to.
+     */
+    @Column(name = "target_url")
+    public String targetUrl;
+
+    @Override
+    public void create() {
         JPA.em().persist(this);
-	}
+    }
 
-	@Override
-	public void delete() {
-		JPA.em().remove(this);
-	}
+    @Override
+    public void update() {
+        JPA.em().merge(this);
+    }
 
+    @Override
+    public void delete() {
+        JPA.em().remove(this);
+    }
+
+    /**
+     * Returns a list of notifications by a specific user account ID.
+     *
+     * @param accountId User account ID
+     * @param maxResults Maximum results
+     * @param offsetResults Offset of results
+     * @return List of notifications
+     * @throws Throwable
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Notification> findByAccountId(final Long accountId, final int maxResults, final int offsetResults) throws Throwable {
+        return JPA.withTransaction(new F.Function0<List<Notification>>() {
+            @Override
+            public List<Notification> apply() throws Throwable {
+                return (List<Notification>) JPA.em()
+                        .createQuery("FROM Notification n WHERE n.recipient.id = :accountId ORDER BY n.createdAt DESC")
+                        .setParameter("accountId", accountId)
+                        .setMaxResults(maxResults)
+                        .setFirstResult(offsetResults)
+                        .getResultList();
+            }
+        });
+    }
+
+    /**
+     * Overloaded method findByAccountId() with default offset 0
+     *
+     * @param accountId User account ID
+     * @return List of notifications
+     * @throws Throwable
+     */
+    public static List<Notification> findByAccountId(final Long accountId, final int maxResults) throws Throwable {
+        return Notification.findByAccountId(accountId, maxResults, 0);
+    }
+
+    /**
+     * Overloaded method findByAccountId() with default max results of 10 and offset 0
+     *
+     * @param accountId User account ID
+     * @return List of notifications
+     * @throws Throwable
+     */
+    public static List<Notification> findByAccountId(final Long accountId) throws Throwable {
+        return Notification.findByAccountId(accountId, 10);
+    }
+
+    /**
+     * Returns a list of notifications by a specific user account ID for a specific page.
+     *
+     * @param accountId User account ID
+     * @param currentPage Current page
+     * @return List of notifications
+     * @throws Throwable
+     */
+    public static List<Notification> findByAccountIdForPage(final Long accountId, int maxResults, int currentPage) throws Throwable {
+        return Notification.findByAccountId(accountId, maxResults, (currentPage * maxResults) - maxResults);
+    }
+
+    /**
+     * Deletes a notification with containing a specific reference.
+     *
+     * @param reference BaseModel reference
+     */
+    public static void deleteReferences(final BaseModel reference) {
+        JPA.em().createQuery("DELETE FROM Notification n WHERE n.reference = :reference")
+                .setParameter("reference", reference)
+                .executeUpdate();
+    }
+
+    /**
+     * Deletes a notification for a specific account ID containing a specific reference.
+     *
+     * @param reference BaseModel reference
+     * @param accountId User account ID
+     */
+    public static void deleteReferencesForAccountId(final BaseModel reference, final long accountId) {
+        JPA.em().createQuery("DELETE FROM Notification n WHERE n.reference = :reference AND n.recipient.id = :accountId")
+                .setParameter("reference", reference)
+                .setParameter("accountId", accountId)
+                .executeUpdate();
+    }
+
+    /**
+     * Returns a specific notification by its ID.
+     *
+     * @param id Notification ID
+     * @return Notification instance
+     */
+    public static Notification findById(Long id) {
+        return JPA.em().find(Notification.class, id);
+    }
+
+    /**
+     * Counts all notifications for an account ID.
+     *
+     * @param accountId User account ID
+     * @return Number of notifications
+     */
+    public static int countNotificationsForAccountId(final Long accountId) {
+        try {
+            return JPA.withTransaction(new F.Function0<Integer>() {
+                @Override
+                public Integer apply() throws Throwable {
+                    return ((Number)JPA.em()
+                            .createQuery("SELECT COUNT(n) FROM Notification n WHERE n.recipient.id = :accountId")
+                            .setParameter("accountId", accountId)
+                            .getSingleResult()).intValue();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Returns a map with recipients as a key and a list of unsent and unread notifications
+     * as value. The map contains recipients, who wish to receive either hourly emails or
+     * daily, if the current hour is equal the desired receiving hour.
+     *
+     * Example: {<Account>: <List<Notification>, <Account>: <List<Notification>, ...}
+     *
+     * @return Map of accounts containing list of unsent and unread notifications
+     * @throws Throwable
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<Account, List<Notification>> findUsersWithDailyHourlyEmailNotifications() throws Throwable {
+        List<Object[]> notificationsRecipients = JPA.withTransaction(new F.Function0<List<Object[]>>() {
+            @Override
+            public List<Object[]> apply() throws Throwable {
+                return (List<Object[]>) JPA.em()
+                    .createQuery("FROM Notification n JOIN n.recipient a WHERE n.isSent = false AND n.isRead = false "
+                        + "AND ((a.emailNotifications = :daily AND HOUR(CURRENT_TIME) = a.dailyEmailNotificationHour) "
+                        + "OR a.emailNotifications = :hourly) ORDER BY n.recipient.id DESC"
+                    )
+                    .setParameter("daily", EmailNotifications.COLLECTED_DAILY)
+                    .setParameter("hourly", EmailNotifications.HOURLY)
+                    .getResultList();
+            }
+        });
+
+        // translate list of notifications and accounts into map
+        Map<Account, List<Notification>> accountMap = new HashMap<>();
+        for (Object[] entry : notificationsRecipients) {
+            Notification notification = (Notification)entry[0];
+            Account account = (Account)entry[1];
+            List<Notification> listForAccount;
+
+            // add account and new list of notifications, if not set already, otherwise load list
+            if (!accountMap.containsKey(account)) {
+                listForAccount = new ArrayList<>();
+                accountMap.put(account, listForAccount);
+            } else {
+                listForAccount = accountMap.get(account);
+            }
+
+            // add notification to list for account
+            listForAccount.add(notification);
+        }
+
+        return accountMap;
+    }
+
+    @Override
+    public ObjectNode getAsJson() {
+        ObjectNode node = Json.newObject();
+        node.put("id", this.id);
+        node.put("is_read", this.isRead);
+        node.put("content", this.rendered);
+        node.put("created", this.createdAt.getTime());
+        node.put("updated", this.updatedAt.getTime());
+
+        return node;
+    }
 }

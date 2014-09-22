@@ -1,7 +1,7 @@
 package models.base;
 
 import models.Account;
-import models.NewNotification;
+import models.Notification;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public interface INotifiable {
      * @param notification The notification which is rendered
      * @return Rendered HTML
      */
-    public String render(NewNotification notification) throws Exception;
+    public String render(Notification notification) throws Exception;
 
     /**
      * Returns the reference, this notification is about (e.g. when posting the actual Post)

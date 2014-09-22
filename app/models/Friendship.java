@@ -11,11 +11,10 @@ import models.base.INotifiable;
 import play.db.jpa.JPA;
 
 import models.enums.LinkType;
-import play.libs.F;
 
 @Entity
 @Table(uniqueConstraints=
-@UniqueConstraint(columnNames = {"account_id", "friend_id"})) 
+@UniqueConstraint(columnNames = {"account_id", "friend_id"}))
 public class Friendship extends BaseNotifiable implements INotifiable {
     public static final String FRIEND_REQUEST_SUCCESS = "request_successful";
     public static final String FRIEND_REQUEST_DECLINE = "request_decline";
@@ -59,7 +58,7 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 
 	@Override
 	public void delete() {
-        NewNotification.deleteReferences(this);
+        Notification.deleteReferences(this);
 		JPA.em().remove(this);
 	}
 
@@ -116,12 +115,23 @@ public class Friendship extends BaseNotifiable implements INotifiable {
      */
     public static boolean alreadyFriendlyTransactional(final Account me, final Account potentialFriend) {
         try {
-            return JPA.withTransaction(new F.Function0<Boolean>() {
-                @Override
-                public Boolean apply() throws Throwable {
-                    return Friendship.alreadyFriendly(me, potentialFriend);
-                }
-            });
+            return JPA.withTransaction(() -> Friendship.alreadyFriendly(me, potentialFriend));
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Returns true, if friendship request is already rejected (transactional).
+     *
+     * @param me Account instance
+     * @param potentialFriend Account instance
+     * @return True, if both accounts are friends
+     */
+    public static boolean alreadyRejectedTransactional(final Account me, final Account potentialFriend) {
+        try {
+            return JPA.withTransaction(() -> Friendship.alreadyRejected(me, potentialFriend));
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return false;
@@ -141,13 +151,8 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 	@SuppressWarnings("unchecked")
 	public static List<Account> findFriends(final Account account){
         try {
-            return JPA.withTransaction(new F.Function0<List<Account>>() {
-                @Override
-                public List<Account> apply() throws Throwable {
-                    return (List<Account>) JPA.em().createQuery("SELECT fs.friend FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2 ORDER BY fs.friend.firstname ASC")
-                            .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList();
-                }
-            });
+            return JPA.withTransaction(() -> (List<Account>) JPA.em().createQuery("SELECT fs.friend FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2 ORDER BY fs.friend.firstname ASC")
+                    .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList());
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return null;
@@ -157,13 +162,8 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 	@SuppressWarnings("unchecked")
 	public static List<Friendship> findRequests(final Account account) {
         try {
-            return JPA.withTransaction(new F.Function0<List<Friendship>>() {
-                @Override
-                public List<Friendship> apply() throws Throwable {
-                    return (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE (fs.friend.id = ?1 OR fs.account.id = ?1) AND fs.linkType = ?2")
-                            .setParameter(1, account.id).setParameter(2, LinkType.request).getResultList();
-                }
-            });
+            return JPA.withTransaction(() -> (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE (fs.friend.id = ?1 OR fs.account.id = ?1) AND fs.linkType = ?2")
+                    .setParameter(1, account.id).setParameter(2, LinkType.request).getResultList());
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return null;
@@ -173,13 +173,8 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 	@SuppressWarnings("unchecked")
 	public static List<Friendship> findRejects(final Account account) {
         try {
-            return JPA.withTransaction(new F.Function0<List<Friendship>>() {
-                @Override
-                public List<Friendship> apply() throws Throwable {
-                    return (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
-                            .setParameter(1, account.id).setParameter(2, LinkType.reject).getResultList();
-                }
-            });
+            return JPA.withTransaction(() -> (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
+                    .setParameter(1, account.id).setParameter(2, LinkType.reject).getResultList());
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return null;

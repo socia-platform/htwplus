@@ -174,7 +174,7 @@ public class ProfileController extends BaseController {
 		}
 
         try {
-            NewNotification.findUsersWithDailyHourlyEmailNotifications();
+            Notification.findUsersWithDailyHourlyEmailNotifications();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

@@ -6,6 +6,7 @@ import controllers.Navigation.Level;
 import models.*;
 import models.enums.LinkType;
 import models.services.NotificationService;
+import play.db.jpa.JPA;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -42,14 +43,14 @@ public class FriendshipController extends BaseController {
 		}
 		
 		Friendship friendship = new Friendship(currentUser, potentialFriend, LinkType.request);
-		friendship.create();
+        JPA.withTransaction(friendship::create);
         NotificationService.getInstance().createNotification(friendship, Friendship.FRIEND_NEW_REQUEST);
 
         flash("success","Deine Einladung wurde verschickt!");
 		return redirect(controllers.routes.FriendshipController.index());
 		
 	}
-	
+
 	public static Result deleteFriend(long friendId) {
 		Account currentUser = Component.currentAccount();
 		Account friend = Account.findById(friendId);
@@ -122,7 +123,7 @@ public class FriendshipController extends BaseController {
 
 		return redirect(controllers.routes.FriendshipController.index());
 	}
-	
+
 	public static Result cancelFriendRequest(long friendshipId) {
 		Friendship friendship = Friendship.findById(friendshipId);
 		if (friendship != null && friendship.account.equals(Component.currentAccount())) {
@@ -155,7 +156,7 @@ public class FriendshipController extends BaseController {
 			return true;
 		}
 		
-		if (Friendship.alreadyRejected(currentUser, potentialFriend)) {
+		if (Friendship.alreadyRejectedTransactional(currentUser, potentialFriend)) {
 			flash("info","Deine Freundschaftsanfrage wurde bereits abgelehnt. "
 					+ "Bestätige die Ablehnung und dann kannst du es noch einmal versuchen.");
 			return true;

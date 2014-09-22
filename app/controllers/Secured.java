@@ -64,7 +64,7 @@ public class Secured extends Security.Authenticator {
 	 */
 	
 	public static boolean isMemberOfGroup(Group group, Account account){
-		return Group.isMember(group, account);
+		return Group.isMemberTransactional(group, account);
 	}
 	
 	public static boolean isOwnerOfGroup(Group group, Account account){
@@ -473,7 +473,7 @@ public class Secured extends Security.Authenticator {
      * @param notification Notification to be checked
      * @return True, if user has access
      */
-	public static boolean hasAccessToNotification(NewNotification notification) {
+	public static boolean hasAccessToNotification(Notification notification) {
 		return notification.recipient.equals(Component.currentAccount());
 	}
 }

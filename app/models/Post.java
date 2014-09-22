@@ -67,7 +67,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 			comment.delete();
 		}
 
-        NewNotification.deleteReferences(this);
+        Notification.deleteReferences(this);
 		JPA.em().remove(this);
 	}
 	

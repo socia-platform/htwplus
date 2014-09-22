@@ -177,7 +177,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 		}
 		
 		// Delete Notifications
-        NewNotification.deleteReferences(this);
+        Notification.deleteReferences(this);
 		JPA.em().remove(this);
 	}
 
@@ -228,15 +228,19 @@ public class Group extends BaseNotifiable implements INotifiable {
      * @param group Group instance
      * @param account Account instance
      * @return True, if account is member of group
-     * @throws Throwable
      */
-    public static boolean isMemberTransactional(final Group group, final Account account) throws Throwable {
-        return JPA.withTransaction(new F.Function0<Boolean>() {
-            @Override
-            public Boolean apply() throws Throwable {
-                return Group.isMember(group, account);
-            }
-        });
+    public static boolean isMemberTransactional(final Group group, final Account account) {
+        try {
+            return JPA.withTransaction(new F.Function0<Boolean>() {
+                @Override
+                public Boolean apply() throws Throwable {
+                    return Group.isMember(group, account);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return false;
+        }
     }
 
 	/**

@@ -3,7 +3,7 @@ package models.services;
 import com.typesafe.plugin.MailerAPI;
 import com.typesafe.plugin.MailerPlugin;
 import models.Account;
-import models.NewNotification;
+import models.Notification;
 import play.Logger;
 import play.Play;
 import play.db.jpa.JPA;
@@ -77,7 +77,7 @@ public class EmailService {
      * @param notifications List of notifications
      * @param recipient Recipient of the email notification
      */
-    public void sendNotificationsEmail(final List<NewNotification> notifications, Account recipient) {
+    public void sendNotificationsEmail(final List<Notification> notifications, Account recipient) {
         try {
             String subject = notifications.size() > 1
                     ? Messages.get("notification.email_notifications.collected.subject", notifications.size())
@@ -92,7 +92,7 @@ public class EmailService {
             JPA.withTransaction(new F.Callback0() {
                 @Override
                 public void invoke() throws Throwable {
-                    for (NewNotification notification : notifications) {
+                    for (Notification notification : notifications) {
                         notification.isSent = true;
                         notification.update();
                     }
@@ -113,8 +113,8 @@ public class EmailService {
      *
      * @param notification Notification instance
      */
-    public void sendNotificationEmail(NewNotification notification) {
-        List<NewNotification> notifications = new ArrayList<>();
+    public void sendNotificationEmail(Notification notification) {
+        List<Notification> notifications = new ArrayList<>();
         notifications.add(notification);
 
         this.sendNotificationsEmail(notifications, notification.recipient);
@@ -129,8 +129,8 @@ public class EmailService {
             Logger.info("Start sending of daily email notifications...");
 
             // load map with recipients containing list of unread notifications and iterate over the map
-            Map<Account, List<NewNotification>> notificationsRecipients = NewNotification.findUsersWithDailyHourlyEmailNotifications();
-            for (Map.Entry<Account, List<NewNotification>> entry : notificationsRecipients.entrySet()) {
+            Map<Account, List<Notification>> notificationsRecipients = Notification.findUsersWithDailyHourlyEmailNotifications();
+            for (Map.Entry<Account, List<Notification>> entry : notificationsRecipients.entrySet()) {
                 this.sendNotificationsEmail(entry.getValue(), entry.getKey());
             }
         } catch (Throwable throwable) {

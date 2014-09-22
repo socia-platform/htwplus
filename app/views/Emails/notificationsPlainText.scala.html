@@ -1,4 +1,4 @@
-@(notifications: List[NewNotification], recipient: Account)
+@(notifications: List[Notification], recipient: Account)
 @import helper._
 @if(notifications.size > 1) {@Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size)} else {@Messages("notification.email_notifications.single.intro_text", recipient.name)}
 @if(notifications != null) {

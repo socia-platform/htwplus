@@ -4,7 +4,7 @@ package models.base;
 import models.Account;
 import models.Group;
 import models.GroupAccount;
-import models.NewNotification;
+import models.Notification;
 import models.enums.LinkType;
 import models.services.TemplateService;
 import play.Logger;
@@ -49,19 +49,19 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      * Returns the fully qualified path to the compiled template class desired for this notification as string.
      * Example:
      * - For post:  There are types like PROFILE or STREAM posts, therefore the fully qualified
-     *              string for a profile post is: views.html.NewNotification.post.profile
+     *              string for a profile post is: views.html.Notification.post.profile
      *
      * @return The desired template class as string
      */
     protected String getTemplateClass() {
         return this.type.equals("")
-            ? "views.html.NewNotification." + this.getClass().getSimpleName().toLowerCase()
-            : "views.html.NewNotification." + this.getClass().getSimpleName().toLowerCase() + "."
+            ? "views.html.Notification." + this.getClass().getSimpleName().toLowerCase()
+            : "views.html.Notification." + this.getClass().getSimpleName().toLowerCase() + "."
                 + this.type.toLowerCase();
     }
 
     @Override
-    public String render(NewNotification notification) {
+    public String render(Notification notification) {
         return TemplateService.getInstance().getRenderedTemplate(this.getTemplateClass(), notification, this);
     }
 
