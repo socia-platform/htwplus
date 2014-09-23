@@ -8,6 +8,7 @@ import models.enums.LinkType;
 import models.services.NotificationService;
 import play.db.jpa.JPA;
 import play.db.jpa.Transactional;
+import play.libs.F;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Friends.*;
@@ -42,8 +43,13 @@ public class FriendshipController extends BaseController {
 			return redirect(controllers.routes.FriendshipController.index());
 		}
 		
-		Friendship friendship = new Friendship(currentUser, potentialFriend, LinkType.request);
-        JPA.withTransaction(friendship::create);
+		final Friendship friendship = new Friendship(currentUser, potentialFriend, LinkType.request);
+        JPA.withTransaction(new F.Callback0() {
+            @Override
+            public void invoke() throws Throwable {
+                friendship.create();
+            }
+        });
         NotificationService.getInstance().createNotification(friendship, Friendship.FRIEND_NEW_REQUEST);
 
         flash("success","Deine Einladung wurde verschickt!");
@@ -151,7 +157,7 @@ public class FriendshipController extends BaseController {
 			return true;
 		}
 		
-		if (Friendship.alreadyFriendlyTransactional(currentUser,potentialFriend)) {
+		if (Friendship.alreadyFriendlyTransactional(currentUser, potentialFriend)) {
 			flash("info","Ihr seid bereits Freunde!");
 			return true;
 		}

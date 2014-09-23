@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import models.services.WebSocketService;
 import play.Logger;
 import play.db.jpa.Transactional;
+import play.libs.F;
 import play.mvc.Http;
 import play.mvc.Security;
 import play.mvc.WebSocket;
@@ -35,12 +36,18 @@ public class WebSocketController extends BaseController {
                 final ActorRef actor = WebSocketService.getInstance().getActorForAccountId(accountId, in, out);
 
                 // For each event received on the socket,
-                in.onMessage(wsMessage -> WebSocketService.getInstance().handleWsMessage(accountId, wsMessage));
+                in.onMessage(new F.Callback<JsonNode>() {
+                    public void invoke(JsonNode wsMessage) {
+                        WebSocketService.getInstance().handleWsMessage(accountId, wsMessage);
+                    }
+                });
 
                 // When the socket is closed.
-                in.onClose(() -> {
-                    WebSocketService.getInstance().stopActor(accountId);
-                    Logger.info("[WS] Disconnected User ID: " + accountId);
+                in.onClose(new F.Callback0() {
+                    public void invoke() {
+                        WebSocketService.getInstance().stopActor(accountId);
+                        Logger.info("[WS] Disconnected User ID: " + accountId);
+                    }
                 });
             }
         };
