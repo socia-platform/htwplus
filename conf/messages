@@ -28,3 +28,12 @@ error.minLength=Minimum length is {0}
 error.maxLength=Maximum length is {0}
 error.email=Bitte eine gültige Adresse eingeben
 error.pattern=Must satisfy {0}
+
+# authenticate
+authenticate.matriculationNumberMissing=Also deine Matrikelnummer brauchen wir schon!
+authenticate.logout=Du bist nun ausgeloggt
+
+# LDAP connector
+ldap.noConnection=Keine Verbindung zum LDAP-Server möglich. Bitte versuche es später noch einmal.
+ldap.wrongCredentials=Ungültiges Passwort und/oder Matrikelnummer.
+ldap.generalError=Es gab ein Problem bei der Verbindung zum LDAP-Server. Bitte versuche es später noch einmal.
