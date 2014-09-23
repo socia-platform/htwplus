@@ -159,6 +159,8 @@ function WS() {
         while (notificationDropDownLayer.find('li').length > maxLiElements) {
             notificationDropDownLayer.find('li:nth-last-child(2)').remove();
         }
+        $('.notification-show-all').removeClass('hidden');
+        $('.nothing-new').remove();
     };
 }
 

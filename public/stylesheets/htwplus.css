@@ -241,6 +241,9 @@ h1 {
 .hp-notifications {
     padding: 7px;
 }
+.nothing-new {
+    border: none!important;
+}
 
 div.well.notification span {
     margin-right: 10px;
