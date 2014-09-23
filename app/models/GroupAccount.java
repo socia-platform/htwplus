@@ -179,19 +179,50 @@ public class GroupAccount extends BaseModel {
 		}
 		return true;
 	}
+
+    /**
+     * Retrieve Accounts from Group with given LinkType (transactional).
+     *
+     * @param group Group
+     * @param type Link Type
+     * @return List of accounts
+     */
+    public static List<Account> findAccountsByGroupTransactional(final Group group, final LinkType type) {
+        try {
+            return JPA.withTransaction(new F.Function0<List<Account>>() {
+                @Override
+                public List<Account> apply() throws Throwable {
+                    return GroupAccount.findAccountsByGroup(group, type);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
 	
 	/**
 	 * Retrieve Accounts from Group with given LinkType.
 	 */
-	public static List<Account> findAccountsByGroup(Group group, LinkType type) {
-		@SuppressWarnings("unchecked")
-		List<Account> accounts = (List<Account>) JPA
-				.em()
-				.createQuery(
-						"SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
-				.setParameter(1, group.id).setParameter(2, type)
-				.getResultList();
-		return accounts;
+	public static List<Account> findAccountsByGroup(final Group group, final LinkType type) {
+        try {
+            return JPA.withTransaction(new F.Function0<List<Account>>() {
+                @Override
+                public List<Account> apply() throws Throwable {
+                    @SuppressWarnings("unchecked")
+                    List<Account> accounts = (List<Account>) JPA
+                            .em()
+                            .createQuery(
+                                    "SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
+                            .setParameter(1, group.id).setParameter(2, type)
+                            .getResultList();
+                    return accounts;
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
 	}
 
     /**
