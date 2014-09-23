@@ -1,0 +1,5 @@
+@(notification: Notification, notifiable: Post)
+
+@import helper._
+
+<span class="glyphicon glyphicon-list"></span>@Html(Messages("post.comment_group", truncate(notifiable.parent.content, 20), truncate(notifiable.parent.group.title, 20)))

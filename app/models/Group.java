@@ -1,20 +1,14 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-import models.base.BaseModel;
+import models.base.BaseNotifiable;
+import models.base.INotifiable;
 import models.enums.GroupType;
 import models.enums.LinkType;
 
@@ -55,6 +49,7 @@ import play.Logger;
 import play.data.validation.ValidationError;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
+import play.libs.F;
 
 @Indexed
 @Entity
@@ -64,9 +59,14 @@ import play.db.jpa.JPA;
 		@TokenFilterDef(factory = LowerCaseFilterFactory.class),
 		@TokenFilterDef(factory = StopFilterFactory.class, params = { @Parameter(name = "ignoreCase", value = "true") }) })
 @org.hibernate.search.annotations.Analyzer(definition = "searchtokenanalyzer")
-public class Group extends BaseModel {
+public class Group extends BaseNotifiable implements INotifiable {
+    public static final String GROUP_INVITATION = "group_invitation";
+    public static final String GROUP_NEW_REQUEST = "group_new_request";
+    public static final String GROUP_REQUEST_SUCCESS = "group_request_success";
+    public static final String GROUP_REQUEST_DECLINE = "group_request_decline";
+    public static final String GROUP_NEW_MEDIA = "group_new_media";
 
-	@Required
+    @Required
 	@Column(unique = true)
 	@Field(index = Index.YES, analyze = Analyze.YES, store = Store.NO)
 	public String title;
@@ -88,7 +88,13 @@ public class Group extends BaseModel {
 	@OrderBy("createdAt DESC")
 	public List<Media> media;
 
-	// GETTER & SETTER
+    /**
+     * Possible invitation list
+     */
+    @Transient
+    public Collection<String> inviteList = null;
+
+    // GETTER & SETTER
 
 	public String getTitle() {
 		return title;
@@ -132,11 +138,7 @@ public class Group extends BaseModel {
 	}
 	
 	public static boolean validateToken(String token) {
-		if(token.equals("") || token.length() < 4 || token.length() > 45){
-			return false;
-		} else {
-			return true;
-		}
+        return !(token.equals("") || token.length() < 4 || token.length() > 45);
 	}
 
 	public void createWithGroupAccount(Account account) {
@@ -175,7 +177,7 @@ public class Group extends BaseModel {
 		}
 		
 		// Delete Notifications
-		Notification.deleteByObject(this.id);
+        Notification.deleteReferences(this);
 		JPA.em().remove(this);
 	}
 
@@ -198,10 +200,16 @@ public class Group extends BaseModel {
 
 	@SuppressWarnings("unchecked")
 	public static List<Group> all() {
-		List<Group> groups = JPA.em().createQuery("FROM Group").getResultList();
-		return groups;
+        return JPA.em().createQuery("FROM Group").getResultList();
 	}
 
+    /**
+     * Returns true, if an account is member of a group.
+     *
+     * @param group Group instance
+     * @param account Account instance
+     * @return True, if account is member of group
+     */
 	public static boolean isMember(Group group, Account account) {
 		@SuppressWarnings("unchecked")
 		List<GroupAccount> groupAccounts = (List<GroupAccount>) JPA
@@ -211,18 +219,34 @@ public class Group extends BaseModel {
 				.setParameter(1, account.id).setParameter(2, group.id)
 				.setParameter(3, LinkType.establish).getResultList();
 
-		if (groupAccounts.isEmpty()) {
-			return false;
-		} else {
-			return true;
-		}
-
+        return !groupAccounts.isEmpty();
 	}
+
+    /**
+     * Returns true, if an account is member of a group (transactional).
+     *
+     * @param group Group instance
+     * @param account Account instance
+     * @return True, if account is member of group
+     */
+    public static boolean isMemberTransactional(final Group group, final Account account) {
+        try {
+            return JPA.withTransaction(new F.Function0<Boolean>() {
+                @Override
+                public Boolean apply() throws Throwable {
+                    return Group.isMember(group, account);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return false;
+        }
+    }
 
 	/**
 	 * Search for a group with a given keyword.
 	 * 
-	 * @param keyword
+	 * @param keyword Keyword to search for
 	 * @return List of groups wich matches with the keyword
 	 */
 
@@ -303,8 +327,7 @@ public class Group extends BaseModel {
 		int offset = (page * limit) - limit;
 				
 		FullTextQuery fullTextQuery = searchForGroupByKeyword(keyword, limit, offset);
-		List<Group> groups = fullTextQuery.getResultList(); // The result...
-		return groups;
+        return fullTextQuery.getResultList();
 	}
 	
 	public static int countGroupSearch(String keyword) {
@@ -312,8 +335,7 @@ public class Group extends BaseModel {
 		FullTextQuery fullTextQuery = searchForGroupByKeyword(keyword, 0, 0);
 		
 		// SearchException: HSEARCH000105: Cannot safely compute getResultSize() when a Criteria with restriction is used.
-		int count = fullTextQuery.getResultList().size();
-		return count;
+        return fullTextQuery.getResultList().size();
 	}
 
 	public static FullTextQuery searchForCourseByKeyword(String keyword, int limit, int offset) {
@@ -388,8 +410,7 @@ public class Group extends BaseModel {
 		int offset = (page * limit) - limit;
 				
 		FullTextQuery fullTextQuery = searchForCourseByKeyword(keyword, limit, offset);
-		List<Group> courses = fullTextQuery.getResultList(); // The result...
-		return courses;
+        return fullTextQuery.getResultList();
 	}
 	
 	public static int countCourseSearch(String keyword) {
@@ -397,8 +418,7 @@ public class Group extends BaseModel {
 		FullTextQuery fullTextQuery = searchForCourseByKeyword(keyword, 0, 0);
 		
 		// SearchException: HSEARCH000105: Cannot safely compute getResultSize() when a Criteria with restriction is used.
-		int count = fullTextQuery.getResultList().size();
-		return count;
+        return fullTextQuery.getResultList().size();
 	}
 	
 	
@@ -411,4 +431,71 @@ public class Group extends BaseModel {
 		}
 		return criteria;
 	}
+
+    @Override
+    public Account getSender() {
+        return this.temporarySender;
+    }
+
+    @Override
+    public List<Account> getRecipients() {
+        List<Account> recipients = new ArrayList<Account>();
+        if (this.type.equals(Group.GROUP_INVITATION)) {
+            // this is a group invitation, all selected people will be notified
+            for (String accountId : inviteList) {
+                try {
+                    final Account account = Account.findByIdTransactional(Long.parseLong(accountId));
+                    GroupAccount groupAccount = GroupAccount.findTransactional(account, this);
+                    if (!Group.isMemberTransactional(this, account) && Friendship.alreadyFriendlyTransactional(this.getSender(), account) && groupAccount == null) {
+                        final Group thisGroup = this;
+                        JPA.withTransaction(new F.Callback0() {
+                            @Override
+                            public void invoke() throws Throwable {
+                                (new GroupAccount(account, thisGroup, LinkType.invite)).create();
+                            }
+                        });
+                        recipients.add(account);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+
+            return recipients;
+        } else if (this.type.equals(Group.GROUP_NEW_REQUEST)) {
+            // group entry request notification, notify the owner of the group
+            return this.getAsAccountList(this.owner);
+        } else if (this.type.equals(Group.GROUP_NEW_MEDIA)) {
+            // new media available in group, whole group must be notified
+            final Group currentGroup = this;
+            try {
+                return JPA.withTransaction(new F.Function0<List<Account>>() {
+                    @Override
+                    public List<Account> apply() throws Throwable {
+                        return GroupAccount.findAccountsByGroup(currentGroup, LinkType.establish);
+                    }
+                });
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                return null;
+            }
+        }
+
+        // this is a request accept or decline notification, notify the requester
+        return this.temporaryRecipients;
+    }
+
+    @Override
+    public String getTargetUrl() {
+        if (this.type.equals(Group.GROUP_REQUEST_SUCCESS)
+                || this.type.equals(Group.GROUP_NEW_MEDIA)
+                || this.type.equals(Group.GROUP_NEW_REQUEST)
+        ) {
+            return controllers.routes.GroupController.view(this.id, 1).toString();
+        }
+
+        return controllers.routes.GroupController.index().toString();
+    }
 }

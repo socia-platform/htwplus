@@ -2,19 +2,24 @@ package controllers;
 
 import static play.data.Form.form;
 
-import java.util.Random;
-
-import org.apache.commons.io.FileUtils;
-
 import models.Account;
+import models.Post;
 import models.enums.AccountRole;
+import models.services.NotificationService;
 import play.Logger;
+import play.data.DynamicForm;
 import play.data.Form;
+import play.db.jpa.JPA;
 import play.db.jpa.Transactional;
+import play.i18n.Messages;
+import play.libs.F;
 import play.mvc.Security;
 import play.mvc.Result;
 import play.mvc.With;
 import views.html.Admin.*;
+import play.libs.F.Promise;
+
+import java.util.*;
 
 @Security.Authenticated(Secured.class)
 // Action performs the authentication
@@ -22,6 +27,7 @@ import views.html.Admin.*;
 public class AdminController extends BaseController {
 
 	static Form<Account> accountForm = form(Account.class);
+    static Form<Post> postForm = form(Post.class);
 	
 	public static Result index(){
 		return ok(index.render());
@@ -90,7 +96,78 @@ public class AdminController extends BaseController {
 	public static Result listAccounts(){
 		return ok(listAccounts.render(Account.all()));
 	}
-	
-	
+
+    /**
+     * Returns the rendered form for broadcast posts.
+     *
+     * @return Result
+     */
+    public static Result broadcastNotificationForm() {
+        if (!Secured.isAdmin()) {
+            return redirect(controllers.routes.Application.index());
+        }
+
+        return ok(createBroadcastNotification.render(AdminController.postForm, Account.all()));
+    }
+
+    /**
+     * Handles posted broadcast post. As broadcastMemberList could be a large list and causes
+     * Account.getAccountListByIdCollection() to be costly, this action method is realized
+     * asynchronous to be non blocking.
+     *
+     * @return Result
+     */
+    public static Promise<Result> broadcastNotification() {
+        Promise<Result> promiseResult = Promise.promise(
+            new F.Function0<Result>() {
+                public Result apply() {
+                    if (!Secured.isAdmin()) {
+                        return redirect(controllers.routes.Application.index());
+                    }
+
+                    DynamicForm form = Form.form().bindFromRequest();
+                    List<String> broadcastMemberList = new ArrayList<>();
+                    final Post broadcastPost = new Post();
+                    broadcastPost.owner = Component.currentAccount();
+                    broadcastPost.isBroadcastMessage = true;
+
+                    // iterate over posted values to get recipient account IDs and post content
+                    for (Map.Entry<String, String> entry : form.data().entrySet()) {
+                        if (entry.getKey().startsWith("account")) {
+                            // add account ID if not the sender
+                            if (!broadcastPost.owner.id.equals(Long.valueOf(entry.getValue()))) {
+                                broadcastMemberList.add(entry.getValue());
+                            }
+                        } else {
+                            broadcastPost.content = entry.getValue();
+                        }
+                    }
+
+                    for (Account account : Account.getAccountListByIdCollection(broadcastMemberList)) {
+                        broadcastPost.addRecipient(account);
+                    }
+
+                    JPA.withTransaction(new F.Callback0() {
+                        @Override
+                        public void invoke() throws Throwable {
+                            broadcastPost.create();
+                        }
+                    });
+                    NotificationService.getInstance().createNotification(broadcastPost, Post.BROADCAST);
+
+                    flash("success", Messages.get("admin.broadcast_notification.success"));
+                    return ok(index.render());
+                }
+            }
+        );
+
+        return promiseResult.map(
+                new F.Function<Result, Result>() {
+                    public Result apply(Result result) {
+                        return result;
+                    }
+                }
+        );
+    }
 }
 	

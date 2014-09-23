@@ -1,0 +1,5 @@
+@(notification: Notification, notifiable: Post)
+
+@import helper._
+
+<span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.profile_new_post", fullTrim(notifiable.getSender().name)))

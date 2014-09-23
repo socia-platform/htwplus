@@ -1,0 +1,5 @@
+@(notification: Notification, notifiable: Group)
+
+@import helper._
+
+<span class='glyphicon glyphicon-lock'></span>@Html(Messages("group.group_new_request", truncate(notifiable.title,20)))

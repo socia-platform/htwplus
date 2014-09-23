@@ -6,17 +6,20 @@ import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-import controllers.Secured;
-
+import models.base.BaseNotifiable;
+import models.base.INotifiable;
 import play.db.jpa.JPA;
 
-import models.base.BaseModel;
 import models.enums.LinkType;
 
 @Entity
 @Table(uniqueConstraints=
-@UniqueConstraint(columnNames = {"account_id", "friend_id"})) 
-public class Friendship extends BaseModel {
+@UniqueConstraint(columnNames = {"account_id", "friend_id"}))
+public class Friendship extends BaseNotifiable implements INotifiable {
+    public static final String FRIEND_REQUEST_SUCCESS = "request_successful";
+    public static final String FRIEND_REQUEST_DECLINE = "request_decline";
+    public static final String FRIEND_NEW_REQUEST = "new_request";
+    public static final int PAGE = 1;
 	
 	@ManyToOne
 	@NotNull
@@ -30,8 +33,7 @@ public class Friendship extends BaseModel {
 	@NotNull
 	public LinkType linkType;
 	
-	public Friendship(){
-		
+	public Friendship() {
 	}
 	
 	public Friendship(Account account, Account friend, LinkType type) {
@@ -46,19 +48,17 @@ public class Friendship extends BaseModel {
 
 	@Override
 	public void create() {
-		
 		JPA.em().persist(this);
-		
 	}
 
 	@Override
 	public void update() {
 		JPA.em().merge(this);
-		
 	}
 
 	@Override
 	public void delete() {
+        Notification.deleteReferences(this);
 		JPA.em().remove(this);
 	}
 
@@ -88,7 +88,14 @@ public class Friendship extends BaseModel {
 			return null;
 		}
 	}
-	
+
+    /**
+     * Returns true, if two accounts have a friendly relationship.
+     *
+     * @param me Account instance
+     * @param potentialFriend Account instance
+     * @return True, if both accounts are friends
+     */
 	public static boolean alreadyFriendly(Account me, Account potentialFriend) {
 		try {
 			JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 and fs.friend.id = ?2 AND fs.linkType = ?3")
@@ -98,6 +105,38 @@ public class Friendship extends BaseModel {
 		}
 		return true;
 	}
+
+    /**
+     * Returns true, if two accounts have a friendly relationship (transactional).
+     *
+     * @param me Account instance
+     * @param potentialFriend Account instance
+     * @return True, if both accounts are friends
+     */
+    public static boolean alreadyFriendlyTransactional(final Account me, final Account potentialFriend) {
+        try {
+            return JPA.withTransaction(() -> Friendship.alreadyFriendly(me, potentialFriend));
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Returns true, if friendship request is already rejected (transactional).
+     *
+     * @param me Account instance
+     * @param potentialFriend Account instance
+     * @return True, if both accounts are friends
+     */
+    public static boolean alreadyRejectedTransactional(final Account me, final Account potentialFriend) {
+        try {
+            return JPA.withTransaction(() -> Friendship.alreadyRejected(me, potentialFriend));
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return false;
+        }
+    }
 	
 	public static boolean alreadyRejected(Account me, Account potentialFriend) {
 		try {
@@ -108,44 +147,84 @@ public class Friendship extends BaseModel {
 		}
 		return true;
 	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Account> findFriends(final Account account){
+        try {
+            return JPA.withTransaction(() -> (List<Account>) JPA.em().createQuery("SELECT fs.friend FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2 ORDER BY fs.friend.firstname ASC")
+                    .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList());
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
 	
 	@SuppressWarnings("unchecked")
-	public static List<Account> findFriends(Account account){
-		return (List<Account>) JPA.em().createQuery("SELECT fs.friend FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2 ORDER BY fs.friend.firstname ASC")
-				.setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList();
+	public static List<Friendship> findRequests(final Account account) {
+        try {
+            return JPA.withTransaction(() -> (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE (fs.friend.id = ?1 OR fs.account.id = ?1) AND fs.linkType = ?2")
+                    .setParameter(1, account.id).setParameter(2, LinkType.request).getResultList());
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static List<Friendship> findRequests(Account account) {
-		return (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE (fs.friend.id = ?1 OR fs.account.id = ?1) AND fs.linkType = ?2")
-				.setParameter(1, account.id).setParameter(2, LinkType.request).getResultList();
-	}
-	
-	@SuppressWarnings("unchecked")
-	public static List<Friendship> findRejects(Account account) {
-		return (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
-				.setParameter(1, account.id).setParameter(2, LinkType.reject).getResultList();
+	public static List<Friendship> findRejects(final Account account) {
+        try {
+            return JPA.withTransaction(() -> (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
+                    .setParameter(1, account.id).setParameter(2, LinkType.reject).getResultList());
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
 	}
 	
 	public static List<Account> friendsToInvite(Account account, Group group) {
-		List<Account> inviteableFriends = findFriends(account);
+		List<Account> inevitableFriends = findFriends(account);
 		
-		if(inviteableFriends != null) {
-		
-			Iterator<Account> it = inviteableFriends.iterator();
-			Account friend = null;
+		if (inevitableFriends != null) {
+			Iterator<Account> it = inevitableFriends.iterator();
+			Account friend;
 			
 			while(it.hasNext()) {
 				friend = it.next();
 				
 				//remove account from list if there is any type of link (requests, invite, already member)
-				if(GroupAccount.hasLinkTypes(friend, group)){
+				if (GroupAccount.hasLinkTypes(friend, group)) {
 					it.remove();
 				}
 			}	        
 		}
 		
-		return inviteableFriends;
+		return inevitableFriends;
 	}
-	
+
+    @Override
+    public Account getSender() {
+        return this.type.equals(Friendship.FRIEND_REQUEST_DECLINE)
+                ? this.friend
+                : this.account;
+    }
+
+    @Override
+    public List<Account> getRecipients() {
+        return this.type.equals(Friendship.FRIEND_REQUEST_DECLINE)
+                ? this.getAsAccountList(this.account)
+                : this.getAsAccountList(this.friend);
+    }
+
+    @Override
+    public String getTargetUrl() {
+        if (this.type.equals(Friendship.FRIEND_NEW_REQUEST) || this.type.equals(Friendship.FRIEND_REQUEST_DECLINE)) {
+            return controllers.routes.FriendshipController.index().toString();
+        }
+
+        if (this.type.equals(Friendship.FRIEND_REQUEST_SUCCESS)) {
+            return controllers.routes.ProfileController.stream(this.account.id, Friendship.PAGE).toString();
+        }
+
+        return super.getTargetUrl();
+    }
 }

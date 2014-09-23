@@ -1,0 +1,24 @@
+@(notifications: List[Notification], limit: Integer, currentPage: Integer, count: Integer)
+@import helper._
+
+@main("Notifications") {
+    <h1>@Messages("notification.news")</h1><br />
+    @if(notifications != null) {
+        @for(notification <- notifications) {
+            <div class="well notification">
+                <div class="notification-date">@Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"))</div>
+                @if(notification.isRead){
+                <div class="notification-read read">@Messages("notification.date_read", notification.updatedAt.format("dd.MM.YYYY"), notification.updatedAt.format("HH:mm"))</div>
+                }else{
+                <div class="notification-read unread">@Messages("notification.not_read")</div>
+                }
+                <div class="hp-truncate hp-white-space" id="@notification.id">
+                    <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>
+                </div>
+            </div><br>
+        }
+    } else {
+        <div>@Messages("notification.nothing_new")</div>
+    }
+    @views.html.pagination(count, limit, currentPage, routes.NotificationController.showAll(1).toString, "?")
+}

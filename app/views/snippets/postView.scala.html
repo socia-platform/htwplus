@@ -5,7 +5,7 @@
 	<br />
 	@views.html.snippets.deletePostModal(post.id)
 
-	<div class="well">
+	<div class="well@if(post.isBroadcastMessage){ broadcast}">
 		<div class="media">
 			@views.html.snippets.userLinkAvatar(post.owner)
 			<div class="media-body">
@@ -13,8 +13,8 @@
 					@views.html.snippets.userLink(post.owner)
 					@if(post.belongsToGroup && currentView != "group"){schrieb in <a href="@routes.GroupController.view(post.group.id)">@truncate(post.group.title,50)</a>}
 					@if(post.belongsToAccount && currentUser != post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(post.account)} 
-					@if(post.belongsToAccount && currentUser == post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(currentUser)} 
-					@if(Secured.isAllowedToDeletePost(post, currentUser)){
+					@if(post.belongsToAccount && currentUser == post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(currentUser)}
+                    @if(Secured.isAllowedToDeletePost(post, currentUser)){
                 			<a href="#confirmModalDeletePost@post.id" data-toggle="modal" rel="tooltip" data-original-title="Post löschen">
                 				<span class="glyphicon glyphicon-trash"></span>
                 			</a>
@@ -32,10 +32,12 @@
 				<a href="#collapse-@post.id" class="olderComments unloaded">Alle Kommentare anzeigen...</a>
 				<div id="collapse-@post.id" class="collapse"></div>
 			}
-			@defining(PostController.getCommentsForPostInGroup(post.id)) { comments => 
-	 			@for(comment <- comments){
-	 				@views.html.snippets.postComment(comment)
-	 			}
+			@defining(PostController.getCommentsForPostInGroup(post.id)) { comments =>
+                @if(comments != null) {
+                    @for(comment <- comments){
+                        @views.html.snippets.postComment(comment)
+                    }
+                }
 	 		}
 	 		@if(Secured.addComment(post)) {
 	 			@form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form", 'id -> "addComment-@post.id") {

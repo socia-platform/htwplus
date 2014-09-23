@@ -1,0 +1,6 @@
+@**********************************************************************
+* this template function removes all control characters from a string *
+***********************************************************************@
+@(text: String)@{
+    text.trim.filter(_ >= ' ').stripLineEnd
+}

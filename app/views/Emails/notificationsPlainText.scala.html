@@ -1,0 +1,9 @@
+@(notifications: List[Notification], recipient: Account)
+@import helper._
+@if(notifications.size > 1) {@Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size)} else {@Messages("notification.email_notifications.single.intro_text", recipient.name)}
+@if(notifications != null) {
+@for(notification <- notifications) {
+@Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"))
+@notification.rendered.replaceAll("\\<[^>]*>", "")
+}
+}

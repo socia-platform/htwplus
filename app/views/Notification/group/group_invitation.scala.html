@@ -1,0 +1,6 @@
+@(notification: Notification, notifiable: Group)
+
+@import models.enums.GroupType
+@import helper._
+
+<span class='glyphicon glyphicon-@{if(notifiable.groupType == GroupType.open){"globe"}else{"lock"}}'></span>@Html(Messages("group.group_invitation", notifiable.getSender().name, truncate(notifiable.title,20)))

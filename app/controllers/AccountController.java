@@ -87,7 +87,7 @@ public class AccountController extends BaseController {
 			session("rememberMe", "1");
 		}
 
-		return redirect(routes.Application.index());
+		return redirect(controllers.routes.Application.index());
 	}
 
 	private static Result defaultAuthenticate() {
@@ -107,7 +107,7 @@ public class AccountController extends BaseController {
 				session("rememberMe", "1");
 			}
 			
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		}
 	}
 
@@ -117,7 +117,7 @@ public class AccountController extends BaseController {
 	public static Result logout() {
 		session().clear();
 		flash("success", "Du bist nun ausgeloggt");
-		return redirect(routes.Application.index());
+		return redirect(controllers.routes.Application.index());
 	}
 
 }

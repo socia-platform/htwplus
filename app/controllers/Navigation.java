@@ -5,23 +5,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import play.Logger;
+import play.i18n.Messages;
 import play.mvc.Http.Context;
 import play.mvc.*;
 
 public class Navigation {
 
-	public static enum Level {PROFILE,STREAM,FRIENDS,GROUPS,COURSES,HELP,USER,ADMIN}
+	public static enum Level {PROFILE,STREAM,FRIENDS,GROUPS,COURSES,HELP,USER,ADMIN,NOTIFICATIONS}
 	
 	private static Map<Level,Call> callMapping = new HashMap<Navigation.Level, Call>();
 	static
 	{
-		callMapping.put(Level.PROFILE, routes.ProfileController.me());
-		callMapping.put(Level.STREAM, routes.Application.index());
-		callMapping.put(Level.FRIENDS, routes.FriendshipController.index());
-		callMapping.put(Level.GROUPS, routes.GroupController.index());
-		callMapping.put(Level.HELP, routes.Application.help());
-		callMapping.put(Level.ADMIN, routes.AdminController.index());
+		callMapping.put(Level.PROFILE, controllers.routes.ProfileController.me());
+		callMapping.put(Level.STREAM, controllers.routes.Application.index());
+		callMapping.put(Level.FRIENDS, controllers.routes.FriendshipController.index());
+		callMapping.put(Level.GROUPS, controllers.routes.GroupController.index());
+		callMapping.put(Level.HELP, controllers.routes.Application.help());
+		callMapping.put(Level.ADMIN, controllers.routes.AdminController.index());
+        callMapping.put(Level.NOTIFICATIONS, controllers.routes.NotificationController.showAll(1));
 	}
 	
 	private static Map<Level,String> titleMapping = new HashMap<Navigation.Level, String>();
@@ -34,9 +35,10 @@ public class Navigation {
 		titleMapping.put(Level.HELP, "Hilfe");
 		titleMapping.put(Level.USER, "Person");
 		titleMapping.put(Level.ADMIN, "Control Center");
+        titleMapping.put(Level.NOTIFICATIONS, Messages.get("notification.news"));
 	}
 	
-	private static Call fallbackCall = routes.Application.index();
+	private static Call fallbackCall = controllers.routes.Application.index();
 
 	final private static String levelIdent = "navLevel";
 	final private static String titleIdent = "navTitle";
