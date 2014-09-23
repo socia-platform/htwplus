@@ -380,8 +380,16 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
             return JPA.withTransaction(new F.Function0<List<Account>>() {
                 @Override
                 public List<Account> apply() throws Throwable {
+                    StringBuilder joinedAccountIds = new StringBuilder();
+                    for (int i = 0; i < accountIds.size(); i++) {
+                        if (i > 0) {
+                            joinedAccountIds.append(",");
+                        }
+                        joinedAccountIds.append(accountIds.get(i));
+                    }
+
                     return JPA.em()
-                            .createQuery("FROM Account a WHERE a.id IN (" + String.join(",", accountIds) + ")", Account.class)
+                            .createQuery("FROM Account a WHERE a.id IN (" +joinedAccountIds.toString() + ")", Account.class)
                             .getResultList();
                 }
             });
