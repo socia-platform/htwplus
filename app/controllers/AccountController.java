@@ -14,7 +14,7 @@ import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
-import views.html.index;
+import views.html.landingpage;
 
 @Transactional
 public class AccountController extends BaseController {
@@ -32,7 +32,7 @@ public class AccountController extends BaseController {
 			return defaultAuthenticate();
 		} else if (username.length() == 0) {
 			flash("error", "Also deine Matrikelnummer brauchen wir schon!");
-			return badRequest(index.render());
+			return badRequest(landingpage.render());
 		} else {
 			return LDAPAuthenticate();
 		}
@@ -53,7 +53,7 @@ public class AccountController extends BaseController {
 		} catch (LDAPConnectorException e) {
 			flash("error", e.getMessage());
 			Component.addToContext(Component.ContextIdent.loginForm, form);
-			return badRequest(index.render());
+			return badRequest(landingpage.render());
 		}
 
 		Account account = Account.findByLoginName(ldap.getUsername());
@@ -95,7 +95,7 @@ public class AccountController extends BaseController {
 		if (loginForm.hasErrors()) {
 			flash("error", loginForm.globalError().message());
 			Component.addToContext(Component.ContextIdent.loginForm, loginForm);
-			return badRequest(index.render());
+			return badRequest(landingpage.render());
 		} else {
 			session().clear();
 			session("email", loginForm.get().email);

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>HTWplus</title>
+    <link rel="stylesheet" href="@routes.Assets.at("bootstrap/css/bootstrap.min.css")">
+    <link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/htwplus.css")">
+    <link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/bootstrap-prettyfile.css")">
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.ico")">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body id="hp-landingpage">
+    <div class="container-fluid">
+
+        <div id="login" class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-12 col-md-5 col-md-offset-1">
+                    <div class="hp-logo">
+                        <img src="@routes.Assets.at("images/logos/logo.svg")" />
+                    </div>
+                    <p>
+                        Das soziale Netzwerk für deine Hochschule!
+                    </p>
+                </div>
+                <div class="col-xs-12 col-md-5">
+                    @controllers.Component.loginForm()
+                </div>
+            </div>
+        </div>
+
+        <div id="features" class="row">
+            <div class="col-xs-12">
+
+            </div>
+        </div>
+
+
+    </div> <!-- /container -->
+
+    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("bootstrap/js/bootstrap.min.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.linkify.min.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/htwplus.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/landingpage.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>
+
+</body>
+
+</html>
