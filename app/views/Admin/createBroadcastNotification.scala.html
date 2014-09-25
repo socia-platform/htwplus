@@ -2,10 +2,12 @@
 @import helper._
 
 @admin("Control Center") {
-    <br>
     @form(routes.AdminController.broadcastNotification) {
+    <br />
     <dl class="dl-horizontal">
         @textarea(postForm(Messages("admin.broadcast_notification")), 'class -> "form-control", 'id -> "hp-new-post-content", 'placeholder -> Messages("admin.broadcast_notification.write"))
+        <div class="broadcast-intro">@Messages("admin.broadcast_notification.intro")</div>
+        <br />
         <table class="table table-hover">
             <thead>
             <tr>

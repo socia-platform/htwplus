@@ -88,3 +88,5 @@ admin.broadcast_notification=Broadcast Nachricht
 admin.broadcast_notification.write=Schreibe eine Broadcast Nachricht und wähle die Empfänger aus
 admin.broadcast_notification.send=Broadcast Nachricht senden
 admin.broadcast_notification.success=Broadcast Nachrichten werden erzeugt und den Empfängern zugestellt
+admin.broadcast_notification.intro=Wähle einen oder mehrere Empfänger dieser Nachricht aus. Sollte kein expliziter Empfänger ausgewählt sein, wird die Nachricht an sämtliche User verschickt.
+admin.broadcast_notification.error.no_message=Bitte gebe zumindest eine Broadcast Nachricht ein
