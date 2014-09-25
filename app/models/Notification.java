@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.base.BaseModel;
 import models.base.IJsonNodeSerializable;
 import models.enums.EmailNotifications;
+import org.hibernate.annotations.ManyToAny;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import play.libs.F;
@@ -51,10 +52,16 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
     public boolean isSent;
 
     /**
-     * An object, this notification has a reference to (e.g. when notified after posting the post).
+     * An object id, this notification has a reference to (e.g. when notified after posting the post).
      */
-    @ManyToOne
-    public BaseModel reference;
+    @Column(name = "reference_id", nullable = false)
+    public Long referenceId;
+
+    /**
+     * An object type, this notification has a reference to (e.g. when notified after posting the post).
+     */
+    @Column(name = "reference_type", nullable = false)
+    public String referenceType;
 
     /**
      * The target URL, this notification refers to.
@@ -141,8 +148,8 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
      * @param reference BaseModel reference
      */
     public static void deleteReferences(final BaseModel reference) {
-        JPA.em().createQuery("DELETE FROM Notification n WHERE n.reference = :reference")
-                .setParameter("reference", reference)
+        JPA.em().createQuery("DELETE FROM Notification n WHERE n.referenceId = :referenceId")
+                .setParameter("referenceId", reference.id)
                 .executeUpdate();
     }
 
@@ -153,8 +160,8 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
      * @param accountId User account ID
      */
     public static void deleteReferencesForAccountId(final BaseModel reference, final long accountId) {
-        JPA.em().createQuery("DELETE FROM Notification n WHERE n.reference = :reference AND n.recipient.id = :accountId")
-                .setParameter("reference", reference)
+        JPA.em().createQuery("DELETE FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :accountId")
+                .setParameter("referenceId", reference.id)
                 .setParameter("accountId", accountId)
                 .executeUpdate();
     }

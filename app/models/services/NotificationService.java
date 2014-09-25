@@ -77,7 +77,8 @@ public class NotificationService {
                         notification.isSent = false;
                         notification.recipient = recipient;
                         notification.sender = notifiable.getSender();
-                        notification.reference = notifiable.getReference();
+                        notification.referenceId = notifiable.getReference().id;
+                        notification.referenceType = notifiable.getReference().getClass().getSimpleName();
                         notification.targetUrl = notifiable.getTargetUrl();
 
                         try {

@@ -136,18 +136,15 @@ public class Post extends BaseNotifiable implements INotifiable {
 
         @SuppressWarnings("unchecked")
 	public static List<Post> findStreamForAccount(Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor, int limit, int offset){
-		
-		Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, isVisitor, " ORDER BY p.updatedAt DESC");
-
-		// set limit and offset
-		query = limit(query, limit, offset);
-        final Query finalQuery = query;
-
         try {
             return JPA.withTransaction(new F.Function0<List>() {
                 @Override
                 public List apply() throws Throwable {
-                    return finalQuery.getResultList();
+                    Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, isVisitor, " ORDER BY p.updatedAt DESC");
+
+                    // set limit and offset
+                    query = limit(query, limit, offset);
+                    return query.getResultList();
                 }
             });
         } catch (Throwable throwable) {
@@ -157,12 +154,11 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 	
 	public static int countStreamForAccount(final Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor) {
-		final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, isVisitor,"");
-
-        try {
+		try {
             return JPA.withTransaction(new F.Function0<Integer>() {
                 @Override
                 public Integer apply() throws Throwable {
+                    final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, isVisitor,"");
                     return ((Number) query.getSingleResult()).intValue();
                 }
             });
@@ -237,7 +233,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 		// create Query.
         String completeQuery = selectClause + " FROM Post p" + broadcastJoin + " WHERE " + myPostsClause
                 + groupListClause + friendListClause + visitorClause + broadcastClause + orderByClause;
-		Query query = JPA.em("default").createQuery(completeQuery);
+		Query query = JPA.em().createQuery(completeQuery);
 		query.setParameter("account", account);
 
 
@@ -253,8 +249,18 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 	
 	public static int countCommentsForPost(Long id) {
-		return ((Number)JPA.em("default").createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
-	}
+        try {
+            return JPA.withTransaction(new F.Function0<Integer>() {
+                @Override
+                public Integer apply() throws Throwable {
+                    return ((Number)JPA.em().createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return 0;
+        }
+    }
 	
 	public int getCountComments() {
 		return Post.countCommentsForPost(this.id);
