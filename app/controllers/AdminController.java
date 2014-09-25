@@ -142,7 +142,7 @@ public class AdminController extends BaseController {
 
                     // iterate over posted values to get recipient account IDs and post content, if at least one is clicked
                     // otherwise take all accounts
-                    List<Account> recipientList;
+                    final List<Account> recipientList;
                     if (form.data().size() > 1) {
                         for (Map.Entry<String, String> entry : form.data().entrySet()) {
                             if (entry.getKey().startsWith("account")) {
