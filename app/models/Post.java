@@ -135,7 +135,7 @@ public class Post extends BaseNotifiable implements INotifiable {
     }
 
         @SuppressWarnings("unchecked")
-	public static List<Post> findStreamForAccount(Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor, int limit, int offset){
+	public static List<Post> findStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final boolean isVisitor, final int limit, final int offset) {
         try {
             return JPA.withTransaction(new F.Function0<List>() {
                 @Override
@@ -153,7 +153,7 @@ public class Post extends BaseNotifiable implements INotifiable {
         }
 	}
 	
-	public static int countStreamForAccount(final Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor) {
+	public static int countStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final boolean isVisitor) {
 		try {
             return JPA.withTransaction(new F.Function0<Integer>() {
                 @Override
@@ -248,7 +248,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 		return query;
 	}
 	
-	public static int countCommentsForPost(Long id) {
+	public static int countCommentsForPost(final Long id) {
         try {
             return JPA.withTransaction(new F.Function0<Integer>() {
                 @Override
