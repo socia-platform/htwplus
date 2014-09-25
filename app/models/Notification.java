@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.base.BaseModel;
 import models.base.IJsonNodeSerializable;
 import models.enums.EmailNotifications;
-import org.hibernate.annotations.ManyToAny;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import play.libs.F;
