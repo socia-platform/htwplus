@@ -100,7 +100,7 @@ public class AccountController extends BaseController {
 		}
 
         // update account if needed
-        if (updateAccount && account instanceof Account) {
+        if (updateAccount) {
             account.firstname = ldap.getFirstName();
             account.lastname = ldap.getLastName();
             account.email = ldap.getEmail();

@@ -60,15 +60,21 @@ public class Post extends BaseNotifiable implements INotifiable {
 
 	@Override
 	public void delete() {
-		// delete all comments first
-		List<Post> comments = getCommentsForPost(this.id, 0, 0);
-		
-		for (Post comment : comments) {
-			comment.delete();
-		}
+        final Post self = this;
+        JPA.withTransaction(new F.Callback0() {
+            @Override
+            public void invoke() throws Throwable {
+                // delete all comments first
+                List<Post> comments = getCommentsForPost(self.id, 0, 0);
 
-        Notification.deleteReferences(this);
-		JPA.em().remove(this);
+                for (Post comment : comments) {
+                    comment.delete();
+                }
+
+                Notification.deleteReferences(self);
+                JPA.em().remove(self);
+            }
+        });
 	}
 	
 	protected static Query limit(Query query, int limit, int offset) {
@@ -86,30 +92,60 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<Post> getPostsForGroup(Group group, int limit, int page) {
-		Query query = JPA.em()
-				.createQuery("SELECT p FROM Post p WHERE p.group.id = ?1 ORDER BY p.createdAt DESC")
-				.setParameter(1, group.id);
-		
-		int offset = (page * limit) - limit;
-		query = limit(query, limit, offset);
+	public static List<Post> getPostsForGroup(final Group group, final int limit, final int page) {
+        try {
+            return JPA.withTransaction(new F.Function0<List<Post>>() {
+                @Override
+                public List<Post> apply() throws Throwable {
+                    Query query = JPA.em()
+                            .createQuery("SELECT p FROM Post p WHERE p.group.id = ?1 ORDER BY p.createdAt DESC")
+                            .setParameter(1, group.id);
 
-		return query.getResultList();
+                    int offset = (page * limit) - limit;
+                    query = limit(query, limit, offset);
+
+                    return query.getResultList();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
 	}
 	
-	public static int countPostsForGroup(Group group) {
-		return ((Number)JPA.em().createQuery("SELECT COUNT(p) FROM Post p WHERE p.group.id = ?1").setParameter(1, group.id).getSingleResult()).intValue();
+	public static int countPostsForGroup(final Group group) {
+        try {
+            return JPA.withTransaction(new F.Function0<Integer>() {
+                @Override
+                public Integer apply() throws Throwable {
+                    return ((Number)JPA.em().createQuery("SELECT COUNT(p) FROM Post p WHERE p.group.id = ?1").setParameter(1, group.id).getSingleResult()).intValue();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return 0;
+        }
 	}
 	
 	
 	@SuppressWarnings("unchecked")
-	public static List<Post> getCommentsForPost(Long id, int start, int max) {	
-		return (List<Post>) JPA.em()
-				.createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
-				.setParameter(1, id)
-				.setFirstResult(start)
-				.setMaxResults(max)
-				.getResultList();
+	public static List<Post> getCommentsForPost(final Long id, final int start, final int max) {
+        try {
+            return JPA.withTransaction(new F.Function0<List<Post>>() {
+                @Override
+                public List<Post> apply() throws Throwable {
+                    return (List<Post>) JPA.em()
+                            .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
+                            .setParameter(1, id)
+                            .setFirstResult(start)
+                            .setMaxResults(max)
+                            .getResultList();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
 	}
 
     /**

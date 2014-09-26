@@ -198,10 +198,11 @@ public class GroupController extends BaseController {
 		return redirect(controllers.routes.GroupController.view(groupId, PAGE));
 		
 	}
-	
+
+    @Transactional
 	public static Result delete(Long id) {
 		Group group = Group.findById(id);
-		if(Secured.deleteGroup(group)){
+		if (Secured.deleteGroup(group)) {
 			group.delete();
 			flash("info", "'" + group.title + "' wurde erfolgreich gelöscht!");
 		} else {

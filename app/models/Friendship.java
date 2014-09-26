@@ -59,7 +59,13 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 
 	@Override
 	public void delete() {
-        Notification.deleteReferences(this);
+        final Friendship self = this;
+        JPA.withTransaction(new F.Callback0() {
+            @Override
+            public void invoke() throws Throwable {
+                Notification.deleteReferences(self);
+            }
+        });
 		JPA.em().remove(this);
 	}
 
