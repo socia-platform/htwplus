@@ -102,12 +102,13 @@ public class AdminController extends BaseController {
      *
      * @return Result
      */
+    @Transactional
     public static Result broadcastNotificationForm() {
         if (!Secured.isAdmin()) {
             return redirect(controllers.routes.Application.index());
         }
 
-        return ok(createBroadcastNotification.render(AdminController.postForm, Account.all()));
+        return ok(createBroadcastNotification.render(AdminController.postForm, Account.allTransactional()));
     }
 
     /**
@@ -131,25 +132,39 @@ public class AdminController extends BaseController {
                     broadcastPost.owner = Component.currentAccount();
                     broadcastPost.isBroadcastMessage = true;
 
-                    // iterate over posted values to get recipient account IDs and post content
-                    for (Map.Entry<String, String> entry : form.data().entrySet()) {
-                        if (entry.getKey().startsWith("account")) {
-                            // add account ID if not the sender
-                            if (!broadcastPost.owner.id.equals(Long.valueOf(entry.getValue()))) {
-                                broadcastMemberList.add(entry.getValue());
-                            }
-                        } else {
-                            broadcastPost.content = entry.getValue();
-                        }
+                    String broadcastMessage = form.data().get(Messages.get("admin.broadcast_notification")).trim();
+                    if (broadcastMessage.equals("")) {
+                        flash("error", Messages.get("admin.broadcast_notification.error.no_message"));
+                        return controllers.AdminController.broadcastNotificationForm();
                     }
 
-                    for (Account account : Account.getAccountListByIdCollection(broadcastMemberList)) {
-                        broadcastPost.addRecipient(account);
+                    broadcastPost.content = broadcastMessage;
+
+                    // iterate over posted values to get recipient account IDs and post content, if at least one is clicked
+                    // otherwise take all accounts
+                    final List<Account> recipientList;
+                    if (form.data().size() > 1) {
+                        for (Map.Entry<String, String> entry : form.data().entrySet()) {
+                            if (entry.getKey().startsWith("account")) {
+                                broadcastMemberList.add(entry.getValue());
+                            }
+                        }
+                        recipientList = Account.getAccountListByIdCollection(broadcastMemberList);
+                    } else {
+                        recipientList = Account.allTransactional();
                     }
 
                     JPA.withTransaction(new F.Callback0() {
                         @Override
                         public void invoke() throws Throwable {
+                            // add recipients to broadcast post recipient list
+                            for (Account account : recipientList) {
+                                // add account ID if not the sender
+                                if (!broadcastPost.owner.id.equals(account.id)) {
+                                    broadcastPost.addRecipient(account);
+                                }
+                            }
+
                             broadcastPost.create();
                         }
                     });

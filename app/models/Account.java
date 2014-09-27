@@ -290,9 +290,28 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public static List<Account> all() {
-		List<Account> accounts = JPA.em().createQuery("FROM Account").getResultList();
-		return accounts;
+        return JPA.em().createQuery("FROM Account").getResultList();
 	}
+
+    /**
+     * Returns all accounts transactional.
+     *
+     * @return List of accounts.
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Account> allTransactional() {
+        try {
+            return JPA.withTransaction(new F.Function0<List<Account>>() {
+                @Override
+                public List<Account> apply() throws Throwable {
+                    return JPA.em().createQuery("FROM Account").getResultList();
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
 	
 	/**
 	 * Search for a account with a given keyword.

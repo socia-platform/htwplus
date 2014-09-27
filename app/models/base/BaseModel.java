@@ -7,8 +7,7 @@ import javax.persistence.*;
 /**
  * Provides a base model with standard attributes like ID, creation/modification date for all persistence models.
  */
-@Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@MappedSuperclass
 public abstract class BaseModel {
     /**
      * Model ID.

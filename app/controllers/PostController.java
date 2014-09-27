@@ -55,6 +55,7 @@ public class PostController extends BaseController {
 	 * @param target define target stream: profile-stream, group-stream
 	 * @return Result
 	 */
+    @Transactional
 	public static Result addPost(Long anyId, String target) {
 		Account account = Component.currentAccount();
 		Form<Post> filledForm = postForm.bindFromRequest();
@@ -65,10 +66,15 @@ public class PostController extends BaseController {
 				if (filledForm.hasErrors()) {
 					flash("error", Messages.get("post.try_with_content"));
 				} else {
-					Post post = filledForm.get();
+					final Post post = filledForm.get();
 					post.owner = Component.currentAccount();
 					post.group = group;
-					post.create();
+                    JPA.withTransaction(new F.Callback0() {
+                        @Override
+                        public void invoke() throws Throwable {
+                            post.create();
+                        }
+                    });
                     NotificationService.getInstance().createNotification(post, Post.GROUP);
 				}
 			} else {
@@ -84,10 +90,15 @@ public class PostController extends BaseController {
 				if (filledForm.hasErrors()) {
 					flash("error", Messages.get("post.try_with_content"));
 				} else {
-					Post post = filledForm.get();
+					final Post post = filledForm.get();
 					post.account = profile;
 					post.owner = account;
-					post.create();
+                    JPA.withTransaction(new F.Callback0() {
+                        @Override
+                        public void invoke() throws Throwable {
+                            post.create();
+                        }
+                    });
 					if (!account.equals(profile)) {
                         NotificationService.getInstance().createNotification(post, Post.PROFILE);
 					}
@@ -106,10 +117,15 @@ public class PostController extends BaseController {
 				if (filledForm.hasErrors()) {
 					flash("error", Messages.get("post.try_with_content"));
 				} else {
-					Post post = filledForm.get();
+					final Post post = filledForm.get();
 					post.account = profile;
 					post.owner = account;
-					post.create();
+                    JPA.withTransaction(new F.Callback0() {
+                        @Override
+                        public void invoke() throws Throwable {
+                            post.create();
+                        }
+                    });
 				}
 				return redirect(controllers.routes.Application.stream(PAGE));
 			}
@@ -126,7 +142,7 @@ public class PostController extends BaseController {
 		final Post parent = Post.findById(postId);
 		final Account account = Component.currentAccount();
 		
-		if(!Secured.addComment(parent)){
+		if (!Secured.addComment(parent)) {
 			return badRequest();
 		}
 		
@@ -165,15 +181,12 @@ public class PostController extends BaseController {
 			return ok(views.html.snippets.postComment.render(post));
 		}
 	}
-	
 
-	
-	
 	@Transactional
 	public static List<Post> getCommentsForPostInGroup(Long id) {
 		int max = Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
 		int count = Post.countCommentsForPost(id);
-		if(count <= max){
+		if (count <= max) {
 			return Post.getCommentsForPostTransactional(id, 0, count);
 		} else {
 			return Post.getCommentsForPostTransactional(id, count-max, count);
@@ -184,7 +197,7 @@ public class PostController extends BaseController {
 	public static Result getOlderComments(Long id, Integer current) {
 		Post parent = Post.findById(id);
 		
-		if(!Secured.viewComments(parent)){
+		if (!Secured.viewComments(parent)) {
 			return badRequest();
 		}
 		
@@ -193,7 +206,7 @@ public class PostController extends BaseController {
 		int max = current;
 		int count = Post.countCommentsForPost(id);
 		List<Post> comments;
-		if(count <= max){
+		if (count <= max) {
 			return ok(result);	
 		} else {
 			comments = Post.getCommentsForPostTransactional(id, 0, count-max);
