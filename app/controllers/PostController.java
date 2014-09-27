@@ -171,8 +171,7 @@ public class PostController extends BaseController {
 				if (!account.equals(parent.owner) && !parent.account.equals(parent.owner)) {
 					// this is a comment on a news stream post from another person
                     NotificationService.getInstance().createNotification(post, Post.COMMENT_OWN_PROFILE);
-                }
-				if (!account.equals(parent.account)) {
+                } else if (!account.equals(parent.account)) {
                     // this is a comment on a foreign news stream post
                     NotificationService.getInstance().createNotification(post, Post.COMMENT_PROFILE);
 				}				
