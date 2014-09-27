@@ -70,16 +70,14 @@ function WS() {
      */
     this.createNotificationElement = function(notification) {
         var notificationElement = document.createElement('li');
-        var parentDiv = document.createElement('div');
         var notificationLink = document.createElement('a');
 
+        notificationLink.href = '/notification/' + notification.id;
+        notificationLink.innerHTML = notification.content;
         notificationElement.className = 'notification-element ' + (notification.is_read ? 'read' : 'unread');
         notificationElement.id = 'notification_' + notification.id;
         notificationElement.style.display = 'none';
-        notificationElement.appendChild(parentDiv);
-        notificationLink.href = '/notification/' + notification.id;
-        notificationLink.innerHTML = notification.content;
-        parentDiv.appendChild(notificationLink);
+        notificationElement.appendChild(notificationLink);
 
         return notificationElement;
     };

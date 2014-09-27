@@ -1,6 +1,8 @@
 @defining(Component.currentAccount()) { user =>
-	<nav class="hp-navbar navbar navbar-default navbar-fixed-top" role="navigation">
+
+<nav class="hp-navbar navbar navbar-default navbar-fixed-top" role="navigation">
 	<div class="hp-navbar-container">
+
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header">
 			@defining(if(Navigation.getLevel() == Navigation.Level.STREAM){"active"} else {"deactive"}) { status =>
@@ -19,22 +21,28 @@
 
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-			<ul class="hp-nav nav navbar-nav">
+
+            <ul class="hp-nav nav navbar-nav">
+                <!-- Friends -->
 				@defining(if(Navigation.getLevel() == Navigation.Level.FRIENDS){"active"} else {"deactive"}) { status =>
 					<li class="@status">
 						<a class="visible-xs" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)"><span class="glyphicon glyphicon-user"></span></a>
 						<a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)">@Navigation.getLevelTitle(Navigation.Level.FRIENDS)</a>
 					</li>
 				}
+
+                <!-- Groups -->
 				@defining(if(Navigation.getLevel() == Navigation.Level.GROUPS){"active"} else {"deactive"}) { status =>
 					<li class="@status">
 						<a class="visible-xs" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)"><span class="glyphicon glyphicon-list"></span></a>
 						<a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)">@Navigation.getLevelTitle(Navigation.Level.GROUPS)</a>
 					</li>
 				}
-      				@controllers.NotificationController.view()
-	
-				
+
+                <!-- Notifications -->
+                @controllers.NotificationController.view()
+
+                <!-- Search -->
 				<li class="visible-xs dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span> <b class="caret"></b></a>
 					<ul class="hp-dropdown-search dropdown-menu">
@@ -47,14 +55,16 @@
 					</ul>
 				</li>
 			</ul>
-			
+
+            <!-- Search -->
 			<form class="hidden-xs hp-search-form navbar-form navbar-left" role="search" action="@routes.Application.search" method="GET">
 				<div class="form-group">
 					<input id="searchQuery" class="form-control hp-easy-search" rel="tooltip" data-placement="bottom" data-original-title="Sucht nach Personen, Gruppen und Kursen - gleichzeitig!" type="text" placeholder="EasySearch" name="keyword">
 				</div>
 				<button type="submit"><span class="glyphicon glyphicon-search"></span></button>
 			</form>
-			
+
+            <!-- User Menu -->
 			<ul class="nav navbar-nav pull-right">
 				<li class="dropdown">
 					<a href="#" class="hp-nav-user dropdown-toggle" data-toggle="dropdown">
@@ -74,8 +84,10 @@
 					</ul>
 				</li>
 			</ul>
+
 		</div><!-- /navbar-collapse -->
 		
-		</div>
-	</nav>
+	</div>
+</nav>
+
 }
