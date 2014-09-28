@@ -117,44 +117,106 @@ body#hp-landingpage {
     margin-right: -10px;
 }
 
-#hp-landingpage div#login {
-	padding: 150px 0;
+#hp-description {
+    text-align: center;
+    padding-top: 30px;
+    font-family: 'Swanky and Moo Moo', cursive;
+    font-size: 20pt;
+	-moz-transform: rotate(350deg);
+	-ms-transform: rotate(350deg);
+	-o-transform: rotate(350deg);
+    -webkit-transform: rotate(350deg);
+    transform: rotate(350deg);
+}
+
+#hp-landingpage div#hp-login {
+	padding: 50px 0;
 	background-image: url('http://www.htw-berlin.de/fileadmin/HTW/Zentral/DE/HTW/ZR1_Presse/Pressefotos/130719___Philipp_Meuser_0011_01_1200px_crop.jpg');
 	background-repeat: no-repeat;
 	background-size: 100% auto;
 	background-position: center center;
+	color: white !important;
+	text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
 }
 
-#login .hp-logo img {
-	width: 50%;
+@media (min-width: 992px) {
+    #hp-landingpage div#hp-login {
+       	padding: 150px 0;
+    }
+    #hp-landingpage div#hp-login .hp-logo {
+       	margin-top: 30px;
+    }
+}
+
+#hp-landingpage div#hp-login .hp-logo img {
 	margin: 0;
+	padding: 0 50px;
 }
 
-#hp-landingpage div#features {
-	min-height: 600px;
+#hp-landingpage div#hp-login input {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+#hp-landingpage div#hp-login > div {
+    background-color: rgba(0, 0, 0, 0.35);
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+@media (max-width: 991px) {
+    #hp-landingpage div#hp-login > div {
+        margin: -50px 0;
+        padding-top: 65px;
+        padding-bottom: 65px;
+    }
+    #hp-landingpage div#hp-login #hp-login-right {
+        margin-top: 30px;
+    }
+}
+
+#hp-landingpage div#hp-navbar {
+    border-width: 0 0 1px;
+}
+
+#hp-landingpage div#hp-navbar.affix {
+	top: 0;
+	left: 0;
+	right: 0;
+}
+
+#hp-landingpage div#hp-about {
+	min-height: 500px;
+}
+
+#hp-landingpage div#hp-features {
+	min-height: 500px;
+}
+
+#hp-landingpage div#hp-team {
+	min-height: 500px;
 }
 
 
 /*============================== Navigation ==============================*/
 
-.hp-navbar .hp-search-form {
+#hp-navbar .hp-search-form {
 	padding-right: 7px;
 }
 
-.hp-navbar .hp-search-form input {
+#hp-navbar .hp-search-form input {
 	width: 150px;
 	padding-right: 20px;
 	background-color: #E0F2BF;
 }
 
-.hp-navbar .hp-search-form button {
+#hp-navbar .hp-search-form button {
 	background: transparent;
 	border: 0;
 	margin-left: -28px;
 	outline: none;
 }
 
-.hp-navbar li .glyphicon {
+#hp-navbar li .glyphicon {
 	color: inherit!important;
 }
 
@@ -325,24 +387,24 @@ dt.email-notifications {
 	margin: 50px 0 100px;
 }
 
-.hp-navbar .hp-logo {
+#hp-navbar .hp-logo {
 	height: 50px;
 	padding: 15px 15px 12px 10px
 }
 
-.hp-navbar .hp-logo img {
+#hp-navbar .hp-logo img {
 	height: 23px;
 	width: auto;
 	margin: 0;
 }
 
-.hp-navbar .hp-logo:hover #hover,
-.hp-navbar .hp-logo #normal {
+#hp-navbar .hp-logo:hover #hover,
+#hp-navbar .hp-logo #normal {
 	display: inherit!important;
 }
 
-.hp-navbar .hp-logo #hover,
-.hp-navbar .hp-logo:hover #normal {
+#hp-navbar .hp-logo #hover,
+#hp-navbar .hp-logo:hover #normal {
 	display: none!important;
 }
 
@@ -643,7 +705,7 @@ div.hp-pagination {
 	height: 120px;
 }
 
-.hp-navbar .hp-avatar {
+#hp-navbar .hp-avatar {
 	height: 32px;
 	width: 32px;
 }
