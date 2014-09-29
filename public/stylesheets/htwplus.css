@@ -176,6 +176,8 @@ body#hp-landingpage {
 
 #hp-landingpage div#hp-navbar {
     border-width: 0 0 1px;
+    z-index: 1030;
+    margin-bottom: -51px;
 }
 
 #hp-landingpage div#hp-navbar.affix {
@@ -184,7 +186,19 @@ body#hp-landingpage {
 	right: 0;
 }
 
+#hp-landingpage div#hp-navbar ul.hp-nav {
+	float: none;
+	margin-left: auto;
+	margin-right: auto;
+	display: table;
+}
+
+#hp-landingpage div#hp-navbar ul.hp-nav > li:not(:last-child) {
+	margin-right: 30px;
+}
+
 #hp-landingpage div#hp-about {
+	margin-top: 51px;
 	min-height: 500px;
 }
 

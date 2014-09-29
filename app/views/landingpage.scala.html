@@ -32,35 +32,34 @@
         </div>
 
         <div id="hp-navbar" class="row navbar navbar-default">
-            <div class="hp-navbar-container"></div>
+            <div class="hp-navbar-container">
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="hp-nav nav navbar-nav">
-                        <li><a href="#about">Über HTWplus</a></li>
-                        <li><a href="#features">Funktionen</a></li>
-                        <li><a href="#team">Das Team</a></li>
+                        <li data-scrollspy-target="hp-about"><a href='javascript:scrollTo("#hp-about");'>Über HTWplus</a></li>
+                        <li data-scrollspy-target="hp-features"><a href='javascript:scrollTo("#hp-features");'>Funktionen</a></li>
+                        <li data-scrollspy-target="hp-team"><a href='javascript:scrollTo("#hp-team");'>Das Team</a></li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <div id="hp-about" class="row">
+        <div id="hp-about" class="hp-section row">
             <div class="col-xs-12">
                 <h2 id="about">Über</h2>
             </div>
         </div>
 
-        <div id="hp-features" class="row">
+        <div id="hp-features" class="hp-section row">
             <div class="col-xs-12">
                 <h2 id="features">Funktionen</h2>
             </div>
         </div>
 
-        <div id="hp-team" class="row">
+        <div id="hp-team" class="hp-section row">
             <div class="col-xs-12">
                 <h2 id="team">Team</h2>
             </div>
         </div>
-
 
     </div> <!-- /container -->
 
@@ -71,6 +70,7 @@
     <script type="text/javascript" src='@routes.Assets.at("javascripts/htwplus.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/landingpage.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery-scrollspy.js")'></script>
 
 </body>
 
