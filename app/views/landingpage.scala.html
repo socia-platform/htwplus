@@ -19,7 +19,7 @@
             <div class="col-xs-12">
                 <div id="hp-login-left" class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-5 col-md-offset-1">
                     <div class="hp-logo">
-                        <img src="@routes.Assets.at("images/logos/logo-white.svg")" />
+                        <img src='@routes.Assets.at("images/logos/logo-white.svg")'/>
                     </div>
                     <div id="hp-description">
                         Das soziale Netzwerk für<br />deine Hochschule!
@@ -50,8 +50,19 @@
         </div>
 
         <div id="hp-features" class="hp-section row">
-            <div class="col-xs-12">
-                <h2 id="features">Funktionen</h2>
+            <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+                <!-- single feature -->
+                <div class="row">
+                    <div class="col-xs-12 col-md-5">
+                        @views.html.snippets.notepad{
+                            <h3>Hello World!</h3>
+                        }
+                    </div>
+                    <div class="col-xs-12 col-md-7">
+                        <h2>First Feature</h2>
+                        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+                    </div>
+                </div>
             </div>
         </div>
 

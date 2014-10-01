@@ -5,31 +5,23 @@
 <html lang="de">
 	<head>
 		<title>HTWplus | @title</title>
-		<link rel="stylesheet" href="@routes.Assets.at("bootstrap/css/bootstrap.min.css")">
-		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/htwplus.css")">
-		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/bootstrap-prettyfile.css")">
-		<link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.ico")">
+		<link rel="stylesheet" href='@routes.Assets.at("bootstrap/css/bootstrap.min.css")'>
+		<link rel="stylesheet" media="all" href='@routes.Assets.at("stylesheets/htwplus.css")'>
+		<link rel="stylesheet" media="all" href='@routes.Assets.at("stylesheets/bootstrap-prettyfile.css")'>
+		<link rel="shortcut icon" type="image/png" href='@routes.Assets.at("images/favicon.ico")'>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	</head>
 	
-@if(user == null){
-	<body id="hp-landingpage">
-} else {
 	<body>
-}
-	
-	@if(user != null){
 		@views.html.snippets.navi()
-	}
-
 		<div class="container">
 
 			<div class="row">
 				<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
-				@if(user != null){
-						@views.html.snippets.breadcrumb()
-				}
+
+                    @views.html.snippets.breadcrumb()
+
 				@if(flash.containsKey("success")) {
 					<div class="alert alert-success fade in">
 						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
@@ -48,25 +40,13 @@
 						@flash.get("error")
 					</div>
 				}
-					<div id="hp-right">
-						<div id="hp-topRight"></div>
-						<div id="hp-bottomRight"></div>
-						<div id="hp-left">
-							<div id="hp-topLeft"></div>
-							<div id="hp-bottomLeft"></div>
-							<div id="hp-top">
-								<div id="hp-bottom">
-									<div id="hp-content">
-										<a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
-											<span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
-											<div class="hp-easy-feedback">Feedback</div>
-										</a>
-			                  				@content
-									</div> <!-- /content -->
-								</div> <!-- /bottom -->
-							</div> <!-- /top -->
-						</div> <!-- /left -->
-					</div> <!-- /right -->
+                    <a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
+                        <span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
+                        <div class="hp-easy-feedback">Feedback</div>
+                    </a>
+
+                    @views.html.snippets.notepad{ @content }
+
 				</div> <!-- /col-xs-9 -->
 			</div> <!-- /row -->
 		</div> <!-- /container -->
@@ -99,10 +79,7 @@
         <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.linkify.min.js")'></script>
         <script type="text/javascript" src='@routes.Assets.at("javascripts/htwplus.js")'></script>
         <script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>
-
-        @if(user != null){
-            <script type="text/javascript" src='@routes.Assets.at("javascripts/notification.js")'></script>
-        }
+        <script type="text/javascript" src='@routes.Assets.at("javascripts/notification.js")'></script>
 
 	</body>
 </html>
