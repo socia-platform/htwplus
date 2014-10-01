@@ -22,7 +22,7 @@ public class WebSocketActor extends UntypedActor {
      * @param out WebSocket output stream
      */
     public WebSocketActor(Long accountId, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) {
-        this.account = Account.findById(accountId);
+        this.account = Account.findByIdTransactional(accountId);
         this.in = in;
         this.out = out;
     }

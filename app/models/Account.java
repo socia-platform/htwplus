@@ -111,8 +111,29 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public static Account findById(Long id) {
 		return JPA.em().find(Account.class, id);
 	}
-	
-	@SuppressWarnings("unchecked")
+
+    /**
+     * Returns an account by account ID (transactional).
+     *
+     * @param id Account ID
+     * @return Account instance
+     */
+    public static Account findByIdTransactional(final Long id) {
+        try {
+            return JPA.withTransaction(new F.Function0<Account>() {
+                @Override
+                public Account apply() throws Throwable {
+                    return Account.findById(id);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
+
+
+    @SuppressWarnings("unchecked")
 	public static List<Account> findAll(){
 		return JPA.em().createQuery("SELECT a FROM Account a ORDER BY a.name").getResultList();
 	}

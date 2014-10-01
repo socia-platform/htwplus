@@ -221,7 +221,7 @@ public class WebSocketService {
         Long recipientAccountId = wsMessage.get("recipient").asLong();
         String text = wsMessage.get("text").asText();
         ActorRef recipientActor = this.getActorForAccountId(recipientAccountId);
-        Account recipient = Account.findById(recipientAccountId);
+        Account recipient = Account.findByIdTransactional(recipientAccountId);
 
         // check, if the recipient is online
         if (recipientActor == null) {
@@ -233,7 +233,7 @@ public class WebSocketService {
             return this.errorResponse("Cannot send chat to yourself");
         }
         // check, if sender and recipient are friends
-        if (sender == null || recipient == null || !(Friendship.alreadyFriendly(sender, recipient))) {
+        if (sender == null || recipient == null || !(Friendship.alreadyFriendlyTransactional(sender, recipient))) {
             return this.errorResponse("You must be a friend of the recipient");
         }
 

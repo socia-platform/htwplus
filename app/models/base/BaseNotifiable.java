@@ -78,7 +78,7 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      * @return List of account instances
      */
     public List<Account> getAsAccountList(Account account) {
-        List<Account> accounts = new ArrayList<Account>();
+        List<Account> accounts = new ArrayList<>();
         accounts.add(account);
 
         return accounts;
@@ -91,7 +91,7 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      * @return List of accounts of group
      */
     public List<Account> getGroupAsAccountList(final Group group) {
-    	return GroupAccount.findAccountsByGroup(group, LinkType.establish);
+    	return GroupAccount.findAccountsByGroupTransactional(group, LinkType.establish);
     }
 
     /**
