@@ -26,7 +26,6 @@
 		@group.title
 	</h2>		
 	</br>
-    </br>
 	@form(routes.GroupController.update(group.id), 'id -> "editGroupForm") {
 		<dl class="dl-horizontal">
 			<dt>Gruppengründer</dt>
@@ -78,5 +77,6 @@
 			<button type="submit" class="btn btn-warning">Speichern</button>
 			<a type="button" class="btn btn-default" href="@routes.GroupController.view(group.id)">Abbrechen</a>
 		</div>
+        <div class="clearfix"></div>
 	}
 }
