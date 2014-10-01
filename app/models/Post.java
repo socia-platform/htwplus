@@ -9,7 +9,6 @@ import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
-import play.libs.F;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {

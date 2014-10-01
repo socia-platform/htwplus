@@ -7,9 +7,6 @@ import models.GroupAccount;
 import models.Notification;
 import models.enums.LinkType;
 import models.services.TemplateService;
-import play.Logger;
-import play.db.jpa.JPA;
-import play.libs.F;
 
 import javax.persistence.Transient;
 import java.util.ArrayList;
@@ -101,7 +98,7 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      */
     public void addTemporaryRecipient(Account recipient) {
         if (this.temporaryRecipients == null) {
-            this.temporaryRecipients = new ArrayList<Account>();
+            this.temporaryRecipients = new ArrayList<>();
         }
 
         if (!this.temporaryRecipients.contains(recipient)) {
