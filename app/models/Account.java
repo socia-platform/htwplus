@@ -111,26 +111,6 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public static Account findById(Long id) {
 		return JPA.em().find(Account.class, id);
 	}
-
-    /**
-     * Returns an account by account ID (transactional).
-     *
-     * @param id Account ID
-     * @return Account instance
-     */
-    public static Account findByIdTransactional(final Long id) {
-        try {
-            return JPA.withTransaction(new F.Function0<Account>() {
-                @Override
-                public Account apply() throws Throwable {
-                    return Account.findById(id);
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
-    }
 	
 	@SuppressWarnings("unchecked")
 	public static List<Account> findAll(){
@@ -262,28 +242,6 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		}
 	}
 
-    /**
-     * Method isOwner with JPA transaction.
-     *
-     * @param accountId Account ID
-     * @param currentUser Current User
-     * @return True, if an account ID is of current user
-     */
-    public static boolean isOwnerTransactional(final Long accountId, final Account currentUser) {
-        try {
-            return JPA.withTransaction(new F.Function0<Boolean>() {
-                @Override
-                public Boolean apply() throws Throwable {
-                    return Account.isOwner(accountId, currentUser);
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return false;
-        }
-    }
-	
-	
 	/**
 	 * Try to get all accounts...
 	 * @return List of accounts.
@@ -292,26 +250,6 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public static List<Account> all() {
         return JPA.em().createQuery("FROM Account").getResultList();
 	}
-
-    /**
-     * Returns all accounts transactional.
-     *
-     * @return List of accounts.
-     */
-    @SuppressWarnings("unchecked")
-    public static List<Account> allTransactional() {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Account>>() {
-                @Override
-                public List<Account> apply() throws Throwable {
-                    return JPA.em().createQuery("FROM Account").getResultList();
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
-    }
 	
 	/**
 	 * Search for a account with a given keyword.
@@ -395,27 +333,17 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
      * @return List of accounts
      */
     public static List<Account> getAccountListByIdCollection(final List<String> accountIds) {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Account>>() {
-                @Override
-                public List<Account> apply() throws Throwable {
-                    StringBuilder joinedAccountIds = new StringBuilder();
-                    for (int i = 0; i < accountIds.size(); i++) {
-                        if (i > 0) {
-                            joinedAccountIds.append(",");
-                        }
-                        joinedAccountIds.append(accountIds.get(i));
-                    }
-
-                    return JPA.em()
-                            .createQuery("FROM Account a WHERE a.id IN (" +joinedAccountIds.toString() + ")", Account.class)
-                            .getResultList();
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
+    	StringBuilder joinedAccountIds = new StringBuilder();
+        for (int i = 0; i < accountIds.size(); i++) {
+            if (i > 0) {
+                joinedAccountIds.append(",");
+            }
+            joinedAccountIds.append(accountIds.get(i));
         }
+
+        return JPA.em()
+                .createQuery("FROM Account a WHERE a.id IN (" +joinedAccountIds.toString() + ")", Account.class)
+                .getResultList();
     }
 	
 	@SuppressWarnings("unchecked")

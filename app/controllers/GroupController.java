@@ -387,7 +387,7 @@ public class GroupController extends BaseController {
 	public static Result invite(long groupId) {
 		Group group = Group.findById(groupId);
 		Navigation.set(Level.GROUPS, "Freunde einladen", group.title, controllers.routes.GroupController.view(group.id, PAGE));
-		return ok(invite.render(group, Friendship.friendsToInvite(Component.currentAccount(), group), GroupAccount.findAccountsByGroupTransactional(group, LinkType.invite)));
+		return ok(invite.render(group, Friendship.friendsToInvite(Component.currentAccount(), group), GroupAccount.findAccountsByGroup(group, LinkType.invite)));
 	}
 	
 	public static Result inviteMember(long groupId) {

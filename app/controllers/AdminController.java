@@ -108,7 +108,7 @@ public class AdminController extends BaseController {
             return redirect(controllers.routes.Application.index());
         }
 
-        return ok(createBroadcastNotification.render(AdminController.postForm, Account.allTransactional()));
+        return ok(createBroadcastNotification.render(AdminController.postForm, Account.all()));
     }
 
     /**
@@ -151,23 +151,20 @@ public class AdminController extends BaseController {
                         }
                         recipientList = Account.getAccountListByIdCollection(broadcastMemberList);
                     } else {
-                        recipientList = Account.allTransactional();
+                        recipientList = Account.all();
                     }
 
-                    JPA.withTransaction(new F.Callback0() {
-                        @Override
-                        public void invoke() throws Throwable {
-                            // add recipients to broadcast post recipient list
-                            for (Account account : recipientList) {
-                                // add account ID if not the sender
-                                if (!broadcastPost.owner.id.equals(account.id)) {
-                                    broadcastPost.addRecipient(account);
-                                }
-                            }
-
-                            broadcastPost.create();
-                        }
-                    });
+                    
+	                // add recipients to broadcast post recipient list
+	                for (Account account : recipientList) {
+	                    // add account ID if not the sender
+	                    if (!broadcastPost.owner.id.equals(account.id)) {
+	                        broadcastPost.addRecipient(account);
+	                    }
+	                }
+	
+	                broadcastPost.create();
+                        
                     NotificationService.getInstance().createNotification(broadcastPost, Post.BROADCAST);
 
                     flash("success", Messages.get("admin.broadcast_notification.success"));

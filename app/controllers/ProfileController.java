@@ -69,7 +69,7 @@ public class ProfileController extends BaseController {
 		}
 
 		// case for friends and own profile
-		if (Friendship.alreadyFriendlyTransactional(Component.currentAccount(), account)
+		if (Friendship.alreadyFriendly(Component.currentAccount(), account)
 				|| currentUser.equals(account) || Secured.isAdmin()) {
 			return ok(stream.render(account, Post.getFriendStream(account, LIMIT, page),
 					postForm,Post.countFriendStream(account), LIMIT, page));

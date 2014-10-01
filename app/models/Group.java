@@ -222,26 +222,6 @@ public class Group extends BaseNotifiable implements INotifiable {
         return !groupAccounts.isEmpty();
 	}
 
-    /**
-     * Returns true, if an account is member of a group (transactional).
-     *
-     * @param group Group instance
-     * @param account Account instance
-     * @return True, if account is member of group
-     */
-    public static boolean isMemberTransactional(final Group group, final Account account) {
-        try {
-            return JPA.withTransaction(new F.Function0<Boolean>() {
-                @Override
-                public Boolean apply() throws Throwable {
-                    return Group.isMember(group, account);
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return false;
-        }
-    }
 
 	/**
 	 * Search for a group with a given keyword.
@@ -444,16 +424,11 @@ public class Group extends BaseNotifiable implements INotifiable {
             // this is a group invitation, all selected people will be notified
             for (String accountId : inviteList) {
                 try {
-                    final Account account = Account.findByIdTransactional(Long.parseLong(accountId));
-                    GroupAccount groupAccount = GroupAccount.findTransactional(account, this);
-                    if (!Group.isMemberTransactional(this, account) && Friendship.alreadyFriendlyTransactional(this.getSender(), account) && groupAccount == null) {
+                    final Account account = Account.findById(Long.parseLong(accountId));
+                    GroupAccount groupAccount = GroupAccount.find(account, this);
+                    if (!Group.isMember(this, account) && Friendship.alreadyFriendly(this.getSender(), account) && groupAccount == null) {
                         final Group thisGroup = this;
-                        JPA.withTransaction(new F.Callback0() {
-                            @Override
-                            public void invoke() throws Throwable {
-                                (new GroupAccount(account, thisGroup, LinkType.invite)).create();
-                            }
-                        });
+                        (new GroupAccount(account, thisGroup, LinkType.invite)).create();
                         recipients.add(account);
                     }
                 } catch (Exception e) {
@@ -470,17 +445,7 @@ public class Group extends BaseNotifiable implements INotifiable {
         } else if (this.type.equals(Group.GROUP_NEW_MEDIA)) {
             // new media available in group, whole group must be notified
             final Group currentGroup = this;
-            try {
-                return JPA.withTransaction(new F.Function0<List<Account>>() {
-                    @Override
-                    public List<Account> apply() throws Throwable {
-                        return GroupAccount.findAccountsByGroup(currentGroup, LinkType.establish);
-                    }
-                });
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-                return null;
-            }
+            return GroupAccount.findAccountsByGroup(currentGroup, LinkType.establish);
         }
 
         // this is a request accept or decline notification, notify the requester

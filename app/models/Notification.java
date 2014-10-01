@@ -94,17 +94,12 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
      */
     @SuppressWarnings("unchecked")
     public static List<Notification> findByAccountId(final Long accountId, final int maxResults, final int offsetResults) throws Throwable {
-        return JPA.withTransaction(new F.Function0<List<Notification>>() {
-            @Override
-            public List<Notification> apply() throws Throwable {
-                return (List<Notification>) JPA.em()
-                        .createQuery("FROM Notification n WHERE n.recipient.id = :accountId ORDER BY n.createdAt DESC")
-                        .setParameter("accountId", accountId)
-                        .setMaxResults(maxResults)
-                        .setFirstResult(offsetResults)
-                        .getResultList();
-            }
-        });
+    	return (List<Notification>) JPA.em()
+                .createQuery("FROM Notification n WHERE n.recipient.id = :accountId ORDER BY n.createdAt DESC")
+                .setParameter("accountId", accountId)
+                .setMaxResults(maxResults)
+                .setFirstResult(offsetResults)
+                .getResultList();
     }
 
     /**
@@ -182,21 +177,10 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
      * @return Number of notifications
      */
     public static int countNotificationsForAccountId(final Long accountId) {
-        try {
-            return JPA.withTransaction(new F.Function0<Integer>() {
-                @Override
-                public Integer apply() throws Throwable {
-                    return ((Number)JPA.em()
-                            .createQuery("SELECT COUNT(n) FROM Notification n WHERE n.recipient.id = :accountId")
-                            .setParameter("accountId", accountId)
-                            .getSingleResult()).intValue();
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-
-        return 0;
+    	return ((Number)JPA.em()
+                .createQuery("SELECT COUNT(n) FROM Notification n WHERE n.recipient.id = :accountId")
+                .setParameter("accountId", accountId)
+                .getSingleResult()).intValue();
     }
 
     /**

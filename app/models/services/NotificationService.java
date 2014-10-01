@@ -57,6 +57,7 @@ public class NotificationService {
             new Runnable() {
                 // runs the Akka schedule
                 public void run() {
+                	System.out.println("CREATENOTI");
                     List<Account> recipients = notifiable.getRecipients();
 
                     // if no recipients, abort
