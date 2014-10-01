@@ -165,23 +165,6 @@ public class GroupAccount extends BaseModel {
 	}
 
     /**
-     * Retrieve Accounts from Group with given LinkType (transactional).
-     */
-    public static List<Account> findAccountsByGroupTransactional(final Group group, final LinkType type) {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Account>>() {
-                @Override
-                public List<Account> apply() throws Throwable {
-                    return GroupAccount.findAccountsByGroup(group, type);
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
      * Returns a group account by account and group.
      *
      * @param account Account instance
@@ -200,25 +183,4 @@ public class GroupAccount extends BaseModel {
 			return null;
 		}
 	}
-
-    /**
-     * Returns a group account by account and group (transactional).
-     *
-     * @param account Account instance
-     * @param group Group instance
-     * @return Group account instance
-     */
-    public static GroupAccount findTransactional(final Account account, final Group group) {
-        try {
-            return JPA.withTransaction(new F.Function0<GroupAccount>() {
-                @Override
-                public GroupAccount apply() throws Throwable {
-                    return GroupAccount.find(account, group);
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
-    }
 }

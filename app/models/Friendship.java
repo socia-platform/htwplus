@@ -106,27 +106,6 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 		}
 		return true;
 	}
-
-    /**
-     * Returns true, if two accounts have a friendly relationship (transactional).
-     *
-     * @param me Account instance
-     * @param potentialFriend Account instance
-     * @return True, if both accounts are friends
-     */
-    public static boolean alreadyFriendlyTransactional(final Account me, final Account potentialFriend) {
-        try {
-            return JPA.withTransaction(new F.Function0<Boolean>() {
-                @Override
-                public Boolean apply() throws Throwable {
-                    return Friendship.alreadyFriendly(me, potentialFriend);
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return false;
-        }
-    }
 	
 	public static boolean alreadyRejected(Account me, Account potentialFriend) {
 		try {

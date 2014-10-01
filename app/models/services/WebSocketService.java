@@ -9,7 +9,9 @@ import models.Friendship;
 import models.actors.WebSocketActor;
 import models.base.IJsonNodeSerializable;
 import play.Logger;
+import play.db.jpa.JPA;
 import play.libs.Akka;
+import play.libs.F;
 import play.libs.Json;
 import play.mvc.WebSocket;
 
@@ -19,6 +21,7 @@ import java.util.*;
 /**
  * WebSocket service that is handling all active WebSocket actors.
  */
+@SuppressWarnings("unused")
 public class WebSocketService {
     public static final String WS_METHOD_SEND_CHAT = "SendChat";
     public static final String WS_METHOD_RECEIVE_CHAT = "ReceiveChat";
@@ -32,7 +35,7 @@ public class WebSocketService {
     private static WebSocketService instance = null;
 
     /**
-     * Holds all active WebSocket actors
+     * Holds all active WebSocket actors per Account ID
      */
     Map<Long, ActorRef> accountActor = new HashMap<>();
 
@@ -57,17 +60,26 @@ public class WebSocketService {
     /**
      * Invokes a new ActorRef instance of type WebSocketActor for an account ID.
      *
-     * @param accountId Account ID
+     * @param account Account
      * @param in WebSocket input stream
      * @param out WebSocket output stream
      */
-    public void invokeActor(Long accountId, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) {
-        if (this.getActorForAccountId(accountId) != null) {
+    public void invokeActor(final Account account, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) {
+        if (this.getActorForAccount(account) != null) {
             return;
         }
 
+        this.accountActor.put(account.id, Akka.system().actorOf(Props.create(WebSocketActor.class, account, in, out)));
+    }
 
-        this.accountActor.put(accountId, Akka.system().actorOf(Props.create(WebSocketActor.class, accountId, in, out)));
+    /**
+     * Returns an ActorRef instance for an account if available, otherwise null.
+     *
+     * @param account Account
+     * @return ActorRef instance if available for account ID, otherwise null
+     */
+    public ActorRef getActorForAccount(Account account) {
+        return this.getActorForAccountId(account.id);
     }
 
     /**
@@ -88,30 +100,30 @@ public class WebSocketService {
      * Returns an ActorRef instance for an account ID. If no ActorRef available the invokeActor() method
      * is called and the new ActorRef instance is returned.
      *
-     * @param accountId Account ID
+     * @param account Account
      * @param in WebSocket input stream
      * @param out WebSocket output stream
      * @return ActorRef instance
      */
-    public ActorRef getActorForAccountId(Long accountId, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) {
-        if (this.getActorForAccountId(accountId) == null) {
-            this.invokeActor(accountId, in, out);
+    public ActorRef getActorForAccount(Account account, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) {
+        if (this.getActorForAccount(account) == null) {
+            this.invokeActor(account, in, out);
         }
 
-        return this.getActorForAccountId(accountId);
+        return this.getActorForAccount(account);
     }
 
     /**
      * Stops an ActorRef for an account ID.
      *
-     * @param accountId Account ID
+     * @param account Account
      */
-    public void stopActor(Long accountId) {
-        if (this.getActorForAccountId(accountId) == null) {
+    public void stopActor(Account account) {
+        if (this.getActorForAccount(account) == null) {
             return;
         }
 
-        ActorRef stoppingActorRef = this.accountActor.remove(accountId);
+        ActorRef stoppingActorRef = this.accountActor.remove(account.id);
         Akka.system().stop(stoppingActorRef);
     }
 
@@ -121,6 +133,7 @@ public class WebSocketService {
      * @param serializableList List of IJsonNodeSerializable implementing instances
      * @return List of ObjectNode instances
      */
+    @SuppressWarnings("unused")
     public List<ObjectNode> getJsonList(List<? extends IJsonNodeSerializable> serializableList) {
         List<ObjectNode> jsonList = new ArrayList<>(serializableList.size());
         for (IJsonNodeSerializable serializable : serializableList) {
@@ -133,19 +146,19 @@ public class WebSocketService {
     /**
      * Handles a WebSocket message
      *
-     * @param accountId Account ID
+     * @param account Account
      * @param wsMessage WebSocket message as JsonNode object
      */
-    public void handleWsMessage(Long accountId, JsonNode wsMessage) {
+    public void handleWsMessage(Account account, JsonNode wsMessage) {
         // Log events to the console
-        Logger.info("[WS] Received (User ID: " + accountId + "): " + wsMessage.toString());
+        Logger.info("[WS] Received (User ID: " + account.id + "): " + wsMessage.toString());
 
         if (!wsMessage.has("method")) {
             Logger.error("[WS] No method received");
             return;
         }
 
-        ActorRef senderActor = this.getActorForAccountId(accountId);
+        ActorRef senderActor = this.getActorForAccount(account);
         senderActor.tell(wsMessage, null);
     }
 
@@ -204,6 +217,47 @@ public class WebSocketService {
     }
 
     /**
+     * Returns an account by ID, enclosed by transaction.
+     *
+     * @param accountId Account ID
+     * @return Account
+     */
+    private Account getAccountById(final Long accountId) {
+        try {
+            return JPA.withTransaction(new F.Function0<Account>() {
+                @Override
+                public Account apply() throws Throwable {
+                    return Account.findById(accountId);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Returns true, if Account A and Account B are friends.
+     *
+     * @param a Account A
+     * @param b Account B
+     * @return True, if friendship is established
+     */
+    private boolean isFriendshipEstablished(final Account a, final Account b) {
+        try {
+            return JPA.withTransaction(new F.Function0<Boolean>() {
+                @Override
+                public Boolean apply() throws Throwable {
+                    return Friendship.alreadyFriendly(a, b);
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
      * WebSocket method when sending chat.
      *
      * @param wsMessage WebSocket message as JsonNode object
@@ -220,9 +274,15 @@ public class WebSocketService {
 
         Long recipientAccountId = wsMessage.get("recipient").asLong();
         String text = wsMessage.get("text").asText();
-        ActorRef recipientActor = this.getActorForAccountId(recipientAccountId);
-        Account recipient = Account.findByIdTransactional(recipientAccountId);
+        Account recipient = this.getAccountById(recipientAccountId);
 
+        // check, if recipient exists
+        if (recipient == null) {
+            return this.errorResponse("User not found");
+        }
+
+
+        ActorRef recipientActor = this.getActorForAccount(recipient);
         // check, if the recipient is online
         if (recipientActor == null) {
             return this.errorResponse("Recipient not online");
@@ -233,7 +293,7 @@ public class WebSocketService {
             return this.errorResponse("Cannot send chat to yourself");
         }
         // check, if sender and recipient are friends
-        if (sender == null || recipient == null || !(Friendship.alreadyFriendlyTransactional(sender, recipient))) {
+        if (sender == null || !this.isFriendshipEstablished(sender, recipient)) {
             return this.errorResponse("You must be a friend of the recipient");
         }
 
