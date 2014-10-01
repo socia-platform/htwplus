@@ -71,26 +71,6 @@ public class GroupAccount extends BaseModel {
 		return groupAccounts;
 	}
 
-    /**
-     * Method findEstablished() JPA transactional.
-     *
-     * @param account Account instance
-     * @return List of Group instances
-     */
-    public static List<Group> findEstablishedTransactional(final Account account) {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Group>>() {
-                @Override
-                public List<Group> apply() throws Throwable {
-                    return GroupAccount.findEstablished(account);
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
-    }
-
 	/**
 	 * Find all groups where given account is owner or member
 	 */
@@ -126,23 +106,13 @@ public class GroupAccount extends BaseModel {
 	 */
     @SuppressWarnings("unchecked")
 	public static List<Group> findPublicEstablished(final Account account) {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Group>>() {
-                @Override
-                public List<Group> apply() throws Throwable {
-                return JPA
-                    .em()
-                    .createQuery(
-                            "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType = ?3")
-                    .setParameter(1, account.id)
-                    .setParameter(2, LinkType.establish)
-                    .setParameter(3, GroupType.open).getResultList();
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
+    	return JPA
+                .em()
+                .createQuery(
+                        "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType = ?3")
+                .setParameter(1, account.id)
+                .setParameter(2, LinkType.establish)
+                .setParameter(3, GroupType.open).getResultList();
 	}
 
 	/**
@@ -179,50 +149,19 @@ public class GroupAccount extends BaseModel {
 		}
 		return true;
 	}
-
-    /**
-     * Retrieve Accounts from Group with given LinkType (transactional).
-     *
-     * @param group Group
-     * @param type Link Type
-     * @return List of accounts
-     */
-    public static List<Account> findAccountsByGroupTransactional(final Group group, final LinkType type) {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Account>>() {
-                @Override
-                public List<Account> apply() throws Throwable {
-                    return GroupAccount.findAccountsByGroup(group, type);
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
-    }
 	
 	/**
 	 * Retrieve Accounts from Group with given LinkType.
 	 */
 	public static List<Account> findAccountsByGroup(final Group group, final LinkType type) {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Account>>() {
-                @Override
-                public List<Account> apply() throws Throwable {
-                    @SuppressWarnings("unchecked")
-                    List<Account> accounts = (List<Account>) JPA
-                            .em()
-                            .createQuery(
-                                    "SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
-                            .setParameter(1, group.id).setParameter(2, type)
-                            .getResultList();
-                    return accounts;
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
+		@SuppressWarnings("unchecked")
+        List<Account> accounts = (List<Account>) JPA
+                .em()
+                .createQuery(
+                        "SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
+                .setParameter(1, group.id).setParameter(2, type)
+                .getResultList();
+        return accounts;
 	}
 
     /**
@@ -244,21 +183,4 @@ public class GroupAccount extends BaseModel {
 			return null;
 		}
 	}
-
-    /**
-     * Returns a group account by JPA transaction.
-     *
-     * @param account Account instance
-     * @param group Group instance
-     * @return Group account instance.
-     * @throws Throwable
-     */
-    public static GroupAccount findTransactional(final Account account, final Group group) throws Throwable {
-        return JPA.withTransaction(new F.Function0<GroupAccount>() {
-            @Override
-            public GroupAccount apply() throws Throwable {
-                return GroupAccount.find(account, group);
-            }
-        });
-    }
 }

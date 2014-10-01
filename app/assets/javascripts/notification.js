@@ -108,8 +108,8 @@ function WS() {
         }
 
         // update counter and eventually delete obsolete previous notifications
-        this.updateNewNotificationCounter(notifications);
-        this.deleteObsoleteNotifications(notifications);
+        this.updateNewNotificationCounter();
+        this.deleteObsoleteNotifications();
     };
 
     /**
@@ -117,16 +117,9 @@ function WS() {
      *
      * @param notifications
      */
-    this.updateNewNotificationCounter = function(notifications) {
+    this.updateNewNotificationCounter = function() {
         // count new/unread notifications
-        var unreadNotifications = 0;
-        for (var notificationIndex in notifications) {
-            if (notifications.hasOwnProperty(notificationIndex)) {
-                if (!notifications[notificationIndex].is_read) {
-                    unreadNotifications++;
-                }
-            }
-        }
+        var unreadNotifications = $('.unread').length;
 
         var notificationCounters = $('#hp-notifications-item').find('.badge');
         // if update counters

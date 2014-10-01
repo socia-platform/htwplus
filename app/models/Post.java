@@ -9,7 +9,6 @@ import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
-import play.libs.F;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
@@ -60,21 +59,15 @@ public class Post extends BaseNotifiable implements INotifiable {
 
 	@Override
 	public void delete() {
-        final Post self = this;
-        JPA.withTransaction(new F.Callback0() {
-            @Override
-            public void invoke() throws Throwable {
-                // delete all comments first
-                List<Post> comments = getCommentsForPost(self.id, 0, 0);
+		// delete all comments first
+        List<Post> comments = getCommentsForPost(this.id, 0, 0);
 
-                for (Post comment : comments) {
-                    comment.delete();
-                }
+        for (Post comment : comments) {
+            comment.delete();
+        }
 
-                Notification.deleteReferences(self);
-                JPA.em().remove(self);
-            }
-        });
+        Notification.deleteReferences(this);
+        JPA.em().remove(this);
 	}
 	
 	protected static Query limit(Query query, int limit, int offset) {
@@ -93,115 +86,43 @@ public class Post extends BaseNotifiable implements INotifiable {
 
 	@SuppressWarnings("unchecked")
 	public static List<Post> getPostsForGroup(final Group group, final int limit, final int page) {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Post>>() {
-                @Override
-                public List<Post> apply() throws Throwable {
-                    Query query = JPA.em()
-                            .createQuery("SELECT p FROM Post p WHERE p.group.id = ?1 ORDER BY p.createdAt DESC")
-                            .setParameter(1, group.id);
+		Query query = JPA.em()
+                .createQuery("SELECT p FROM Post p WHERE p.group.id = ?1 ORDER BY p.createdAt DESC")
+                .setParameter(1, group.id);
 
-                    int offset = (page * limit) - limit;
-                    query = limit(query, limit, offset);
+        int offset = (page * limit) - limit;
+        query = limit(query, limit, offset);
 
-                    return query.getResultList();
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
+        return query.getResultList();
 	}
 	
 	public static int countPostsForGroup(final Group group) {
-        try {
-            return JPA.withTransaction(new F.Function0<Integer>() {
-                @Override
-                public Integer apply() throws Throwable {
-                    return ((Number)JPA.em().createQuery("SELECT COUNT(p) FROM Post p WHERE p.group.id = ?1").setParameter(1, group.id).getSingleResult()).intValue();
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return 0;
-        }
+		return ((Number)JPA.em().createQuery("SELECT COUNT(p) FROM Post p WHERE p.group.id = ?1").setParameter(1, group.id).getSingleResult()).intValue();
 	}
 	
 	
 	@SuppressWarnings("unchecked")
 	public static List<Post> getCommentsForPost(final Long id, final int start, final int max) {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Post>>() {
-                @Override
-                public List<Post> apply() throws Throwable {
-                    return (List<Post>) JPA.em()
-                            .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
-                            .setParameter(1, id)
-                            .setFirstResult(start)
-                            .setMaxResults(max)
-                            .getResultList();
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
+		return (List<Post>) JPA.em()
+                .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
+                .setParameter(1, id)
+                .setFirstResult(start)
+                .setMaxResults(max)
+                .getResultList();
 	}
 
-    /**
-     * Method getCommentsForPostTransactional() JPA transactional.
-     *
-     * @param id ID of parent post
-     * @param start Comment start
-     * @param max Max comments
-     * @return List of Posts
-     */
-    public static List<Post> getCommentsForPostTransactional(final Long id, final int start, final int max) {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Post>>() {
-                @Override
-                public List<Post> apply() throws Throwable {
-                    return Post.getCommentsForPost(id, start, max);
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
-    }
-
-        @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
 	public static List<Post> findStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final boolean isVisitor, final int limit, final int offset) {
-        try {
-            return JPA.withTransaction(new F.Function0<List>() {
-                @Override
-                public List apply() throws Throwable {
-                    Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, isVisitor, " ORDER BY p.updatedAt DESC");
+        	Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, isVisitor, " ORDER BY p.updatedAt DESC");
 
-                    // set limit and offset
-                    query = limit(query, limit, offset);
-                    return query.getResultList();
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
+            // set limit and offset
+            query = limit(query, limit, offset);
+            return query.getResultList();
 	}
 	
 	public static int countStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final boolean isVisitor) {
-		try {
-            return JPA.withTransaction(new F.Function0<Integer>() {
-                @Override
-                public Integer apply() throws Throwable {
-                    final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, isVisitor,"");
-                    return ((Number) query.getSingleResult()).intValue();
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return 0;
-        }
+		final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, isVisitor,"");
+        return ((Number) query.getSingleResult()).intValue();
 	}
 	
 	/**
@@ -285,17 +206,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 	
 	public static int countCommentsForPost(final Long id) {
-        try {
-            return JPA.withTransaction(new F.Function0<Integer>() {
-                @Override
-                public Integer apply() throws Throwable {
-                    return ((Number)JPA.em().createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return 0;
-        }
+		return ((Number)JPA.em().createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
     }
 	
 	public int getCountComments() {
@@ -317,7 +228,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	public static List<Post> getStream(Account account, int limit, int page) {
 		// find friends and groups of given account
 		List<Account> friendList = Friendship.findFriends(account);
-		List<Group> groupList = GroupAccount.findEstablishedTransactional(account);
+		List<Group> groupList = GroupAccount.findEstablished(account);
 		
 		int offset = (page * limit) - limit;
 		return findStreamForAccount(account, groupList, friendList, false, limit, offset);
@@ -331,7 +242,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	public static int countStream(Account account){
 		// find friends and groups of given account
 		List<Account> friendList = Friendship.findFriends(account);
-		List<Group> groupList = GroupAccount.findEstablishedTransactional(account);
+		List<Group> groupList = GroupAccount.findEstablished(account);
 			
 		return countStreamForAccount(account, groupList, friendList, false);
 	}

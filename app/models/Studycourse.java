@@ -41,18 +41,7 @@ public class Studycourse extends BaseModel {
 
     @SuppressWarnings("unchecked")
     public static List<Studycourse> getAll() {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Studycourse>>() {
-                @Override
-                public List<Studycourse> apply() throws Throwable {
-                    return JPA.em().createQuery("FROM Studycourse ORDER BY title").getResultList();
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-
-        return null;
+    	return JPA.em().createQuery("FROM Studycourse ORDER BY title").getResultList();
     }
 
 }

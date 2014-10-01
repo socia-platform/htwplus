@@ -53,10 +53,51 @@ public class NotificationService {
     public void createNotification(final INotifiable notifiable) {
         // schedule async process in 0 second from now on
         Akka.system().scheduler().scheduleOnce(
-            Duration.create(0, TimeUnit.SECONDS),
-            new Runnable() {
-                // runs the Akka schedule
-                public void run() {
+                Duration.create(0, TimeUnit.SECONDS),
+                new NotificationRunnable(notifiable),
+                Akka.system().dispatcher()
+        );
+    }
+
+    /**
+     * Overloaded method createNotification() with notification type. The notification type
+     * is an important information for nearly every notification, as it determines the
+     * correct template and eventually also logic in methods like getRecipients() of the
+     * notification.
+     *
+     * @param notifiable Notifiable instance, to retrieve the required notification data
+     * @param notificationType Type of this notification
+     */
+    public void createNotification(INotifiable notifiable, final String notificationType) {
+        if (notifiable instanceof BaseNotifiable) {
+            ((BaseNotifiable)notifiable).type = notificationType;
+        }
+
+        this.createNotification(notifiable);
+    }
+
+    /**
+     * Sub-Class to implement a Runnable interface for notification creation.
+     */
+    public class NotificationRunnable implements Runnable {
+        private INotifiable notifiable;
+        private NotificationRunnable self;
+
+        /**
+         * Constructor.
+         *
+         * @param notifiable Notifiable instance, to retrieve the required notification data
+         */
+        public NotificationRunnable(final INotifiable notifiable) {
+            this.notifiable = notifiable;
+            this.self = this;
+        }
+
+        @Override
+        public void run() {
+            JPA.withTransaction(new F.Callback0() {
+                @Override
+                public void invoke() throws Throwable {
                     List<Account> recipients = notifiable.getRecipients();
 
                     // if no recipients, abort
@@ -86,16 +127,11 @@ public class NotificationService {
 
                             // persist notification using JPA.withTransaction, as we are not in the main
                             // execution context of play, but in Akka sub-system
-                            JPA.withTransaction(new F.Callback0() {
-                                @Override
-                                public void invoke() throws Throwable {
-                                    notification.create();
-                                }
-                            });
+                            notification.create();
 
                             Logger.info("Created new async Notification for User: " + recipient.id.toString());
-                            this.webSocketPush(notification);
-                            this.handleMail(notification);
+                            self.webSocketPush(notification);
+                            self.handleMail(notification);
                         } catch (Exception e) {
                             Logger.error("Could not render notification. Notification will not be stored in DB" +
                                             " nor will the user be notified in any way." + e.getMessage()
@@ -103,67 +139,49 @@ public class NotificationService {
                         }
                     }
                 }
-
-                /**
-                 * Pushes the new notification to the recipient if he is currently online.
-                 *
-                 * @param notification Notification
-                 */
-                private void webSocketPush(final Notification notification) {
-                    ActorRef recipientActor = WebSocketService.getInstance().getActorForAccountId(notification.recipient.id);
-
-                    // continue if recipientActor is instance (he is currently online)
-                    if (recipientActor != null) {
-                        ObjectNode node = WebSocketService.getInstance()
-                                .successResponseTemplate(WebSocketService.WS_METHOD_RECEIVE_NOTIFICATION);
-                        node.put("notification", notification.getAsJson());
-                        recipientActor.tell(Json.toJson(node), null);
-                    }
-                }
-
-                /**
-                 * Sends mail to recipient, if he wishes to be notified via mail immediately
-                 * and notification is currently unsent/unread.
-                 *
-                 * @param notification Notification
-                 */
-                private void handleMail(final Notification notification) {
-                    if (notification.recipient.emailNotifications == EmailNotifications.IMMEDIATELY_ALL
-                            && !notification.isSent
-                            && !notification.isRead
-                    ) {
-                        // schedule another for email handling async process in 0 second from now on
-                        Akka.system().scheduler().scheduleOnce(
-                            Duration.create(0, TimeUnit.SECONDS),
-                            new Runnable() {
-                                // runs the Akka schedule
-                                public void run() {
-                                    EmailService.getInstance().sendNotificationEmail(notification);
-                                }
-                            },
-                            Akka.system().dispatcher()
-                        );
-                    }
-                }
-            },
-            Akka.system().dispatcher()
-        );
-    }
-
-    /**
-     * Overloaded method createNotification() with notification type. The notification type
-     * is an important information for nearly every notification, as it determines the
-     * correct template and eventually also logic in methods like getRecipients() of the
-     * notification.
-     *
-     * @param notifiable Notifiable instance, to retrieve the required notification data
-     * @param notificationType Type of this notification
-     */
-    public void createNotification(INotifiable notifiable, final String notificationType) {
-        if (notifiable instanceof BaseNotifiable) {
-            ((BaseNotifiable)notifiable).type = notificationType;
+            });
         }
 
-        this.createNotification(notifiable);
+        /**
+         * Pushes the new notification to the recipient if he is currently online.
+         *
+         * @param notification Notification
+         */
+        public void webSocketPush(final Notification notification) {
+            ActorRef recipientActor = WebSocketService.getInstance().getActorForAccount(notification.recipient);
+
+            // continue if recipientActor is instance (he is currently online)
+            if (recipientActor != null) {
+                ObjectNode node = WebSocketService.getInstance()
+                        .successResponseTemplate(WebSocketService.WS_METHOD_RECEIVE_NOTIFICATION);
+                node.put("notification", notification.getAsJson());
+                recipientActor.tell(Json.toJson(node), null);
+            }
+        }
+
+        /**
+         * Sends mail to recipient, if he wishes to be notified via mail immediately
+         * and notification is currently unsent/unread.
+         *
+         * @param notification Notification
+         */
+        public void handleMail(final Notification notification) {
+            if (notification.recipient.emailNotifications == EmailNotifications.IMMEDIATELY_ALL
+                    && !notification.isSent
+                    && !notification.isRead
+                    ) {
+                // schedule another for email handling async process in 0 second from now on
+                Akka.system().scheduler().scheduleOnce(
+                        Duration.create(0, TimeUnit.SECONDS),
+                        new Runnable() {
+                            // runs the Akka schedule
+                            public void run() {
+                                EmailService.getInstance().sendNotificationEmail(notification);
+                            }
+                        },
+                        Akka.system().dispatcher()
+                );
+            }
+        }
     }
 }

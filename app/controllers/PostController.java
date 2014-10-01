@@ -69,12 +69,7 @@ public class PostController extends BaseController {
 					final Post post = filledForm.get();
 					post.owner = Component.currentAccount();
 					post.group = group;
-                    JPA.withTransaction(new F.Callback0() {
-                        @Override
-                        public void invoke() throws Throwable {
-                            post.create();
-                        }
-                    });
+					post.create();
                     NotificationService.getInstance().createNotification(post, Post.GROUP);
 				}
 			} else {
@@ -93,12 +88,7 @@ public class PostController extends BaseController {
 					final Post post = filledForm.get();
 					post.account = profile;
 					post.owner = account;
-                    JPA.withTransaction(new F.Callback0() {
-                        @Override
-                        public void invoke() throws Throwable {
-                            post.create();
-                        }
-                    });
+					post.create();
 					if (!account.equals(profile)) {
                         NotificationService.getInstance().createNotification(post, Post.PROFILE);
 					}
@@ -120,12 +110,7 @@ public class PostController extends BaseController {
 					final Post post = filledForm.get();
 					post.account = profile;
 					post.owner = account;
-                    JPA.withTransaction(new F.Callback0() {
-                        @Override
-                        public void invoke() throws Throwable {
-                            post.create();
-                        }
-                    });
+					post.create();
 				}
 				return redirect(controllers.routes.Application.stream(PAGE));
 			}
@@ -153,14 +138,9 @@ public class PostController extends BaseController {
 			final Post post = filledForm.get();
 			post.owner = account;
 			post.parent = parent;
-            JPA.withTransaction(new F.Callback0() {
-                @Override
-                public void invoke() throws Throwable {
-                    post.create();
-                    // update parent to move it to the top
-                    parent.update();
-                }
-            });
+			post.create();
+            // update parent to move it to the top
+            parent.update();
 			
 			if (parent.belongsToGroup()) {
 				// this is a comment in a group post
@@ -171,8 +151,7 @@ public class PostController extends BaseController {
 				if (!account.equals(parent.owner) && !parent.account.equals(parent.owner)) {
 					// this is a comment on a news stream post from another person
                     NotificationService.getInstance().createNotification(post, Post.COMMENT_OWN_PROFILE);
-                }
-				if (!account.equals(parent.account)) {
+                } else if (!account.equals(parent.account)) {
                     // this is a comment on a foreign news stream post
                     NotificationService.getInstance().createNotification(post, Post.COMMENT_PROFILE);
 				}				
@@ -187,9 +166,9 @@ public class PostController extends BaseController {
 		int max = Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
 		int count = Post.countCommentsForPost(id);
 		if (count <= max) {
-			return Post.getCommentsForPostTransactional(id, 0, count);
+			return Post.getCommentsForPost(id, 0, count);
 		} else {
-			return Post.getCommentsForPostTransactional(id, count-max, count);
+			return Post.getCommentsForPost(id, count-max, count);
 		}
 	}
 	
@@ -209,7 +188,7 @@ public class PostController extends BaseController {
 		if (count <= max) {
 			return ok(result);	
 		} else {
-			comments = Post.getCommentsForPostTransactional(id, 0, count-max);
+			comments = Post.getCommentsForPost(id, 0, count-max);
 			for (Post post : comments) {
 				result = result.concat(views.html.snippets.postComment.render(post).toString());
 			}

@@ -64,7 +64,7 @@ public class Secured extends Security.Authenticator {
 	 */
 	
 	public static boolean isMemberOfGroup(Group group, Account account){
-		return Group.isMemberTransactional(group, account);
+		return Group.isMember(group, account);
 	}
 	
 	public static boolean isOwnerOfGroup(Group group, Account account){
@@ -402,11 +402,11 @@ public class Secured extends Security.Authenticator {
 	
 	
 	public static boolean isOwnerOfAccount(final Long accountId) {
-		return Account.isOwnerTransactional(accountId, Component.currentAccount());
+		return Account.isOwner(accountId, Component.currentAccount());
 	}
 
 	public static boolean isFriend(Account account) {
-		return Friendship.alreadyFriendlyTransactional(Component.currentAccount(), account);
+		return Friendship.alreadyFriendly(Component.currentAccount(), account);
 	}
 
 	public static boolean editAccount(Account account) {

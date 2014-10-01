@@ -7,9 +7,6 @@ import models.GroupAccount;
 import models.Notification;
 import models.enums.LinkType;
 import models.services.TemplateService;
-import play.Logger;
-import play.db.jpa.JPA;
-import play.libs.F;
 
 import javax.persistence.Transient;
 import java.util.ArrayList;
@@ -78,7 +75,7 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      * @return List of account instances
      */
     public List<Account> getAsAccountList(Account account) {
-        List<Account> accounts = new ArrayList<Account>();
+        List<Account> accounts = new ArrayList<>();
         accounts.add(account);
 
         return accounts;
@@ -91,18 +88,7 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      * @return List of accounts of group
      */
     public List<Account> getGroupAsAccountList(final Group group) {
-        try {
-            return JPA.withTransaction(new F.Function0<List<Account>>() {
-                @Override
-                public List<Account> apply() throws Throwable {
-                    return GroupAccount.findAccountsByGroup(group, LinkType.establish);
-                }
-            });
-        } catch (Throwable ex) {
-            Logger.error("Could not get list of accounts by group \"" + group.getTitle()
-                    + "\", returning empty list: " + ex.getMessage());
-            return new ArrayList<Account>();
-        }
+    	return GroupAccount.findAccountsByGroup(group, LinkType.establish);
     }
 
     /**
@@ -112,7 +98,7 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      */
     public void addTemporaryRecipient(Account recipient) {
         if (this.temporaryRecipients == null) {
-            this.temporaryRecipients = new ArrayList<Account>();
+            this.temporaryRecipients = new ArrayList<>();
         }
 
         if (!this.temporaryRecipients.contains(recipient)) {

@@ -17,12 +17,12 @@ public class WebSocketActor extends UntypedActor {
     /**
      * Constructor, sets the web socket attributes.
      *
-     * @param accountId Current user ID of this context
+     * @param account Current user
      * @param in WebSocket input stream
      * @param out WebSocket output stream
      */
-    public WebSocketActor(Long accountId, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) {
-        this.account = Account.findByIdTransactional(accountId);
+    public WebSocketActor(Account account, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) {
+        this.account = account;
         this.in = in;
         this.out = out;
     }

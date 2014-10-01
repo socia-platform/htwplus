@@ -43,13 +43,8 @@ public class FriendshipController extends BaseController {
 			return redirect(controllers.routes.FriendshipController.index());
 		}
 		
-		final Friendship friendship = new Friendship(currentUser, potentialFriend, LinkType.request);
-        JPA.withTransaction(new F.Callback0() {
-            @Override
-            public void invoke() throws Throwable {
-                friendship.create();
-            }
-        });
+		Friendship friendship = new Friendship(currentUser, potentialFriend, LinkType.request);
+		friendship.create();
         NotificationService.getInstance().createNotification(friendship, Friendship.FRIEND_NEW_REQUEST);
 
         flash("success","Deine Einladung wurde verschickt!");
@@ -157,12 +152,12 @@ public class FriendshipController extends BaseController {
 			return true;
 		}
 		
-		if (Friendship.alreadyFriendlyTransactional(currentUser, potentialFriend)) {
+		if (Friendship.alreadyFriendly(currentUser, potentialFriend)) {
 			flash("info","Ihr seid bereits Freunde!");
 			return true;
 		}
 		
-		if (Friendship.alreadyRejectedTransactional(currentUser, potentialFriend)) {
+		if (Friendship.alreadyRejected(currentUser, potentialFriend)) {
 			flash("info","Deine Freundschaftsanfrage wurde bereits abgelehnt. "
 					+ "Bestätige die Ablehnung und dann kannst du es noch einmal versuchen.");
 			return true;
