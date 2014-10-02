@@ -49,7 +49,6 @@ import play.Logger;
 import play.data.validation.ValidationError;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
-import play.libs.F;
 
 @Indexed
 @Entity
@@ -129,7 +128,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 	}
 
 	public List<ValidationError> validate() {
-		List<ValidationError> errors = new ArrayList<ValidationError>();
+		List<ValidationError> errors = new ArrayList<>();
 		if (Group.findByTitle(this.title) != null) {
 			errors.add(new ValidationError("title", "error.title"));
 			return errors;
@@ -428,13 +427,7 @@ public class Group extends BaseNotifiable implements INotifiable {
                         GroupAccount groupAccount = GroupAccount.find(account, this);
                         if (!Group.isMember(this, account)
                                 && Friendship.alreadyFriendly(this.getSender(), account) && groupAccount == null) {
-                            final Group thisGroup = this;
-                            JPA.withTransaction(new F.Callback0() {
-                                @Override
-                                public void invoke() throws Throwable {
-                                    (new GroupAccount(account, thisGroup, LinkType.invite)).create();
-                                }
-                            });
+                            (new GroupAccount(account, this, LinkType.invite)).create();
                             recipients.add(account);
                         }
                     } catch (Throwable t) {
@@ -458,10 +451,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     @Override
     public String getTargetUrl() {
-        if (this.type.equals(Group.GROUP_REQUEST_SUCCESS)
-                || this.type.equals(Group.GROUP_NEW_MEDIA)
-                || this.type.equals(Group.GROUP_NEW_REQUEST)
-        ) {
+        if (this.type.equals(Group.GROUP_REQUEST_SUCCESS) || this.type.equals(Group.GROUP_NEW_MEDIA)) {
             return controllers.routes.GroupController.view(this.id, 1).toString();
         }
 
