@@ -1,4 +1,4 @@
-package models;
+package models.services;
 
 import models.enums.AccountRole;
 
@@ -17,9 +17,9 @@ import play.Play;
 import play.i18n.Messages;
 
 /**
- * LDAP Connector to establish LDAP connection and request user account data from directory.
+ * LDAP service to establish LDAP connection and request user account data from directory.
  */
-public class LDAPConnector {
+public class LdapService {
     /**
      * First name
      */
@@ -82,9 +82,14 @@ public class LDAPConnector {
     }
 
     /**
-     * Constructor.
+     * Singleton instance
      */
-    public LDAPConnector() {
+    private static LdapService instance = null;
+
+    /**
+     * Private constructor for singleton instance
+     */
+    private LdapService() {
         String server = Play.application().configuration().getString("ldap.server");
         int port = Integer.parseInt(Play.application().configuration().getString("ldap.port"));
         boolean startTls = Boolean.parseBoolean(Play.application().configuration().getString("ldap.startTls"));
@@ -95,6 +100,19 @@ public class LDAPConnector {
         connectionConfig.setUseTls(startTls);
 
         this.connection = new LdapNetworkConnection(connectionConfig);
+    }
+
+    /**
+     * Returns the singleton instance.
+     *
+     * @return NotificationHandler instance
+     */
+    public static LdapService getInstance() {
+        if (LdapService.instance == null) {
+            LdapService.instance = new LdapService();
+        }
+
+        return LdapService.instance;
     }
 
     /**

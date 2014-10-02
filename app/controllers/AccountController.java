@@ -5,7 +5,7 @@ import static play.data.Form.form;
 import java.util.Random;
 
 import models.Account;
-import models.LDAPConnector;
+import models.services.LdapService;
 import models.enums.AccountRole;
 import models.Login;
 import play.Logger;
@@ -41,7 +41,7 @@ public class AccountController extends BaseController {
 			flash("error", Messages.get("authenticate.matriculationNumberMissing"));
 			return badRequest(index.render());
 		} else {
-			return LDAPAuthenticate();
+			return LdapAuthenticate();
 		}
 	}
 
@@ -50,7 +50,7 @@ public class AccountController extends BaseController {
      *
      * @return Result
      */
-	private static Result LDAPAuthenticate() {
+	private static Result LdapAuthenticate() {
 		Form<Login> form = form(Login.class).bindFromRequest();
 		String matriculationNumber = form.field("email").value();
 		String password = form.field("password").value();
@@ -60,10 +60,10 @@ public class AccountController extends BaseController {
 		matriculationNumber = matriculationNumber.trim().toLowerCase();
 
         // establish LDAP connection and try to get user data
-		LDAPConnector ldap = new LDAPConnector();
+		LdapService ldap = LdapService.getInstance();
 		try {
 			ldap.connect(matriculationNumber, password);
-		} catch (LDAPConnector.LdapConnectorException e) {
+		} catch (LdapService.LdapConnectorException e) {
 			flash("error", e.getMessage());
 			Component.addToContext(Component.ContextIdent.loginForm, form);
 			return badRequest(index.render());

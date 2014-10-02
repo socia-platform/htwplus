@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.Account;
 import models.Friendship;
 import models.actors.WebSocketActor;
-import models.base.IJsonNodeSerializable;
 import play.Logger;
 import play.db.jpa.JPA;
 import play.libs.Akka;
@@ -26,6 +25,7 @@ public class WebSocketService {
     public static final String WS_METHOD_SEND_CHAT = "SendChat";
     public static final String WS_METHOD_RECEIVE_CHAT = "ReceiveChat";
     public static final String WS_METHOD_RECEIVE_NOTIFICATION = "ReceiveNotification";
+    public static final String WS_METHOD_RECEIVE_PING = "Ping";
     public static final String WS_RESPONSE_OK = "OK";
     public static final String WS_RESPONSE_ERROR = "ERROR";
 
@@ -128,22 +128,6 @@ public class WebSocketService {
     }
 
     /**
-     * Returns a List of ObjectNode instances by a list of IJsonNodeSerializable implementing instances.
-     *
-     * @param serializableList List of IJsonNodeSerializable implementing instances
-     * @return List of ObjectNode instances
-     */
-    @SuppressWarnings("unused")
-    public List<ObjectNode> getJsonList(List<? extends IJsonNodeSerializable> serializableList) {
-        List<ObjectNode> jsonList = new ArrayList<>(serializableList.size());
-        for (IJsonNodeSerializable serializable : serializableList) {
-            jsonList.add(serializable.getAsJson());
-        }
-
-        return jsonList;
-    }
-
-    /**
      * Handles a WebSocket message
      *
      * @param account Account
@@ -208,12 +192,12 @@ public class WebSocketService {
      * @return ObjectNode instance
      */
     public ObjectNode successResponseTemplate(String method) {
-        ObjectNode node = Json.newObject();
-        node.put("method", method);
-        node.put("code", WebSocketService.WS_RESPONSE_OK);
-        node.put("time", (new Date()).getTime());
+        Map<String, Object> map = new HashMap<>();
+        map.put("method", method);
+        map.put("code", WebSocketService.WS_RESPONSE_OK);
+        map.put("time", new Date());
 
-        return node;
+        return JsonService.getInstance().getObjectNodeFromMap(map);
     }
 
     /**
@@ -258,6 +242,18 @@ public class WebSocketService {
     }
 
     /**
+     * WebSocket method Ping for testing purposes.
+     *
+     * @param wsMessage WebSocket message as JsonNode object
+     * @param senderActor Sending actor
+     * @param sender Sending account
+     * @return WebSocket response
+     */
+    private JsonNode wsPing(JsonNode wsMessage, ActorRef senderActor, Account sender) {
+        return Json.toJson("Pong");
+    }
+
+    /**
      * WebSocket method when sending chat.
      *
      * @param wsMessage WebSocket message as JsonNode object
@@ -265,7 +261,6 @@ public class WebSocketService {
      * @param sender Sending account
      * @return WebSocket response
      */
-    @SuppressWarnings("unused")
     private JsonNode wsSendChat(JsonNode wsMessage, ActorRef senderActor, Account sender) {
         // validate given parameters
         if (!wsMessage.has("recipient") || !wsMessage.has("text")) {
@@ -315,7 +310,6 @@ public class WebSocketService {
      * @param sender Sending account
      * @return WebSocket response
      */
-    @SuppressWarnings("unused")
     private JsonNode wsReceiveChat(JsonNode wsMessage, ActorRef senderActor, Account sender) {
         return wsMessage;
     }
@@ -328,7 +322,6 @@ public class WebSocketService {
      * @param sender Sending account
      * @return WebSocket response
      */
-    @SuppressWarnings("unused")
     private JsonNode wsReceiveNotification(JsonNode wsMessage, ActorRef senderActor, Account sender) {
         return wsMessage;
     }

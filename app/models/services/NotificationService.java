@@ -129,7 +129,7 @@ public class NotificationService {
                             // execution context of play, but in Akka sub-system
                             notification.create();
 
-                            Logger.info("Created new async Notification for User: " + recipient.id.toString());
+                            Logger.info("Created new Notification for User: " + recipient.id.toString());
                             self.webSocketPush(notification);
                             self.handleMail(notification);
                         } catch (Exception e) {
