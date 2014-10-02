@@ -51,18 +51,55 @@
 
         <div id="hp-features" class="hp-section row">
             <div class="col-xs-12 col-sm-10 col-sm-offset-1">
-                <!-- single feature -->
-                <div class="row">
-                    <div class="col-xs-12 col-md-5">
-                        @views.html.snippets.notepad{
-                            <h3>Hello World!</h3>
-                        }
-                    </div>
-                    <div class="col-xs-12 col-md-7">
-                        <h2>First Feature</h2>
-                        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                    </div>
-                </div>
+
+                <!-- Login -->
+                @views.html.snippets.feature("Anmeldung",
+                    "Legt sofort los und nutzt alle Vorteil von HTWplus! Als Studierender oder Mitarbeiter der HTW-Berlin hast du die Möglichkeit, dich direkt ganz bequem mit deinem Hochschul-Account anzumelden.") {
+                <h3>Hello World!</h3>
+                }
+
+                <!-- Profile -->
+                @views.html.snippets.feature("Profil",
+                    "Nach der ersten Anmeldung wird automatisch dein ganz persönliches Profil angelegt und bereits durch deinen Vor- und Nachname ergänzt. Natürlich kannst du anschließend dein Profil auch bearbeiten und beispielsweise eine E-Mail Adresse hinterlegen oder einen anderes Profilbild festlegen.") {
+                <h3>Hello World!</h3>
+                }
+
+                <!-- Newsstream -->
+                @views.html.snippets.feature("Newsstream",
+                    "Die erste Anlaufstelle ist dein persönlicher Newsstream. Wie üblich erfolgt die Kommunikation bei HTWplus über Posts und dazugehörige Kommentare. Auf deinem Newsstream kannst du nun Posts zu Themen verfassen, die dich vielleicht aktuell bewegen. Diese können anschließend von anderen HTWplus Nutzern gelsesen und kommentiert werden.  Weiterhin werden dir auf deinem Newsstream unter anderem neue Posts und Kommentare aus Gruppen und Kursen angezeigt, in denen du Mitglied bist.") {
+                <h3>Hello World!</h3>
+                }
+
+                <!-- Groups -->
+                @views.html.snippets.feature("Gruppen",
+                    "Koordiniert und organisiert eure Arbeiten an Gemeinschaftsprojekten oder bereitet euch kollektiv auf Vorlesungen, Übungen und Klausuren vor. In HTWplus hat dazu jeder die Möglichkeit, private und öffentliche Gruppen zu erstellen oder bestehenden beizutreten und sich an Gesprächen oder Diskussionen zu beteiligen.") {
+                <h3>Hello World!</h3>
+                }
+
+                <!-- Courses -->
+                @views.html.snippets.feature("Kurse",
+                    "Mitarbeiter bzw. Dozenten können zusätzlich Kurse erstellen und darüber teilnehmende Studierende beispielsweise über organisatorische Aspekte ihrer Vorlesungen informieren. Beim Anlegen wird ein sogenannter Token festgelegt, der benötigt wird, um an bestehenden Kursen teilzunehmen.") {
+                <h3>Hello World!</h3>
+                }
+
+                <!-- File management -->
+                @views.html.snippets.feature("Dateiverwaltung",
+                    "Sowohl in euren beigetretenen Gruppen als auch Kursen könnt ihr Dateien hochlanden und somit anderen Mitgliedern zur Verfügung stellen. Damit lassen sich beliebige Dokumente wie Vorlesungsskripte oder Notizen bequem verteilen, ohne auf andere Dienste angewiesen zu sein.") {
+                <h3>Hello World!</h3>
+                }
+
+                <!-- Friends -->
+                @views.html.snippets.feature("Freunde",
+                    "Wie es sich für ein soziales Netzwerk gehört, kannst du auch bei HTWplus Bekanntschaft mit Kommilitonen aber auch Dozenten schließen. So ist es euch möglich, gegenseitig eure Newsstreams zu lesen, Gruppeneinladungen auszusprechen und vieles mehr.") {
+                <h3>Hello World!</h3>
+                }
+
+                <!-- Notifications -->
+                @views.html.snippets.feature("Benachrichtigungen",
+                    "Damit entgeht dir nichts, was bei HTWplus passiert! Ob neue Posts, Kommentare, Freundschaftsanfragen oder Gruppeneinladungen - du wirst über alles informiert. Je nach Wunsch kannst du dich auch per E-Mail über Neuigkeiten automatisch benachrichtigen lassen.") {
+                <h3>Hello World!</h3>
+                }
+
             </div>
         </div>
 

@@ -206,6 +206,21 @@ body#hp-landingpage {
 	min-height: 500px;
 }
 
+#hp-landingpage div#hp-features .hp-feature-picture .hp-notepad-content {
+	min-height: inherit;
+}
+
+#hp-landingpage div#hp-features .hp-feature-text {
+	margin-top: 55px;
+}
+
+#hp-landingpage div#hp-features .hp-feature-description {
+	line-height: 1.5;
+	font-family: 'Swanky and Moo Moo', cursive;
+	font-style: italic;
+	margin-top: 30px;
+}
+
 #hp-landingpage div#hp-team {
 	min-height: 500px;
 }
@@ -437,7 +452,7 @@ dt.email-notifications {
 
 /*============================== Notepad ==============================*/
 
-div#hp-right {
+div.hp-notepad-right {
 	position: relative;
 	background-image: url(../images/vertical.png);
 	background-repeat: repeat-y;
@@ -447,13 +462,13 @@ div#hp-right {
 }
 
 @media (max-width: 767px) {
-    div#hp-right  {
+    div.hp-notepad-right  {
         margin-right: -25px;
         margin-left: -49px;
     }
 }
 
-div#hp-topRight {
+div.hp-notepad-topRight {
 	width: 48px;
 	height: 15px;
 	position: absolute;
@@ -464,7 +479,7 @@ div#hp-topRight {
 	background-position: -50px -15px;
 }
 
-div#hp-bottomRight {
+div.hp-notepad-bottomRight {
 	width: 48px;
 	height: 22px;
 	position: absolute;
@@ -475,14 +490,14 @@ div#hp-bottomRight {
 	background-position: -50px -30px;
 }
 
-div#hp-left {
+div.hp-notepad-left {
 	margin-right: 24px;
 	background-image: url(../images/vertical.png);
 	background-repeat: repeat-y;
 	background-position: 0px 15px;
 }
 
-div#hp-topLeft {
+div.hp-notepad-topLeft {
 	width: 50px;
 	height: 15px;
 	vertical-align: top;
@@ -494,7 +509,7 @@ div#hp-topLeft {
 	background-position: 0px -15px;
 }
 
-div#hp-bottomLeft {
+div.hp-notepad-bottomLeft {
 	width: 50px;
 	height: 22px;
 	position: absolute;
@@ -505,7 +520,7 @@ div#hp-bottomLeft {
 	background-position: 0px -30px;
 }
 
-div#hp-top {
+div.hp-notepad-top {
 	margin-left: 50px;
 	padding-top: 15px;
 	background-image: url(../images/backgrounds.png);
@@ -513,14 +528,14 @@ div#hp-top {
 	background-position: 0px top;
 }
 
-div#hp-bottom {
+div.hp-notepad-bottom {
 	padding-bottom: 22px;
 	background-image: url(../images/backgrounds.png);
 	background-repeat: repeat-x;
 	background-position: 0px bottom;
 }
 
-div#hp-content {
+div.hp-notepad-content {
 	min-height: 500px;
 	padding: 5px 30px 0;
 	background-color: white;
@@ -530,7 +545,7 @@ div#hp-content {
 }
 
 @media (max-width: 767px) {
-    div#hp-content {
+    div.hp-notepad-content {
         padding-right: 5px;
         padding-left: 5px;
     }

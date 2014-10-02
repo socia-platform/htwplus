@@ -1,21 +1,12 @@
-function getCurrentStyle (element, cssPropertyName) {
-   if (window.getComputedStyle) {
-     return window.getComputedStyle(element, '').getPropertyValue(cssPropertyName.replace(/([A-Z])/g, "-$1").toLowerCase());
-   }
-   else if (element.currentStyle) {
-     return element.currentStyle[cssPropertyName];
-   }
-   else {
-     return '';
-   }
-}
 
 function resizeRings() {
-	var offset = ($("#hp-content").height() + parseInt($("#hp-content").css('padding-top'))) % 12.0;
-	if (offset != 0)
-		$("#hp-content").css('padding-bottom', (12.0 - offset) + "px");
-	else
-		$("#hp-content").css('padding-bottom', '0');
+	$('.hp-notepad-content').each(function() {
+		var offset = ($(this).height() + parseInt($(this).css('padding-top'))) % 12.0;
+		if (offset != 0)
+			$(this).css('padding-bottom', (12.0 - offset) + "px");
+		else
+			$(this).css('padding-bottom', '0');
+	});
 }
 
 function toggleMediaSelection(parent) {
@@ -178,13 +169,12 @@ $(document).ready(function () {
 	});
 
 	autolinkUrls();
+	resizeRings();
 });
 
 $(window).resize(function() {
 	resizeRings();
 });
-
-resizeRings();
 
 $('[rel="tooltip"]').tooltip();
 $('[rel="popover"]').popover();
