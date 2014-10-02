@@ -241,6 +241,7 @@ public class GroupController extends BaseController {
 		}
 	}
 
+    @Transactional
 	public static Result join(long id) {
 		Account account = Component.currentAccount();
 		Group group = Group.findById(id);
@@ -328,6 +329,7 @@ public class GroupController extends BaseController {
      * @param accountId Account ID
      * @return Result
      */
+    @Transactional
 	public static Result acceptRequest(long groupId, long accountId){
 		Account account = Account.findById(accountId);
 		Group group = Group.findById(groupId);
@@ -362,6 +364,7 @@ public class GroupController extends BaseController {
      * @param accountId Account ID
      * @return Result
      */
+    @Transactional
 	public static Result declineRequest(long groupId, long accountId){
 		Account account = Account.findById(accountId);
 		Group group = Group.findById(groupId);
@@ -383,13 +386,15 @@ public class GroupController extends BaseController {
 
 		return redirect(controllers.routes.GroupController.index());
 	}
-	
+
+    @Transactional
 	public static Result invite(long groupId) {
 		Group group = Group.findById(groupId);
 		Navigation.set(Level.GROUPS, "Freunde einladen", group.title, controllers.routes.GroupController.view(group.id, PAGE));
 		return ok(invite.render(group, Friendship.friendsToInvite(Component.currentAccount(), group), GroupAccount.findAccountsByGroup(group, LinkType.invite)));
 	}
-	
+
+    @Transactional
 	public static Result inviteMember(long groupId) {
 		Group group = Group.findById(groupId);
 		Account currentUser = Component.currentAccount();
