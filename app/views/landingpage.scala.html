@@ -61,13 +61,112 @@
                 <!-- Profile -->
                 @views.html.snippets.feature("Profil",
                     "Nach der ersten Anmeldung wird automatisch dein ganz persönliches Profil angelegt und bereits durch deinen Vor- und Nachname ergänzt. Natürlich kannst du anschließend dein Profil auch bearbeiten und beispielsweise eine E-Mail Adresse hinterlegen oder einen anderes Profilbild festlegen.") {
-                <h3>Hello World!</h3>
+                <h2>Max Mustermann</h2>
+                <br>
+                <img alt="avatar" src="/assets/images/avatars/a11.png" class="img-thumbnail">
+                <br>
+                <br>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th style="width:30%;">E-Mail</th>
+                            <td style="width:70%;">max@@mustermann.de</td>
+                        </tr>
+                        <tr>
+                            <th>Studiengang</th>
+                            <td>Angewandte Informatik</td>
+                        </tr>
+                        <tr>
+                            <th>Semester</th>
+                            <td>1. Semester</td>
+                        </tr>
+                        <tr>
+                            <th>Abschluss</th>
+                            <td>Bachelor</td>
+                        </tr>
+                        <tr>
+                            <th>Rolle</th>
+                            <td>Student</td>
+                        </tr>
+                    </tbody>
+                </table>
                 }
 
                 <!-- Newsstream -->
                 @views.html.snippets.feature("Newsstream",
                     "Die erste Anlaufstelle ist dein persönlicher Newsstream. Wie üblich erfolgt die Kommunikation bei HTWplus über Posts und dazugehörige Kommentare. Auf deinem Newsstream kannst du nun Posts zu Themen verfassen, die dich vielleicht aktuell bewegen. Diese können anschließend von anderen HTWplus Nutzern gelsesen und kommentiert werden.  Weiterhin werden dir auf deinem Newsstream unter anderem neue Posts und Kommentare aus Gruppen und Kursen angezeigt, in denen du Mitglied bist.") {
-                <h3>Hello World!</h3>
+                <h1>Mein Newsstream</h1><br>
+
+                <form action="" method="" class="hp-post-form" id="addPost">
+                    <div class="hp-horizontal-form col-xs-12">
+                        <div class="input-group">
+                            <dl class=" " id="hp-new-post-content_field">
+                                <dt><label for="hp-new-post-content">Content</label></dt>
+                                <dd><textarea id="hp-new-post-content" name="Content" class="form-control" placeholder="Erstelle einen neuen Post..."></textarea></dd>
+                            </dl>
+                            <span class="input-group-btn">
+                                <button type="button" href="javascript:;" class="btn btn-warning">Posten</button>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+                <br>
+
+                <div class="well">
+                    <div class="media">
+                        <a class="pull-left" href="javascript:;"><img alt="avatar" src="/assets/images/avatars/a11.png" class="hp-avatar"></a>
+                        <div class="media-body">
+                            <h4 class="media-heading">
+                                <a href="javascript:;" data-placement="top" data-original-title="Max Mustermann" data-content="Rolle: Student" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                    Max Mustermann</a>
+                                schrieb in <a href="javascript:;">Immatrikulationsfeier</a>
+                                <a href="javascript:;" data-toggle="modal" rel="tooltip" data-original-title="Post löschen">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </a>
+                            </h4>
+                            <small>01.04.2014 13:37</small>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="hp-truncate hp-white-space">Thema WebSockets &amp; Apache 2.2</div>
+                    <hr>
+                    <div class="hp-comments">
+                        <div class="media">
+                            <a class="pull-left" href="javascript:;">
+                                <img alt="avatar" src="/assets/images/avatars/a22.png" class="hp-avatar">
+                            </a>
+                            <div class="media-body">
+                                <h5 class="media-heading">
+                                    <a href="javascript:;" data-placement="top" data-original-title="Kevin Bernum" data-content="Rolle: Student <br /> Studiengang: Angewandte Informatik" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                        Kevin Bernum</a>
+                                    <small>(01.04.2014 13:38)</small>
+                                    <a href="javascript:;" data-toggle="modal" rel="tooltip" data-original-title="Post löschen">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </h5>
+                                <div class="hp-truncate hp-white-space" id="6952">Geil...wiedermal super Einsatz! :-)</div>
+                            </div>
+                        </div>
+
+                        <form action="" method="" class="hp-comment-form">
+                            <div class="hp-horizontal-form col-xs-12">
+                                <div class="input-group">
+                                    <dl class=" " id="hp-new-comment-content_field">
+                                        <dt><label for="hp-new-comment-content">Content</label></dt>
+                                        <dd>
+                                            <textarea id="hp-new-comment-content" name="Content" class="form-control" placeholder="Erstelle ein Kommentar..."></textarea>
+                                        </dd>
+                                    </dl>
+                                    <span class="input-group-btn">
+                                        <button type="button" href="javascript:;" class="btn btn-sm btn-warning commentSubmit">Kommentieren</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="clear"></div>
+                </div>
                 }
 
                 <!-- Groups -->
