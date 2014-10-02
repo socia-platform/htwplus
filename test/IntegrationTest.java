@@ -11,8 +11,10 @@ import java.io.File;
 import static play.test.Helpers.*;
 import static org.fest.assertions.Assertions.*;
 
+/**
+ * Simple integration test.
+ */
 public class IntegrationTest {
-
     /**
      * add your integration test here
      * in this example we just check if the welcome page is being shown
@@ -22,10 +24,12 @@ public class IntegrationTest {
         Config config = ConfigFactory.parseFile(new File("conf/application.conf"));
         Configuration additionalConfigurations = new Configuration(config);
 
-        running(testServer(3333, fakeApplication(additionalConfigurations.asMap())), HTMLUNIT, browser -> {
-            browser.goTo("http://localhost:3333");
-            assertThat(browser.pageSource()).contains("Anmelden");
+        running(testServer(3333, fakeApplication(additionalConfigurations.asMap())), HTMLUNIT, new Callback<TestBrowser>() {
+            @Override
+            public void invoke(TestBrowser browser) throws Throwable {
+                browser.goTo("http://localhost:3333");
+                assertThat(browser.pageSource()).contains("Anmelden");
+            }
         });
     }
-
 }

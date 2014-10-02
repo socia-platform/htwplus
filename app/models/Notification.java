@@ -171,6 +171,19 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
     }
 
     /**
+     * Returns a specific notification by its rendered content.
+     *
+     * @param renderedContent Rendered content to select
+     * @return Notification instance
+     */
+    public static List<Notification> findByRenderedContent(String renderedContent) throws NoResultException {
+        return JPA.em()
+                .createQuery("FROM Notification n WHERE n.rendered = :renderedContent", Notification.class)
+                .setParameter("renderedContent", renderedContent)
+                .getResultList();
+    }
+
+    /**
      * Counts all notifications for an account ID.
      *
      * @param accountId User account ID

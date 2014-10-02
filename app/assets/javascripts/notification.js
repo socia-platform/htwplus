@@ -116,8 +116,6 @@ function WS() {
 
     /**
      * Updates the new notification counter.
-     *
-     * @param notifications
      */
     this.updateNewNotificationCounter = function() {
         // count new/unread notifications
