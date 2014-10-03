@@ -417,35 +417,16 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     @Override
     public List<Account> getRecipients() {
-        List<Account> recipients = new ArrayList<>();
         switch (this.type) {
-            case Group.GROUP_INVITATION:
-                // this is a group invitation, all selected people will be notified
-                for (String accountId : inviteList) {
-                    try {
-                        final Account account = Account.findById(Long.parseLong(accountId));
-                        GroupAccount groupAccount = GroupAccount.find(account, this);
-                        if (!Group.isMember(this, account)
-                                && Friendship.alreadyFriendly(this.getSender(), account) && groupAccount == null) {
-                            (new GroupAccount(account, this, LinkType.invite)).create();
-                            recipients.add(account);
-                        }
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
-                }
-
-                return recipients;
             case Group.GROUP_NEW_REQUEST:
                 // group entry request notification, notify the owner of the group
                 return this.getAsAccountList(this.owner);
             case Group.GROUP_NEW_MEDIA:
                 // new media available in group, whole group must be notified
-                final Group currentGroup = this;
-                return GroupAccount.findAccountsByGroup(currentGroup, LinkType.establish);
+                return GroupAccount.findAccountsByGroup(this, LinkType.establish);
         }
 
-        // this is a request accept or decline notification, notify the requester
+        // this is an invitation, a request accept or decline notification, notify the temporaryRecipients
         return this.temporaryRecipients;
     }
 
