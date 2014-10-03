@@ -62,7 +62,7 @@
 						</td>
 						<td>@if(accountGroup.linkType.equals(models.enums.LinkType.reject)) {abgelehnt} else {in Bearbeitung}</td>
 						<td class="hp-optionsMenu">
-                            @views.html.Group.snippets.inviteOptionMenu(accountGroup)
+                            @views.html.Group.snippets.inviteOptionMenu(accountGroup, user)
                         </td>
 					} else {
 						<td><span class="glyphicon glyphicon-lock"></span></td>
@@ -70,7 +70,7 @@
 						<td>@views.html.snippets.userLink(accountGroup.account)</td>
 						<td>zu bearbeiten</td>
 						<td class="hp-optionsMenu">
-                            @views.html.Group.snippets.inviteOptionMenu(accountGroup)
+                            @views.html.Group.snippets.inviteOptionMenu(accountGroup, user)
                         </td>
 					}
 				</tr>

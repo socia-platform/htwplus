@@ -59,7 +59,7 @@
 		<span rel="tooltip" data-original-title="Hier findest du alle Personen, mit denen du befreundet bist." data-delay="500">Meine Freunde</span>
 	</h2>
 	
-	@if(!friends.isEmpty()) {
+	@if(!friends.isEmpty) {
 	
 		<!-- list all found persons -->
 		@views.html.snippets.listAccounts(friends)

@@ -74,9 +74,11 @@ GET		/media/:id							controllers.MediaController.view(id:Long)
 GET 	/media/:id/delete					controllers.MediaController.delete(id:Long)
 
 #Notification
-GET		/notification/delete				controllers.NotificationController.deleteAll()
-GET		/notification/view					controllers.NotificationController.viewAjax()
-GET		/notification/:id					controllers.NotificationController.forward(id:Long,url:String)
+GET     /notification                       controllers.NotificationController.showAll(page: Integer ?= 1)
+GET		/notification/:id					controllers.NotificationController.forward(id:Long)
+
+# WebSocket
+GET     /websocket                          controllers.WebSocketController.webSocket()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               		controllers.Assets.at(path="/public", file)
@@ -88,6 +90,9 @@ POST	/admin/user/create					controllers.AdminController.createAccount()
 GET		/admin/user/list					controllers.AdminController.listAccounts()
 GET		/admin/media/						controllers.AdminController.viewMediaTemp()
 GET		/admin/media/clean					controllers.AdminController.cleanMediaTemp()
+GET     /admin/broadcast_notification       controllers.AdminController.broadcastNotificationForm()
+POST    /admin/broadcast_notification       controllers.AdminController.broadcastNotification()
+
 
 # No route found? take this
 GET     /*path                  			controllers.Application.defaultRoute(path: String)

@@ -1,10 +1,7 @@
 package controllers;
 
-import models.Account;
-import models.Friendship;
-import models.Post;
-import models.Studycourse;
-import models.enums.AccountRole;
+import models.*;
+import models.enums.EmailNotifications;
 import play.Play;
 import play.data.Form;
 import play.db.jpa.Transactional;
@@ -23,14 +20,13 @@ public class ProfileController extends BaseController {
 	static Form<Account> accountForm = Form.form(Account.class);
 	static Form<Post> postForm = Form.form(Post.class);
 	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
-	static final int PAGE = 1;
 
 	public static Result me() {
 		Navigation.set(Level.PROFILE,"Ich");
 		Account account = Component.currentAccount();
 		if (account == null) {
 			flash("info", "Diese Person gibt es nicht.");
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		} else {
 			return ok(index.render(account, postForm));
 			// return ok(index.render(account));
@@ -42,12 +38,12 @@ public class ProfileController extends BaseController {
 
 		if (account == null) {
 			flash("info", "Diese Person gibt es nicht.");
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		} else {
 			if(Secured.isFriend(account)) {
-				Navigation.set(Level.FRIENDS, "Profil", account.name, routes.ProfileController.view(account.id));
+				Navigation.set(Level.FRIENDS, "Profil", account.name, controllers.routes.ProfileController.view(account.id));
 			} else {
-				Navigation.set(Level.USER, "Profil", account.name, routes.ProfileController.view(account.id));
+				Navigation.set(Level.USER, "Profil", account.name, controllers.routes.ProfileController.view(account.id));
 			}
 	
 			return ok(index.render(account, postForm));
@@ -55,20 +51,21 @@ public class ProfileController extends BaseController {
 		}
 	}
 
+    @Transactional
 	public static Result stream(Long accountId, int page) {
 		Account account = Account.findById(accountId);
 		Account currentUser = Component.currentAccount();
 		
 		if (account == null) {
 			flash("info", "Diese Person gibt es nicht.");
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		}
 
 		if (currentUser.equals(account)) {
 			Navigation.set(Level.PROFILE, "Newsstream");
 		} else {
 			Navigation.set(Level.FRIENDS, "Newsstream", account.name,
-					routes.ProfileController.view(account.id));
+                    controllers.routes.ProfileController.view(account.id));
 		}
 
 		// case for friends and own profile
@@ -79,7 +76,7 @@ public class ProfileController extends BaseController {
 		}
 		// case for visitors
 		flash("info", "Du kannst nur den Stream deiner Freunde betrachten!");
-		return redirect(routes.ProfileController.view(accountId));
+		return redirect(controllers.routes.ProfileController.view(accountId));
 	}
 
 	public static Result editPassword(Long id) {
@@ -87,11 +84,11 @@ public class ProfileController extends BaseController {
 		
 		if (account == null) {
 			flash("info", "Diese Person gibt es nicht.");
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		}
 		// Check Access
 		if(!Secured.editAccount(account)) {
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		}
 		
 		Navigation.set(Level.PROFILE, "Editieren");
@@ -103,7 +100,7 @@ public class ProfileController extends BaseController {
 		Account account = Account.findById(id);
 		if (account == null) {
 			flash("info", "Diese Person gibt es nicht.");
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		}
 		
 		// Create error switch
@@ -111,7 +108,7 @@ public class ProfileController extends BaseController {
 		
 		// Check Access
 		if(!Secured.editAccount(account)) {
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		}
 		
 		// Get data from request
@@ -161,22 +158,28 @@ public class ProfileController extends BaseController {
 			account.update();
 			flash("success", "Passwort erfolgreich geändert.");
 		}
-		return redirect(routes.ProfileController.me());
+		return redirect(controllers.routes.ProfileController.me());
 	}
 
 	public static Result edit(Long id) {
 		Account account = Account.findById(id);
 		if (account == null) {
 			flash("info", "Diese Person gibt es nicht.");
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		}
 		
 		// Check Access
 		if(!Secured.editAccount(account)) {
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		}
-		
-		Navigation.set(Level.PROFILE, "Editieren");
+
+        try {
+            Notification.findUsersWithDailyHourlyEmailNotifications();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
+        Navigation.set(Level.PROFILE, "Editieren");
 		return ok(edit.render(account, accountForm.fill(account)));
 	}
 
@@ -185,12 +188,12 @@ public class ProfileController extends BaseController {
 		Account account = Account.findById(id);
 		if (account == null) {
 			flash("info", "Diese Person gibt es nicht.");
-			return redirect(routes.Application.index());
+			return redirect(controllers.routes.Application.index());
 		}
 		
 		// Check Access
-		if(!Secured.editAccount(account)) {
-			return redirect(routes.Application.index());
+		if (!Secured.editAccount(account)) {
+			return redirect(controllers.routes.Application.index());
 		}
 		
 		// Get the data from the request
@@ -212,7 +215,7 @@ public class ProfileController extends BaseController {
 		}
 		
 		// Perform JPA Validation
-		if(filledForm.hasErrors()) {
+		if (filledForm.hasErrors()) {
 			return badRequest(edit.render(account, filledForm));
 		} else {
 
@@ -220,13 +223,13 @@ public class ProfileController extends BaseController {
 			// because the its just a partial form
 			account.avatar = filledForm.field("avatar").value();
 			
-			if(!((String)filledForm.field("email").value()).isEmpty()){
+			if (!filledForm.field("email").value().isEmpty()) {
 				account.email = filledForm.field("email").value();
 			} else {
 				account.email = null;
 			}
 
-			if(filledForm.data().containsKey("degree")){
+			if (filledForm.data().containsKey("degree")) {
 				if (filledForm.field("degree").value().equals("null")) {
 					account.degree = null;
 				} else {
@@ -234,13 +237,23 @@ public class ProfileController extends BaseController {
 				}
 			}
 
-			if(filledForm.data().containsKey("semester")){
+			if (filledForm.data().containsKey("semester")) {
 				if (filledForm.field("semester").value().equals("0")) {
 					account.semester = null;
 				} else {
 					account.semester = Integer.parseInt(filledForm.field("semester").value());
 				}
 			}
+
+            if (filledForm.data().containsKey("emailNotifications")) {
+                account.emailNotifications = EmailNotifications.valueOf(filledForm.field("emailNotifications").value());
+                if (account.emailNotifications.equals(EmailNotifications.COLLECTED_DAILY)
+                        && filledForm.data().containsKey("dailyEmailNotificationHour")) {
+                    account.dailyEmailNotificationHour = Integer.valueOf(
+                            filledForm.field("dailyEmailNotificationHour").value()
+                    );
+                }
+            }
 
 			Long studycourseId = Long.parseLong(filledForm.field("studycourse").value());
 			Studycourse studycourse;
@@ -253,8 +266,7 @@ public class ProfileController extends BaseController {
 			account.update();
 		
 			flash("success", "Profil erfolgreich gespeichert.");
-			return redirect(routes.ProfileController.me());
+			return redirect(controllers.routes.ProfileController.me());
 		}
 	}
-
 }

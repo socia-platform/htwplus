@@ -2,13 +2,8 @@ package controllers;
 
 
 import java.util.Date;
-import models.Account;
-import models.Friendship;
-import models.Group;
-import models.GroupAccount;
-import models.Media;
-import models.Notification;
-import models.Post;
+
+import models.*;
 import models.enums.AccountRole;
 import play.Logger;
 import play.Play;
@@ -382,11 +377,7 @@ public class Secured extends Security.Authenticator {
 		}
 		
 		if(post.belongsToGroup()) {
-			if(Secured.isMemberOfGroup(post.group, current)) {
-				return true;
-			} else {
-				return false;
-			}
+            return Secured.isMemberOfGroup(post.group, current);
 		}
 		
 		if(post.belongsToAccount()) {
@@ -466,42 +457,23 @@ public class Secured extends Security.Authenticator {
 	}
 
 	public static boolean viewMedia(Media media) {
-		if(media == null){
-			return false;
-		} else {
-			return Secured.viewGroup(media.group);
-		}
+        return media != null && Secured.viewGroup(media.group);
 	}
 
 	public static boolean deleteMedia(Media media) {
 		Account current = Component.currentAccount();
 		Group group = media.group;
-		if (Secured.isAdmin()) {
-			return true;
-		}
+        
+        return Secured.isAdmin() || Secured.isOwnerOfGroup(group, current) || media.owner.equals(current);
+    }
 
-		if (Secured.isOwnerOfGroup(group, current)) {
-			return true;
-		}
-
-		if (media.owner.equals(current)) {
-			return true;
-		}
-
-		return false;
+    /**
+     * Returns true, if the current user has access to a notification.
+     *
+     * @param notification Notification to be checked
+     * @return True, if user has access
+     */
+	public static boolean hasAccessToNotification(Notification notification) {
+		return notification.recipient.equals(Component.currentAccount());
 	}
-	
-	/*
-	 * Notification
-	 */
-	
-
-	public static boolean deleteNotification(Notification note) {
-		if(note.account.equals(Component.currentAccount())) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
 }

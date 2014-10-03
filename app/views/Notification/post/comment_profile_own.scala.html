@@ -1,0 +1,5 @@
+@(notification: Notification, notifiable: Post)
+
+@import helper._
+
+<span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.comment_profile_own", truncate(notifiable.parent.content, 20), notifiable.parent.account.name))

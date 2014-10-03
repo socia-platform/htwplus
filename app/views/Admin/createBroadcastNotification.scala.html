@@ -1,0 +1,44 @@
+@(postForm: Form[Post], accounts: List[Account])
+@import helper._
+
+@admin("Control Center") {
+    @form(routes.AdminController.broadcastNotification) {
+    <br />
+    <dl class="dl-horizontal">
+        @textarea(postForm(Messages("admin.broadcast_notification")), 'class -> "form-control", 'id -> "hp-new-post-content", 'placeholder -> Messages("admin.broadcast_notification.write"))
+        <div class="broadcast-intro">@Messages("admin.broadcast_notification.intro")</div>
+        <br />
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th style="width:23px">
+                    <input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body" onclick="toggleMediaSelection(this)">
+                </th>
+                <th style="width:36px"></th>
+                <th>Name</th>
+                <th style="width:35px"></th>
+            </tr>
+            </thead>
+            <tbody id="mediaList" class="hp-optionsTable">
+            @for(account <- accounts) {
+                @if(!Component.currentAccount().equals(account)) {
+                    <tr>
+                        <td><input type="checkbox" name="account[]" value="@account.id"></td>
+                        <td>@views.html.snippets.userLinkAvatar(account)</td>
+                        <td>@views.html.snippets.userLink(account)</td>
+                        <td class="hp-optionsMenu">
+                            @views.html.snippets.accountOptionMenu(account)
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+            <tfoot>
+            </tfoot>
+        </table>
+    </dl>
+    <div class="pull-right">
+        <button type="submit" id="submitSignup" class="btn btn-warning">@Messages("admin.broadcast_notification.send")</button>
+    </div>
+    }
+}

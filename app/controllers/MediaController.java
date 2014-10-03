@@ -12,13 +12,11 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import models.services.NotificationService;
 import org.apache.commons.io.FileUtils;
 
-import akka.actor.IO;
 import models.Group;
 import models.Media;
-import models.Notification;
-import models.Notification.NotificationType;
 import play.Logger;
 import play.Play;
 import play.data.Form;
@@ -41,14 +39,14 @@ public class MediaController extends BaseController {
     	Media media = Media.findById(id);
     	if(Secured.viewMedia(media)) {
 			if (media == null) {
-				return redirect(routes.Application.index());
+				return redirect(controllers.routes.Application.index());
 			} else {
 				response().setHeader("Content-disposition","attachment; filename=\"" + media.fileName + "\"");
 				return ok(media.file);
 			}
     	} else {
     		flash("error", "Dazu hast du keine Berechtigung!");
-    		return redirect(routes.Application.index());
+    		return redirect(controllers.routes.Application.index());
      	}
     }
     
@@ -56,13 +54,13 @@ public class MediaController extends BaseController {
     public static Result delete(Long id) {
     	Media media = Media.findById(id);
     	
-    	Call ret = routes.Application.index();
+    	Call ret = controllers.routes.Application.index();
     	if(media.belongsToGroup()){
     		Group group = media.group;
     		if(!Secured.deleteMedia(media)){
-				return redirect(routes.Application.index());
+				return redirect(controllers.routes.Application.index());
     		}
-    		ret = routes.GroupController.media(group.id);
+    		ret = controllers.routes.GroupController.media(group.id);
     	} 
     	
     	media.delete();
@@ -73,17 +71,17 @@ public class MediaController extends BaseController {
     @Transactional(readOnly=true)	
     public static Result multiView(String target, Long id) {
     	
-		Call ret = routes.Application.index();
+		Call ret = controllers.routes.Application.index();
 		Group group = null;
 		String filename = "result.zip";
 		
 		if(target.equals(Media.GROUP)) {
 			group = Group.findById(id);
 			if(!Secured.viewGroup(group)){
-				return redirect(routes.Application.index());
+				return redirect(controllers.routes.Application.index());
 			}
 			filename = createFileName(group.title);
-			ret = routes.GroupController.media(id);
+			ret = controllers.routes.GroupController.media(id);
 		} else {
 			return redirect(ret);
 		}
@@ -98,7 +96,7 @@ public class MediaController extends BaseController {
             		mediaList.add(media);	
         		} else {
         			flash("error", "Dazu hast du keine Berechtigung!");
-        			return redirect(routes.Application.index());
+        			return redirect(controllers.routes.Application.index());
         		}
            	}
     	} else {
@@ -190,31 +188,38 @@ public class MediaController extends BaseController {
 	    }
 	    
     }
-    
+
+    /**
+     * New file is uploaded.
+     *
+     * @param target Target of the file (e.g. "group")
+     * @param id ID of the target (e.g. group ID)
+     * @return Result
+     */
 	@Transactional
-    public static Result upload(String target, Long id) {	
-		
+    public static Result upload(String target, Long id) {
 	    final int maxTotalSize = Play.application().configuration().getInt("media.maxSize.total");
 	    final int maxFileSize = Play.application().configuration().getInt("media.maxSize.file");
 	    
-		Call ret = routes.Application.index();
-		Group group = null;
-		
-		// Where to put the media
-		if(target.equals(Media.GROUP)) {
+		Call ret = controllers.routes.Application.index();
+		Group group;
+
+        // Where to put the media
+		if (target.equals(Media.GROUP)) {
 			group = Group.findById(id);
-			if(!Secured.uploadMedia(group)){
-				return redirect(routes.Application.index());
+			if (!Secured.uploadMedia(group)) {
+				return redirect(controllers.routes.Application.index());
 			}
-			Notification.newGroupNotification(NotificationType.GROUP_NEW_MEDIA, group, Component.currentAccount());
-			ret = routes.GroupController.media(id);
+			group.temporarySender = Component.currentAccount();
+            NotificationService.getInstance().createNotification(group, Group.GROUP_NEW_MEDIA);
+			ret = controllers.routes.GroupController.media(id);
 		} else {
 			return redirect(ret);
 		}
 		
 		// Is it to big in total?
 		String[] contentLength = request().headers().get("Content-Length");
-		if(contentLength != null){
+		if (contentLength != null) {
 			int size = Integer.parseInt(contentLength[0]);
 			if(Media.byteAsMB(size) > maxTotalSize) {
 				flash("error", "Du darfst auf einmal nur " + maxTotalSize + " MB hochladen.");
@@ -231,7 +236,7 @@ public class MediaController extends BaseController {
 
 		List<Media> mediaList = new ArrayList<Media>();
 		
-		if(!uploads.isEmpty()) {
+		if (!uploads.isEmpty()) {
 			
 			// Create the Media models and perform some checks
 			for (FilePart upload : uploads) {
@@ -273,7 +278,6 @@ public class MediaController extends BaseController {
 			flash("error", "Etwas ist schiefgegangen. Bitte probiere es noch einmal!");
 		    return redirect(ret);  
 		}
-		
     }
 	
 	public static String bytesToString(long bytes, boolean si) {

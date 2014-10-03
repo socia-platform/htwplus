@@ -1,27 +1,32 @@
-@(notification:List[Notification])
+@(notifications: List[Notification], countNotifications: Integer, unreadNotifications: Integer)
 
-@defining(notification.size()) { countNotification =>
-<li class="dropdown" id="hp-notification-item">
-         <a href="#" class="visible-xs dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-bell"></span> 
-         
-         @if(countNotification > 0) {
-         	<span class="badge">@countNotification</span>
-         } 
-         
-         <b class="caret"></b></a>
-         <a href="#" class="hidden-xs dropdown-toggle" data-toggle="dropdown">Neuigkeiten 
-         
-         @if(countNotification > 0) {
-         	<span class="badge">@countNotification</span> 
+<li class="dropdown" id="hp-notifications-item">
+     <a href="#" class="visible-xs dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-bell"></span>
+     <span class="badge"@if(unreadNotifications < 1){ style="display: none;"}>@unreadNotifications</span>
+
+     <b class="caret"></b></a>
+     <a href="#" class="hidden-xs dropdown-toggle" data-toggle="dropdown">@Messages("notification.news")
+     <span class="badge"@if(unreadNotifications < 1){ style="display: none;"}>@unreadNotifications</span>
+
+     <b class="caret"></b></a>
+     <ul class="hp-dropdown-search dropdown-menu">
+      @if(countNotifications > 0) {
+         @for(notification <- notifications) {
+            <li class="notification-element @if(notification.isRead){ read}else{ unread}" id="notification_@{notification.id}">
+                <div>
+                    <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>
+                </div>
+            </li>
          }
-         
-         <b class="caret"></b></a>
-         <ul class="hp-dropdown-search dropdown-menu">
-          @if(countNotification > 0) {
-          			@list(notification)
-          } else {
-          			<li class="hp-notification">Nichts neues passiert</li>
-          }
-         </ul>
+      } else {
+         <li class="hp-notifications nothing-new">
+             @Messages("notification.nothing_new")
+         </li>
+      }
+      <li class="notification-element notification-show-all@if(countNotifications == 0) { hidden}">
+         <div>
+             <a href="@routes.NotificationController.showAll()" id="hp-show-notifications-history">@Messages("notification.show_everything")</a>
+         </div>
+      </li>
+     </ul>
 </li>
-}

@@ -28,7 +28,7 @@
 	<br />
 	<br />
 	
-	@if(!friendsToInvite.isEmpty() || !alreadyInvitedFriends.isEmpty()){
+	@if(!friendsToInvite.isEmpty || !alreadyInvitedFriends.isEmpty){
 		
 		@form(action = routes.GroupController.inviteMember(group.id)) {
 

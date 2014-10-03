@@ -1,0 +1,5 @@
+@(notification: Notification, notifiable: Post)
+
+@import helper._
+
+<span class="glyphicon glyphicon-bullhorn"></span>@Html(Messages("post.broadcast_post", fullTrim(notifiable.getSender().name)))

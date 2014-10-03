@@ -1,0 +1,5 @@
+@(notification: Notification, notifiable: Friendship)
+
+@import helper._
+
+<span class="glyphicon glyphicon-user"></span>@Html(Messages("friendship.new_request", notifiable.account.name))

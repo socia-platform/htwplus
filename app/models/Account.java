@@ -4,16 +4,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.NoResultException;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PersistenceException;
+import javax.persistence.*;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.base.BaseModel;
+import models.base.IJsonNodeSerializable;
 import models.enums.AccountRole;
 
+import models.enums.EmailNotifications;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
@@ -49,7 +47,8 @@ import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import controllers.Component;
-import controllers.routes;
+import play.libs.F;
+import play.libs.Json;
 
 @Entity
 @Indexed
@@ -58,7 +57,7 @@ import controllers.routes;
 		@TokenFilterDef(factory = LowerCaseFilterFactory.class),
 		@TokenFilterDef(factory = StopFilterFactory.class, params = { @Parameter(name = "ignoreCase", value = "true") }) })
 @org.hibernate.search.annotations.Analyzer(definition = "searchtokenanalyzerAcc")
-public class Account extends BaseModel {
+public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	public String loginname;
 	
@@ -97,14 +96,23 @@ public class Account extends BaseModel {
 
 	public AccountRole role;
 
+    public EmailNotifications emailNotifications;
+
+    public Integer dailyEmailNotificationHour;
+
 	public Boolean approved;
 
+    /**
+     * Returns an account by account ID.
+     *
+     * @param id Account ID
+     * @return Account instance
+     */
 	public static Account findById(Long id) {
 		return JPA.em().find(Account.class, id);
 	}
-	
-	
-	@SuppressWarnings("unchecked")
+
+    @SuppressWarnings("unchecked")
 	public static List<Account> findAll(){
 		return JPA.em().createQuery("SELECT a FROM Account a ORDER BY a.name").getResultList();
 	}
@@ -181,7 +189,7 @@ public class Account extends BaseModel {
 	//
 	
 	public String getAvatarUrl() {
-		String url = routes.Assets.at("images/avatars/" + this.avatar + ".png").toString();
+		String url = controllers.routes.Assets.at("images/avatars/" + this.avatar + ".png").toString();
 		return url;
 	}
 	
@@ -233,16 +241,14 @@ public class Account extends BaseModel {
 			return false;
 		}
 	}
-	
-	
+
 	/**
 	 * Try to get all accounts...
 	 * @return List of accounts.
 	 */
 	@SuppressWarnings("unchecked")
 	public static List<Account> all() {
-		List<Account> accounts = JPA.em().createQuery("FROM Account").getResultList();
-		return accounts;
+        return JPA.em().createQuery("FROM Account").getResultList();
 	}
 	
 	/**
@@ -319,6 +325,26 @@ public class Account extends BaseModel {
 		session.clear();
 		return fullTextQuery;
 	}
+
+    /**
+     * Returns a list of account instances by an ID collection of Strings.
+     *
+     * @param accountIds String array of account IDs
+     * @return List of accounts
+     */
+    public static List<Account> getAccountListByIdCollection(final List<String> accountIds) {
+    	StringBuilder joinedAccountIds = new StringBuilder();
+        for (int i = 0; i < accountIds.size(); i++) {
+            if (i > 0) {
+                joinedAccountIds.append(",");
+            }
+            joinedAccountIds.append(accountIds.get(i));
+        }
+
+        return JPA.em()
+                .createQuery("FROM Account a WHERE a.id IN (" +joinedAccountIds.toString() + ")", Account.class)
+                .getResultList();
+    }
 	
 	@SuppressWarnings("unchecked")
 	public static List<Account> accountSearch(String keyword, int limit, int page) {
@@ -349,4 +375,13 @@ public class Account extends BaseModel {
 		}
 		return criteria;
 	}
+
+    @Override
+    public ObjectNode getAsJson() {
+        ObjectNode node = Json.newObject();
+        node.put("id", this.id);
+        node.put("name", this.name);
+
+        return node;
+    }
 }

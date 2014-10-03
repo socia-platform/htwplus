@@ -1,0 +1,5 @@
+@(notification: Notification, notifiable: Post)
+
+@import helper._
+
+<span class="glyphicon glyphicon-list"></span>@Html(Messages("post.group_new_post", truncate(notifiable.group.title, 20)))

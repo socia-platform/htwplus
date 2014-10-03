@@ -1,0 +1,5 @@
+@(notification: Notification, notifiable: Friendship)
+
+@import helper._
+
+<span class="glyphicon glyphicon-remove"></span>@Html(Messages("friendship.request_decline", notifiable.friend.name))

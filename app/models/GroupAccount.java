@@ -10,6 +10,7 @@ import java.util.List;
 import models.base.BaseModel;
 import models.enums.GroupType;
 import models.enums.LinkType;
+import play.libs.F;
 
 @Entity
 @Table(name = "group_account", uniqueConstraints = @UniqueConstraint(columnNames = {
@@ -52,6 +53,7 @@ public class GroupAccount extends BaseModel {
 
 	@Override
 	public void delete() {
+        Notification.deleteReferencesForAccountId(this.group, this.account.id);
 		JPA.em().remove(this);
 	}
 	
@@ -102,24 +104,23 @@ public class GroupAccount extends BaseModel {
 	/**
 	 * Find all open groups where given account is owner or member 
 	 */
-	public static List<Group> findPublicEstablished(Account account) {
-		@SuppressWarnings("unchecked")
-		List<Group> groupAccounts = JPA
-				.em()
-				.createQuery(
-						"SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType = ?3")
-				.setParameter(1, account.id)
-				.setParameter(2, LinkType.establish)
-				.setParameter(3, GroupType.open).getResultList();
-		return groupAccounts;
+    @SuppressWarnings("unchecked")
+	public static List<Group> findPublicEstablished(final Account account) {
+    	return JPA
+                .em()
+                .createQuery(
+                        "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType = ?3")
+                .setParameter(1, account.id)
+                .setParameter(2, LinkType.establish)
+                .setParameter(3, GroupType.open).getResultList();
 	}
 
 	/**
 	 * Find all requests and rejects for summarization under "Offene Anfragen"
 	 * for given Account
 	 * 
-	 * @param account
-	 * @return
+	 * @param account Account instance
+	 * @return List of group accounts
 	 */
 	public static List<GroupAccount> findRequests(Account account) {
 		@SuppressWarnings("unchecked")
@@ -134,9 +135,10 @@ public class GroupAccount extends BaseModel {
 	
 	/**
 	 * Has account any link-types to given group?
-	 * @param account
-	 * @param group
-	 * @return
+     *
+	 * @param account Account instance
+	 * @param group Group instance
+	 * @return True, if an account has a link type for a group
 	 */
 	public static boolean hasLinkTypes(Account account, Group group) {
 		try {
@@ -151,17 +153,24 @@ public class GroupAccount extends BaseModel {
 	/**
 	 * Retrieve Accounts from Group with given LinkType.
 	 */
-	public static List<Account> findAccountsByGroup(Group group, LinkType type) {
+	public static List<Account> findAccountsByGroup(final Group group, final LinkType type) {
 		@SuppressWarnings("unchecked")
-		List<Account> accounts = (List<Account>) JPA
-				.em()
-				.createQuery(
-						"SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
-				.setParameter(1, group.id).setParameter(2, type)
-				.getResultList();
-		return accounts;
+        List<Account> accounts = (List<Account>) JPA
+                .em()
+                .createQuery(
+                        "SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
+                .setParameter(1, group.id).setParameter(2, type)
+                .getResultList();
+        return accounts;
 	}
 
+    /**
+     * Returns a group account by account and group.
+     *
+     * @param account Account instance
+     * @param group Group instance
+     * @return Group account instance
+     */
 	public static GroupAccount find(Account account, Group group) {
 		try {
 			return (GroupAccount) JPA
