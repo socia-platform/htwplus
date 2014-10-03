@@ -197,32 +197,40 @@ public class PostController extends BaseController {
 	}
 	
 	@Transactional
-	public static Result deletePost(final Long postId) {
-		final Post post = Post.findById(postId);
-		// verify redirect after deletion
+	public static Result deletePost(Long postId) {
+		Post post = Post.findById(postId);
+		Account account = Component.currentAccount();
 		Call routesTo = null;
-		if (post.group != null) {
-			routesTo = controllers.routes.GroupController.view(post.group.id, PAGE);
-		}
-		else if (post.account != null) {
-			routesTo = controllers.routes.Application.index();
-		}
-		else if (post.parent != null) {
-			if (post.parent.group != null) {
-				routesTo = controllers.routes.GroupController.view(post.parent.group.id, PAGE);
-			} else if (post.parent.account != null) {
+		
+		if (Secured.isAllowedToDeletePost(post, account)) {
+			
+			//verify redirect
+			if (post.group != null) {
+				routesTo = controllers.routes.GroupController.view(post.group.id, PAGE);
+			}
+			
+			if (post.account != null) {
 				routesTo = controllers.routes.Application.index();
 			}
-		}
-		final Account account = Component.currentAccount();
-		if (Secured.isAllowedToDeletePost(post, account)) {
+			
+			if (post.parent != null) {
+				if (post.parent.group != null) {
+					routesTo = controllers.routes.GroupController.view(post.parent.group.id, PAGE);
+				} else if (post.parent.account != null) {
+					routesTo = controllers.routes.Application.index();
+				}
+			}
+			
+			
+			
 			post.delete();
 			flash("success", "Gelöscht!");
+			
 		} else {
 			flash("error", "Konnte nicht gelöscht werden!");
-		}
+		}		
 
-        if (routesTo == null) {
+		if (routesTo == null) {
             routesTo = controllers.routes.Application.index();
         }
 
