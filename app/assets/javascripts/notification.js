@@ -1,5 +1,5 @@
 function WS() {
-    this.debug = true;
+    this.debug = false;
     this.targetUrl = window.location.protocol === 'https:'
         ? 'wss://' + window.location.host + '/websocket'
         : 'ws://' + window.location.host + '/websocket';
