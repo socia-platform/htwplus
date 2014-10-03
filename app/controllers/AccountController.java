@@ -77,33 +77,20 @@ public class AccountController extends BaseController {
 		}
 
         // if user is not found in DB, create new user from LDAP data, otherwise update user data
-        boolean updateAccount = false;
 		if (account == null) {
-            account = Account.findByEmail(ldap.getEmail());
-            if (account == null) {
-                account = new Account();
-                Logger.info("New Account for " + matriculationNumber + " will be created.");
-                account.firstname = ldap.getFirstName();
-                account.lastname = ldap.getLastName();
-                account.loginname = matriculationNumber;
-                account.email = ldap.getEmail();
-                account.password = "LDAP - not needed";
-                Random generator = new Random();
-                account.avatar = "a" + generator.nextInt(10);
-                account.role = role;
-                account.create();
-            } else {
-                updateAccount = true;
-            }
-		} else {
-            updateAccount = true;
-		}
-
-        // update account if needed
-        if (updateAccount) {
+            account = new Account();
+            Logger.info("New Account for " + matriculationNumber + " will be created.");
             account.firstname = ldap.getFirstName();
             account.lastname = ldap.getLastName();
-            account.email = ldap.getEmail();
+            account.loginname = matriculationNumber;
+            account.password = "LDAP - not needed";
+            Random generator = new Random();
+            account.avatar = "a" + generator.nextInt(10);
+            account.role = role;
+            account.create();
+		} else {
+            account.firstname = ldap.getFirstName();
+            account.lastname = ldap.getLastName();
             account.role = role;
             account.update();
         }
