@@ -169,15 +169,9 @@ public class ProfileController extends BaseController {
 		}
 		
 		// Check Access
-		if(!Secured.editAccount(account)) {
+		if (!Secured.editAccount(account)) {
 			return redirect(controllers.routes.Application.index());
 		}
-
-        try {
-            Notification.findUsersWithDailyHourlyEmailNotifications();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
 
         Navigation.set(Level.PROFILE, "Editieren");
 		return ok(edit.render(account, accountForm.fill(account)));
