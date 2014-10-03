@@ -131,6 +131,7 @@ function WS() {
                     if (notificationCounters[counterIndex].style.display == 'none') {
                         $(notificationCounters[counterIndex]).fadeIn('slow');
                     }
+                    $('.notification-show-all-read').removeClass('hidden');
                 } else {
                     // we have zero unread notifications, hide counter
                     if (notificationCounters[counterIndex].style.display != 'none') {

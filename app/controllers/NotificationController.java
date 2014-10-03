@@ -122,4 +122,17 @@ public class NotificationController extends BaseController {
 
         return count;
     }
+
+    /**
+     * Marks all notifications as read for an Account.
+     *
+     * @return Result
+     */
+    @Transactional
+    public static Result readAll() {
+        Notification.markAllAsRead(Component.currentAccount());
+        flash("success", Messages.get("notification.read_everything_ok"));
+
+        return redirect(request().getHeader("referer"));
+    }
 }

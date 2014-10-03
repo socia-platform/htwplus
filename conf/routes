@@ -75,6 +75,7 @@ GET 	/media/:id/delete					controllers.MediaController.delete(id:Long)
 
 #Notification
 GET     /notification                       controllers.NotificationController.showAll(page: Integer ?= 1)
+GET     /notification/readAll               controllers.NotificationController.readAll()
 GET		/notification/:id					controllers.NotificationController.forward(id:Long)
 
 # WebSocket
