@@ -11,8 +11,8 @@ public class Login {
 		@Transactional
 		public String validate() {
 			if (Account.authenticate(email, password) == null) {
-				return "Ungültiges Passwort oder Email-Adresse.";
+				return "Bitte melde dich mit deiner Matrikelnummer an.";
 			}
 			return null;
-		}
 	}
+}
