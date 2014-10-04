@@ -125,7 +125,7 @@ function WS() {
         // if update counters
         for (var counterIndex = 0; counterIndex < notificationCounters.size(); counterIndex++) {
             if (notificationCounters.hasOwnProperty(counterIndex)) {
-                notificationCounters[counterIndex].innerHTML = unreadNotifications;
+                notificationCounters[counterIndex].innerHTML = unreadNotifications > 10 ? '10+' : unreadNotifications;
                 this.updateFavicon(unreadNotifications);
                 if (unreadNotifications > 0) {
                     // if counter is hidden, show it
@@ -165,7 +165,7 @@ function WS() {
             head.removeChild(oldLink);
         }
         head.appendChild(link);
-    }
+    };
 
     /**
      * Deletes obsolete notifications, if number of opened notifications bigger than numbers of notifications.
