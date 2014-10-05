@@ -1,129 +1,170 @@
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import base.FakeApplicationTest;
 import controllers.WebSocketController;
 import mock.MockWebSocket;
+import models.Account;
+import models.services.JsonService;
 import org.junit.*;
-import play.mvc.Http;
-import play.test.FakeApplication;
-import play.test.Helpers;
-
-import java.util.Collections;
-import java.util.Map;
 
 import static org.fest.assertions.Assertions.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 /**
- * Testing WebSocket service
+ * Testing WebSocket service.
  */
-public class WebSocketTest {
-    private final Http.Request request = mock(Http.Request.class);
-    public static FakeApplication app;
-
-    @BeforeClass
-    public static void startApp() {
-        app = Helpers.fakeApplication();
-        Helpers.start(app);
+public class WebSocketTest extends FakeApplicationTest {
+    /**
+     * Tests, if a simple "Ping" is responded by "Pong".
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testPing() throws Exception {
+        try {
+            this.loginTestAccount(1);
+            MockWebSocket ws = new MockWebSocket(WebSocketController.webSocket());
+            ws.write(JsonService.getInstance().getJsonFromString("{\"method\": \"Ping\"}"));
+            assertThat(ws.read().toString()).contains("Pong");
+            ws.close();
+            this.logoutTestAccount();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            fail();
+        }
     }
 
-    @Before
-    public void setUp() throws Exception {
-        Map<String, String> flashData = Collections.emptyMap();
-        Map<String, Object> argData = Collections.emptyMap();
-        Long id = 2L;
-        play.api.mvc.RequestHeader header = mock(play.api.mvc.RequestHeader.class);
-        Http.Context context = new Http.Context(id, header, request, flashData, flashData, argData);
-        Http.Context.current.set(context);
-        Http.Context.current().session().put("id", null);
-    }
-
-    @AfterClass
-    public static void stopApp() {
-        Helpers.stop(app);
-    }
-
+    /**
+     * Tests, if a chat message if rejected, because sender is not logged in.
+     *
+     * @throws Exception
+     */
     @Test
     public void testLoggedIn() throws Exception {
         // send WS message without user logged in
         try {
+            Account testAccount = this.getTestAccount(1);
             MockWebSocket ws = new MockWebSocket(WebSocketController.webSocket());
-            ws.write(this.getJsonFromString("{\"method\": \"SendChat\", \"text\": \"Huhu\", \"recipient\": 7}"));
+            ws.write(JsonService.getInstance()
+                    .getJsonFromString("{\"method\": \"SendChat\", \"text\": \"Huhu\", \"recipient\": " + testAccount.id.toString() + "}")
+            );
             assertThat(ws.read().toString()).contains("closed");
             assertThat(ws.read()).isNull();
             ws.close();
+            this.logoutTestAccount();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             fail();
         }
     }
 
+    /**
+     * Tests, if a chat message is rejected, because of recipient is not online.
+     *
+     * @throws Exception
+     */
     @Test
     public void testOnline() throws Exception {
         try {
-            Http.Context.current().session().replace("id", "1");
+            this.loginTestAccount(1);
+            Account testAccount2 = this.getTestAccount(2);
+
             MockWebSocket ws = new MockWebSocket(WebSocketController.webSocket());
-            ws.write(this.getJsonFromString("{\"method\": \"SendChat\", \"text\": \"Huhu\", \"recipient\": 7}"));
+            ws.write(JsonService.getInstance()
+                            .getJsonFromString("{\"method\": \"SendChat\", \"text\": \"Huhu\", \"recipient\": " + testAccount2.id.toString() + "}")
+            );
             assertThat(ws.read().toString()).contains("Recipient not online");
             ws.close();
+            this.logoutTestAccount();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             fail();
         }
     }
 
+    /**
+     * Tests, if a chat message is rejected, because of sending to oneself.
+     *
+     * @throws Exception
+     */
     @Test
     public void testChatYourself() throws Exception {
         try {
-            Http.Context.current().session().replace("id", "1");
+            Account testAccount = this.getTestAccount(1);
+            this.loginTestAccount(testAccount);
+
             MockWebSocket ws = new MockWebSocket(WebSocketController.webSocket());
-            ws.write(this.getJsonFromString("{\"method\": \"SendChat\", \"text\": \"Huhu\", \"recipient\": 1}"));
+            ws.write(JsonService.getInstance()
+                    .getJsonFromString("{\"method\": \"SendChat\", \"text\": \"Huhu\", \"recipient\": " + testAccount.id.toString() + "}")
+            );
             assertThat(ws.read().toString()).contains("Cannot send chat to yourself");
             ws.close();
+            this.logoutTestAccount();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             fail();
         }
     }
 
-    @Test
-    public void testChatSuccess() throws Exception {
-        try {
-            Http.Context.current().session().replace("id", "7");
-            MockWebSocket ws1 = new MockWebSocket(WebSocketController.webSocket());
-            Http.Context.current().session().replace("id", "181");
-            MockWebSocket ws2 = new MockWebSocket(WebSocketController.webSocket());
-            ws2.write(this.getJsonFromString("{\"method\": \"SendChat\", \"text\": \"Huhu\", \"recipient\": 7}"));
-            assertThat(ws2.read().toString()).contains("OK");
-            ws1.close();
-            ws2.close();
-            System.out.println(ws1.read().toString());
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            fail();
-        }
-    }
-
+    /**
+     * Tests, if a chat message is rejected, because of no established friendship.
+     *
+     * @throws Exception
+     */
     @Test
     public void testFriendship() throws Exception {
         try {
-            // fake another login (user 7) and try to send to user 1 (they are no friends)
-            Http.Context.current().session().replace("id", "1");
+            Account testAccountA = this.getTestAccount(3);
+            Account testAccountB = this.getTestAccount(4);
+            this.removeFriendshipTestAccounts(testAccountA, testAccountB);
+
+            this.loginTestAccount(testAccountA);
             MockWebSocket ws1 = new MockWebSocket(WebSocketController.webSocket());
-            Http.Context.current().session().replace("id", "7");
+
+            this.loginTestAccount(testAccountB);
             MockWebSocket ws2 = new MockWebSocket(WebSocketController.webSocket());
-            ws2.write(this.getJsonFromString("{\"method\": \"SendChat\", \"text\": \"Huhu\", \"recipient\": 1}"));
+
+            ws2.write(JsonService.getInstance()
+                            .getJsonFromString("{\"method\": \"SendChat\", \"text\": \"Huhu\", \"recipient\": " + testAccountA.id.toString() + "}")
+            );
+
             assertThat(ws2.read().toString()).contains("You must be a friend of the recipient");
+
             ws1.close();
             ws2.close();
+            this.logoutTestAccount();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             fail();
         }
     }
 
-    private JsonNode getJsonFromString(String jsonString) throws Throwable {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readTree(jsonString);
+    /**
+     * Tests a successful sendable chat message.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testChatSuccess() throws Exception {
+        try {
+            Account testAccountA = this.getTestAccount(1);
+            Account testAccountB = this.getTestAccount(2);
+            this.establishFriendshipTestAccounts(testAccountA, testAccountB);
+
+            this.loginTestAccount(testAccountA);
+            MockWebSocket ws1 = new MockWebSocket(WebSocketController.webSocket());
+
+            this.loginTestAccount(testAccountB);
+            MockWebSocket ws2 = new MockWebSocket(WebSocketController.webSocket());
+
+            ws2.write(JsonService.getInstance()
+                            .getJsonFromString("{\"method\": \"SendChat\", \"text\": \"Huhu\", \"recipient\": " + testAccountA.id.toString() + "}")
+            );
+            assertThat(ws2.read().toString()).contains("OK");
+            ws1.close();
+            ws2.close();
+            this.logoutTestAccount();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            fail();
+        }
     }
 }

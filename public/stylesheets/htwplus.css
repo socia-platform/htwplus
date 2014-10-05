@@ -265,7 +265,7 @@ body#hp-landingpage {
 .hp-dropdown-notifications,
 .hp-dropdown-search {
 	width: 600px;
-	max-height: 450px;
+	max-height: 470px;
 	left: -150px;
 	overflow-y: auto;
 }

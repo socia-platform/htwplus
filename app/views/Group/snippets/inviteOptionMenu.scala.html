@@ -1,4 +1,4 @@
-@(accountGroup: GroupAccount)
+@(accountGroup: GroupAccount, user: Account)
 @import models.enums._
 @import helper._
 
@@ -8,20 +8,32 @@
     </a>
 
     <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
-
-        @if(accountGroup.linkType.equals(models.enums.LinkType.invite)) {
-        <li><a href="@routes.GroupController.acceptInvitation(accountGroup.group.id, accountGroup.account.id)" data-toggle="modal">
-            <span class="glyphicon glyphicon-ok"></span><br>Einladung akzeptieren
-        </a></li>
-
-        <li><a href="@routes.GroupController.declineInvitation(accountGroup.group.id, accountGroup.account.id)" data-toggle="modal">
-            <span class="glyphicon glyphicon-remove"></span><br>Einladung ablehnen
-        </a></li>
-        } else {
-        <li><a href="@routes.GroupController.removeMember(accountGroup.group.id, accountGroup.account.id)" data-toggle="modal">
-            <span class="glyphicon glyphicon-remove"></span><br>@if(accountGroup.linkType.equals(models.enums.LinkType.reject)) {löschen} else {Anfrage löschen}
-        </a></li>
-        }
-
+		@if(accountGroup.account.equals(user)) {
+	        @if(accountGroup.linkType.equals(models.enums.LinkType.invite)) {
+		        <li><a href="@routes.GroupController.acceptInvitation(accountGroup.group.id, accountGroup.account.id)" data-toggle="modal">
+		            	<span class="glyphicon glyphicon-ok"></span><br>Einladung akzeptieren
+		        	</a>
+		        </li>
+		        <li><a href="@routes.GroupController.declineInvitation(accountGroup.group.id, accountGroup.account.id)" data-toggle="modal">
+		            	<span class="glyphicon glyphicon-remove"></span><br>Einladung ablehnen
+		        	</a>
+		        </li>
+		        } else {
+		        <li><a href="@routes.GroupController.removeMember(accountGroup.group.id, accountGroup.account.id)" data-toggle="modal">
+		            	<span class="glyphicon glyphicon-remove"></span><br>@if(accountGroup.linkType.equals(models.enums.LinkType.reject)) {löschen} else {Anfrage löschen}
+		        	</a>
+		        </li>
+	        }
+		} else {
+			<li><a href="@routes.GroupController.acceptRequest(accountGroup.group.id, accountGroup.account.id)" data-toggle="modal">
+					<span class="glyphicon glyphicon-ok"></span><br>Anfrage akzeptieren
+				</a>
+			</li>
+			<li>
+				<a href="@routes.GroupController.declineRequest(accountGroup.group.id, accountGroup.account.id)" data-toggle="modal">
+					<span class="glyphicon glyphicon-remove"></span><br>Anfrage zurückweisen
+				</a>
+			</li>
+		}
     </ul>
 </div>

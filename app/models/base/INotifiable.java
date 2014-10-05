@@ -29,7 +29,7 @@ public interface INotifiable {
      * @param notification The notification which is rendered
      * @return Rendered HTML
      */
-    public String render(Notification notification) throws Exception;
+    public String render(Notification notification);
 
     /**
      * Returns the reference, this notification is about (e.g. when posting the actual Post)

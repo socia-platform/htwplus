@@ -171,6 +171,19 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
     }
 
     /**
+     * Returns a specific notification by its rendered content.
+     *
+     * @param renderedContent Rendered content to select
+     * @return Notification instance
+     */
+    public static List<Notification> findByRenderedContent(String renderedContent) throws NoResultException {
+        return JPA.em()
+                .createQuery("FROM Notification n WHERE n.rendered = :renderedContent", Notification.class)
+                .setParameter("renderedContent", renderedContent)
+                .getResultList();
+    }
+
+    /**
      * Counts all notifications for an account ID.
      *
      * @param accountId User account ID
@@ -241,5 +254,17 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
         node.put("updated", this.updatedAt.getTime());
 
         return node;
+    }
+
+    /**
+     * Marks all unread notifications as read for an account.
+     *
+     * @param account Account
+     */
+    public static void markAllAsRead(Account account) {
+        JPA.em()
+            .createQuery("UPDATE Notification n SET n.isRead = true WHERE n.recipient = :account AND n.isRead = false")
+            .setParameter("account", account)
+            .executeUpdate();
     }
 }

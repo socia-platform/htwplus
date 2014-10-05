@@ -28,5 +28,8 @@
         <li class="notification-element notification-show-all@if(countNotifications == 0) { hidden}">
             <a href="@routes.NotificationController.showAll()" id="hp-show-notifications-history">@Messages("notification.show_everything")</a>
         </li>
+        <li class="notification-show-all-read@if(unreadNotifications < 1){ hidden}">
+            <a href="@routes.NotificationController.readAll()" id="hp-read-notifications">@Messages("notification.read_everything")</a>
+        </li>
     </ul>
 </li>

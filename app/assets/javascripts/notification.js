@@ -1,5 +1,5 @@
 function WS() {
-    this.debug = true;
+    this.debug = false;
     this.targetUrl = window.location.protocol === 'https:'
         ? 'wss://' + window.location.host + '/websocket'
         : 'ws://' + window.location.host + '/websocket';
@@ -114,8 +114,6 @@ function WS() {
 
     /**
      * Updates the new notification counter.
-     *
-     * @param notifications
      */
     this.updateNewNotificationCounter = function() {
         // count new/unread notifications
@@ -131,6 +129,7 @@ function WS() {
                     if (notificationCounters[counterIndex].style.display == 'none') {
                         $(notificationCounters[counterIndex]).fadeIn('slow');
                     }
+                    $('.notification-show-all-read').removeClass('hidden');
                 } else {
                     // we have zero unread notifications, hide counter
                     if (notificationCounters[counterIndex].style.display != 'none') {

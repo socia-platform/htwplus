@@ -241,6 +241,7 @@ public class GroupController extends BaseController {
 		}
 	}
 
+    @Transactional
 	public static Result join(long id) {
 		Account account = Component.currentAccount();
 		Group group = Group.findById(id);
@@ -328,6 +329,7 @@ public class GroupController extends BaseController {
      * @param accountId Account ID
      * @return Result
      */
+    @Transactional
 	public static Result acceptRequest(long groupId, long accountId){
 		Account account = Account.findById(accountId);
 		Group group = Group.findById(groupId);
@@ -362,6 +364,7 @@ public class GroupController extends BaseController {
      * @param accountId Account ID
      * @return Result
      */
+    @Transactional
 	public static Result declineRequest(long groupId, long accountId){
 		Account account = Account.findById(accountId);
 		Group group = Group.findById(groupId);
@@ -383,24 +386,50 @@ public class GroupController extends BaseController {
 
 		return redirect(controllers.routes.GroupController.index());
 	}
-	
+
+    @Transactional
 	public static Result invite(long groupId) {
 		Group group = Group.findById(groupId);
 		Navigation.set(Level.GROUPS, "Freunde einladen", group.title, controllers.routes.GroupController.view(group.id, PAGE));
 		return ok(invite.render(group, Friendship.friendsToInvite(Component.currentAccount(), group), GroupAccount.findAccountsByGroup(group, LinkType.invite)));
 	}
-	
+
+    @Transactional
 	public static Result inviteMember(long groupId) {
 		Group group = Group.findById(groupId);
 		Account currentUser = Component.currentAccount();
 		
 		if (Secured.inviteMember(group)) {
+            // bind invite list to group
 			DynamicForm form = Form.form().bindFromRequest();
 			group.inviteList = form.data().values();
 
+            // if no one is invited, abort
             if (group.inviteList.size() < 1) {
                 flash("error", Messages.get("group.invite_no_invite"));
                 return redirect(controllers.routes.GroupController.invite(groupId));
+            }
+
+            // create GroupAccount link for all invitations
+            for (String accountId : group.inviteList) {
+                try {
+                    Account inviteAccount = Account.findById(Long.parseLong(accountId));
+                    GroupAccount groupAccount = GroupAccount.find(inviteAccount, group);
+
+                    // Create group account link to inviteAccount and add to notification recipient list
+                    // if the inviteAccount is not already member, the sender and recipients are friends
+                    // and the group account link is not already set up.
+                    if (!Secured.isMemberOfGroup(group, inviteAccount) && Friendship.alreadyFriendly(currentUser, inviteAccount) && groupAccount == null) {
+                        new GroupAccount(inviteAccount, group, LinkType.invite).create();
+
+                        // add inviteAccount to temporaryRecipients list for notifications later
+                        group.addTemporaryRecipient(inviteAccount);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    flash("error","Etwas ist schief gelaufen.");
+                    return redirect(routes.GroupController.invite(groupId));
+                }
             }
 
             group.temporarySender = currentUser;
