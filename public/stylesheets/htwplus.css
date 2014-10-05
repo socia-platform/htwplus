@@ -306,7 +306,7 @@ body#hp-landingpage {
 	color: #76B900 !important;
 }
 
-.hp-dropdown-notifications li.notification-show-all a {
+.hp-dropdown-notifications li.notification-action a {
     font-weight: bold;
     color: #76b900;
 }
@@ -325,6 +325,17 @@ body#hp-landingpage {
 
 .hp-dropdown-notifications li.notification-element.unread a {
     color: black;
+}
+
+.hp-dropdown-notifications li#hp-show-notifications-history {
+    width: 50%;
+    float: left;
+}
+
+.hp-dropdown-notifications li#hp-read-notifications {
+    width: 50%;
+    float: right;
+    text-align: right;
 }
 
 .nothing-new {
@@ -359,48 +370,6 @@ div.well.notification div.notification-read.unread {
 
 dt.email-notifications {
     white-space: normal;
-}
-
-.notification-element {
-    border: 1px solid #e3e3e3;
-    border-radius: 4px;
-    margin: 5px;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-}
-
-.notification-show-all-sub {
-    width: 50%!important;
-    text-align: center!important;
-}
-
-.notification-show-all-sub-wrapper {
-    display: table;
-    width: 100%;
-}
-
-.notification-show-all-sub a {
-    width: inherit!important;
-}
-
-.notifications-mark-as-read {
-    text-align: center;
-    margin: 5px;
-}
-
-.dropdown-menu li .glyphicon {
-    margin: 0 7px 0 0;
-}
-
-.dropdown-menu li div {
-    padding: 7px 7px 7px 7px;
-}
-
-.dropdown-menu li div a {
-    text-decoration: none;
-}
-
-.dropdown-menu li div a :first-line {
-    text-indent: 100px;
 }
 
 .hp-breadcrumb {
