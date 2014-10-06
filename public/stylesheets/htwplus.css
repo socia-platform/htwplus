@@ -306,7 +306,21 @@ body#hp-landingpage {
 	color: #76B900 !important;
 }
 
-.hp-dropdown-notifications li.notification-action a {
+.hp-breadcrumb {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+@media (max-width: 767px) {
+    .hp-breadcrumb {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+/*============================== Notification ==============================*/
+
+.hp-dropdown-notifications li.notification-action:not(.disabled) a {
     font-weight: bold;
     color: #76b900;
 }
@@ -327,18 +341,18 @@ body#hp-landingpage {
     color: black;
 }
 
-.hp-dropdown-notifications li#hp-show-notifications-history {
+.hp-dropdown-notifications li#hp-notification-show-history {
     width: 50%;
     float: left;
 }
 
-.hp-dropdown-notifications li#hp-read-notifications {
+.hp-dropdown-notifications li#hp-notification-read-all {
     width: 50%;
     float: right;
     text-align: right;
 }
 
-.nothing-new {
+.hp-dropdown-notifications li#hp-notification-nothing-new {
     text-align: center;
     padding: 7px;
 }
@@ -368,20 +382,9 @@ div.well.notification div.notification-read.unread {
     color: #ff5f00;
 }
 
-dt.email-notifications {
-    white-space: normal;
-}
-
-.hp-breadcrumb {
-    margin-left: -10px;
-    margin-right: -10px;
-}
-
-@media (max-width: 767px) {
-    .hp-breadcrumb {
-        margin-left: 0;
-        margin-right: 0;
-    }
+input.hp-notification-hour {
+	display: inline;
+	width: inherit;
 }
 
 /*============================== Nav-Tabs ==============================*/
@@ -884,9 +887,4 @@ table .hp-avatar {
 
 .hp-optionsTable > tr:hover .dropdown-toggle > .glyphicon {
     color: #76B900
-}
-
-input.hour-time {
-    width: 35px;
-    height: 22px;
 }

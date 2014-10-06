@@ -40,7 +40,7 @@ $('.hp-optionsMenu>div').on('shown.bs.dropdown', function() {
     $(this).find('.dropdown-toggle>span').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
     var menu = $(this).find('ul.dropdown-menu');
     var row = $(this).parents('tr');
-    var top = row.offset().top + row.height() - $('#hp-right').offset().top;
+    var top = row.offset().top + row.height() - $('.hp-notepad-right').offset().top;
     menu.css('top', top + 'px');
 });
 
@@ -69,6 +69,16 @@ $(".hp-optionsTable>tr>td>input").on("click", function(e) {
     e.stopPropagation();
 });
 
+
+/*
+ *  prevent click action for disabled list items
+ */
+$("li > a").click(function(e) {
+	if ($(this).parent().hasClass('disabled')) {
+		e.preventDefault();
+		return false;
+	}
+});
 
 
 $(document).ready(function () {
@@ -174,6 +184,9 @@ $(document).ready(function () {
 
 $(window).resize(function() {
 	resizeRings();
+});
+
+$(window).load(function() {
 });
 
 $('[rel="tooltip"]').tooltip();
