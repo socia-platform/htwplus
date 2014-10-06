@@ -1,5 +1,5 @@
 function WS() {
-    this.debug = true;
+    this.debug = false;
     this.targetUrl = window.location.protocol === 'https:'
         ? 'wss://' + window.location.host + '/websocket'
         : 'ws://' + window.location.host + '/websocket';
@@ -116,8 +116,6 @@ function WS() {
 
     /**
      * Updates the new notification counter.
-     *
-     * @param notifications
      */
     this.updateNewNotificationCounter = function() {
         // count new/unread notifications
@@ -127,12 +125,14 @@ function WS() {
         // if update counters
         for (var counterIndex = 0; counterIndex < notificationCounters.size(); counterIndex++) {
             if (notificationCounters.hasOwnProperty(counterIndex)) {
-                notificationCounters[counterIndex].innerHTML = unreadNotifications;
+                notificationCounters[counterIndex].innerHTML = unreadNotifications > 10 ? '10+' : unreadNotifications;
+                this.updateFavicon(unreadNotifications);
                 if (unreadNotifications > 0) {
                     // if counter is hidden, show it
                     if (notificationCounters[counterIndex].style.display == 'none') {
                         $(notificationCounters[counterIndex]).fadeIn('slow');
                     }
+                    $('.notification-show-all-read').removeClass('hidden');
                 } else {
                     // we have zero unread notifications, hide counter
                     if (notificationCounters[counterIndex].style.display != 'none') {
@@ -141,6 +141,30 @@ function WS() {
                 }
             }
         }
+    };
+
+    /**
+     * Updates the favicon by the notification count.
+     */
+    this.updateFavicon = function(count) {
+        var head = document.head ? document.head : document.getElementsByTagName('head')[0];
+        var link = document.createElement('link');
+        var oldLink = document.getElementById('dynamic-favicon');
+        link.id = 'dynamic-favicon';
+        link.rel = 'shortcut icon';
+
+        if (count < 1) {
+            link.href = '/assets/images/favicon.ico'
+        } else if (count <= 10) {
+            link.href = '/assets/images/favicons/favicon_X.ico'.replace('X', count.toString());
+        } else {
+            link.href = '/assets/images/favicons/favicon_plus.ico';
+        }
+
+        if (oldLink) {
+            head.removeChild(oldLink);
+        }
+        head.appendChild(link);
     };
 
     /**
@@ -160,4 +184,5 @@ function WS() {
 var webSocket;
 $(document).ready(function () {
     webSocket = new WS();
+    webSocket.updateNewNotificationCounter();
 });

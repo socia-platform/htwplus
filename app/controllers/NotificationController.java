@@ -86,8 +86,11 @@ public class NotificationController extends BaseController {
             notifications = Notification.findByAccountIdForPage(Component.currentAccount().id, NotificationController.LIMIT, page);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
+        List<Integer> countedNotifications = NotificationController.countNotifications(notifications);
         Navigation.set(Navigation.Level.NOTIFICATIONS, Messages.get("notification.news"));
-        return ok(view.render(notifications, LIMIT, page, Notification.countNotificationsForAccountId(Component.currentAccount().id)));
+        return ok(view.render(notifications, LIMIT, page,
+                Notification.countNotificationsForAccountId(Component.currentAccount().id), countedNotifications.get(1)
+        ));
     }
 
     /**
@@ -121,5 +124,18 @@ public class NotificationController extends BaseController {
         count.add(2, countRead);
 
         return count;
+    }
+
+    /**
+     * Marks all notifications as read for an Account.
+     *
+     * @return Result
+     */
+    @Transactional
+    public static Result readAll() {
+        Notification.markAllAsRead(Component.currentAccount());
+        flash("success", Messages.get("notification.read_everything_ok"));
+
+        return redirect(request().getHeader("referer"));
     }
 }

@@ -1,4 +1,4 @@
-package models;
+package models.services;
 
 import models.enums.AccountRole;
 
@@ -7,7 +7,6 @@ import org.apache.directory.api.ldap.model.cursor.EntryCursor;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.message.SearchScope;
-import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.directory.ldap.client.api.exception.InvalidConnectionException;
@@ -17,9 +16,9 @@ import play.Play;
 import play.i18n.Messages;
 
 /**
- * LDAP Connector to establish LDAP connection and request user account data from directory.
+ * LDAP service to establish LDAP connection and request user account data from directory.
  */
-public class LDAPConnector {
+public class LdapService {
     /**
      * First name
      */
@@ -31,19 +30,24 @@ public class LDAPConnector {
     private String lastName = null;
 
     /**
-     * E-Mail
-     */
-    private String email = null;
-
-    /**
      * Account role
      */
     private AccountRole role = null;
 
     /**
-     * LDAP connection reference
+     * LDAP server host
      */
-    LdapConnection connection = null;
+    String ldapServer = null;
+
+    /**
+     * LDAP port
+     */
+    int ldapPort;
+
+    /**
+     * If true, Start TLS is used for LDAP connection
+     */
+    boolean ldapStartTls;
 
     /**
      * Getter for first name.
@@ -64,15 +68,6 @@ public class LDAPConnector {
     }
 
     /**
-     * Getter for email.
-     *
-     * @return E-Mail
-     */
-    public String getEmail() {
-        return this.email;
-    }
-
-    /**
      * Getter for account role.
      *
      * @return Account role
@@ -82,23 +77,34 @@ public class LDAPConnector {
     }
 
     /**
-     * Constructor.
+     * Singleton instance
      */
-    public LDAPConnector() {
-        String server = Play.application().configuration().getString("ldap.server");
-        int port = Integer.parseInt(Play.application().configuration().getString("ldap.port"));
-        boolean startTls = Boolean.parseBoolean(Play.application().configuration().getString("ldap.startTls"));
+    private static LdapService instance = null;
 
-        LdapConnectionConfig connectionConfig = new LdapConnectionConfig();
-        connectionConfig.setLdapHost(server);
-        connectionConfig.setLdapPort(port);
-        connectionConfig.setUseTls(startTls);
-
-        this.connection = new LdapNetworkConnection(connectionConfig);
+    /**
+     * Private constructor for singleton instance
+     */
+    private LdapService() {
+        this.ldapServer = Play.application().configuration().getString("ldap.server");
+        this.ldapPort = Integer.parseInt(Play.application().configuration().getString("ldap.port"));
+        this.ldapStartTls = Boolean.parseBoolean(Play.application().configuration().getString("ldap.startTls"));
     }
 
     /**
-     * Connects to the LDAP server. If successful connected, the user is searched. If found, the user
+     * Returns the singleton instance.
+     *
+     * @return NotificationHandler instance
+     */
+    public static LdapService getInstance() {
+        if (LdapService.instance == null) {
+            LdapService.instance = new LdapService();
+        }
+
+        return LdapService.instance;
+    }
+
+    /**
+     * Connects to the LDAP ldapServer. If successful connected, the user is searched. If found, the user
      * data is read and set into firstName and lastName.
      *
      * @param userName User
@@ -117,17 +123,25 @@ public class LDAPConnector {
         String groupSearch = Play.application().configuration().getString("ldap.groupSearch")
                 .replace("%BIND%", connectionBind);
 
-        // LDAP keys for values from LDAP server
+        // LDAP keys for values from LDAP ldapServer
         String userFirstName = Play.application().configuration().getString("ldap.serverValues.firstName");
         String userLastName = Play.application().configuration().getString("ldap.serverValues.lastName");
-        String userEmail = Play.application().configuration().getString("ldap.serverValues.email");
         String groupName = Play.application().configuration().getString("ldap.serverValues.groupName");
         String studentRole = Play.application().configuration().getString("ldap.serverValues.studentRole");
         String tutorRole = Play.application().configuration().getString("ldap.serverValues.tutorRole");
 
-        // try to connect to the LDAP server
+        LdapNetworkConnection ldapConnection;
+
+        // try to connect to the LDAP ldapServer
         try {
-            this.connection.bind(connectionBind, password);
+            LdapConnectionConfig connectionConfig = new LdapConnectionConfig();
+            connectionConfig.setLdapHost(this.ldapServer);
+            connectionConfig.setLdapPort(this.ldapPort);
+            connectionConfig.setUseTls(this.ldapStartTls);
+            connectionConfig.setCredentials(password);
+            connectionConfig.setName(connectionBind);
+            ldapConnection = new LdapNetworkConnection(connectionConfig);
+            ldapConnection.bind();
         } catch (InvalidConnectionException e) {
             e.printStackTrace();
             throw new LdapConnectorException(Messages.get("ldap.noConnection"));
@@ -139,13 +153,12 @@ public class LDAPConnector {
         // login to LDAP successful, try to find the user data
         EntryCursor entCursor;
         try {
-            entCursor = this.connection.search(userRoot, userSearch, SearchScope.ONELEVEL, "*");
+            entCursor = ldapConnection.search(userRoot, userSearch, SearchScope.ONELEVEL, "*");
             entCursor.next();
             Entry entry = entCursor.get();
             this.firstName = entry.get(userFirstName).getString();
             this.lastName = entry.get(userLastName).getString();
-            this.email = entry.get(userEmail).getString();
-            Logger.info("Read Account from LDAP: " + this.firstName + " " + this.lastName + " (E-Mail: " + this.email + ")");
+            Logger.info("Read Account from LDAP: " + this.firstName + " " + this.lastName);
         } catch (LdapException | CursorException e) {
             e.printStackTrace();
             throw new LdapConnectorException(Messages.get("ldap.generalError"));
@@ -153,7 +166,7 @@ public class LDAPConnector {
 
         // user data successfully set, try to find the role of the user
         try {
-            entCursor =  connection.search(groupRoot, groupSearch, SearchScope.ONELEVEL, "*");
+            entCursor =  ldapConnection.search(groupRoot, groupSearch, SearchScope.ONELEVEL, "*");
             String role;
             while (entCursor.next()) {
                 Entry entry = entCursor.get();

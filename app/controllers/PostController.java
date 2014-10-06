@@ -162,15 +162,15 @@ public class PostController extends BaseController {
 	}
 
 	@Transactional
-	public static List<Post> getCommentsForPostInGroup(Long id) {
-		int max = Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
-		int count = Post.countCommentsForPost(id);
-		if (count <= max) {
-			return Post.getCommentsForPost(id, 0, count);
-		} else {
-			return Post.getCommentsForPost(id, count-max, count);
+	public static List<Post> getComments(Long id, int limit) {
+		//int max = Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
+		int offset = 0;
+		if(limit != 0){
+			offset = Post.countCommentsForPost(id) - limit;
 		}
+		return Post.getCommentsForPost(id, limit, offset);
 	}
+	
 	
 	@Transactional
 	public static Result getOlderComments(Long id, Integer current) {
@@ -181,48 +181,53 @@ public class PostController extends BaseController {
 		}
 		
 		String result = "";
-		//int max = Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
-		int max = current;
-		int count = Post.countCommentsForPost(id);
+		
+		// subtract already displayed comments
+		int limit = Post.countCommentsForPost(id) - Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
+		
 		List<Post> comments;
-		if (count <= max) {
-			return ok(result);	
-		} else {
-			comments = Post.getCommentsForPost(id, 0, count-max);
-			for (Post post : comments) {
-				result = result.concat(views.html.snippets.postComment.render(post).toString());
-			}
-			return ok(result);	
+		comments = Post.getCommentsForPost(id, limit, 0);
+		for (Post post : comments) {
+			result = result.concat(views.html.snippets.postComment.render(post).toString());
 		}
+		return ok(result);	
 	}
 	
 	@Transactional
-	public static Result deletePost(final Long postId) {
-		final Post post = Post.findById(postId);
-		// verify redirect after deletion
+	public static Result deletePost(Long postId) {
+		Post post = Post.findById(postId);
+		Account account = Component.currentAccount();
 		Call routesTo = null;
-		if (post.group != null) {
-			routesTo = controllers.routes.GroupController.view(post.group.id, PAGE);
-		}
-		else if (post.account != null) {
-			routesTo = controllers.routes.Application.index();
-		}
-		else if (post.parent != null) {
-			if (post.parent.group != null) {
-				routesTo = controllers.routes.GroupController.view(post.parent.group.id, PAGE);
-			} else if (post.parent.account != null) {
+		
+		if (Secured.isAllowedToDeletePost(post, account)) {
+			
+			//verify redirect
+			if (post.group != null) {
+				routesTo = controllers.routes.GroupController.view(post.group.id, PAGE);
+			}
+			
+			if (post.account != null) {
 				routesTo = controllers.routes.Application.index();
 			}
-		}
-		final Account account = Component.currentAccount();
-		if (Secured.isAllowedToDeletePost(post, account)) {
+			
+			if (post.parent != null) {
+				if (post.parent.group != null) {
+					routesTo = controllers.routes.GroupController.view(post.parent.group.id, PAGE);
+				} else if (post.parent.account != null) {
+					routesTo = controllers.routes.Application.index();
+				}
+			}
+			
+			
+			
 			post.delete();
 			flash("success", "Gelöscht!");
+			
 		} else {
 			flash("error", "Konnte nicht gelöscht werden!");
-		}
+		}		
 
-        if (routesTo == null) {
+		if (routesTo == null) {
             routesTo = controllers.routes.Application.index();
         }
 
