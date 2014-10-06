@@ -1,5 +1,6 @@
-@(post: Post, postForm: Form[Post], currentView: String)
+@(post: Post, postForm: Form[Post], currentView: String, commentLimit: Integer)
 @import helper._
+@import play._
 
 @defining(Component.currentAccount()) { currentUser =>
 	<br />
@@ -27,12 +28,12 @@
 		<div class="hp-truncate hp-white-space" id="@post.id">@post.content</div>
 		<hr />
 		<div class="hp-comments" id="comments-@post.id">
-
-			@if(post.getCountComments() > 2) {
+			@if(post.getCountComments() > Play.application().configuration().getInt("htwplus.comments.init") && commentLimit != Play.application().configuration().getInt("htwplus.comments.singlepost")) {
 				<a href="#collapse-@post.id" class="olderComments unloaded">Alle Kommentare anzeigen...</a>
 				<div id="collapse-@post.id" class="collapse"></div>
 			}
-			@defining(PostController.getCommentsForPostInGroup(post.id)) { comments =>
+			
+			@defining(PostController.getComments(post.id, commentLimit)) { comments =>
                 @if(comments != null) {
                     @for(comment <- comments){
                         @views.html.snippets.postComment(comment)
@@ -41,19 +42,16 @@
 	 		}
 	 		@if(Secured.addComment(post)) {
 	 			@form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form", 'id -> "addComment-@post.id") {
-				<div class="hp-horizontal-form col-xs-12">
-					<div class="input-group">
-						@textarea(postForm("Content"), 'class -> "form-control", 'id -> "hp-new-comment-content", 'placeholder -> "Erstelle ein Kommentar...")
-						<span class="input-group-btn">
-							<button type="submit" class="btn btn-sm btn-warning commentSubmit">Kommentieren</button> 
-						</span>
+					<div class="hp-horizontal-form col-xs-12">
+						<div class="input-group">
+							@textarea(postForm("Content"), 'class -> "form-control", 'id -> "hp-new-comment-content", 'placeholder -> "Erstelle ein Kommentar...")
+							<span class="input-group-btn">
+								<button type="submit" class="btn btn-sm btn-warning commentSubmit">Kommentieren</button> 
+							</span>
+						</div>
 					</div>
-				</div>
-			}
-	 		
+				}
 	 		}
-	 		
-
 		</div>
 		<div class="clear"></div>
 	</div>

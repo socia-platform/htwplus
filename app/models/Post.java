@@ -71,9 +71,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 	
 	protected static Query limit(Query query, int limit, int offset) {
-		if (limit > 0) {
-			query.setMaxResults(limit);
-		}
+		query.setMaxResults(limit);
 		if (offset >= 0) {
 			query.setFirstResult(offset);
 		}
@@ -102,13 +100,14 @@ public class Post extends BaseNotifiable implements INotifiable {
 	
 	
 	@SuppressWarnings("unchecked")
-	public static List<Post> getCommentsForPost(final Long id, final int start, final int max) {
-		return (List<Post>) JPA.em()
+	public static List<Post> getCommentsForPost(Long id, int limit, int offset) {
+		Query query = JPA.em()
                 .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
-                .setParameter(1, id)
-                .setFirstResult(start)
-                .setMaxResults(max)
-                .getResultList();
+                .setParameter(1, id);
+		
+		query = limit(query, limit, offset);
+		
+		return (List<Post>) query.getResultList();
 	}
 
     @SuppressWarnings("unchecked")
