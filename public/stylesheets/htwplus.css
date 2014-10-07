@@ -590,9 +590,11 @@ form dl dt {
 	text-align: left !important;
 }
 
+/*
 form dl dd {
 	margin-bottom: 15px;
 }
+*/
 
 form dl dd > .checkbox,
 form dl dd > .radio {
@@ -668,7 +670,6 @@ div.hp-pagination {
 
 .hp-comments {
 	margin-left: 50px;
-	margin-bottom: -15px;
 }
 
 @media (max-width: 767px) {
