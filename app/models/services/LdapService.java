@@ -128,7 +128,7 @@ public class LdapService {
         String userLastName = Play.application().configuration().getString("ldap.serverValues.lastName");
         String groupName = Play.application().configuration().getString("ldap.serverValues.groupName");
         String studentRole = Play.application().configuration().getString("ldap.serverValues.studentRole");
-        String tutorRole = Play.application().configuration().getString("ldap.serverValues.tutorRole");
+        String tutorRole = Play.application().configuration().getString("ldap.serverValues.profRole");
 
         LdapNetworkConnection ldapConnection;
 
