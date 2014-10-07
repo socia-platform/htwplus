@@ -35,9 +35,15 @@
             <div class="hp-navbar-container">
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="hp-nav nav navbar-nav">
-                        <li data-scrollspy-target="hp-about"><a href='javascript:scrollTo("#hp-about");'>Über HTWplus</a></li>
-                        <li data-scrollspy-target="hp-features"><a href='javascript:scrollTo("#hp-features");'>Funktionen</a></li>
-                        <li data-scrollspy-target="hp-team"><a href='javascript:scrollTo("#hp-team");'>Das Team</a></li>
+                        <li data-scrollspy-target="hp-about">
+                            <a href='javascript:scrollTo("#hp-about");'>Über HTWplus</a>
+                        </li>
+                        <li data-scrollspy-target="hp-features">
+                            <a href='javascript:scrollTo("#hp-features");'>@Messages("landingpage.features")</a>
+                        </li>
+                        <li data-scrollspy-target="hp-team">
+                            <a href='javascript:scrollTo("#hp-team");'>Das Team</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -53,48 +59,38 @@
             <div class="col-xs-12 col-sm-10 col-sm-offset-1">
 
                 <!-- Login -->
-                @views.html.snippets.feature("Anmeldung",
-                    "Legt sofort los und nutzt alle Vorteil von HTWplus! Als Studierender oder Mitarbeiter der HTW-Berlin hast du die Möglichkeit, dich direkt ganz bequem mit deinem Hochschul-Account anzumelden.") {
+                @views.html.snippets.feature(Messages("landingpage.features.login.title"),
+                                             Messages("landingpage.features.login.description")) {
                 <h3>Hello World!</h3>
                 }
 
-                <!-- Profile -->
-                @views.html.snippets.feature("Profil",
-                    "Nach der ersten Anmeldung wird automatisch dein ganz persönliches Profil angelegt und bereits durch deinen Vor- und Nachname ergänzt. Natürlich kannst du anschließend dein Profil auch bearbeiten und beispielsweise eine E-Mail Adresse hinterlegen oder einen anderes Profilbild festlegen.") {
-                <h2>Max Mustermann</h2>
-                <br>
-                <img alt="avatar" src="/assets/images/avatars/a11.png" class="img-thumbnail">
-                <br>
-                <br>
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <th style="width:30%;">E-Mail</th>
-                            <td style="width:70%;">max@@mustermann.de</td>
-                        </tr>
-                        <tr>
-                            <th>Studiengang</th>
-                            <td>Angewandte Informatik</td>
-                        </tr>
-                        <tr>
-                            <th>Semester</th>
-                            <td>1. Semester</td>
-                        </tr>
-                        <tr>
-                            <th>Abschluss</th>
-                            <td>Bachelor</td>
-                        </tr>
-                        <tr>
-                            <th>Rolle</th>
-                            <td>Student</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Friends -->
+                @views.html.snippets.feature(Messages("landingpage.features.friends.title"),
+                                             Messages("landingpage.features.friends.description")) {
+                <h3>Hello World!</h3>
+                }
+
+                <!-- Groups -->
+                @views.html.snippets.feature(Messages("landingpage.features.groups.title"),
+                                             Messages("landingpage.features.groups.description")) {
+                <h3>Hello World!</h3>
+                }
+
+                <!-- Courses -->
+                @views.html.snippets.feature(Messages("landingpage.features.courses.title"),
+                                             Messages("landingpage.features.courses.description")) {
+                <h3>Hello World!</h3>
+                }
+
+                <!-- File management -->
+                @views.html.snippets.feature(Messages("landingpage.features.filemgmt.title"),
+                                             Messages("landingpage.features.filemgmt.description")) {
+                <h3>Hello World!</h3>
                 }
 
                 <!-- Newsstream -->
-                @views.html.snippets.feature("Newsstream",
-                    "Die erste Anlaufstelle ist dein persönlicher Newsstream. Wie üblich erfolgt die Kommunikation bei HTWplus über Posts und dazugehörige Kommentare. Auf deinem Newsstream kannst du nun Posts zu Themen verfassen, die dich vielleicht aktuell bewegen. Diese können anschließend von anderen HTWplus Nutzern gelsesen und kommentiert werden.  Weiterhin werden dir auf deinem Newsstream unter anderem neue Posts und Kommentare aus Gruppen und Kursen angezeigt, in denen du Mitglied bist.") {
+                @views.html.snippets.feature(Messages("landingpage.features.newsstream.title"),
+                                             Messages("landingpage.features.newsstream.description")) {
                 <h1>Mein Newsstream</h1><br>
 
                 <form action="" method="" class="hp-post-form" id="addPost">
@@ -169,33 +165,9 @@
                 </div>
                 }
 
-                <!-- Groups -->
-                @views.html.snippets.feature("Gruppen",
-                    "Koordiniert und organisiert eure Arbeiten an Gemeinschaftsprojekten oder bereitet euch kollektiv auf Vorlesungen, Übungen und Klausuren vor. In HTWplus hat dazu jeder die Möglichkeit, private und öffentliche Gruppen zu erstellen oder bestehenden beizutreten und sich an Gesprächen oder Diskussionen zu beteiligen.") {
-                <h3>Hello World!</h3>
-                }
-
-                <!-- Courses -->
-                @views.html.snippets.feature("Kurse",
-                    "Mitarbeiter bzw. Dozenten können zusätzlich Kurse erstellen und darüber teilnehmende Studierende beispielsweise über organisatorische Aspekte ihrer Vorlesungen informieren. Beim Anlegen wird ein sogenannter Token festgelegt, der benötigt wird, um an bestehenden Kursen teilzunehmen.") {
-                <h3>Hello World!</h3>
-                }
-
-                <!-- File management -->
-                @views.html.snippets.feature("Dateiverwaltung",
-                    "Sowohl in euren beigetretenen Gruppen als auch Kursen könnt ihr Dateien hochlanden und somit anderen Mitgliedern zur Verfügung stellen. Damit lassen sich beliebige Dokumente wie Vorlesungsskripte oder Notizen bequem verteilen, ohne auf andere Dienste angewiesen zu sein.") {
-                <h3>Hello World!</h3>
-                }
-
-                <!-- Friends -->
-                @views.html.snippets.feature("Freunde",
-                    "Wie es sich für ein soziales Netzwerk gehört, kannst du auch bei HTWplus Bekanntschaft mit Kommilitonen aber auch Dozenten schließen. So ist es euch möglich, gegenseitig eure Newsstreams zu lesen, Gruppeneinladungen auszusprechen und vieles mehr.") {
-                <h3>Hello World!</h3>
-                }
-
                 <!-- Notifications -->
-                @views.html.snippets.feature("Benachrichtigungen",
-                    "Damit entgeht dir nichts, was bei HTWplus passiert! Ob neue Posts, Kommentare, Freundschaftsanfragen oder Gruppeneinladungen - du wirst über alles informiert. Je nach Wunsch kannst du dich auch per E-Mail über Neuigkeiten automatisch benachrichtigen lassen.") {
+                @views.html.snippets.feature(Messages("landingpage.features.notifications.title"),
+                                             Messages("landingpage.features.notifications.description")) {
                 <h3>Hello World!</h3>
                 }
 
