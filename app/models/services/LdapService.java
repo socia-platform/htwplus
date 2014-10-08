@@ -172,6 +172,7 @@ public class LdapService {
             while (entCursor.next()) {
                 Entry entry = entCursor.get();
                 role = entry.get(groupName).getString();
+                System.out.println(role);
                 if (role.equals(studentRole)) {
                     this.role = AccountRole.STUDENT;
                 }
