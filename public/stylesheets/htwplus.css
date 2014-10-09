@@ -176,14 +176,39 @@ body#hp-landingpage {
 
 #hp-landingpage div#hp-navbar {
     border-width: 0 0 1px;
+    border-radius: 0;
     z-index: 1030;
-    margin-bottom: -51px;
+}
+
+#hp-landingpage div#hp-navbar.hp-animate {
+    transition: 0.3s ease 0s;
+	-webkit-transition: 0.3s ease 0s;
+	-moz-transition: 0.3s ease 0s;
+	-ms-transition: 0.3s ease 0s;
+	-o-transition: 0.3s ease 0s;
+}
+
+#hp-landingpage div#hp-navbar.affix-top {
+    min-height: 15px;
+    margin-bottom: -16px;
+}
+
+#hp-landingpage div#hp-navbar.affix-top > div.hp-navbar-container {
+    display: none !important;
+    visibility: hidden;
 }
 
 #hp-landingpage div#hp-navbar.affix {
 	top: 0;
 	left: 0;
 	right: 0;
+	min-height: 50px;
+    margin-bottom: -51px;
+}
+
+#hp-landingpage div#hp-navbar.affix > div.hp-navbar-container {
+    display: none;
+    visibility: visible;
 }
 
 #hp-landingpage div#hp-navbar ul.hp-nav {
@@ -229,38 +254,17 @@ body#hp-landingpage {
 
 /*============================== Navigation ==============================*/
 
-#hp-navbar .hp-search-form {
-	padding-right: 7px;
-}
-
-#hp-navbar .hp-search-form input {
-	width: 150px;
-	padding-right: 20px;
-	background-color: #E0F2BF;
-}
-
-#hp-navbar .hp-search-form button {
-	background: transparent;
-	border: 0;
-	margin-left: -28px;
-	outline: none;
-}
-
-#hp-navbar li .glyphicon {
-	color: inherit!important;
-}
-
 .hp-navbar-container {
 	max-width: 1000px;
 	margin: 0 auto;
 }
 
-.hp-nav-user {
-	padding: 9px 10px !important;
+.hp-navbar-container .navbar-right {
+    margin-right: 0 !important;
 }
 
-.hp-nav-user span {
-	display: inline-block !important;
+.hp-nav-user {
+	padding: 9px 10px !important;
 }
 
 .hp-dropdown-notifications,
@@ -276,7 +280,7 @@ body#hp-landingpage {
 	.hp-dropdown-search {
 		position: fixed;
 		width: auto;
-		top: 51px;
+		top: 50px;
 		right: 1px;
 		left: 1px;
 	}
@@ -303,8 +307,29 @@ body#hp-landingpage {
 	right: 11px;
 }
 
-.hp-dropdown-search button .glyphicon:hover {
+.hp-navbar-container > .hp-search-form {
+	padding-right: 7px;
+}
+
+.hp-navbar-container > .hp-search-form input {
+	width: 150px;
+	padding-right: 20px;
+	background-color: #E0F2BF;
+}
+
+.hp-search-form button {
+	background: transparent;
+	border: 0;
+	margin-left: -28px;
+	outline: none;
+}
+
+.hp-search-form button .glyphicon:hover {
 	color: #76B900 !important;
+}
+
+#hp-navbar li a .glyphicon {
+	color: inherit !important;
 }
 
 .hp-breadcrumb {

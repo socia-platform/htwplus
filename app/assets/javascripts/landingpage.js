@@ -34,6 +34,14 @@ $('#hp-navbar').affix({
     }
 });
 
+$('#hp-navbar').on('webkitTransitionEnd', function() {
+    var container = $('div.hp-navbar-container');
+    if (container.css('visibility') == 'visible') {
+        container.css('display', 'block');
+    } else {
+        container.css('display', 'none');
+    }
+});
 
 $(window).load(function() {
 	// load banner dimensions
@@ -56,7 +64,7 @@ $(window).load(function() {
             }
         });
     });
-
+    $('#hp-navbar').addClass('hp-animate');
     resizeBackground();
 });
 
