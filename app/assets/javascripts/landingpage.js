@@ -34,14 +34,16 @@ $('#hp-navbar').affix({
     }
 });
 
-$('#hp-navbar').on('webkitTransitionEnd', function() {
+function navbarVisibility() {
     var container = $('div.hp-navbar-container');
     if (container.css('visibility') == 'visible') {
         container.css('display', 'block');
     } else {
         container.css('display', 'none');
     }
-});
+}
+
+$('#hp-navbar').on('webkitTransitionEnd', navbarVisibility);
 
 $(window).load(function() {
 	// load banner dimensions
@@ -50,7 +52,7 @@ $(window).load(function() {
     imgHeight = newImg.height;
     imgWidth = newImg.width;
 
-	// append scrollspy for sections, will activate items on hp-navbar if there are reached while scrolling
+	// apply scrollspy for sections, will activate items on hp-navbar if corresponding section is reached while scrolling
     $('.hp-section').each(function() {
         var curY = $(this).offset().top - $('#hp-navbar').outerHeight();
         $(this).scrollspy({
@@ -69,3 +71,4 @@ $(window).load(function() {
 });
 
 $(window).resize(resizeBackground);
+navbarVisibility();

@@ -179,7 +179,6 @@ $(document).ready(function () {
 	});
 
 	autolinkUrls();
-	resizeRings();
 });
 
 $(window).resize(function() {
@@ -195,3 +194,5 @@ $('[rel="popover"]').popover();
 $('.hp-focus-search').click(function() {
     $('.hp-easy-search').focus();
 });
+
+resizeRings();
