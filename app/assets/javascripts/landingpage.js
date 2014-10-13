@@ -70,5 +70,45 @@ $(window).load(function() {
     resizeBackground();
 });
 
-$(window).resize(resizeBackground);
+/**
+ * Magic Scroll
+ */
+var controller;
+
+function replaceTriggerHook() {
+	if (scene != null)
+		scene.triggerHook(50 / $(window).height());
+}
+
+$(document).ready(function() {
+	// init controller
+	controller = new ScrollMagic();
+
+	// build scenes
+	var scene0 = new ScrollScene({triggerElement: "#hp-feature-trigger-demo"})
+					.setPin("#hp-feature-demo")
+					.addTo(controller)
+					.triggerHook(50 / $(window).height())
+					.addIndicators();
+
+	var scene1 = new ScrollScene({triggerElement: "#hp-feature-trigger-1", duration: 300})
+					.setTween(TweenMax.to("#hp-feature-text-1", 0.5, {display: "none"}))
+					.addTo(controller)
+					.triggerHook(50 / $(window).height())
+					.addIndicators();
+
+	var scene2 = new ScrollScene({triggerElement: "#hp-feature-trigger-2", duration: 300})
+					.setTween(TweenMax.to("#hp-feature-text-2", 0.5, {display: "none"}))
+					.addTo(controller)
+					.triggerHook(50 / $(window).height())
+					.addIndicators();
+
+});
+
+
+$(window).resize(function() {
+	resizeBackground();
+	//replaceTriggerHook();
+});
+
 navbarVisibility();

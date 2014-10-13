@@ -231,20 +231,18 @@ body#hp-landingpage {
 	min-height: 500px;
 }
 
-#hp-landingpage div#hp-features .hp-feature-picture .hp-notepad-content {
-	min-height: inherit;
-}
-
 #hp-landingpage div#hp-features .hp-feature-text {
 	margin-top: 55px;
 }
 
 #hp-landingpage div#hp-features .hp-feature-title {
 	font-family: 'Swanky and Moo Moo', cursive;
+	margin-top: 0;
 }
 
 #hp-landingpage div#hp-features .hp-feature-description {
 	margin-top: 30px;
+	margin-bottom: 0;
 }
 
 #hp-landingpage div#hp-team {

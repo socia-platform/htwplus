@@ -49,14 +49,16 @@
             </div>
         </div>
 
-        <div id="hp-about" class="hp-section row">
-            <div class="col-xs-12">
-                <h2 id="about">Über</h2>
-            </div>
-        </div>
+        <!-- content wrapper -->
+        <div class="col-xs-12 col-sm-10 col-sm-offset-1">
 
-        <div id="hp-features" class="hp-section row">
-            <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+            <div id="hp-about" class="hp-section row">
+                <div class="col-xs-12">
+                    <h2 id="about">Über</h2>
+                </div>
+            </div>
+
+            <div id="hp-features" class="hp-section row">
 
                 <!-- Login -->
                 @views.html.snippets.feature(Messages("landingpage.features.login.title"),
@@ -68,7 +70,7 @@
                 @views.html.snippets.feature(Messages("landingpage.features.friends.title"),
                                              Messages("landingpage.features.friends.description")) {
                 <h2><span rel="tooltip" data-original-title="Hier findest du den aktuellen Status deiner Freundschafts-Anfragen." data-delay="500">
-		            Offene Anfragen</span>
+                    Offene Anfragen</span>
                 </h2>
                 <table class="table table-hover">
                     <thead>
@@ -541,13 +543,50 @@
                 }
 
             </div>
-        </div>
 
-        <div id="hp-team" class="hp-section row">
-            <div class="col-xs-12">
-                <h2 id="team">Team</h2>
+            <br>
+            <br>
+            <br>
+            <br>
+
+            <div id="hp-features" class="hp-section row">
+                <!-- feature demos -->
+                <div class="hp-feature-picture col-md-6">
+                    <div id="hp-feature-demo" style="">
+                        @views.html.snippets.notepad{
+
+                        <div id="hp-feature-demo-1">
+                            <h3>Test 1!!!</h3>
+                        </div>
+
+                        <div id="hp-feature-demo-2">
+                            <h3>Test 2!!!</h3>
+                        </div>
+
+                        }
+                    </div>
+                </div>
+
+                <!-- feature descriptions -->
+                <div class="hp-feature-text col-md-5 col-md-offset-1" style="height: 2000px; background-color: gainsboro;">
+                    <div id="hp-feature-trigger-demo" style="min-height: 1px; width: 100%; background-color: blue;"></div>
+
+                    <div id="hp-feature-trigger-1" style="min-height: 1px; width: 100%; background-color: green;"></div>
+                    <div id="hp-feature-text-1" style="height: 300px;">
+                        <h1 class="hp-feature-title">Test 1</h1>
+                        <h4 class="hp-feature-description">kl asdhfkh aklsdh fkhjaskd lhfiuu ahwduh fhasilduh fliuh asliduh filuh alsiduh f</h4>
+                    </div>
+
+                    <div id="hp-feature-trigger-2" style="min-height: 1px; width: 100%; background-color: green;"></div>
+                    <div id="hp-feature-text-2" style="height: 300px;">
+                        <h1 class="hp-feature-title">Test 2</h1>
+                        <h4 class="hp-feature-description">kl asdhfkh aklsdh fkhjaskd lhfiuu ahwduh fhasilduh fliuh asliduh filuh alsiduh f</h4>
+                    </div>
+
+                </div>
             </div>
-        </div>
+
+        </div> <!-- end content wrapper -->
 
     </div> <!-- /container -->
 
@@ -555,10 +594,13 @@
     <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("bootstrap/js/bootstrap.min.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.linkify.min.js")'></script>
-    <script type="text/javascript" src='@routes.Assets.at("javascripts/landingpage.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/htwplus.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery-scrollspy.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/vendor/greensock/TweenMax.min.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.scrollmagic.min.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.scrollmagic.debug.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/landingpage.js")'></script>
 
 </body>
 
