@@ -1,9 +1,16 @@
-@(notifications: List[Notification], limit: Integer, currentPage: Integer, count: Integer)
+@(notifications: List[Notification], limit: Integer, currentPage: Integer, count: Integer, unreadNotifications: Integer)
 @import helper._
 
 @main("Notifications") {
-    <h1>@Messages("notification.news")</h1><br />
+    <h1>@Messages("notification.news")</h1>
     @if(notifications != null) {
+        @if(unreadNotifications > 0) {
+            <div class="notifications-mark-as-read">
+                <span class="glyphicon glyphicon-ok"></span>
+                <a href="@routes.NotificationController.readAll()">@Messages("notification.read_everything")</a>
+            </div>
+        }
+        <br />
         @for(notification <- notifications) {
             <div class="well notification">
                 <div class="notification-date">@Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"))</div>
