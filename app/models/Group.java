@@ -93,40 +93,6 @@ public class Group extends BaseNotifiable implements INotifiable {
     @Transient
     public Collection<String> inviteList = null;
 
-    // GETTER & SETTER
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public Account getOwner() {
-		return owner;
-	}
-
-	public void setOwner(Account owner) {
-		this.owner = owner;
-	}
-
-	public List<Media> getMedia() {
-		return media;
-	}
-
-	public void setMedia(List<Media> media) {
-		this.media = media;
-	}
-
 	public List<ValidationError> validate() {
 		List<ValidationError> errors = new ArrayList<>();
 		if (Group.findByTitle(this.title) != null) {
