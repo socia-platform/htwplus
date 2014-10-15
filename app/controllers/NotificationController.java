@@ -86,8 +86,11 @@ public class NotificationController extends BaseController {
             notifications = Notification.findByAccountIdForPage(Component.currentAccount().id, NotificationController.LIMIT, page);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
+        List<Integer> countedNotifications = NotificationController.countNotifications(notifications);
         Navigation.set(Navigation.Level.NOTIFICATIONS, Messages.get("notification.title"));
-        return ok(view.render(notifications, LIMIT, page, Notification.countNotificationsForAccountId(Component.currentAccount().id)));
+        return ok(view.render(notifications, LIMIT, page,
+                Notification.countNotificationsForAccountId(Component.currentAccount().id), countedNotifications.get(1)
+        ));
     }
 
     /**
