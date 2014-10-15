@@ -2,7 +2,7 @@
 
 <li class="dropdown" id="hp-notifications-item">
      <a href="#" class="visible-xs dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-bell"></span>
-     <span class="badge"@if(unreadNotifications < 1){ style="display: none;"}>@unreadNotifications</span>
+     <span class="badge"@if(unreadNotifications < 1){ style="display: none;"} id="hp-notification-count" data-count="@unreadNotifications">@unreadNotifications</span>
 
      <b class="caret"></b></a>
      <a href="#" class="hidden-xs dropdown-toggle" data-toggle="dropdown">@Messages("notification.news")
@@ -23,7 +23,7 @@
              @Messages("notification.nothing_new")
          </li>
       }
-      <li class="notification-element notification-show-all@if(countNotifications == 0) { hidden}">
+      <li class="notification-element notification-show-all">
           <div class="notification-show-all-sub-wrapper">
               <div class="notification-show-all-sub">
                   <a href="@routes.NotificationController.showAll()" id="hp-show-notifications-history">

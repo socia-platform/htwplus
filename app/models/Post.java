@@ -19,7 +19,6 @@ public class Post extends BaseNotifiable implements INotifiable {
     public static final String COMMENT_GROUP = "comment_group";             // comment on a group post
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
     public static final String BROADCAST = "broadcast";                     // broadcast post from admin control center
-    public static final int PAGE = 1;
 
     @Required
 	@Column(length=2000)
@@ -316,27 +315,27 @@ public class Post extends BaseNotifiable implements INotifiable {
     @Override
     public String getTargetUrl() {
         if (this.type.equals(Post.GROUP)) {
-            return controllers.routes.GroupController.view(this.group.id, Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.id).toString();
         }
 
         if (this.type.equals(Post.PROFILE)) {
-            return controllers.routes.ProfileController.stream(this.account.id, Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.id).toString();
         }
 
         if (this.type.equals(Post.COMMENT_PROFILE)) {
-            return controllers.routes.ProfileController.stream(this.parent.account.id, Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.parent.id).toString();
         }
 
         if (this.type.equals(Post.COMMENT_GROUP)) {
-            return controllers.routes.GroupController.view(this.parent.group.id, Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.parent.id).toString();
         }
 
         if (this.type.equals(Post.COMMENT_OWN_PROFILE)) {
-            return controllers.routes.ProfileController.stream(this.parent.account.id, Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.parent.id).toString();
         }
 
         if (this.type.equals(Post.BROADCAST)) {
-            return controllers.routes.Application.stream(Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.id).toString();
         }
 
         return super.getTargetUrl();
