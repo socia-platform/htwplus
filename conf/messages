@@ -39,6 +39,7 @@ ldap.wrongCredentials=Ungültiges Passwort und/oder Matrikelnummer.
 ldap.generalError=Es gab ein Problem bei der Verbindung zum LDAP-Server. Bitte versuche es später noch einmal.
 
 # notifications
+notification.title=Übersicht
 notification.news=Neuigkeiten
 notification.nothing_new=Es ist noch nichts passiert...
 notification.show_everything=Zeige alle Nachrichten
