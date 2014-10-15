@@ -87,7 +87,7 @@ public class NotificationController extends BaseController {
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
         List<Integer> countedNotifications = NotificationController.countNotifications(notifications);
-        Navigation.set(Navigation.Level.NOTIFICATIONS, Messages.get("notification.news"));
+        Navigation.set(Navigation.Level.NOTIFICATIONS, Messages.get("notification.title"));
         return ok(view.render(notifications, LIMIT, page,
                 Notification.countNotificationsForAccountId(Component.currentAccount().id), countedNotifications.get(1)
         ));

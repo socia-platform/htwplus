@@ -245,7 +245,7 @@ h1 {
     border: none!important;
 }
 
-div.well.notification span {
+div.well.notification .glyphicon {
     margin-right: 10px;
 }
 
