@@ -281,18 +281,9 @@ dt.email-notifications {
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
-.notification-show-all-sub {
-    width: 50%!important;
-    text-align: center!important;
-}
-
-.notification-show-all-sub-wrapper {
-    display: table;
-    width: 100%;
-}
-
-.notification-show-all-sub a {
-    width: inherit!important;
+.notification-show-all a {
+    float: right;
+    padding: 3px 10px;
 }
 
 .notifications-mark-as-read {
@@ -302,10 +293,6 @@ dt.email-notifications {
 
 .dropdown-menu li .glyphicon {
     margin: 0 7px 0 0;
-}
-
-.dropdown-menu li div {
-    padding: 7px 7px 7px 7px;
 }
 
 .dropdown-menu li div a {
