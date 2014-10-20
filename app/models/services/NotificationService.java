@@ -155,6 +155,7 @@ public class NotificationService {
                 ObjectNode node = WebSocketService.getInstance()
                         .successResponseTemplate(WebSocketService.WS_METHOD_RECEIVE_NOTIFICATION);
                 node.put("notification", notification.getAsJson());
+                node.put("unreadCount", Notification.countUnreadNotificationsForAccountId(notification.recipient.id));
                 recipientActor.tell(Json.toJson(node), null);
             }
         }
