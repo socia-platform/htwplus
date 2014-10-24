@@ -173,6 +173,6 @@ public class Media extends BaseNotifiable implements INotifiable {
 
     @Override
     public String getTargetUrl() {
-        return controllers.routes.GroupController.view(this.group.id, 1).toString();
+        return controllers.routes.GroupController.media(this.group.id).toString();
     }
 }
