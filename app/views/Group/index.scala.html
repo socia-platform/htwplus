@@ -22,6 +22,14 @@
 	}
 	<!-- End confirmDeleteGroupModal -->
 	
+	<!-- Start confirmLeaveGroupModal -->
+	@for(group <- approvedGroups ++ approvedCourses) {
+	<div class="modal fade" id="confirmLeaveGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		@views.html.Group.snippets.leaveGroupModal(group)
+	</div>
+	}
+	<!-- End confirmDeleteGroupModal -->
+	
 	
 	@defining(Component.currentAccount()) { user =>
 		<h2>
