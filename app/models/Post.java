@@ -24,6 +24,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     @Required
     @Lob
+    @Type(type = "org.hibernate.type.TextType")
 	public String content;
 
 	@ManyToOne
