@@ -58,6 +58,7 @@ notification.email_notifications.single.subject=HTWplus | Eine neue Nachricht
 notification.email_notifications.collected.subject=HTWplus | {0} neue Nachrichten
 notification.email_notifications.single.intro_text=Hallo {0}, du hast folgende neue Nachricht auf HTWplus erhalten
 notification.email_notifications.collected.intro_text=Hallo {0}, du hast heute {1} neue Nachrichten auf HTWplus erhalten
+notification.obsolete_notification=Diese Nachricht existiert leider nicht mehr
 
 # base model messages
 post.try_with_content=Jo, fast. Probiere es noch einmal mit Inhalt ;-)
