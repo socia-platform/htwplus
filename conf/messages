@@ -45,8 +45,9 @@ notification.nothing_new=Es ist nichts Neues passiert...
 notification.show_everything=Zeige alle Nachrichten
 notification.read_everything=Markiere alle als gelesen
 notification.read_everything_ok=Alle Nachrichten wurden als gelesen markiert
-notification.date=Neuigkeit erhalten am {0} um {1} Uhr
-notification.date_read=Gelesen am {0} um {1} Uhr
+notification.date=Neuigkeit erhalten am <span class="hp-bold">{0}</span> um <span class="hp-bold">{1}</span> Uhr
+notification.date_updated=Neuigkeit erstmals am <span class="hp-bold">{0}</span> um <span class="hp-bold">{1}</span> Uhr erhalten, zuletzt aktualisiert am <span class="hp-bold">{2}</span> um <span class="hp-bold">{3}</span> Uhr
+notification.date_read=Du hast diese Neuigkeit bereits gelesen
 notification.not_read=Du hast diese Neuigkeit noch nicht angeklickt bzw. gelesen
 notification.email_notifications=Neuigkeiten per E-Mail
 notification.email_notifications.none=Keine
@@ -63,24 +64,24 @@ notification.email_notifications.collected.intro_text=Hallo {0}, du hast heute {
 post.try_with_content=Jo, fast. Probiere es noch einmal mit Inhalt ;-)
 post.join_group_first=Bitte tritt der Gruppe erst bei.
 post.post_on_stream_only=Du kannst nur Freunden auf den Stream schreiben!
-post.profile_new_post=Neuer Post von <span class="hp-green">{0}</span> auf deinem Newsstream
-post.group_new_post=Neues auf dem Newsstream der Gruppe <span class="hp-green">{0}</span>
-post.comment_profile=Neuer Kommentar zum Post <span class="hp-green">{0}</span> auf deinem Newsstream
-post.comment_group=Neuer Kommentar zum Post <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>
-post.comment_profile_own=Neuer Kommentar zu deinem Post <span class="hp-green">{0}</span> auf dem Newstream von <span class="hp-green">{1}</span>
-post.broadcast_post=Neue Broadcast Nachricht von <span class="hp-green">{0}</span> auf deinem Newsstream
-friendship.new_request=Neue Freundschaftsanfrage von <span class="hp-green">{0}</span>
-friendship.request_decline=<span class="hp-green">{0}</span> hat deine Freundschaftsanfrage abgelehnt
-friendship.request_successful=<span class="hp-green">{0}</span> hat deine Freundschaftsanfrage angenommen
-group.group_invitation=Du wurdest von {0} in die Gruppe <span class="hp-green">{1}</span> eingeladen
-group.group_new_request=Neue Anfrage für die Gruppe <span class="hp-green">{0}</span>
-group.group_request_success=Deine Anfrage für die Gruppe <span class="hp-green">{0}</span> wurde akzeptiert
-group.group_request_decline=Deine Anfrage für die Gruppe <span class="hp-green">{0}</span> wurde abgelehnt
+post.profile_new_post=Neuer Post <span class="hp-bold">{0}</span> von <span class="hp-bold">{1}</span> auf deinem Newsstream
+post.group_new_post=Neues auf dem Newsstream der Gruppe <span class="hp-bold">{0}</span>
+post.comment_profile=Neues zum Post <span class="hp-bold">{0}</span> auf deinem Newsstream
+post.comment_group=Neues zum Post <span class="hp-bold">{0}</span> in der Gruppe <span class="hp-bold">{1}</span>
+post.comment_profile_own=Neues zu deinem Post <span class="hp-bold">{0}</span> auf dem Newstream von <span class="hp-bold">{1}</span>
+post.broadcast_post=Neue Broadcast Nachricht von <span class="hp-bold">{0}</span> auf deinem Newsstream
+friendship.new_request=Neue Freundschaftsanfrage von <span class="hp-bold">{0}</span>
+friendship.request_decline=<span class="hp-bold">{0}</span> hat deine Freundschaftsanfrage abgelehnt
+friendship.request_successful=<span class="hp-bold">{0}</span> hat deine Freundschaftsanfrage angenommen
+group.group_invitation=Du wurdest von {0} in die Gruppe <span class="hp-bold">{1}</span> eingeladen
+group.group_new_request=Neue Anfrage für die Gruppe <span class="hp-bold">{0}</span>
+group.group_request_success=Deine Anfrage für die Gruppe <span class="hp-bold">{0}</span> wurde akzeptiert
+group.group_request_decline=Deine Anfrage für die Gruppe <span class="hp-bold">{0}</span> wurde abgelehnt
 group.invite_no_invite=Bitte mindestens eine Person einladen
 group.invite_invited=Einladungen verschickt!
 group.group_request_sent=Deine Anfrage wurde erfolgreich übermittelt!
 group.group_not_found=Gruppe wurde nicht gefunden!
-group.group_new_media=Neues bei den Medien der Gruppe <span class="hp-green">{0}</span>
+group.group_new_media=Neues bei den Medien der Gruppe <span class="hp-bold">{0}</span>
 
 # admin control center
 admin.admin_control_center=HTWplus Control Center EasyAdmin™

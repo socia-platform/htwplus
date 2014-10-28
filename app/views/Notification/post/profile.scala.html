@@ -2,4 +2,4 @@
 
 @import helper._
 
-<span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.profile_new_post", fullTrim(notifiable.getSender().name)))
+<span class="glyphicon glyphicon-comment"></span>@Html(Messages("post.profile_new_post", truncate(notifiable.content, 20), fullTrim(notifiable.getSender().name)))

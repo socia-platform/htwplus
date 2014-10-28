@@ -5,8 +5,10 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import models.base.BaseModel;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
+import play.Logger;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 
@@ -339,5 +341,43 @@ public class Post extends BaseNotifiable implements INotifiable {
         }
 
         return super.getTargetUrl();
+    }
+
+    /**
+     * As the notifications should only refer to the main post, we need to return the parent, if given.
+     * Otherwise this is the main post and we can return this.
+     *
+     * @return Post instance
+     */
+    @Override
+    public BaseModel getReference() {
+        if (this.parent != null) {
+            return this.parent;
+        }
+
+        return this;
+    }
+
+    /**
+     * As we want to have only one notification per post and just update if there is a new comment,
+     * we need to find out, if there is a notification per post and user already given. If there is no
+     * notification given for a user and post, we create a new notification instance.
+     *
+     * @param recipient Account recipient
+     * @return Notification instance
+     */
+    @Override
+    public Notification getNotification(Account recipient) {
+        if (this.parent != null) {
+            try {
+                return Notification.findByReferenceIdAndRecipientId(this.parent.id, recipient.id);
+            } catch (NoResultException ex) {
+                Logger.error("Error while trying to fetch notification for Post ID: " + this.parent.id
+                        + ", Recipient ID: " + recipient.id + ": " + ex.getMessage()
+                );
+            }
+        }
+
+        return new Notification();
     }
 }

@@ -75,7 +75,7 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
 
     @Override
     public void update() {
-        JPA.em().merge(this);
+        updatedAt();
     }
 
     @Override
@@ -95,7 +95,7 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
     @SuppressWarnings("unchecked")
     public static List<Notification> findByAccountId(final Long accountId, final int maxResults, final int offsetResults) throws Throwable {
     	return (List<Notification>) JPA.em()
-                .createQuery("FROM Notification n WHERE n.recipient.id = :accountId ORDER BY n.isRead ASC, n.createdAt DESC")
+                .createQuery("FROM Notification n WHERE n.recipient.id = :accountId ORDER BY n.isRead ASC, n.updatedAt DESC")
                 .setParameter("accountId", accountId)
                 .setMaxResults(maxResults)
                 .setFirstResult(offsetResults)
@@ -162,6 +162,22 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
      */
     public static Notification findById(Long id) {
         return JPA.em().find(Notification.class, id);
+    }
+
+    /**
+     * Returns a notification by a reference ID and a recipient ID.
+     *
+     * @param referenceId Reference ID
+     * @param recipientId Recipient ID
+     * @return Notification instance
+     * @throws NoResultException
+     */
+    public static Notification findByReferenceIdAndRecipientId(Long referenceId, Long recipientId) throws NoResultException {
+        return JPA.em()
+                .createQuery("FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :recipientId", Notification.class)
+                .setParameter("referenceId", referenceId)
+                .setParameter("recipientId", recipientId)
+                .getSingleResult();
     }
 
     /**
