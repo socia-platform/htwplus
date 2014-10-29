@@ -6,8 +6,9 @@
     @if(notifications != null) {
         @if(unreadNotifications > 0) {
             <div class="notifications-mark-as-read">
-                <span class="glyphicon glyphicon-ok"></span>
-                <a href="@routes.NotificationController.readAll()">@Messages("notification.read_everything")</a>
+                <a href="@routes.NotificationController.readAll()">
+                    <span class="glyphicon glyphicon-ok"></span>@Messages("notification.read_everything")
+                </a>
             </div>
         }
         <br />

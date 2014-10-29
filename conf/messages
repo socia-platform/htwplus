@@ -34,9 +34,10 @@ authenticate.matriculationNumberMissing=Also deine Matrikelnummer brauchen wir s
 authenticate.logout=Du bist nun ausgeloggt
 
 # --- Landingpage
+landingpage.to_login=Zum Login
 landingpage.about=Über HTWplus
 landingpage.about.title=Nutze deinen HTW-Account
-landingpage.about.description=Die Anmeldung erfolgt unkompliziert mit deinem HTW-Account.
+landingpage.about.description=Die Anmeldung erfolgt unkompliziert mit deinem HTW-Account ohne zusätzliche Registrierung.
 landingpage.features=Die Funktionen
 landingpage.features.login.title=Nutze deinen HTW-Account
 landingpage.features.login.description=Die Anmeldung erfolgt unkompliziert mit deinem HTW-Account.

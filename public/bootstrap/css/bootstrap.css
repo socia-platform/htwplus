@@ -5,8 +5,8 @@
  */
 
 /*!
- * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=4a20915944196dc50c70)
- * Config saved to config.json and https://gist.github.com/4a20915944196dc50c70
+ * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=35e1be6af624a960b743)
+ * Config saved to config.json and https://gist.github.com/35e1be6af624a960b743
  */
 /*! normalize.css v3.0.1 | MIT License | git.io/normalize */
 html {
@@ -893,7 +893,7 @@ html {
 body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
   font-size: 12px;
-  line-height: 1.45;
+  line-height: 1.42857143;
   color: #5a5858;
   background-color: #ffffff;
 }
@@ -940,7 +940,7 @@ img {
 }
 .img-thumbnail {
   padding: 4px;
-  line-height: 1.45;
+  line-height: 1.42857143;
   background-color: #ffffff;
   border: 1px solid #dddddd;
   border-radius: 4px;
@@ -994,7 +994,7 @@ h6,
 .h6 {
   font-family: inherit;
   font-weight: 500;
-  line-height: 1.1;
+  line-height: 1.42857143;
   color: inherit;
 }
 h1 small,
@@ -1245,7 +1245,7 @@ dl {
 }
 dt,
 dd {
-  line-height: 1.45;
+  line-height: 1.42857143;
 }
 dt {
   font-weight: bold;
@@ -1292,7 +1292,7 @@ blockquote small,
 blockquote .small {
   display: block;
   font-size: 80%;
-  line-height: 1.45;
+  line-height: 1.42857143;
   color: #777777;
 }
 blockquote footer:before,
@@ -1331,7 +1331,7 @@ blockquote:after {
 address {
   margin-bottom: 17px;
   font-style: normal;
-  line-height: 1.45;
+  line-height: 1.42857143;
 }
 code,
 kbd,
@@ -1364,7 +1364,7 @@ pre {
   padding: 8px;
   margin: 0 0 8.5px;
   font-size: 11px;
-  line-height: 1.45;
+  line-height: 1.42857143;
   word-break: break-all;
   word-wrap: break-word;
   color: #333333;
@@ -2069,7 +2069,7 @@ th {
 .table > tbody > tr > td,
 .table > tfoot > tr > td {
   padding: 8px;
-  line-height: 1.45;
+  line-height: 1.42857143;
   vertical-align: top;
   border-top: 1px solid #dddddd;
 }
@@ -2341,7 +2341,7 @@ output {
   display: block;
   padding-top: 7px;
   font-size: 12px;
-  line-height: 1.45;
+  line-height: 1.42857143;
   color: #555555;
 }
 .form-control {
@@ -2350,7 +2350,7 @@ output {
   height: 31px;
   padding: 6px 12px;
   font-size: 12px;
-  line-height: 1.45;
+  line-height: 1.42857143;
   color: #555555;
   background-color: #ffffff;
   background-image: none;
@@ -2396,7 +2396,7 @@ input[type="time"],
 input[type="datetime-local"],
 input[type="month"] {
   line-height: 31px;
-  line-height: 1.45 \0;
+  line-height: 1.42857143 \0;
 }
 input[type="date"].input-sm,
 input[type="time"].input-sm,
@@ -2726,7 +2726,7 @@ select[multiple].input-lg {
   white-space: nowrap;
   padding: 6px 12px;
   font-size: 12px;
-  line-height: 1.45;
+  line-height: 1.42857143;
   border-radius: 4px;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -3155,7 +3155,7 @@ tbody.collapse.in {
   padding: 3px 20px;
   clear: both;
   font-weight: normal;
-  line-height: 1.45;
+  line-height: 1.42857143;
   color: #333333;
   white-space: nowrap;
 }
@@ -3204,7 +3204,7 @@ tbody.collapse.in {
   display: block;
   padding: 3px 20px;
   font-size: 11px;
-  line-height: 1.45;
+  line-height: 1.42857143;
   color: #777777;
   white-space: nowrap;
 }
@@ -3620,7 +3620,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 }
 .nav-tabs > li > a {
   margin-right: 2px;
-  line-height: 1.45;
+  line-height: 1.42857143;
   border: 1px solid transparent;
   border-radius: 4px 4px 0 0;
 }
@@ -4310,7 +4310,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
   position: relative;
   float: left;
   padding: 6px 12px;
-  line-height: 1.45;
+  line-height: 1.42857143;
   text-decoration: none;
   color: #76b900;
   background-color: #ffffff;
@@ -4575,7 +4575,7 @@ a.list-group-item.active > .badge,
   display: block;
   padding: 4px;
   margin-bottom: 17px;
-  line-height: 1.45;
+  line-height: 1.42857143;
   background-color: #ffffff;
   border: 1px solid #dddddd;
   border-radius: 4px;
@@ -5418,14 +5418,14 @@ button.close {
 .modal-header {
   padding: 15px;
   border-bottom: 1px solid #e5e5e5;
-  min-height: 16.45px;
+  min-height: 16.42857143px;
 }
 .modal-header .close {
   margin-top: -2px;
 }
 .modal-title {
   margin: 0;
-  line-height: 1.45;
+  line-height: 1.42857143;
 }
 .modal-body {
   position: relative;

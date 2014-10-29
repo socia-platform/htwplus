@@ -15,10 +15,15 @@ function resizeBackground() {
 	}
 }
 
+function resizeNotepad() {
+    $('#hp-feature-demo .hp-notepad-content').css('height', $(window).height() - 160);
+    resizeRings();
+}
+
 /**
  * Easy Scroll - The page scrolls to the given element under hp-navbar.
  */
-function scrollTo(element) {
+function scrollToElement(element) {
     $('html, body').animate({
         scrollTop: $(element).offset().top - $('#hp-navbar').innerHeight()
 	}, 500);
@@ -44,6 +49,9 @@ function navbarVisibility() {
 }
 
 $('#hp-navbar').on('webkitTransitionEnd', navbarVisibility);
+$('#hp-navbar').on('transitionend', navbarVisibility);
+$('#hp-navbar').on('otransitionend', navbarVisibility);
+$('#hp-navbar').on('MSTransitionEnd', navbarVisibility);
 
 $(window).load(function() {
 	// load banner dimensions
@@ -68,47 +76,79 @@ $(window).load(function() {
     });
     $('#hp-navbar').addClass('hp-animate');
     resizeBackground();
+    resizeNotepad();
 });
 
 /**
  * Magic Scroll
  */
 var controller;
+var demoScene = null;
+var scenes = [];
+var tweens = [];
 
-function replaceTriggerHook() {
-	if (scene != null)
-		scene.triggerHook(50 / $(window).height());
+function controlAnimation() {
+    var mq = window.matchMedia("(min-width: 992px)");
+    if (mq.matches) {
+        if (!controller.enabled()) {
+            controller.enabled(true);
+        }
+    } else {
+        controller.enabled(false);
+        $("[id^=hp-feature-text-]").removeAttr('style');
+    }
 }
 
+function updateScenes(sceneList, tweenList) {
+	demoScene.triggerHook(50 / $(window).height());
+}
+
+function buildScenes() {
+    // init controller
+    controller = new ScrollMagic();
+
+    // build scenes
+    demoScene = new ScrollScene({triggerElement: "#hp-feature-trigger-demo"})
+        .addTo(controller)
+        //.addIndicators()
+        .setPin("#hp-feature-demo")
+        .triggerHook(50 / $(window).height());
+
+    var features = ['login', 'friends', 'groups', 'courses', 'filemgmt', 'newsstream', 'notifications'];
+
+    for (i = 0; i <= features.length; i++) {
+        var newTop = ($(window).height() - $(('#hp-feature-text-').concat(features[i])).height()) / 2;
+        var tween;
+        if (i == 0) {
+            tween = new TimelineMax()
+                .add(TweenMax.to(('#hp-feature-text-').concat(features[i]), 0.5, {top: newTop}), 0)
+                .add(TweenMax.to(('#hp-feature-demo-').concat(features[i]), 0.3, {display: 'block', opacity: 1}), 0);
+        } else {
+            tween = new TimelineMax()
+                //.add(TweenMax.to(('#hp-feature-text-').concat(features[i-1]), 0.5, {top: -200}), 0)
+                //.add(TweenMax.to(('#hp-feature-demo-').concat(features[i-1]), 0.3, {opacity: 0, zIndex: 1000}), 0)
+                .add(TweenMax.to(('#hp-feature-text-').concat(features[i]), 0.5, {top: newTop}), 0.1)
+                .add(TweenMax.to(('#hp-feature-demo-').concat(features[i]), 0.3, {display: 'block', opacity: 1}), 0.3);
+        }
+        tweens[tweens.length] = tween;
+        scenes[scenes.length] = new ScrollScene({triggerElement: ('#hp-feature-trigger-').concat(features[i])})
+            .addTo(controller)
+            //.addIndicators()
+            .setTween(tween);
+    }
+}
+
+
 $(document).ready(function() {
-	// init controller
-	controller = new ScrollMagic();
-
-	// build scenes
-	var scene0 = new ScrollScene({triggerElement: "#hp-feature-trigger-demo"})
-					.setPin("#hp-feature-demo")
-					.addTo(controller)
-					.triggerHook(50 / $(window).height())
-					.addIndicators();
-
-	var scene1 = new ScrollScene({triggerElement: "#hp-feature-trigger-1", duration: 300})
-					.setTween(TweenMax.to("#hp-feature-text-1", 0.5, {display: "none"}))
-					.addTo(controller)
-					.triggerHook(50 / $(window).height())
-					.addIndicators();
-
-	var scene2 = new ScrollScene({triggerElement: "#hp-feature-trigger-2", duration: 300})
-					.setTween(TweenMax.to("#hp-feature-text-2", 0.5, {display: "none"}))
-					.addTo(controller)
-					.triggerHook(50 / $(window).height())
-					.addIndicators();
-
+    buildScenes();
+    controlAnimation();
 });
-
 
 $(window).resize(function() {
 	resizeBackground();
-	//replaceTriggerHook();
+	resizeNotepad();
+    controlAnimation();
+	updateScenes(scenes, tweens);
 });
 
 navbarVisibility();
