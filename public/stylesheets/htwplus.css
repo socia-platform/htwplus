@@ -233,46 +233,39 @@ body#hp-landingpage {
 	min-height: 1000px;
 }
 
-#hp-landingpage div#hp-features-demo .hp-notepad-right {
+#hp-landingpage div#hp-feature-text {
     margin-top: 30px;
 }
 
-#hp-landingpage div#hp-features .hp-notepad-content {
-	position: relative;
-    min-height: inherit;
-}
 
-div[id*='hp-feature-text-'] table {
+div#hp-feature-text table {
     width: 100%;
     margin-top: 80px;
 }
 
 @media (min-width: 992px) {
-    #hp-landingpage div#hp-features div[id*='hp-feature-text-'] {
-        top: 1000px;
-        position: fixed;
-        background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 15%, rgba(255,255,255,1) 100%);
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(15%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,1)));
-        background: -webkit-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 15%,rgba(255,255,255,1) 100%);
-        background: -o-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 15%,rgba(255,255,255,1) 100%);
-        background: -ms-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 15%,rgba(255,255,255,1) 100%);
-        background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 15%,rgba(255,255,255,1) 100%);
-        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=0 );
-        z-index: -1;
+
+    #hp-landingpage div#hp-feature-text table {
+        height: 100%;
+        margin: 0;
     }
 
-    #hp-landingpage div#hp-features div[id*='hp-feature-text-'] table {
-        height: 350px;
-        margin-bottom: 0;
-    }
-
-    #hp-landingpage div#hp-features div[id*='hp-feature-text-'] table tr:first-child {
+    #hp-landingpage div#hp-feature-text table tr:first-child {
         vertical-align: bottom;
     }
 
-    #hp-landingpage div#hp-features div[id*='hp-feature-text-'] table tr:last-child {
+    #hp-landingpage div#hp-feature-text table tr:last-child {
         vertical-align: top;
     }
+
+	#hp-landingpage div#hp-feature-demo .hp-notepad-right {
+	    margin-top: 30px;
+	}
+
+	#hp-landingpage div#hp-feature-demo .hp-notepad-content {
+		position: relative;
+	    min-height: inherit;
+	}
 
     #hp-landingpage div#hp-features div[id*='hp-feature-demo-'] {
         display: none;
@@ -293,10 +286,21 @@ div[id*='hp-feature-text-'] table {
         opacity: 1 !important;
     }
 
-    #hp-landingpage div#hp-features div[id*='hp-feature-trigger-'] {
-        min-height: 500px;
+    #hp-landingpage div#hp-triggers div[id*='hp-feature-trigger-'] {
+        min-height: 1px;
+        margin-bottom: 500px;
         width: 100%;
+        background-color: green;
     }
+
+    #hp-landingpage div#hp-feature-trigger-main {
+        margin-bottom: 0;
+    }
+}
+
+.hp-feature-title::before {
+	content: 'bla';
+	color: red;
 }
 
 #hp-landingpage div#hp-features .hp-feature-title {
@@ -308,10 +312,6 @@ div[id*='hp-feature-text-'] table {
 #hp-landingpage div#hp-features .hp-feature-description {
 	margin-top: 30px;
 	margin-bottom: 0;
-}
-
-#hp-landingpage div#hp-team {
-	min-height: 500px;
 }
 
 #hp-landingpage div.hp-feature-icon {

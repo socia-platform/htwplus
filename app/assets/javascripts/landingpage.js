@@ -15,11 +15,6 @@ function resizeBackground() {
 	}
 }
 
-function resizeNotepad() {
-    $('#hp-feature-demo .hp-notepad-content').css('height', $(window).height() - 160);
-    resizeRings();
-}
-
 /**
  * Easy Scroll - The page scrolls to the given element under hp-navbar.
  */
@@ -76,7 +71,6 @@ $(window).load(function() {
     });
     $('#hp-navbar').addClass('hp-animate');
     resizeBackground();
-    resizeNotepad();
 });
 
 /**
@@ -84,6 +78,7 @@ $(window).load(function() {
  */
 var controller;
 var demoScene = null;
+var textScene = null;
 var scenes = [];
 var tweens = [];
 
@@ -99,8 +94,22 @@ function controlAnimation() {
     }
 }
 
-function updateScenes(sceneList, tweenList) {
+function updateScenes() {
 	demoScene.triggerHook(50 / $(window).height());
+	textScene.triggerHook(50 / $(window).height());
+}
+
+function resizeScenes() {
+    $('#hp-feature-text').css('height', $(window).height() - 110);
+    $('#hp-feature-demo .hp-notepad-content').css('height', $(window).height() - 160);
+    resizeRings();
+}
+
+function changeText(element) {
+	var newTitle = $('#hp-feature-text-' + element + ' .hp-feature-title').html();
+	var newDescription = $('#hp-feature-text-' + element + ' .hp-feature-description').html();
+	$('#hp-feature-text .hp-feature-title').html(newTitle);
+    $('#hp-feature-text .hp-feature-description').html(newDescription);
 }
 
 function buildScenes() {
@@ -108,47 +117,65 @@ function buildScenes() {
     controller = new ScrollMagic();
 
     // build scenes
-    demoScene = new ScrollScene({triggerElement: "#hp-feature-trigger-demo"})
+    demoScene = new ScrollScene({triggerElement: "#hp-feature-trigger-main"})
         .addTo(controller)
-        //.addIndicators()
+        .addIndicators()
         .setPin("#hp-feature-demo")
+        .triggerHook(50 / $(window).height());
+    textScene = new ScrollScene({triggerElement: "#hp-feature-trigger-main"})
+        .addTo(controller)
+        .addIndicators()
+        .setPin("#hp-feature-text")
         .triggerHook(50 / $(window).height());
 
     var features = ['login', 'friends', 'groups', 'courses', 'filemgmt', 'newsstream', 'notifications'];
+    var newTitle, newDescription, oldTitle, oldDescription = '';
 
-    for (i = 0; i <= features.length; i++) {
-        var newTop = ($(window).height() - $(('#hp-feature-text-').concat(features[i])).height()) / 2;
-        var tween;
-        if (i == 0) {
-            tween = new TimelineMax()
-                .add(TweenMax.to(('#hp-feature-text-').concat(features[i]), 0.5, {top: newTop}), 0)
-                .add(TweenMax.to(('#hp-feature-demo-').concat(features[i]), 0.3, {display: 'block', opacity: 1}), 0);
-        } else {
-            tween = new TimelineMax()
-                //.add(TweenMax.to(('#hp-feature-text-').concat(features[i-1]), 0.5, {top: -200}), 0)
-                //.add(TweenMax.to(('#hp-feature-demo-').concat(features[i-1]), 0.3, {opacity: 0, zIndex: 1000}), 0)
-                .add(TweenMax.to(('#hp-feature-text-').concat(features[i]), 0.5, {top: newTop}), 0.1)
-                .add(TweenMax.to(('#hp-feature-demo-').concat(features[i]), 0.3, {display: 'block', opacity: 1}), 0.3);
-        }
+    var $title = $('#hp-feature-text .hp-feature-title');
+    var $description = $('#hp-feature-text .hp-feature-description');
+
+    for (i = 1; i <= features.length; i++) {
+		newTitle = $('#hp-feature-text-' + features[i] + ' .hp-feature-title').html();
+		newDescription = $('#hp-feature-text-' + features[i] + ' .hp-feature-description').html();
+		oldTitle = $('#hp-feature-text-' + features[i-1] + ' .hp-feature-title').html();
+		oldDescription = $('#hp-feature-text-' + features[i-1] + ' .hp-feature-description').html();
+        var tween = new TimelineMax()
+            .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 1}, {opacity: 0}), 0)
+            .add(TweenMax.fromTo('#hp-feature-text', 0.2, {y: 0}, {y: -500}), 0)
+            //.add(TweenMax.fromTo('#hp-feature-text .hp-feature-title', 0.5, {x: 0}, {x: 200}), 0.2)
+            .add(TweenMax.fromTo(CSSRulePlugin.getRule('.hp-feature-title:before'), 0, {cssRule:{content: 'blaaa1'}}, {cssRule:{content: 'blaaa2'}}), 0.2)
+            //.add(TweenMax.to('#hp-feature-text', 0, {
+            //    onReverseComplete:  function() {
+            //        $title.html('bla ' + (i-1));
+            //        $description.html('blubb ' + (i-1));
+            //    },
+            //    onStart: function() {
+            //        $title.html('bla ' + i);
+            //        $description.html('blubb ' + i);
+            //    }}), 0.2)
+            .add(TweenMax.fromTo('#hp-feature-text', 0.3, {y: 1500}, {y: 0}), 0.2)
+            .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 0}, {opacity: 1}), 0.2)
+            .add(TweenMax.to(('#hp-feature-demo-').concat(features[i]), 0.3, {display: 'block', opacity: 1}), 0.2);
         tweens[tweens.length] = tween;
         scenes[scenes.length] = new ScrollScene({triggerElement: ('#hp-feature-trigger-').concat(features[i])})
             .addTo(controller)
-            //.addIndicators()
-            .setTween(tween);
+            .addIndicators()
+            .setTween(tween)
+            .triggerHook(1);
     }
+    resizeScenes();
 }
 
 
 $(document).ready(function() {
     buildScenes();
-    controlAnimation();
+    //controlAnimation();
 });
 
 $(window).resize(function() {
 	resizeBackground();
-	resizeNotepad();
-    controlAnimation();
-	updateScenes(scenes, tweens);
+	updateScenes();
+	resizeScenes();
 });
 
 navbarVisibility();
