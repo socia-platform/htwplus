@@ -15,7 +15,7 @@
 <body id="hp-landingpage">
     <div class="container-fluid">
 
-        <div id="hp-login" class="row">
+        <div id="hp-login" class="row" data-scrollspy-name="hp-login">
             <div class="col-xs-12">
                 <div id="hp-login-left" class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-5 col-md-offset-1">
                     <div class="hp-logo">
@@ -55,7 +55,7 @@
         <!-- content wrapper -->
         <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-12 col-md-offset-0 col-lg-10 col-lg-offset-1">
 
-            <div id="hp-about" class="hp-section row">
+            <div id="hp-about" class="hp-section row" data-scrollspy-name="hp-about">
                 <div class="col-xs-12">
                     <h2 id="about">Über</h2>
                 </div>
@@ -63,7 +63,7 @@
 
             <div id="hp-feature-trigger-main"></div>
 
-            <div id="hp-features" class="hp-section row">
+            <div id="hp-features" class="hp-section row" data-scrollspy-name="hp-features">
                 <!-- feature demos -->
                 <div class="hidden-xs hidden-sm col-md-6">
                     <div id="hp-feature-demo">
@@ -626,12 +626,14 @@
                 <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-5 col-md-offset-1">
 
                     <!-- only in combination with demo views -->
-                    <div id="hp-feature-text" class="hidden-xs hidden-sm">
-                        <table><tr><td>
-                            <h1 class="hp-feature-title">A</h1>
-                        </td></tr><tr><td>
-                            <h4 class="hp-feature-description">AAAAAAAAAAAA</h4>
-                        </td></tr></table>
+                    <div class="hidden-xs hidden-sm">
+                        <div id="hp-feature-text">
+                            <table><tr><td>
+                                <h1 class="hp-feature-title">@Messages("landingpage.features.login.title")</h1>
+                            </td></tr><tr><td>
+                                <h4 class="hp-feature-description">@Messages("landingpage.features.login.description")</h4>
+                            </td></tr></table>
+                        </div>
                     </div>
 
                     <!-- Login -->
@@ -706,7 +708,7 @@
 
                 </div>
             </div>
-            <div id="hp-triggers" class="row hidden-xs hidden-sm">
+            <div id="hp-triggers" class="hp-section row hidden-xs hidden-sm" data-scrollspy-name="hp-features">
                 <div id="hp-feature-trigger-login"></div>
                 <div id="hp-feature-trigger-friends"></div>
                 <div id="hp-feature-trigger-groups"></div>
@@ -728,8 +730,6 @@
     <script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery-scrollspy.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/vendor/greensock/TweenMax.min.js")'></script>
-    <script type="text/javascript" src='@routes.Assets.at("javascripts/vendor/greensock/plugins/CSSPlugin.min.js")'></script>
-    <script type="text/javascript" src='@routes.Assets.at("javascripts/vendor/greensock/plugins/CSSRulePlugin.min.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.scrollmagic.min.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.scrollmagic.debug.js")'></script>
     <script type="text/javascript" src='@routes.Assets.at("javascripts/landingpage.js")'></script>

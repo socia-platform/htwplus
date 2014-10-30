@@ -20,7 +20,7 @@ function resizeBackground() {
  */
 function scrollToElement(element) {
     $('html, body').animate({
-        scrollTop: $(element).offset().top - $('#hp-navbar').innerHeight()
+        scrollTop: $(element).offset().top - $('#hp-navbar').innerHeight() + 1
 	}, 500);
 }
 
@@ -48,31 +48,6 @@ $('#hp-navbar').on('transitionend', navbarVisibility);
 $('#hp-navbar').on('otransitionend', navbarVisibility);
 $('#hp-navbar').on('MSTransitionEnd', navbarVisibility);
 
-$(window).load(function() {
-	// load banner dimensions
-    var newImg = new Image();
-    newImg.src = 'http://www.htw-berlin.de/fileadmin/HTW/Zentral/DE/HTW/ZR1_Presse/Pressefotos/130719___Philipp_Meuser_0011_01_1200px_crop.jpg';
-    imgHeight = newImg.height;
-    imgWidth = newImg.width;
-
-	// apply scrollspy for sections, will activate items on hp-navbar if corresponding section is reached while scrolling
-    $('.hp-section').each(function() {
-        var curY = $(this).offset().top - $('#hp-navbar').outerHeight();
-        $(this).scrollspy({
-            min: curY,
-            max: curY + $(this).innerHeight(),
-            onEnter: function(element) {
-                $("#hp-navbar li[data-scrollspy-target='"+element.id+"']").addClass('active');
-            },
-            onLeave: function(element) {
-                $("#hp-navbar li[data-scrollspy-target='"+element.id+"']").removeClass('active');
-            }
-        });
-    });
-    $('#hp-navbar').addClass('hp-animate');
-    resizeBackground();
-});
-
 /**
  * Magic Scroll
  */
@@ -87,10 +62,11 @@ function controlAnimation() {
     if (mq.matches) {
         if (!controller.enabled()) {
             controller.enabled(true);
+            demoScene.refresh();
+            textScene.refresh();
         }
     } else {
         controller.enabled(false);
-        $("[id^=hp-feature-text-]").removeAttr('style');
     }
 }
 
@@ -110,66 +86,84 @@ function changeText(element) {
 	var newDescription = $('#hp-feature-text-' + element + ' .hp-feature-description').html();
 	$('#hp-feature-text .hp-feature-title').html(newTitle);
     $('#hp-feature-text .hp-feature-description').html(newDescription);
+    return true;
 }
 
 function buildScenes() {
     // init controller
     controller = new ScrollMagic();
 
-    // build scenes
+    // build scenes - pins for demo and text area
     demoScene = new ScrollScene({triggerElement: "#hp-feature-trigger-main"})
         .addTo(controller)
-        .addIndicators()
+        //.addIndicators()
         .setPin("#hp-feature-demo")
         .triggerHook(50 / $(window).height());
     textScene = new ScrollScene({triggerElement: "#hp-feature-trigger-main"})
         .addTo(controller)
-        .addIndicators()
+        //.addIndicators()
         .setPin("#hp-feature-text")
         .triggerHook(50 / $(window).height());
 
-    var features = ['login', 'friends', 'groups', 'courses', 'filemgmt', 'newsstream', 'notifications'];
-    var newTitle, newDescription, oldTitle, oldDescription = '';
-
-    var $title = $('#hp-feature-text .hp-feature-title');
-    var $description = $('#hp-feature-text .hp-feature-description');
-
-    for (i = 1; i <= features.length; i++) {
-		newTitle = $('#hp-feature-text-' + features[i] + ' .hp-feature-title').html();
-		newDescription = $('#hp-feature-text-' + features[i] + ' .hp-feature-description').html();
-		oldTitle = $('#hp-feature-text-' + features[i-1] + ' .hp-feature-title').html();
-		oldDescription = $('#hp-feature-text-' + features[i-1] + ' .hp-feature-description').html();
+    // build scenes - tweens for features
+    var features = [];
+    $($("[id^=hp-feature-text-]")).each(function() {
+        features[features.length] = $(this).attr('id').replace('hp-feature-text-', '');
+    });
+    for (i = 1; i < features.length; i++) {
         var tween = new TimelineMax()
             .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 1}, {opacity: 0}), 0)
             .add(TweenMax.fromTo('#hp-feature-text', 0.2, {y: 0}, {y: -500}), 0)
-            //.add(TweenMax.fromTo('#hp-feature-text .hp-feature-title', 0.5, {x: 0}, {x: 200}), 0.2)
-            .add(TweenMax.fromTo(CSSRulePlugin.getRule('.hp-feature-title:before'), 0, {cssRule:{content: 'blaaa1'}}, {cssRule:{content: 'blaaa2'}}), 0.2)
-            //.add(TweenMax.to('#hp-feature-text', 0, {
-            //    onReverseComplete:  function() {
-            //        $title.html('bla ' + (i-1));
-            //        $description.html('blubb ' + (i-1));
-            //    },
-            //    onStart: function() {
-            //        $title.html('bla ' + i);
-            //        $description.html('blubb ' + i);
-            //    }}), 0.2)
-            .add(TweenMax.fromTo('#hp-feature-text', 0.3, {y: 1500}, {y: 0}), 0.2)
+            .add(TweenMax.fromTo('#hp-feature-text', 0.3, {y: 1500}, {y: 0,
+                onStart: changeText, onStartParams: [features[i]],
+                onReverseComplete: changeText, onReverseCompleteParams: [features[i-1]]
+            }), 0.2)
             .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 0}, {opacity: 1}), 0.2)
             .add(TweenMax.to(('#hp-feature-demo-').concat(features[i]), 0.3, {display: 'block', opacity: 1}), 0.2);
         tweens[tweens.length] = tween;
         scenes[scenes.length] = new ScrollScene({triggerElement: ('#hp-feature-trigger-').concat(features[i])})
             .addTo(controller)
-            .addIndicators()
+            //.addIndicators()
             .setTween(tween)
             .triggerHook(1);
     }
+    TweenMax.set('#hp-feature-text', {opacity: 1, y: 0,});
+
     resizeScenes();
 }
 
+/**
+ * window listener & main stuff
+ */
+$(window).load(function() {
+	// load banner dimensions
+    var newImg = new Image();
+    newImg.src = 'http://www.htw-berlin.de/fileadmin/HTW/Zentral/DE/HTW/ZR1_Presse/Pressefotos/130719___Philipp_Meuser_0011_01_1200px_crop.jpg';
+    imgHeight = newImg.height;
+    imgWidth = newImg.width;
+
+	// apply scrollspy for sections, will activate items on hp-navbar if corresponding section is reached while scrolling
+    $('.hp-section').each(function() {
+        var curY = $(this).offset().top - $('#hp-navbar').outerHeight();
+        var name = $(this).attr('data-scrollspy-name');
+        $(this).scrollspy({
+            min: curY,
+            max: curY + $(this).innerHeight(),
+            onEnter: function(element) {
+                $("#hp-navbar li[data-scrollspy-target='" + $(element).attr('data-scrollspy-name') + "']").addClass('active');
+            },
+            onLeave: function(element) {
+                $("#hp-navbar li[data-scrollspy-target='" + $(element).attr('data-scrollspy-name') + "']").removeClass('active');
+            }
+        });
+    });
+    $('#hp-navbar').addClass('hp-animate');
+    resizeBackground();
+});
 
 $(document).ready(function() {
     buildScenes();
-    //controlAnimation();
+    controlAnimation();
 });
 
 $(window).resize(function() {
