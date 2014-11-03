@@ -43,7 +43,7 @@
 			<thead>
 				<tr>
 					<th style="width:28px"></th>
-					<th style="width:30%">Gruppenname</th>
+					<th style="width:30%">Name</th>
 					<th style="width:30%">Von</th>
 					<th>Status</th>
 					<th style="width:35px"></th>
@@ -56,10 +56,12 @@
 						<td>
 							@if(accountGroup.group.groupType.equals(models.enums.GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
 							@if(accountGroup.group.groupType.equals(models.enums.GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
+							@if(accountGroup.group.groupType.equals(models.enums.GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
 						</td>
 						<td>
 							@if(accountGroup.group.groupType.equals(models.enums.GroupType.open)) { <a href="@routes.GroupController.view(accountGroup.group.id)">@truncate(accountGroup.group.title,30)</a> }
 							@if(accountGroup.group.groupType.equals(models.enums.GroupType.close)) { <a class="no-drop" rel="tooltip" data-original-title="Du musst der Gruppe erst beitreten" data-container="body">@truncate(accountGroup.group.title,30)</a> }
+							@if(accountGroup.group.groupType.equals(models.enums.GroupType.course)) { <a class="no-drop" rel="tooltip" data-original-title="Du musst dem Kurs erst beitreten" data-container="body">@truncate(accountGroup.group.title,30)</a> }
 						</td>
 						<td>
 							@if(accountGroup.linkType.equals(models.enums.LinkType.invite)) {
