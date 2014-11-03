@@ -18,6 +18,12 @@
 	 </div>
 	 <!-- End confirmDeleteGroupModal -->
 	 
+	 <!-- Start confirmLeaveGroupModal -->
+	 <div id="confirmLeaveGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		@views.html.Group.snippets.leaveGroupModal(group)
+	 </div>
+	 <!-- End confirmDeleteGroupModal -->
+	 
 	 @views.html.Group.snippets.navTabs(group)
 	<h2 class="hp-truncate">
 		@if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
