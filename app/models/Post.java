@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.Type;
+
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import play.data.validation.Constraints.Required;
@@ -21,7 +23,8 @@ public class Post extends BaseNotifiable implements INotifiable {
     public static final String BROADCAST = "broadcast";                     // broadcast post from admin control center
 
     @Required
-	@Column(length=2000)
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
 	public String content;
 
 	@ManyToOne
