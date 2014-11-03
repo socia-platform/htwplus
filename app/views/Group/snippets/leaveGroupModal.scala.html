@@ -9,14 +9,16 @@
 				<h4 class="modal-title hp-truncate" id="confirmModalLabel">
 					@if(group.groupType == GroupType.close) {
 					<span class="glyphicon glyphicon-lock"></span>
+					Gruppe verlassen
 					} 
 					@if(group.groupType == GroupType.open) {
 						<span class="glyphicon glyphicon-globe"></span>
+					Gruppe verlassen
 					}
 					@if(group.groupType == GroupType.course) {
 						<span class="glyphicon glyphicon-briefcase"></span>
+					Kurs verlassen
 					}
-					Gruppe verlassen
 				</h4>
 			</div>
 			<div class="modal-body">
