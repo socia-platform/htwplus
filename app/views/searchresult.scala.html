@@ -11,13 +11,13 @@
 	
 		@if(courses != null && courses.size != 0) {
 		
-			<!-- Start confirmDeleteGroupModal -->
+			<!-- Start confirmDeleteCourseModal -->
 			@for(course <- courses) {
 				<div class="modal fade" id="confirmDeleteGroup@course.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
 					@views.html.Group.snippets.deleteGroupModal(course)
 				</div>
 			}
-			<!-- End confirmDeleteGroupModal -->
+			<!-- End confirmDeleteCourseModal -->
 			
 			<!-- Start infoModal -->
 			@for(course <- courses) {
@@ -26,6 +26,14 @@
 			</div>
 			}
 			<!-- Ende infoModal -->
+			
+			<!-- Start confirmLeaveCourseModal -->
+			@for(course <- courses) {
+			<div class="modal fade" id="confirmLeaveGroup@course.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+				@views.html.Group.snippets.leaveGroupModal(course)
+			</div>
+			}
+			<!-- End confirmDeleteCourseModal -->
 			
 			
 			<!-- list all found courses -->
@@ -56,6 +64,14 @@
 			</div>
 			}
 			<!-- Ende infoModal -->
+			
+			<!-- Start confirmLeaveGroupModal -->
+			@for(group <- groups) {
+			<div class="modal fade" id="confirmLeaveGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+				@views.html.Group.snippets.leaveGroupModal(group)
+			</div>
+			}
+			<!-- End confirmDeleteGroupModal -->
 			
 			
 			<!-- list all found groups -->

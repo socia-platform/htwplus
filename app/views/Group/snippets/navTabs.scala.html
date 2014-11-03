@@ -26,6 +26,6 @@
 		<li><a href="@routes.GroupController.join(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Beitreten" data-container="body"><span class="glyphicon glyphicon-ok"></span></a></li>
 	}
 	@if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
-		<li><a href="@routes.GroupController.removeMember(group.id, Component.currentAccount.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Verlassen" data-container="body"><span class="glyphicon glyphicon-remove"></span></a></li>
+		<li><a href="#confirmLeaveGroup" role="button" class="btn btn-default active" rel="tooltip" data-toggle="modal" data-original-title="Gruppe verlassen" data-container="body"><span class="glyphicon glyphicon-remove"></span></a></li>
 	}
 </ul>

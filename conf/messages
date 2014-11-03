@@ -59,6 +59,7 @@ notification.email_notifications.single.subject=HTWplus | Eine neue Nachricht
 notification.email_notifications.collected.subject=HTWplus | {0} neue Nachrichten
 notification.email_notifications.single.intro_text=Hallo {0}, du hast folgende neue Nachricht auf HTWplus erhalten
 notification.email_notifications.collected.intro_text=Hallo {0}, du hast heute {1} neue Nachrichten auf HTWplus erhalten
+notification.obsolete_notification=Diese Nachricht existiert leider nicht mehr
 
 # base model messages
 post.try_with_content=Jo, fast. Probiere es noch einmal mit Inhalt ;-)
@@ -81,7 +82,7 @@ group.invite_no_invite=Bitte mindestens eine Person einladen
 group.invite_invited=Einladungen verschickt!
 group.group_request_sent=Deine Anfrage wurde erfolgreich übermittelt!
 group.group_not_found=Gruppe wurde nicht gefunden!
-group.group_new_media=Neues bei den Medien der Gruppe <span class="hp-bold">{0}</span>
+media.group_new_media=Neues Medium <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>
 
 # admin control center
 admin.admin_control_center=HTWplus Control Center EasyAdmin™

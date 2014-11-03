@@ -61,7 +61,9 @@ public class NotificationController extends BaseController {
 		Notification notification = Notification.findById(notificationId);
 
 		if (notification == null) {
-			return badRequest("Das gibts doch garnicht!");
+            flash("info", Messages.get("notification.obsolete_notification"));
+
+            return redirect(request().getHeader("referer"));
 		}
 		
 		if (!Secured.hasAccessToNotification(notification)) {

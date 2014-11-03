@@ -38,7 +38,7 @@
         }
 
         @if(Secured.isMemberOfGroup(group, user) && !Secured.isOwnerOfGroup(group, user)) {
-        <li><a href="@routes.GroupController.removeMember(group.id, user.id)" data-toggle="modal">
+        <li><a href="#confirmLeaveGroup@group.id" data-toggle="modal">
             <span class="glyphicon glyphicon-remove"></span><br>Verlassen
         </a></li>
         }
