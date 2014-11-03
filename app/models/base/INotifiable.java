@@ -44,4 +44,12 @@ public interface INotifiable {
      * @return Target URL
      */
     public String getTargetUrl();
+
+    /**
+     * Returns a new notification instance or might fetch an already given notification for modification
+     *
+     * @param recipient Account recipient
+     * @return Notification instance
+     */
+    public Notification getNotification(Account recipient);
 }

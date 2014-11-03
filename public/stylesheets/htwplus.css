@@ -108,6 +108,10 @@ h1 {
 	font-weight: bold;
 }
 
+.hp-bold {
+    font-weight: bold;
+}
+
 .no-drop {
 	cursor: no-drop;
 }
