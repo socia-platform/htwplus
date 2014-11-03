@@ -63,7 +63,6 @@ public class Group extends BaseNotifiable implements INotifiable {
     public static final String GROUP_NEW_REQUEST = "group_new_request";
     public static final String GROUP_REQUEST_SUCCESS = "group_request_success";
     public static final String GROUP_REQUEST_DECLINE = "group_request_decline";
-    public static final String GROUP_NEW_MEDIA = "group_new_media";
 
     @Required
 	@Column(unique = true)
@@ -387,9 +386,6 @@ public class Group extends BaseNotifiable implements INotifiable {
             case Group.GROUP_NEW_REQUEST:
                 // group entry request notification, notify the owner of the group
                 return this.getAsAccountList(this.owner);
-            case Group.GROUP_NEW_MEDIA:
-                // new media available in group, whole group must be notified
-                return GroupAccount.findAccountsByGroup(this, LinkType.establish);
         }
 
         // this is an invitation, a request accept or decline notification, notify the temporaryRecipients
@@ -398,7 +394,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     @Override
     public String getTargetUrl() {
-        if (this.type.equals(Group.GROUP_REQUEST_SUCCESS) || this.type.equals(Group.GROUP_NEW_MEDIA)) {
+        if (this.type.equals(Group.GROUP_REQUEST_SUCCESS)) {
             return controllers.routes.GroupController.view(this.id, 1).toString();
         }
 

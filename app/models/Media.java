@@ -11,14 +11,17 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
-import models.base.BaseModel;
+import models.base.BaseNotifiable;
+import models.base.INotifiable;
+import models.enums.LinkType;
 import play.Play;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 
 @Entity
-public class Media extends BaseModel {
-	
+public class Media extends BaseNotifiable implements INotifiable {
+    public static final String MEDIA_NEW_MEDIA = "media_new_media";
+
 	@Required
 	public String title;
 	
@@ -96,6 +99,9 @@ public class Media extends BaseModel {
 	@Override
 	public void delete() {
 		try {
+            // remove deprecated notifications
+            Notification.deleteReferences(this);
+
 			this.deleteFile();
 			JPA.em().remove(this);
 		} catch (FileNotFoundException e) {
@@ -153,5 +159,20 @@ public class Media extends BaseModel {
 		if(this.group != null) return true;
 		return false;
 	}
-		
+
+    @Override
+    public Account getSender() {
+        return this.temporarySender;
+    }
+
+    @Override
+    public List<Account> getRecipients() {
+        // new media available in group, whole group must be notified
+        return GroupAccount.findAccountsByGroup(this.group, LinkType.establish);
+    }
+
+    @Override
+    public String getTargetUrl() {
+        return controllers.routes.GroupController.media(this.group.id).toString();
+    }
 }
