@@ -91,18 +91,25 @@ function changeText(element) {
 
 function buildScenes() {
     // init controller
+    TweenMax.defaultOverwrite = false;
     controller = new ScrollMagic();
+    //var duration = $('#hp-features').innerHeight() + $('#hp-triggers').innerHeight() - 50 - $(window).height();
 
     // build scenes - pins for demo and text area
     demoScene = new ScrollScene({triggerElement: "#hp-feature-trigger-main"})
         .addTo(controller)
         //.addIndicators()
         .setPin("#hp-feature-demo")
+        //.duration(function() {
+        //    $('#hp-features').innerHeight() + $('#hp-triggers').innerHeight() - (50 / $(window).height());
+        //})
+        //.duration(duration)
         .triggerHook(50 / $(window).height());
     textScene = new ScrollScene({triggerElement: "#hp-feature-trigger-main"})
         .addTo(controller)
         //.addIndicators()
         .setPin("#hp-feature-text")
+        //.duration(duration)
         .triggerHook(50 / $(window).height());
 
     // build scenes - tweens for features
@@ -112,14 +119,14 @@ function buildScenes() {
     });
     for (i = 1; i < features.length; i++) {
         var tween = new TimelineMax()
-            .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 1}, {opacity: 0}), 0)
-            .add(TweenMax.fromTo('#hp-feature-text', 0.2, {y: 0}, {y: -500}), 0)
-            .add(TweenMax.fromTo('#hp-feature-text', 0.3, {y: 1500}, {y: 0,
+            .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 1}, {overwrite: false, opacity: 0}), 0)
+            .add(TweenMax.fromTo('#hp-feature-text', 0.2, {y: 0}, {overwrite: false, y: -500}), 0)
+            .add(TweenMax.fromTo('#hp-feature-text', 0.3, {y: 1500}, {overwrite: false, y: 0,
                 onStart: changeText, onStartParams: [features[i]],
                 onReverseComplete: changeText, onReverseCompleteParams: [features[i-1]]
             }), 0.2)
-            .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 0}, {opacity: 1}), 0.2)
-            .add(TweenMax.to(('#hp-feature-demo-').concat(features[i]), 0.3, {display: 'block', opacity: 1}), 0.2);
+            .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 0}, {overwrite: false, opacity: 1}), 0.2)
+            .add(TweenMax.fromTo(('#hp-feature-demo-').concat(features[i]), 0.3, {display: 'none', opacity: 0}, {overwrite: false, display: 'block', opacity: 1}), 0.2);
         tweens[tweens.length] = tween;
         scenes[scenes.length] = new ScrollScene({triggerElement: ('#hp-feature-trigger-').concat(features[i])})
             .addTo(controller)

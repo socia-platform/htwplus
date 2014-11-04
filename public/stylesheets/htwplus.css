@@ -226,8 +226,59 @@ body#hp-landingpage {
 
 #hp-landingpage div#hp-about {
 	margin-top: 51px;
-	min-height: 500px;
+	margin-bottom: 50px;
+	padding-top: 10px;
 }
+
+#hp-landingpage div#hp-about > div {
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 0;
+}
+
+#hp-landingpage div#hp-about > div > * {
+    padding: 0 30px;
+}
+
+#hp-landingpage div#hp-about > div:last-child {
+    padding-bottom: 15px;
+}
+
+#hp-landingpage div#hp-about .hp-circle {
+    width: 110px;
+    margin-top: 30px;
+    position: relative;
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    padding: 5px;
+}
+
+#hp-landingpage div#hp-about .hp-circle > img {
+     border-radius: 50%;
+}
+
+#hp-landingpage div#hp-about > div:after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 90px;
+    top: 0;
+    background: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+    border-radius: 5px 5px 0 0;
+    z-index: -1;
+}
+
+/*
+#hp-landingpage div#hp-features .scrollmagic-pin-spacer {
+    padding-bottom: 0 !important;
+}
+*/
 
 #hp-landingpage div#hp-feature-text {
     margin-top: 30px;
@@ -242,15 +293,18 @@ div[id*='hp-feature-text-'] table {
 
     #hp-landingpage div#hp-feature-text table {
         height: 100%;
+        width: 100%;
         margin: 0;
     }
 
     #hp-landingpage div#hp-feature-text table tr:first-child {
         vertical-align: bottom;
+        height: 50%;
     }
 
     #hp-landingpage div#hp-feature-text table tr:last-child {
         vertical-align: top;
+        height: 50%;
     }
 
 	#hp-landingpage div#hp-feature-demo .hp-notepad-right {
@@ -570,14 +624,26 @@ input.hp-notification-hour {
 }
 
 #hp-plusi {
+	width: 170px;
+}
+
+#hp-login #hp-plusi {
 	position: absolute;
 	right: 5px;
-	bottom: 135px
+	bottom: 135px;
+}
+
+.hp-circle #hp-plusi {
+	width: 100px;
+	margin-left: -2px;
 }
 
 @media all and (max-width: 480px) {
-	#hp-plusi {
+    #hp-plusi {
 		width: 130px;
+    }
+
+	#hp-login #hp-plusi {
 		bottom: 140px;
 	}
 }

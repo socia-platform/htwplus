@@ -36,8 +36,8 @@ authenticate.logout=Du bist nun ausgeloggt
 # --- Landingpage
 landingpage.to_login=Zum Login
 landingpage.about=Über HTWplus
-landingpage.about.title=Nutze deinen HTW-Account
-landingpage.about.description=Die Anmeldung erfolgt unkompliziert mit deinem HTW-Account ohne zusätzliche Registrierung.
+landingpage.about.title=Erlebe das Studium neu!
+landingpage.about.description=Mit HTWplus hast du nun die Möglichkeit mit deinen Kommilitonen stets in Kontakt zu bleiben und dies unabhängig von anderen sozialen Netzwerken, die du vielleicht bereits privat nutzt. Dazu sind bereits zahlreiche Funktionen enthalten, die euch bei eurem Studium unterstützen sollen.
 landingpage.features=Die Funktionen
 landingpage.features.login.title=Nutze deinen HTW-Account
 landingpage.features.login.description=Die Anmeldung erfolgt unkompliziert mit deinem HTW-Account.
