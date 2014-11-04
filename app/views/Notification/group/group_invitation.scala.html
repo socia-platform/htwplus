@@ -3,4 +3,12 @@
 @import models.enums.GroupType
 @import helper._
 
-<span class='glyphicon glyphicon-@{if(notifiable.groupType == GroupType.open){"globe"}else{"lock"}}'></span>@Html(Messages("group.group_invitation", notifiable.getSender().name, truncate(notifiable.title,20)))
+@if(notifiable.groupType.equals(GroupType.open)) {
+<span class='glyphicon glyphicon-globe'></span>@Html(Messages("group.group_invitation", notifiable.getSender().name, truncate(notifiable.title,20)))
+}
+@if(notifiable.groupType.equals(GroupType.close)) { 
+<span class='glyphicon glyphicon-lock'></span>@Html(Messages("group.group_invitation", notifiable.getSender().name, truncate(notifiable.title,20)))
+}
+@if(notifiable.groupType.equals(GroupType.course)) {
+<span class='glyphicon glyphicon-briefcase'></span>@Html(Messages("group.course_invitation", notifiable.getSender().name, truncate(notifiable.title,20)))
+}
