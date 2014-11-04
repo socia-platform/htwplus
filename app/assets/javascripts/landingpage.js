@@ -55,7 +55,6 @@ var controller;
 var demoScene = null;
 var textScene = null;
 var scenes = [];
-var tweens = [];
 
 function controlAnimation() {
     var mq = window.matchMedia("(min-width: 992px)");
@@ -66,7 +65,8 @@ function controlAnimation() {
             textScene.refresh();
         }
     } else {
-        controller.enabled(false);
+        if (controller.enabled())
+            controller.enabled(false);
     }
 }
 
@@ -93,30 +93,28 @@ function buildScenes() {
     // init controller
     TweenMax.defaultOverwrite = false;
     controller = new ScrollMagic();
-    //var duration = $('#hp-features').innerHeight() + $('#hp-triggers').innerHeight() - 50 - $(window).height();
 
-    // build scenes - pins for demo and text area
-    demoScene = new ScrollScene({triggerElement: "#hp-feature-trigger-main"})
-        .addTo(controller)
-        //.addIndicators()
-        .setPin("#hp-feature-demo")
-        //.duration(function() {
-        //    $('#hp-features').innerHeight() + $('#hp-triggers').innerHeight() - (50 / $(window).height());
-        //})
-        //.duration(duration)
-        .triggerHook(50 / $(window).height());
-    textScene = new ScrollScene({triggerElement: "#hp-feature-trigger-main"})
-        .addTo(controller)
-        //.addIndicators()
-        .setPin("#hp-feature-text")
-        //.duration(duration)
-        .triggerHook(50 / $(window).height());
-
-    // build scenes - tweens for features
+    // get all animation items
     var features = [];
     $($("[id^=hp-feature-text-]")).each(function() {
         features[features.length] = $(this).attr('id').replace('hp-feature-text-', '');
     });
+
+    // build scenes - pins for demo and text area
+    demoScene = new ScrollScene({triggerElement: "#hp-features-trigger"})
+        .addTo(controller)
+        //.addIndicators()
+        .duration(features.length * 500)
+        .setPin("#hp-feature-demo")
+        .triggerHook(50 / $(window).height());
+    textScene = new ScrollScene({triggerElement: "#hp-features-trigger"})
+        .addTo(controller)
+        //.addIndicators()
+        .duration(features.length * 500)
+        .setPin("#hp-feature-text")
+        .triggerHook(50 / $(window).height());
+
+    // build scenes - tweens for features
     for (i = 1; i < features.length; i++) {
         var tween = new TimelineMax()
             .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 1}, {overwrite: false, opacity: 0}), 0)
@@ -127,11 +125,11 @@ function buildScenes() {
             }), 0.2)
             .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 0}, {overwrite: false, opacity: 1}), 0.2)
             .add(TweenMax.fromTo(('#hp-feature-demo-').concat(features[i]), 0.3, {display: 'none', opacity: 0}, {overwrite: false, display: 'block', opacity: 1}), 0.2);
-        tweens[tweens.length] = tween;
-        scenes[scenes.length] = new ScrollScene({triggerElement: ('#hp-feature-trigger-').concat(features[i])})
+        scenes[scenes.length] = new ScrollScene({triggerElement: ('#hp-features-trigger')})
             .addTo(controller)
             //.addIndicators()
             .setTween(tween)
+            .offset($('#hp-feature-demo').innerHeight() + 500 * (i + 1))
             .triggerHook(1);
     }
     TweenMax.set('#hp-feature-text', {opacity: 1, y: 0,});
@@ -151,11 +149,11 @@ $(window).load(function() {
 
 	// apply scrollspy for sections, will activate items on hp-navbar if corresponding section is reached while scrolling
     $('.hp-section').each(function() {
-        var curY = $(this).offset().top - $('#hp-navbar').outerHeight();
+        var curY = $(this).offset().top - 50;
         var name = $(this).attr('data-scrollspy-name');
         $(this).scrollspy({
             min: curY,
-            max: curY + $(this).innerHeight(),
+            max: curY + $(this).height(),
             onEnter: function(element) {
                 $("#hp-navbar li[data-scrollspy-target='" + $(element).attr('data-scrollspy-name') + "']").addClass('active');
             },
@@ -170,11 +168,11 @@ $(window).load(function() {
 
 $(document).ready(function() {
     buildScenes();
-    controlAnimation();
 });
 
 $(window).resize(function() {
 	resizeBackground();
+    controlAnimation();
 	updateScenes();
 	resizeScenes();
 });

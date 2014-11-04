@@ -274,12 +274,6 @@ body#hp-landingpage {
     z-index: -1;
 }
 
-/*
-#hp-landingpage div#hp-features .scrollmagic-pin-spacer {
-    padding-bottom: 0 !important;
-}
-*/
-
 #hp-landingpage div#hp-feature-text {
     margin-top: 30px;
 }
@@ -335,18 +329,11 @@ div[id*='hp-feature-text-'] table {
         opacity: 1 !important;
     }
 
-    #hp-landingpage div#hp-triggers {
-        margin-top: 1px;
-    }
-
-    #hp-landingpage div#hp-triggers div[id*='hp-feature-trigger-'] {
-        min-height: 1px;
-        margin-bottom: 500px;
-        width: 100%;
-    }
-
-    #hp-landingpage div#hp-feature-trigger-main {
+    #hp-landingpage div#hp-features-trigger {
         margin-bottom: 0;
+        width: 100%;
+        height: 1px;
+        color: green;
     }
 }
 
