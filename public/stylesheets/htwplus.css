@@ -8,7 +8,7 @@ html {
 }
 
 body {
-	margin-top: 70px;
+	margin-top: 80px;
 	overflow-x: hidden;
 }
 
@@ -476,15 +476,33 @@ div[id*='hp-feature-text-'] table {
 }
 
 .hp-breadcrumb {
-    margin-left: -10px;
-    margin-right: -10px;
+    z-index: 999;
+    position: fixed;
+    top: 51px;
+    width: 100%;
+    height: 40px;
+    line-height: 40px !important;
+    border-bottom: 1px solid #eee;
+    background-color: rgba(255, 255, 255, 0.9);
 }
 
-@media (max-width: 767px) {
-    .hp-breadcrumb {
-        margin-left: 0;
-        margin-right: 0;
-    }
+.hp-breadcrumb .breadcrumb {
+    margin-bottom: 0;
+    background-color: inherit;
+    padding: 0;
+}
+
+.hp-breadcrumb .breadcrumb a {
+    height: 100%;
+    display: inline-block;
+}
+
+.hp-breadcrumb .breadcrumb a:hover .glyphicon {
+    color: #76b900;
+}
+
+.hp-breadcrumb .breadcrumb > li:first-child {
+    margin-left: 10px;
 }
 
 /*============================== Notification ==============================*/
@@ -565,6 +583,7 @@ input.hp-notification-hour {
     text-align: center;
     margin: 5px;
 }
+
 
 /*============================== Nav-Tabs ==============================*/
 
