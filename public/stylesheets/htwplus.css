@@ -491,7 +491,6 @@ div[id*='hp-feature-text-'] table {
 
 .hp-dropdown-notifications li.notification-action:not(.disabled) a {
     color: #76b900;
-    text-align: center;
 }
 
 .hp-dropdown-notifications li.notification-element span.glyphicon {
@@ -513,12 +512,13 @@ div[id*='hp-feature-text-'] table {
 .hp-dropdown-notifications li#hp-notification-show-history {
     width: 50%;
     float: left;
+    text-align: center;
 }
 
 .hp-dropdown-notifications li#hp-notification-read-all {
     width: 50%;
     float: right;
-    text-align: right;
+    text-align: center;
 }
 
 .hp-dropdown-notifications li#hp-notification-nothing-new {

@@ -163,6 +163,7 @@ $(window).load(function() {
         });
     });
     $('#hp-navbar').addClass('hp-animate');
+    navbarVisibility();
     resizeBackground();
 });
 
@@ -177,4 +178,3 @@ $(window).resize(function() {
 	resizeScenes();
 });
 
-navbarVisibility();

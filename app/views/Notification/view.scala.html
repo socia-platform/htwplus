@@ -22,9 +22,9 @@
                     }
                 </div>
                 @if(notification.isRead){
-                <div class="notification-read read"><span class="glyphicon glyphicon-ok-sign"></span>@Messages("notification.date_read")</div>
+                <div class="notification-read read"><span class="glyphicon glyphicon-ok-sign"></span> @Messages("notification.date_read")</div>
                 }else{
-                <div class="notification-read unread"><span class="glyphicon glyphicon-info-sign"></span>@Messages("notification.not_read")</div>
+                <div class="notification-read unread"><span class="glyphicon glyphicon-info-sign"></span> @Messages("notification.not_read")</div>
                 }
                 <div class="hp-truncate hp-white-space" id="@notification.id">
                     <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>
