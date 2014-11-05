@@ -112,9 +112,18 @@ body#hp-landingpage {
 }
 
 #hp-landingpage div.alert {
+	position: absolute;
+	margin: 0;
 	margin-top: 15px !important;
-	margin-left: -10px;
-    margin-right: -10px;
+	left: 10px;
+	right: 10px;
+	text-shadow: none;
+}
+
+@media (min-width: 992px) {
+    #hp-landingpage div.alert {
+    	margin-top: 25px !important;
+    }
 }
 
 #hp-description {
@@ -130,13 +139,18 @@ body#hp-landingpage {
 }
 
 #hp-landingpage div#hp-login {
-	padding: 50px 0;
+	padding: 70px 0;
 	background-image: url('http://www.htw-berlin.de/fileadmin/HTW/Zentral/DE/HTW/ZR1_Presse/Pressefotos/130719___Philipp_Meuser_0011_01_1200px_crop.jpg');
 	background-repeat: no-repeat;
 	background-size: 100% auto;
 	background-position: center center;
 	color: white !important;
 	text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+#hp-landingpage div#hp-login .hp-logo img {
+	margin: 0;
+	padding: 0 50px;
 }
 
 @media (min-width: 992px) {
@@ -146,11 +160,9 @@ body#hp-landingpage {
     #hp-landingpage div#hp-login .hp-logo {
        	margin-top: 30px;
     }
-}
-
-#hp-landingpage div#hp-login .hp-logo img {
-	margin: 0;
-	padding: 0 50px;
+    #hp-landingpage div#hp-login .hp-logo img {
+        padding: 0;
+    }
 }
 
 #hp-landingpage div#hp-login input {
@@ -165,9 +177,9 @@ body#hp-landingpage {
 
 @media (max-width: 991px) {
     #hp-landingpage div#hp-login > div {
-        margin: -50px 0;
-        padding-top: 65px;
-        padding-bottom: 65px;
+        margin: -70px 0;
+        padding-top: 80px;
+        padding-bottom: 80px;
     }
     #hp-landingpage div#hp-login #hp-login-right {
         margin-top: 30px;
@@ -190,7 +202,7 @@ body#hp-landingpage {
 
 #hp-landingpage div#hp-navbar.affix-top {
     min-height: 15px;
-    margin-bottom: -16px;
+    margin-bottom: -15px;
 }
 
 #hp-landingpage div#hp-navbar.affix-top > div.hp-navbar-container {
@@ -226,8 +238,8 @@ body#hp-landingpage {
 
 #hp-landingpage div#hp-about {
 	margin-top: 51px;
-	margin-bottom: 50px;
-	padding-top: 10px;
+	margin-bottom: 20px;
+	padding-top: 15px;
 }
 
 #hp-landingpage div#hp-about > div {

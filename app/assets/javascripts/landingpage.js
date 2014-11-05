@@ -149,11 +149,11 @@ $(window).load(function() {
 
 	// apply scrollspy for sections, will activate items on hp-navbar if corresponding section is reached while scrolling
     $('.hp-section').each(function() {
-        var curY = $(this).offset().top - 50;
+        var curY = $(this).offset().top - parseFloat($(this).css('margin-top')) - 50;
         var name = $(this).attr('data-scrollspy-name');
         $(this).scrollspy({
             min: curY,
-            max: curY + $(this).height(),
+            max: curY + $(this).outerHeight(true),
             onEnter: function(element) {
                 $("#hp-navbar li[data-scrollspy-target='" + $(element).attr('data-scrollspy-name') + "']").addClass('active');
             },

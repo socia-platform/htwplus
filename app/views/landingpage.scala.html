@@ -28,6 +28,26 @@
                 <div id="hp-login-right" class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-4 col-md-offset-1">
                     @controllers.Component.loginForm()
                 </div>
+                <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+                    @if(flash.containsKey("success")) {
+                    <div class="alert alert-success fade in">
+                        <button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+                        @flash.get("success")
+                    </div>
+                    }
+                    @if(flash.containsKey("info")) {
+                    <div class="alert alert-info fade in">
+                        <button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+                        @flash.get("info")
+                    </div>
+                    }
+                    @if(flash.containsKey("error")) {
+                    <div class="alert alert-danger fade in">
+                        <button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+                        @flash.get("error")
+                    </div>
+                    }
+                </div>
             </div>
         </div>
 
