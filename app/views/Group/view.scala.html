@@ -1,6 +1,7 @@
 @(group: Group, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer)
 @import helper._
 @import models.enums._
+@import play._
 
 @main("Group View") {
 
@@ -13,6 +14,12 @@
 	<!-- Start confirmDeleteGroupModal -->
 	<div id="confirmDeleteGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
 		@views.html.Group.snippets.deleteGroupModal(group)   
+	</div>
+	<!-- End confirmDeleteGroupModal -->
+	
+	<!-- Start confirmLeaveGroupModal -->
+	<div id="confirmLeaveGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		@views.html.Group.snippets.leaveGroupModal(group)
 	</div>
 	<!-- End confirmDeleteGroupModal -->
 	
@@ -33,7 +40,7 @@
 		@if(posts != null) {
 			@for(post <- posts) {
 				@if(post.parent == null){
-					@views.html.snippets.postView(post, postForm,  models.Post.GROUP)
+					@views.html.snippets.postView(post, postForm,  models.Post.GROUP, Play.application().configuration().getInt("htwplus.comments.init"))
 				}
 			}
 		}

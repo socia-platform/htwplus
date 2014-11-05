@@ -7,6 +7,7 @@ import models.*;
 import models.enums.AccountRole;
 import play.Logger;
 import play.Play;
+import play.i18n.Messages;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -31,6 +32,7 @@ public class Secured extends Security.Authenticator {
             if (passedT > timeout && !ctx.session().containsKey("rememberMe")) {
                 // session expired
             	ctx.session().clear();
+            	play.mvc.Controller.flash("info", Messages.get("Deine Sitzung ist abgelaufen."));
                 return null;
             } 
         }

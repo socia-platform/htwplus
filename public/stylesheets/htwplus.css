@@ -98,6 +98,10 @@ h1 {
 	font-weight: bold;
 }
 
+.hp-bold {
+    font-weight: bold;
+}
+
 .no-drop {
 	cursor: no-drop;
 }
@@ -557,6 +561,10 @@ input.hp-notification-hour {
 	width: inherit;
 }
 
+.notifications-mark-as-read {
+    text-align: center;
+    margin: 5px;
+}
 
 /*============================== Nav-Tabs ==============================*/
 

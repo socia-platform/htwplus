@@ -41,12 +41,13 @@ public class NotificationController extends BaseController {
 
         List<Notification> list = null;
         try {
-            list = Notification.findByAccountId(account.id);
+            list = Notification.findByAccountIdUnread(account.id);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
         List<Integer> countedNotifications = NotificationController.countNotifications(list);
-
-        return views.html.Notification.menuitem.render(list, countedNotifications.get(0), countedNotifications.get(1));
+        return views.html.Notification.menuitem.render(list, countedNotifications.get(0),
+                Notification.countUnreadNotificationsForAccountId(account.id)
+        );
 	}
 
     /**
@@ -60,7 +61,9 @@ public class NotificationController extends BaseController {
 		Notification notification = Notification.findById(notificationId);
 
 		if (notification == null) {
-			return badRequest("Das gibts doch garnicht!");
+            flash("info", Messages.get("notification.obsolete_notification"));
+
+            return redirect(request().getHeader("referer"));
 		}
 		
 		if (!Secured.hasAccessToNotification(notification)) {
@@ -87,7 +90,7 @@ public class NotificationController extends BaseController {
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
         List<Integer> countedNotifications = NotificationController.countNotifications(notifications);
-        Navigation.set(Navigation.Level.NOTIFICATIONS, Messages.get("notification.news"));
+        Navigation.set(Navigation.Level.NOTIFICATIONS, Messages.get("notification.title"));
         return ok(view.render(notifications, LIMIT, page,
                 Notification.countNotificationsForAccountId(Component.currentAccount().id), countedNotifications.get(1)
         ));

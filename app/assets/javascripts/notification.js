@@ -21,7 +21,7 @@ function WS() {
             }
 
             if (data.code == "OK" && data.method == "ReceiveNotification" && data.notification) {
-                ws.updateNotifications([data.notification]);
+                ws.updateNotification(data.notification, data.unreadCount);
             }
         } catch (exception) {
             if (ws.debug) {
@@ -83,31 +83,27 @@ function WS() {
     };
 
     /**
-     * Updates the notifications, if necessary.
+     * Updates the notification drop down by adding a new notification
      *
-     * @param notifications
+     * @param notification New notification object
+     * @param unreadCount Number of unread notifications
      */
-    this.updateNotifications = function(notifications) {
-        // create new elements for each new notification, append them before last list element (like "show all notifications")
-        for (var notificationIndex in notifications) {
-            if (notifications.hasOwnProperty(notificationIndex)) {
-                var notification = notifications[notificationIndex];
-                var notificationListElement = $('#notification_' + notification.id);
+    this.updateNotification = function(notification, unreadCount) {
+        var notificationListElement = $('#notification_' + notification.id);
 
-                // check, if the li element is already available
-                if (notificationListElement.length) {
-                    // status changed, we must recreate this element with new content
-                    notificationListElement.remove();
-                }
-
-                // li element not available, create new element and append
-                var newNotificationElement = this.createNotificationElement(notification);
-                $('#hp-notifications-item').find('li:first').before(newNotificationElement);
-                $(newNotificationElement).fadeIn('slow');
-            }
+        // check, if the li element is already available
+        if (notificationListElement.length) {
+            // status changed, we must recreate this element with new content
+            notificationListElement.remove();
         }
 
+        // li element not available, create new element and append
+        var newNotificationElement = this.createNotificationElement(notification);
+        $('#hp-notifications-item').find('li:first').before(newNotificationElement);
+        $(newNotificationElement).fadeIn('slow');
+
         // update counter and eventually delete obsolete previous notifications
+        $('#hp-notification-count').data('count', unreadCount);
         this.updateNewNotificationCounter();
         this.deleteObsoleteNotifications();
     };
@@ -117,14 +113,14 @@ function WS() {
      */
     this.updateNewNotificationCounter = function() {
         // count new/unread notifications
-        var unreadNotifications = $('.unread').length;
+        var unreadNotifications = $('#hp-notification-count').data('count');
 
         var notificationCounters = $('#hp-notifications-item').find('.badge');
         // if update counters
         for (var counterIndex = 0; counterIndex < notificationCounters.size(); counterIndex++) {
             if (notificationCounters.hasOwnProperty(counterIndex)) {
-                notificationCounters[counterIndex].innerHTML = unreadNotifications > 10 ? '10+' : unreadNotifications;
-                this.updateFavicon(unreadNotifications);
+                notificationCounters[counterIndex].innerHTML = unreadNotifications;
+                this.updateFaviconTitle(unreadNotifications);
                 if (unreadNotifications > 0) {
                     // if counter is hidden, show it
                     if (notificationCounters[counterIndex].style.display == 'none') {
@@ -142,27 +138,37 @@ function WS() {
     };
 
     /**
-     * Updates the favicon by the notification count.
+     * This attribute will hold the original title of the page, before it may be updated
+     * when we have unread notifications.
      */
-    this.updateFavicon = function(count) {
+    this.originalTitle = undefined;
+
+    /**
+     * Updates the favicon and title by the notification count.
+     *
+     * @param count Number of unread notifications
+     */
+    this.updateFaviconTitle = function(count) {
         var head = document.head ? document.head : document.getElementsByTagName('head')[0];
         var link = document.createElement('link');
+        var title = document.createElement('title');
         var oldLink = document.getElementById('dynamic-favicon');
+        var oldTitle = document.getElementsByTagName('title')[0];
         link.id = 'dynamic-favicon';
         link.rel = 'shortcut icon';
+        link.href = count < 1 ? '/assets/images/favicon.ico' : '/assets/images/favicon_unread.ico';
 
-        if (count < 1) {
-            link.href = '/assets/images/favicon.ico'
-        } else if (count <= 10) {
-            link.href = '/assets/images/favicons/favicon_X.ico'.replace('X', count.toString());
-        } else {
-            link.href = '/assets/images/favicons/favicon_plus.ico';
-        }
+        this.originalTitle = this.originalTitle == undefined ? document.title : this.originalTitle;
+        title.innerHTML = count < 1 ? this.originalTitle : '(' + count.toString() + ') ' + this.originalTitle;
 
         if (oldLink) {
             head.removeChild(oldLink);
         }
+        if (oldTitle) {
+            head.removeChild(oldTitle);
+        }
         head.appendChild(link);
+        head.appendChild(title);
     };
 
     /**

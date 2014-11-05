@@ -1,0 +1,32 @@
+@(group: Group)
+@import helper._
+@import models.enums.GroupType
+
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title hp-truncate" id="confirmModalLabel">
+					@if(group.groupType == GroupType.close) {
+					<span class="glyphicon glyphicon-lock"></span>
+					Gruppe verlassen
+					} 
+					@if(group.groupType == GroupType.open) {
+						<span class="glyphicon glyphicon-globe"></span>
+					Gruppe verlassen
+					}
+					@if(group.groupType == GroupType.course) {
+						<span class="glyphicon glyphicon-briefcase"></span>
+					Kurs verlassen
+					}
+				</h4>
+			</div>
+			<div class="modal-body">
+				Möchtest Du <b>@truncate(group.title,30)</b> wirklich verlassen?<br />
+			</div>
+			<div class="modal-footer">
+				<a type="button"  class="btn btn-warning" href="@routes.GroupController.removeMember(group.id,Component.currentAccount.id)">Ja</a>
+				<a type="button" class="btn btn-default" data-dismiss="modal">Nein</a>
+			</div>
+		</div>
+	</div>

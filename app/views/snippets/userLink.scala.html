@@ -6,7 +6,7 @@
         @if(user.role == AccountRole.STUDENT) {
         data-content="Rolle: Student @if(user.studycourse != null){<br />Studiengang: @user.studycourse.title<br />}@if(user.semester != null){@user.semester. Semester }@if(user.degree != null){@user.degree}"
         } else { @if(user.role == AccountRole.TUTOR) {
-        data-content="Rolle: Dozent<br />Fachbereich: "
+        data-content="Rolle: Dozent @if(user.studycourse != null){<br />Studiengang: @user.studycourse.title}"
         } else {
         data-content="<i>Komisch, diese Person ist unbekannt!</i>"
         }}

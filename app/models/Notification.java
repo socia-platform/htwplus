@@ -75,7 +75,7 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
 
     @Override
     public void update() {
-        JPA.em().merge(this);
+        updatedAt();
     }
 
     @Override
@@ -95,7 +95,7 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
     @SuppressWarnings("unchecked")
     public static List<Notification> findByAccountId(final Long accountId, final int maxResults, final int offsetResults) throws Throwable {
     	return (List<Notification>) JPA.em()
-                .createQuery("FROM Notification n WHERE n.recipient.id = :accountId ORDER BY n.createdAt DESC")
+                .createQuery("FROM Notification n WHERE n.recipient.id = :accountId ORDER BY n.isRead ASC, n.updatedAt DESC")
                 .setParameter("accountId", accountId)
                 .setMaxResults(maxResults)
                 .setFirstResult(offsetResults)
@@ -103,37 +103,31 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
     }
 
     /**
-     * Overloaded method findByAccountId() with default offset 0
-     *
-     * @param accountId User account ID
-     * @return List of notifications
-     * @throws Throwable
-     */
-    public static List<Notification> findByAccountId(final Long accountId, final int maxResults) throws Throwable {
-        return Notification.findByAccountId(accountId, maxResults, 0);
-    }
-
-    /**
-     * Overloaded method findByAccountId() with default max results of 10 and offset 0
-     *
-     * @param accountId User account ID
-     * @return List of notifications
-     * @throws Throwable
-     */
-    public static List<Notification> findByAccountId(final Long accountId) throws Throwable {
-        return Notification.findByAccountId(accountId, 10);
-    }
-
-    /**
      * Returns a list of notifications by a specific user account ID for a specific page.
      *
      * @param accountId User account ID
+     * @param maxResults Maximum results
      * @param currentPage Current page
      * @return List of notifications
      * @throws Throwable
      */
     public static List<Notification> findByAccountIdForPage(final Long accountId, int maxResults, int currentPage) throws Throwable {
         return Notification.findByAccountId(accountId, maxResults, (currentPage * maxResults) - maxResults);
+    }
+
+    /**
+     * Returns a list of unread notifications by a specific user account ID.
+     *
+     * @param accountId User account ID
+     * @return List of notifications
+     * @throws Throwable
+     */
+    public static List<Notification> findByAccountIdUnread(final Long accountId) throws Throwable {
+        return JPA.em()
+                .createQuery("FROM Notification n WHERE n.recipient.id = :accountId AND n.isRead = false", Notification.class)
+                .setParameter("accountId", accountId)
+                .setMaxResults(10)
+                .getResultList();
     }
 
     /**
@@ -171,6 +165,22 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
     }
 
     /**
+     * Returns a notification by a reference ID and a recipient ID.
+     *
+     * @param referenceId Reference ID
+     * @param recipientId Recipient ID
+     * @return Notification instance
+     * @throws NoResultException
+     */
+    public static Notification findByReferenceIdAndRecipientId(Long referenceId, Long recipientId) throws NoResultException {
+        return JPA.em()
+                .createQuery("FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :recipientId", Notification.class)
+                .setParameter("referenceId", referenceId)
+                .setParameter("recipientId", recipientId)
+                .getSingleResult();
+    }
+
+    /**
      * Returns a specific notification by its rendered content.
      *
      * @param renderedContent Rendered content to select
@@ -192,6 +202,19 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
     public static int countNotificationsForAccountId(final Long accountId) {
     	return ((Number)JPA.em()
                 .createQuery("SELECT COUNT(n) FROM Notification n WHERE n.recipient.id = :accountId")
+                .setParameter("accountId", accountId)
+                .getSingleResult()).intValue();
+    }
+
+    /**
+     * Counts all unread notifications for an account ID.
+     *
+     * @param accountId User account ID
+     * @return Number of notifications
+     */
+    public static int countUnreadNotificationsForAccountId(final Long accountId) {
+        return ((Number)JPA.em()
+                .createQuery("SELECT COUNT(n) FROM Notification n WHERE n.recipient.id = :accountId AND n.isRead = false")
                 .setParameter("accountId", accountId)
                 .getSingleResult()).intValue();
     }

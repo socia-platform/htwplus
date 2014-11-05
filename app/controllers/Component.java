@@ -16,7 +16,6 @@ import play.libs.F.Promise;
 import play.mvc.Action;
 import play.mvc.Http.Context;
 import play.mvc.Result;
-import views.html.snippets.loginForm;
 
 public class Component extends Action.Simple {
 	

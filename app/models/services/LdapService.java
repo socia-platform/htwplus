@@ -128,6 +128,7 @@ public class LdapService {
         String userLastName = Play.application().configuration().getString("ldap.serverValues.lastName");
         String groupName = Play.application().configuration().getString("ldap.serverValues.groupName");
         String studentRole = Play.application().configuration().getString("ldap.serverValues.studentRole");
+        String profRole = Play.application().configuration().getString("ldap.serverValues.profRole");
         String tutorRole = Play.application().configuration().getString("ldap.serverValues.tutorRole");
 
         LdapNetworkConnection ldapConnection;
@@ -174,7 +175,7 @@ public class LdapService {
                 if (role.equals(studentRole)) {
                     this.role = AccountRole.STUDENT;
                 }
-                if (role.equals(tutorRole)) {
+                if (role.equals(profRole) || role.equals(tutorRole)) {
                     this.role = AccountRole.TUTOR;
                 }
             }

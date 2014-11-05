@@ -210,8 +210,6 @@ public class MediaController extends BaseController {
 			if (!Secured.uploadMedia(group)) {
 				return redirect(controllers.routes.Application.index());
 			}
-			group.temporarySender = Component.currentAccount();
-            NotificationService.getInstance().createNotification(group, Group.GROUP_NEW_MEDIA);
 			ret = controllers.routes.GroupController.media(id);
 		} else {
 			return redirect(ret);
@@ -255,6 +253,7 @@ public class MediaController extends BaseController {
 				
 				String error = "Eine Datei mit dem Namen " + med.title + " existiert bereits";
 				if(target.equals(Media.GROUP)) {
+                    med.temporarySender = Component.currentAccount();
 					med.group = group;
 					if(med.existsInGroup(group)){
 						flash("error", error);
@@ -268,6 +267,11 @@ public class MediaController extends BaseController {
 			for (Media m : mediaList) {
 				try {
 					m.create();
+
+                    // create group notification, if a group exists
+                    if (m.group != null) {
+                        NotificationService.getInstance().createNotification(m, Media.MEDIA_NEW_MEDIA);
+                    }
 				} catch (Exception e) {
 					return internalServerError(e.getMessage());
 				}

@@ -1,0 +1,5 @@
+@(notification: Notification, notifiable: Media)
+
+@import helper._
+
+<span class='glyphicon glyphicon-paperclip'></span>@Html(Messages("media.group_new_media", truncate(notifiable.fileName,20), truncate(notifiable.group.title,20)))

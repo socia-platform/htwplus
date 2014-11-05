@@ -5,8 +5,12 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.Type;
+
+import models.base.BaseModel;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
+import play.Logger;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 
@@ -19,10 +23,10 @@ public class Post extends BaseNotifiable implements INotifiable {
     public static final String COMMENT_GROUP = "comment_group";             // comment on a group post
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
     public static final String BROADCAST = "broadcast";                     // broadcast post from admin control center
-    public static final int PAGE = 1;
 
     @Required
-	@Column(length=2000)
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
 	public String content;
 
 	@ManyToOne
@@ -71,9 +75,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 	
 	protected static Query limit(Query query, int limit, int offset) {
-		if (limit > 0) {
-			query.setMaxResults(limit);
-		}
+		query.setMaxResults(limit);
 		if (offset >= 0) {
 			query.setFirstResult(offset);
 		}
@@ -102,13 +104,14 @@ public class Post extends BaseNotifiable implements INotifiable {
 	
 	
 	@SuppressWarnings("unchecked")
-	public static List<Post> getCommentsForPost(final Long id, final int start, final int max) {
-		return (List<Post>) JPA.em()
+	public static List<Post> getCommentsForPost(Long id, int limit, int offset) {
+		Query query = JPA.em()
                 .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
-                .setParameter(1, id)
-                .setFirstResult(start)
-                .setMaxResults(max)
-                .getResultList();
+                .setParameter(1, id);
+		
+		query = limit(query, limit, offset);
+		
+		return (List<Post>) query.getResultList();
 	}
 
     @SuppressWarnings("unchecked")
@@ -317,29 +320,67 @@ public class Post extends BaseNotifiable implements INotifiable {
     @Override
     public String getTargetUrl() {
         if (this.type.equals(Post.GROUP)) {
-            return controllers.routes.GroupController.view(this.group.id, Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.id).toString();
         }
 
         if (this.type.equals(Post.PROFILE)) {
-            return controllers.routes.ProfileController.stream(this.account.id, Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.id).toString();
         }
 
         if (this.type.equals(Post.COMMENT_PROFILE)) {
-            return controllers.routes.ProfileController.stream(this.parent.account.id, Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.parent.id).toString();
         }
 
         if (this.type.equals(Post.COMMENT_GROUP)) {
-            return controllers.routes.GroupController.view(this.parent.group.id, Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.parent.id).toString();
         }
 
         if (this.type.equals(Post.COMMENT_OWN_PROFILE)) {
-            return controllers.routes.ProfileController.stream(this.parent.account.id, Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.parent.id).toString();
         }
 
         if (this.type.equals(Post.BROADCAST)) {
-            return controllers.routes.Application.stream(Post.PAGE).toString();
+            return controllers.routes.PostController.view(this.id).toString();
         }
 
         return super.getTargetUrl();
+    }
+
+    /**
+     * As the notifications should only refer to the main post, we need to return the parent, if given.
+     * Otherwise this is the main post and we can return this.
+     *
+     * @return Post instance
+     */
+    @Override
+    public BaseModel getReference() {
+        if (this.parent != null) {
+            return this.parent;
+        }
+
+        return this;
+    }
+
+    /**
+     * As we want to have only one notification per post and just update if there is a new comment,
+     * we need to find out, if there is a notification per post and user already given. If there is no
+     * notification given for a user and post, we create a new notification instance.
+     *
+     * @param recipient Account recipient
+     * @return Notification instance
+     */
+    @Override
+    public Notification getNotification(Account recipient) {
+        if (this.parent != null) {
+            try {
+                return Notification.findByReferenceIdAndRecipientId(this.parent.id, recipient.id);
+            } catch (NoResultException ex) {
+                Logger.error("Error while trying to fetch notification for Post ID: " + this.parent.id
+                        + ", Recipient ID: " + recipient.id + ": " + ex.getMessage()
+                );
+            }
+        }
+
+        return new Notification();
     }
 }

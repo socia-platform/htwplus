@@ -14,11 +14,17 @@
         <br />
         @for(notification <- notifications) {
             <div class="well notification">
-                <div class="notification-date">@Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"))</div>
+                <div class="notification-date">
+                    @if(notification.createdAt.getTime == notification.updatedAt.getTime) {
+                        @Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm")))
+                    } else {
+                        @Html(Messages("notification.date_updated", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"), notification.updatedAt.format("dd.MM.YYYY"), notification.updatedAt.format("HH:mm")))
+                    }
+                </div>
                 @if(notification.isRead){
-                <div class="notification-read read">@Messages("notification.date_read", notification.updatedAt.format("dd.MM.YYYY"), notification.updatedAt.format("HH:mm"))</div>
+                <div class="notification-read read"><span class="glyphicon glyphicon-ok-sign"></span>@Messages("notification.date_read")</div>
                 }else{
-                <div class="notification-read unread">@Messages("notification.not_read")</div>
+                <div class="notification-read unread"><span class="glyphicon glyphicon-info-sign"></span>@Messages("notification.not_read")</div>
                 }
                 <div class="hp-truncate hp-white-space" id="@notification.id">
                     <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>

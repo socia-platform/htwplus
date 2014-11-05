@@ -1,6 +1,7 @@
 @(post: Post, postForm: Form[Post])
 
 @import models.enums._
+@import play._
 
 @main("Post") {
 
@@ -18,6 +19,12 @@
 		</div>
 		<!-- End confirmDeleteGroupModal -->
 		
+		<!-- Start confirmLeaveGroupModal -->
+		<div id="confirmLeaveGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+			@views.html.Group.snippets.leaveGroupModal(post.group)
+		</div>
+		<!-- End confirmDeleteGroupModal -->
+		
 		@views.html.Group.snippets.navTabs(post.group)
 		
 		<h2 class="hp-truncate">
@@ -28,8 +35,7 @@
 		</h2>
 		<br />
 		<br />
-		
-		@views.html.snippets.postView(post, postForm, models.Post.GROUP)
+		@views.html.snippets.postView(post, postForm, models.Post.GROUP, Play.application().configuration().getInt("htwplus.comments.singlepost"))
 				
 	}
 	
@@ -38,6 +44,6 @@
 			<h2>@post.account.name</h2>
 			<br />
 			<br />
-		@views.html.snippets.postView(post, postForm, models.Post.PROFILE)
+		@views.html.snippets.postView(post, postForm, models.Post.PROFILE, Play.application().configuration().getInt("htwplus.comments.singlepost"))
 	}
 }

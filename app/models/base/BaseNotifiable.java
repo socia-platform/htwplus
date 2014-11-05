@@ -67,6 +67,11 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
         return controllers.routes.Application.index().toString();
     }
 
+    @Override
+    public Notification getNotification(Account recipient) {
+        return new Notification();
+    }
+
     /**
      * Helper method to return one account as a List<Account> as required by getRecipients()
      * in the INotifiable interface.

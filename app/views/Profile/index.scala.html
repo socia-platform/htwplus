@@ -30,7 +30,7 @@
 	<tr>
 		<th>Studiengang</th>
 		@if(user.studycourse != null) {
-			<td>@user.studycourse.title</td>
+			<td>@user.studycourse.title @if(user.degree != null) { (@user.degree) }</td>
 		} else {
 			<td>Keine Angabe</td>
 		}
@@ -41,14 +41,6 @@
 			<th>Semester</th>
 			@if(user.semester != null) {
 				<td>@{user.semester + "."} Semester</td>
-			} else {
-				<td>Keine Angabe</td>
-			}
-		</tr>
-		<tr>
-			<th>Abschluss</th>
-			@if(user.degree != null) {
-				<td>@user.degree</td>
 			} else {
 				<td>Keine Angabe</td>
 			}

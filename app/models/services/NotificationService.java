@@ -113,7 +113,7 @@ public class NotificationService {
                         }
 
                         // create new notification and persist in database
-                        final Notification notification = new Notification();
+                        Notification notification = notifiable.getNotification(recipient);
                         notification.isRead = false;
                         notification.isSent = false;
                         notification.recipient = recipient;
@@ -123,13 +123,20 @@ public class NotificationService {
                         notification.targetUrl = notifiable.getTargetUrl();
 
                         try {
+                            // render notification content
                             notification.rendered = notifiable.render(notification);
 
-                            // persist notification using JPA.withTransaction, as we are not in the main
-                            // execution context of play, but in Akka sub-system
-                            notification.create();
+                            // if no ID is set already, persist new instance, otherwise update given instance
+                            if (notification.id == null) {
+                                notification.create();
+                                Logger.info("Created new notification for user: " + recipient.id.toString());
+                            } else {
+                                notification.update();
+                                Logger.info("Updated notification (ID: " + notification.id.toString()
+                                        + ") for user: " + recipient.id.toString()
+                                );
+                            }
 
-                            Logger.info("Created new Notification for User: " + recipient.id.toString());
                             self.webSocketPush(notification);
                             self.handleMail(notification);
                         } catch (Exception e) {
@@ -155,6 +162,7 @@ public class NotificationService {
                 ObjectNode node = WebSocketService.getInstance()
                         .successResponseTemplate(WebSocketService.WS_METHOD_RECEIVE_NOTIFICATION);
                 node.put("notification", notification.getAsJson());
+                node.put("unreadCount", Notification.countUnreadNotificationsForAccountId(notification.recipient.id));
                 recipientActor.tell(Json.toJson(node), null);
             }
         }
