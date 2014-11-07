@@ -76,6 +76,7 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
     @Override
     public void update() {
         updatedAt();
+        JPA.em().merge(this);
     }
 
     @Override
