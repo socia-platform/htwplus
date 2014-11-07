@@ -1,9 +1,9 @@
 @(notifications: List[Notification], recipient: Account)
 @import helper._
-@if(notifications.size > 1) {@Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size)} else {@Messages("notification.email_notifications.single.intro_text", recipient.name)}
+@if(notifications.size > 1) {@Html(Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size)).toString().replaceAll("\\<[^>]*>", "")} else {@Html(Messages("notification.email_notifications.single.intro_text", recipient.name)).toString().replaceAll("\\<[^>]*>", "")}
 @if(notifications != null) {
 @for(notification <- notifications) {
-@Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"))
+@Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"))).toString().replaceAll("\\<[^>]*>", "")
 @notification.rendered.replaceAll("\\<[^>]*>", "")
 }
 }

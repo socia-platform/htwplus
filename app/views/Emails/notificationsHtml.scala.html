@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="notification-date"@Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm")))</div>
                 <div class="hp-truncate hp-white-space" id="@notification.id">
-                    <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>
+                    @Html(notification.rendered)
                 </div>
             </div><br>
         }
