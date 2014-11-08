@@ -1,5 +1,6 @@
 @defining(Component.currentAccount()) { user =>
 
+<<<<<<< HEAD
 <nav id="hp-navbar" class="navbar navbar-default navbar-fixed-top" role="navigation">
 	<div class="hp-navbar-container">
 
@@ -16,9 +17,29 @@
 						<img id="hover" src="@routes.Assets.at("images/logos/logo-gray.svg")">
 					</div>
 				</a>
-			}
-		</div> <!-- /navbar-header -->
+=======
+<nav class="hp-navbar navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
 
+		<!-- navbar-header -->
+		<div class="navbar-header">
+			@defining(if(Navigation.getLevel() == Navigation.Level.STREAM){"active"} else {"deactive"}) { status =>
+            <a href="@Navigation.getLevelRoute(Navigation.Level.STREAM)">
+                <div class="visible-xs visible-sm hp-logo @status">
+                    <img id="normal" src="@routes.Assets.at("images/logos/logo-white-small.svg")">
+                    <img id="hover" src="@routes.Assets.at("images/logos/logo-gray-small.svg")">
+                </div>
+                <div class="hidden-xs hidden-sm hp-logo @status">
+                    <img id="normal" src="@routes.Assets.at("images/logos/logo-white.svg")">
+                    <img id="hover" src="@routes.Assets.at("images/logos/logo-gray.svg")">
+                </div>
+            </a>
+>>>>>>> #61 identical width for breadcrumb and navbar
+			}
+		</div>
+        <!-- end navbar-header -->
+
+<<<<<<< HEAD
 		<!-- Collect the nav links, forms, and other content for toggling -->
 
             <ul class="hp-nav nav navbar-nav">
@@ -28,10 +49,21 @@
 						<a class="visible-xs-block" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)"><span class="glyphicon glyphicon-user"></span></a>
 						<a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)">@Navigation.getLevelTitle(Navigation.Level.FRIENDS)</a>
 					</li>
+=======
+		<!-- navbar-collapse -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="hp-nav nav navbar-nav">
+				@defining(if(Navigation.getLevel() == Navigation.Level.FRIENDS){"active"} else {"deactive"}) { status =>
+                <li class="@status">
+                    <a class="visible-xs" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)"><span class="glyphicon glyphicon-user"></span></a>
+                    <a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)">@Navigation.getLevelTitle(Navigation.Level.FRIENDS)</a>
+                </li>
+>>>>>>> #61 identical width for breadcrumb and navbar
 				}
 
                 <!-- Groups -->
 				@defining(if(Navigation.getLevel() == Navigation.Level.GROUPS){"active"} else {"deactive"}) { status =>
+<<<<<<< HEAD
 					<li class="@status">
 						<a class="visible-xs-block" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)"><span class="glyphicon glyphicon-list"></span></a>
 						<a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)">@Navigation.getLevelTitle(Navigation.Level.GROUPS)</a>
@@ -43,6 +75,16 @@
 
                 <!-- Search -->
 				<li class="visible-xs-block dropdown">
+=======
+                <li class="@status">
+                    <a class="visible-xs" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)"><span class="glyphicon glyphicon-list"></span></a>
+                    <a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)">@Navigation.getLevelTitle(Navigation.Level.GROUPS)</a>
+                </li>
+				}
+                @controllers.NotificationController.view()
+	
+				<li class="visible-xs dropdown">
+>>>>>>> #61 identical width for breadcrumb and navbar
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span> <b class="caret"></b></a>
 					<ul class="hp-dropdown-search dropdown-menu">
 						<form class="hp-search-form navbar-form navbar-left" role="search" action="@routes.Application.search" method="GET">
@@ -73,7 +115,7 @@
 					</a>
 					<ul class="dropdown-menu">
                         @if(Secured.isAdmin()) {
-                            <li><a href="@routes.AdminController.index()" style="color:red;">Control Center</a></li>
+                        <li><a href="@routes.AdminController.index()" style="color:red;">Control Center</a></li>
                         }
 						<li><a href="@routes.ProfileController.stream(user.id)">Mein öffentlicher Newsstream</a></li>
 						<li><a href="@Navigation.getLevelRoute(Navigation.Level.PROFILE)">Mein Profil ansehen</a></li>
@@ -83,9 +125,16 @@
 					</ul>
 				</li>
 			</ul>
+<<<<<<< HEAD
 
 
 	</div>
+=======
+		</div>
+        <!-- end navbar-collapse -->
+		
+    </div>
+>>>>>>> #61 identical width for breadcrumb and navbar
 </nav>
 
 }

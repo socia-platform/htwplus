@@ -2,21 +2,21 @@
 
 <div class="hp-breadcrumb">
     <div class="hp-navbar-container">
-            <ul class="breadcrumb">
-                <li><a href="@routes.Application.index()"><span class="glyphicon glyphicon-home"></span></a></li>
-                @if(Navigation.getLevel() != null && Navigation.getTitle() == null){
-                <li>@Navigation.getLevelTitle(Navigation.getLevel())</li>
-                }
-                @if(Navigation.getLevel() != null && Navigation.getTitle() != null){
-                <li><a href="@Navigation.getLevelRoute(Navigation.getLevel())">@Navigation.getLevelTitle(Navigation.getLevel())</a></li>
-                }
+        <ul class="breadcrumb">
+            <li><a href="@routes.Application.index()"><span class="glyphicon glyphicon-home"></span></a></li>
+            @if(Navigation.getLevel() != null && Navigation.getTitle() == null){
+            <li>@Navigation.getLevelTitle(Navigation.getLevel())</li>
+            }
+            @if(Navigation.getLevel() != null && Navigation.getTitle() != null){
+            <li><a href="@Navigation.getLevelRoute(Navigation.getLevel())">@Navigation.getLevelTitle(Navigation.getLevel())</a></li>
+            }
 
-                @if(Navigation.getParentTitle() != null){
-                <li><a href="@Navigation.getParentCall()">@truncate(Navigation.getParentTitle(),30)</a></li>
-                }
-                @if(Navigation.getTitle() != null){
-                <li>@truncate(Navigation.getTitle(),30)</li>
-                }
-            </ul>
+            @if(Navigation.getParentTitle() != null){
+            <li><a href="@Navigation.getParentCall()">@truncate(Navigation.getParentTitle(),30)</a></li>
+            }
+            @if(Navigation.getTitle() != null){
+            <li>@truncate(Navigation.getTitle(),30)</li>
+            }
+        </ul>
     </div>
 </div>

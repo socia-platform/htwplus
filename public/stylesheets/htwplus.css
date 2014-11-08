@@ -505,6 +505,10 @@ div[id*='hp-feature-text-'] table {
     margin-left: 10px;
 }
 
+.hp-breadcrumb ul.breadcrumb li:last-child {
+    padding-right: 10px;
+}
+
 /*============================== Notification ==============================*/
 
 .hp-dropdown-notifications li.notification-action:not(.disabled) a {
@@ -584,6 +588,17 @@ input.hp-notification-hour {
     margin: 5px;
 }
 
+.dropdown-menu li .glyphicon {
+    margin: 0 7px 0 0;
+}
+
+.dropdown-menu li div a {
+    text-decoration: none;
+}
+
+.dropdown-menu li div a :first-line {
+    text-indent: 100px;
+}
 
 /*============================== Nav-Tabs ==============================*/
 
