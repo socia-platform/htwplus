@@ -38,12 +38,10 @@ function autolinkUrls() {
  */
 $('.hp-optionsMenu>div').on('shown.bs.dropdown', function() {
     $(this).find('.dropdown-toggle>span').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
-    /*
     var menu = $(this).find('ul.dropdown-menu');
     var row = $(this).parents('tr');
     var top = row.offset().top + row.height() - $('.hp-notepad-right').offset().top;
     menu.css('top', top + 'px');
-    */
 });
 
 $('.hp-optionsMenu>div').on('hidden.bs.dropdown', function() {
