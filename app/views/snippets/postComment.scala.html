@@ -7,7 +7,7 @@
 	<div class="media-body">
 		<h5 class="media-heading">
 			@views.html.snippets.userLink(comment.owner)
-			<small>(@comment.createdAt.format("dd.MM.yyyy HH:mm"))</small>
+			<small>@services.TemplateService.getDateColloquially(comment.createdAt)</small>
 			@if(Secured.isAllowedToDeletePost(comment, Component.currentAccount())){
                	<a href="#confirmModalDeleteComment@comment.id" data-toggle="modal" rel="tooltip" data-original-title="Post löschen">
                		<span class="glyphicon glyphicon-trash"></span>
