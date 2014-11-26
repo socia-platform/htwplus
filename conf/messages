@@ -28,6 +28,7 @@ error.minLength=Minimum length is {0}
 error.maxLength=Maximum length is {0}
 error.email=Bitte eine gültige Adresse eingeben
 error.pattern=Must satisfy {0}
+error.sessionExpired=Deine Sitzung ist abgelaufen.
 
 # --- authenticate
 authenticate.matriculationNumberMissing=Also deine Matrikelnummer brauchen wir schon!

@@ -102,6 +102,12 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	public Boolean approved;
 
+	/**
+	 * True, if this account is a test account.
+	 */
+	@Column(name = "is_test_account", nullable = false, columnDefinition = "boolean default false")
+	public Boolean isTestAccount;
+
     /**
      * Returns an account by account ID.
      *
@@ -171,15 +177,15 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
      */
 	public static Account authenticate(String email, String password) {
 		Account currentAcc = null;
-		try{
+		try {
 			final Account result = (Account) JPA.em()
 				.createQuery("from Account a where a.email = :email")
 				.setParameter("email", email).getSingleResult();
-			if (result != null && Component.md5(password).equals(result.password)) {
+			if (result != null && Component.md5(password).equals(result.password) && !result.isTestAccount) {
 				currentAcc = result;
 			}
 			return currentAcc;
-		}catch (NoResultException exp) {
+		} catch (NoResultException exp) {
 			return currentAcc;
 		}
 	}

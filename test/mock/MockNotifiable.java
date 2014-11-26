@@ -13,7 +13,7 @@ import java.util.List;
 public class MockNotifiable implements INotifiable {
     public Account sender;
     public List<Account> recipients;
-    public BaseModel reference = new MockBaseModel();
+    protected BaseModel reference = new MockBaseModel();
     public String rendered = "[MOCK-UP]";
 
     @Override
@@ -39,5 +39,10 @@ public class MockNotifiable implements INotifiable {
     @Override
     public String getTargetUrl() {
         return "[MOCK-UP]";
+    }
+
+    @Override
+    public Notification getNotification(Account recipient) {
+        return new Notification();
     }
 }

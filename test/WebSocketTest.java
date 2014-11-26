@@ -89,7 +89,7 @@ public class WebSocketTest extends FakeApplicationTest {
     public void testChatYourself() throws Exception {
         try {
             Account testAccount = this.getTestAccount(1);
-            this.loginTestAccount(testAccount);
+            this.loginAccount(testAccount);
 
             MockWebSocket ws = new MockWebSocket(WebSocketController.webSocket());
             ws.write(JsonService.getInstance()
@@ -116,10 +116,10 @@ public class WebSocketTest extends FakeApplicationTest {
             Account testAccountB = this.getTestAccount(4);
             this.removeFriendshipTestAccounts(testAccountA, testAccountB);
 
-            this.loginTestAccount(testAccountA);
+            this.loginAccount(testAccountA);
             MockWebSocket ws1 = new MockWebSocket(WebSocketController.webSocket());
 
-            this.loginTestAccount(testAccountB);
+            this.loginAccount(testAccountB);
             MockWebSocket ws2 = new MockWebSocket(WebSocketController.webSocket());
 
             ws2.write(JsonService.getInstance()
@@ -149,10 +149,10 @@ public class WebSocketTest extends FakeApplicationTest {
             Account testAccountB = this.getTestAccount(2);
             this.establishFriendshipTestAccounts(testAccountA, testAccountB);
 
-            this.loginTestAccount(testAccountA);
+            this.loginAccount(testAccountA);
             MockWebSocket ws1 = new MockWebSocket(WebSocketController.webSocket());
 
-            this.loginTestAccount(testAccountB);
+            this.loginAccount(testAccountB);
             MockWebSocket ws2 = new MockWebSocket(WebSocketController.webSocket());
 
             ws2.write(JsonService.getInstance()
