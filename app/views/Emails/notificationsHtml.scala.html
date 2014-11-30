@@ -8,17 +8,17 @@
 <div class="container">
     <div class="row">
         @if(notifications.size > 1) {
-            <h1>@Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size)</h1>
+            <h1>@Html(Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size))</h1>
         } else {
-            <h1>@Messages("notification.email_notifications.single.intro_text", recipient.name)</h1>
+            <h1>@Html(Messages("notification.email_notifications.single.intro_text", recipient.name))</h1>
         }
     </div>
     @if(notifications != null) {
         @for(notification <- notifications) {
             <div class="row">
-                <div class="notification-date">@Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"))</div>
+                <div class="notification-date"@Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm")))</div>
                 <div class="hp-truncate hp-white-space" id="@notification.id">
-                    <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>
+                    @Html(notification.rendered)
                 </div>
             </div><br>
         }

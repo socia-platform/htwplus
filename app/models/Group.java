@@ -85,6 +85,10 @@ public class Group extends BaseNotifiable implements INotifiable {
 	@OneToMany(mappedBy = "group")
 	@OrderBy("createdAt DESC")
 	public List<Media> media;
+	
+	public void setTitle(String title) {
+		this.title = title.trim();
+	}
 
     /**
      * Possible invitation list
