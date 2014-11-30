@@ -29,16 +29,37 @@ error.maxLength=Maximum length is {0}
 error.email=Bitte eine gültige Adresse eingeben
 error.pattern=Must satisfy {0}
 
-# authenticate
+# --- authenticate
 authenticate.matriculationNumberMissing=Also deine Matrikelnummer brauchen wir schon!
 authenticate.logout=Du bist nun ausgeloggt
 
-# LDAP connector
+# --- Landingpage
+landingpage.to_login=Zum Login
+landingpage.about=Über HTWplus
+landingpage.about.title=Erlebe das Studium neu!
+landingpage.about.description=Mit HTWplus hast du nun die Möglichkeit mit deinen Kommilitonen stets in Kontakt zu bleiben und dies unabhängig von anderen sozialen Netzwerken, die du vielleicht bereits privat nutzt. Dazu sind bereits zahlreiche Funktionen enthalten, die euch bei eurem Studium unterstützen sollen.
+landingpage.features=Die Funktionen
+landingpage.features.login.title=Nutze deinen HTW-Account
+landingpage.features.login.description=Die Anmeldung erfolgt unkompliziert mit deinem HTW-Account.
+landingpage.features.friends.title=Vernetze dich mit deinen Kommilitonen
+landingpage.features.friends.description=Pflege dein Hochschul-Netzwerk, indem du Kommilitonen und Dozenten deiner persönlichen Liste von Freunden hinzufügst.
+landingpage.features.groups.title=Vorlesungen, Übungen und Studienprojekte organisieren
+landingpage.features.groups.description=Erstelle Gruppen, um dein Studium gemeinsam mit deinen Kommilitonen zu organisieren oder trete bestehenden Gruppen bei.
+landingpage.features.courses.title=Kommuniziere mit deinen Dozenten und Professoren
+landingpage.features.courses.description=Tausche dich mit deinen Dozenten aus, indem du an ihren virtuellen Kursen teilnimmst.
+landingpage.features.filemgmt.title=Lehrmaterialen abrufen und Dateien austauschen
+landingpage.features.filemgmt.description=Nutze das Medienmanagement in Gruppen und Kursen, um Vorlesungsmaterialen, Notizen und Dokumente zu verwalten.
+landingpage.features.newsstream.title=Immer auf dem neusten Stand
+landingpage.features.newsstream.description=Dein persönlicher Newsstream hält dich immer auf dem Laufenden. Alle Posts und Kommentare deiner Gruppen, Kurse und Freunde werden hier zusammengefasst.
+landingpage.features.notifications.title=Keine Neuigkeiten verpassen
+landingpage.features.notifications.description=Ob neue Posts, Kommentare, Freundschaftsanfragen oder Gruppeneinladungen - du wirst über alles informiert. Auf Wunsch auch per Email.
+
+# --- LDAP connector
 ldap.noConnection=Keine Verbindung zum LDAP-Server möglich. Bitte versuche es später noch einmal.
 ldap.wrongCredentials=Ungültiges Passwort und/oder Matrikelnummer.
 ldap.generalError=Es gab ein Problem bei der Verbindung zum LDAP-Server. Bitte versuche es später noch einmal.
 
-# notifications
+# --- notifications
 notification.title=Übersicht
 notification.news=Neuigkeiten
 notification.nothing_new=Es ist nichts Neues passiert...
@@ -61,7 +82,7 @@ notification.email_notifications.single.intro_text=Hallo {0}, du hast folgende n
 notification.email_notifications.collected.intro_text=Hallo {0}, du hast heute {1} neue Nachrichten auf <a href="https://plus.htw-berlin.de/">HTWplus</a> erhalten
 notification.obsolete_notification=Diese Nachricht existiert leider nicht mehr
 
-# base model messages
+# --- base model messages
 post.try_with_content=Jo, fast. Probiere es noch einmal mit Inhalt ;-)
 post.join_group_first=Bitte tritt der Gruppe erst bei.
 post.post_on_stream_only=Du kannst nur Freunden auf den Stream schreiben!
@@ -85,7 +106,7 @@ group.group_request_sent=Deine Anfrage wurde erfolgreich übermittelt!
 group.group_not_found=Gruppe wurde nicht gefunden!
 media.group_new_media=Neues Medium <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>
 
-# admin control center
+# --- admin control center
 admin.admin_control_center=HTWplus Control Center EasyAdmin™
 admin.create_account=User anlegen
 admin.list_accounts=User verwalten

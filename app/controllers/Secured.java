@@ -11,7 +11,7 @@ import play.i18n.Messages;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.login;
+import views.html.landingpage;
 
 public class Secured extends Security.Authenticator {
 
@@ -47,7 +47,7 @@ public class Secured extends Security.Authenticator {
 	@Override
     public Result onUnauthorized(Context ctx) {
 		Logger.info("Unauthorized - Redirect to Login");
-		return ok(login.render());
+		return ok(landingpage.render());
     }
 		
 

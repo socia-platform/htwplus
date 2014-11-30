@@ -12,17 +12,7 @@ body {
 	overflow-x: hidden;
 }
 
-body#hp-landingpage {
-	margin-top: 0px !important;
-}
-
 div.alert {
-	margin-left: -10px;
-    margin-right: -10px;
-}
-
-body#hp-landingpage div.alert {
-	margin-top: 15px !important;
 	margin-left: -10px;
     margin-right: -10px;
 }
@@ -104,7 +94,7 @@ h1 {
 }
 
 .hp-green {
-	color: #76B900;
+	/* color: #76B900; */
 	font-weight: bold;
 }
 
@@ -119,43 +109,308 @@ h1 {
 .hp-focus-search {
 	cursor: pointer;	
 }
+
+/*============================== Landingpage ==============================*/
+body#hp-landingpage {
+	margin-top: 0px !important;
+}
+
+#hp-landingpage div.alert {
+	position: absolute;
+	margin: 0;
+	margin-top: 15px !important;
+	left: 10px;
+	right: 10px;
+	text-shadow: none;
+}
+
+@media (min-width: 992px) {
+    #hp-landingpage div.alert {
+    	margin-top: 25px !important;
+    }
+}
+
+#hp-description {
+    text-align: center;
+    padding-top: 30px;
+    font-family: 'Swanky and Moo Moo', cursive;
+    font-size: 20pt;
+	-moz-transform: rotate(350deg);
+	-ms-transform: rotate(350deg);
+	-o-transform: rotate(350deg);
+    -webkit-transform: rotate(350deg);
+    transform: rotate(350deg);
+}
+
+#hp-landingpage div#hp-login {
+	padding: 70px 0;
+	background-image: url('http://www.htw-berlin.de/fileadmin/HTW/Zentral/DE/HTW/ZR1_Presse/Pressefotos/130719___Philipp_Meuser_0011_01_1200px_crop.jpg');
+	background-repeat: no-repeat;
+	background-size: 100% auto;
+	background-position: center center;
+	color: white !important;
+	text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+#hp-landingpage div#hp-login .hp-logo img {
+	margin: 0;
+	padding: 0 50px;
+}
+
+@media (min-width: 992px) {
+    #hp-landingpage div#hp-login {
+       	padding: 150px 0;
+    }
+    #hp-landingpage div#hp-login .hp-logo {
+       	margin-top: 30px;
+    }
+    #hp-landingpage div#hp-login .hp-logo img {
+        padding: 0;
+    }
+}
+
+#hp-landingpage div#hp-login input {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+#hp-landingpage div#hp-login > div {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+@media (max-width: 991px) {
+    #hp-landingpage div#hp-login > div {
+        margin: -70px 0;
+        padding-top: 80px;
+        padding-bottom: 80px;
+    }
+    #hp-landingpage div#hp-login #hp-login-right {
+        margin-top: 30px;
+    }
+}
+
+#hp-landingpage div#hp-navbar {
+    border-width: 0 0 1px;
+    border-radius: 0;
+    z-index: 1030;
+}
+
+#hp-landingpage div#hp-navbar.hp-animate {
+    transition: 0.3s ease 0s;
+	-webkit-transition: 0.3s ease 0s;
+	-moz-transition: 0.3s ease 0s;
+	-ms-transition: 0.3s ease 0s;
+	-o-transition: 0.3s ease 0s;
+}
+
+#hp-landingpage div#hp-navbar.affix-top {
+    min-height: 15px;
+    margin-bottom: -15px;
+}
+
+#hp-landingpage div#hp-navbar.affix-top > div.hp-navbar-container {
+    display: none !important;
+    visibility: hidden;
+}
+
+#hp-landingpage div#hp-navbar.affix {
+	top: 0;
+	left: 0;
+	right: 0;
+	min-height: 50px;
+    margin-bottom: -51px;
+}
+
+#hp-landingpage div#hp-navbar.affix > div.hp-navbar-container {
+    display: none;
+    visibility: visible;
+}
+
+#hp-landingpage div#hp-navbar ul.hp-nav {
+	float: none;
+	margin-left: auto;
+	margin-right: auto;
+	display: table;
+}
+
+@media (min-width: 768px) {
+    #hp-landingpage div#hp-navbar ul.hp-nav > li:not(:last-child) {
+        margin-right: 30px;
+    }
+}
+
+#hp-landingpage div#hp-about {
+	margin-top: 51px;
+	margin-bottom: 20px;
+	padding-top: 15px;
+}
+
+#hp-landingpage div#hp-about > div {
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 0;
+}
+
+#hp-landingpage div#hp-about > div > * {
+    padding: 0 30px;
+}
+
+#hp-landingpage div#hp-about > div:last-child {
+    padding-bottom: 15px;
+}
+
+#hp-landingpage div#hp-about .hp-circle {
+    width: 110px;
+    margin-top: 30px;
+    position: relative;
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    padding: 5px;
+}
+
+#hp-landingpage div#hp-about .hp-circle > img {
+     border-radius: 50%;
+}
+
+#hp-landingpage div#hp-about > div:after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 90px;
+    top: 0;
+    background: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+    border-radius: 5px 5px 0 0;
+    z-index: -1;
+}
+
+#hp-landingpage div#hp-feature-text {
+    margin-top: 30px;
+}
+
+div[id*='hp-feature-text-'] table {
+    width: 100%;
+    margin-top: 80px;
+}
+
+@media (min-width: 992px) {
+
+    #hp-landingpage div#hp-feature-text table {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+    }
+
+    #hp-landingpage div#hp-feature-text table tr:first-child {
+        vertical-align: bottom;
+        height: 50%;
+    }
+
+    #hp-landingpage div#hp-feature-text table tr:last-child {
+        vertical-align: top;
+        height: 50%;
+    }
+
+	#hp-landingpage div#hp-feature-demo .hp-notepad-right {
+	    margin-top: 30px;
+	}
+
+	#hp-landingpage div#hp-feature-demo .hp-notepad-content {
+		position: relative;
+	    min-height: inherit;
+	}
+
+    #hp-landingpage div#hp-features div[id*='hp-feature-demo-'] {
+        display: none;
+        opacity: 0;
+        position: absolute;
+        top: 5px;
+        left: 30px;
+        right: 15px;
+        z-index: 1000;
+        height: 100%;
+        background-color: white;
+        padding-right: 15px;
+        overflow-y: auto;
+    }
+
+    #hp-landingpage div#hp-features div[id*='hp-feature-demo-']:first-child {
+        display: block !important;
+        opacity: 1 !important;
+    }
+
+    #hp-landingpage div#hp-features-trigger {
+        margin-bottom: 0;
+        width: 100%;
+        height: 1px;
+        color: green;
+    }
+}
+
+#hp-landingpage div#hp-features .hp-feature-title {
+	font-family: 'Swanky and Moo Moo', cursive;
+	margin-top: 0;
+	line-height: 1.1;
+}
+
+#hp-landingpage div#hp-features .hp-feature-description {
+	margin-top: 30px;
+	margin-bottom: 0;
+}
+
+#hp-landingpage div.hp-feature-icon {
+    position: absolute;
+    top: 0;
+    z-index: -1;
+}
+
+#hp-landingpage div.hp-feature-icon span.glyphicon {
+    font-size: 50pt;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 50px;
+    color: rgb(230,230,230);
+}
+
+#hp-landingpage div[id*='hp-feature-text-']:nth-child(2n) div.hp-feature-icon {
+    left: 0;
+	-moz-transform: rotate(15deg);
+	-ms-transform: rotate(15deg);
+	-o-transform: rotate(15deg);
+	-webkit-transform: rotate(15deg);
+}
+
+#hp-landingpage div[id*='hp-feature-text-']:nth-child(2n+1) div.hp-feature-icon {
+    right: 0;
+	-moz-transform: rotate(345deg);
+	-ms-transform: rotate(345deg);
+	-o-transform: rotate(345deg);
+	-webkit-transform: rotate(345deg);
+}
+
+
 /*============================== Navigation ==============================*/
-
-.hp-navbar .hp-search-form {
-	padding-right: 7px;
-}
-
-.hp-navbar .hp-search-form input {
-	width: 150px;
-	padding-right: 20px;
-	background-color: #E0F2BF;
-}
-
-.hp-navbar .hp-search-form button {
-	background: transparent;
-	border: 0;
-	margin-left: -28px;
-	outline: none;
-}
-
-.hp-navbar li .glyphicon {
-	color: inherit!important;
-}
 
 .hp-navbar-container {
 	max-width: 1000px;
 	margin: 0 auto;
 }
 
+.hp-navbar-container .navbar-right {
+    margin-right: 0 !important;
+}
+
 .hp-nav-user {
 	padding: 9px 10px !important;
 }
 
-.hp-nav-user span {
-	display: inline-block !important;
-}
-
-.hp-dropdown-news,
+.hp-dropdown-notifications,
 .hp-dropdown-search {
 	width: 600px;
 	max-height: 470px;
@@ -164,11 +419,11 @@ h1 {
 }
 
 @media (max-width: 767px) {
-	.hp-dropdown-news,
+	.hp-dropdown-notifications,
 	.hp-dropdown-search {
 		position: fixed;
 		width: auto;
-		top: 51px;
+		top: 50px;
 		right: 1px;
 		left: 1px;
 	}
@@ -195,66 +450,93 @@ h1 {
 	right: 11px;
 }
 
-.hp-dropdown-search button .glyphicon:hover {
+.hp-navbar-container > .hp-search-form {
+	padding-right: 7px;
+}
+
+.hp-navbar-container > .hp-search-form input {
+	width: 150px;
+	padding-right: 20px;
+	background-color: #E0F2BF;
+}
+
+.hp-search-form button {
+	background: transparent;
+	border: 0;
+	margin-left: -28px;
+	outline: none;
+}
+
+.hp-search-form button .glyphicon:hover {
 	color: #76B900 !important;
 }
 
-.hp-dropdown-search li.notification-show-all {
-    font-weight: bold;
+#hp-navbar li a .glyphicon {
+	color: inherit !important;
 }
 
-.hp-dropdown-search li.notification-element div {
-    display: table;
-    width: 100%;
-    padding: 0;
-    margin: 0;
+.hp-breadcrumb {
+    margin-left: -10px;
+    margin-right: -10px;
 }
 
-.hp-dropdown-search li.notification-element:hover {
-    background-color: #ededed;
+@media (max-width: 767px) {
+    .hp-breadcrumb {
+        margin-left: 0;
+        margin-right: 0;
+    }
 }
 
-.hp-dropdown-search li.notification-element div a {
-    display: table-cell;
-    vertical-align: middle;
-    padding: 7px 10px 7px 10px;
-    width: 100%;
+/*============================== Notification ==============================*/
+
+.hp-dropdown-notifications li.notification-action:not(.disabled) a {
+    color: #76b900;
 }
 
-.hp-dropdown-search li.read div a {
-    color: #bcbcbc;
-}
-
-.hp-dropdown-search li.unread div a {
-    color: black;
-}
-
-.hp-dropdown-search li.notification-element div div {
-    display: table-cell;
-    vertical-align: middle;
-}
-
-.hp-nav .dropdown {
-	height: 50px;
-}
-
-.hp-notification {
-	padding: 3px 20px;
-}
-
-.hp-notifications {
-    padding: 7px;
-}
-.nothing-new {
-    border: none!important;
-}
-
-div.well.notification .glyphicon {
+.hp-dropdown-notifications li.notification-element span.glyphicon {
     margin-right: 10px;
 }
 
-div.well.notification a:hover {
-    text-decoration: none;
+.hp-dropdown-notifications li.notification-element a {
+    width: 100%;
+}
+
+.hp-dropdown-notifications li.notification-element.read a {
+    color: #bcbcbc;
+}
+
+.hp-dropdown-notifications li.notification-element.unread a {
+    color: black;
+}
+
+.hp-dropdown-notifications li#hp-notification-show-history {
+    width: 50%;
+    float: left;
+    text-align: center;
+}
+
+.hp-dropdown-notifications li#hp-notification-read-all {
+    width: 50%;
+    float: right;
+    text-align: center;
+}
+
+.hp-dropdown-notifications li#hp-notification-nothing-new {
+    text-align: center;
+    padding: 7px;
+}
+
+div.hp-mailto a span.glyphicon,
+div.notifications-mark-as-read a span.glyphicon,
+div.well.notification a span.glyphicon {
+    margin-right: 7px;
+    color: #76b900;
+}
+
+div.hp-mailto a:hover span.glyphicon,
+div.notifications-mark-as-read a:hover span.glyphicon,
+div.well.notification a:hover span.glyphicon {
+    color: rgb(90,88,88);
 }
 
 div.well.notification div.notification-date {
@@ -274,50 +556,14 @@ div.well.notification div.notification-read.unread {
     color: #ff5f00;
 }
 
-dt.email-notifications {
-    white-space: normal;
-}
-
-.notification-element {
-    border: 1px solid #e3e3e3;
-    border-radius: 4px;
-    margin: 5px;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-}
-
-.notification-show-all a {
-    float: right;
-    padding: 3px 10px;
+input.hp-notification-hour {
+	display: inline;
+	width: inherit;
 }
 
 .notifications-mark-as-read {
     text-align: center;
     margin: 5px;
-}
-
-.dropdown-menu li .glyphicon {
-    margin: 0 7px 0 0;
-}
-
-.dropdown-menu li div a {
-    text-decoration: none;
-}
-
-.dropdown-menu li div a :first-line {
-    text-indent: 100px;
-}
-
-
-.hp-breadcrumb {
-    margin-left: -10px;
-    margin-right: -10px;
-}
-
-@media (max-width: 767px) {
-    .hp-breadcrumb {
-        margin-left: 0;
-        margin-right: 0;
-    }
 }
 
 /*============================== Nav-Tabs ==============================*/
@@ -363,43 +609,55 @@ dt.email-notifications {
 	margin: 50px 0 100px;
 }
 
-.hp-navbar .hp-logo {
+#hp-navbar .hp-logo {
 	height: 50px;
 	padding: 15px 15px 12px 10px
 }
 
-.hp-navbar .hp-logo img {
+#hp-navbar .hp-logo img {
 	height: 23px;
 	width: auto;
 	margin: 0;
 }
 
-.hp-navbar .hp-logo:hover #hover,
-.hp-navbar .hp-logo #normal {
+#hp-navbar .hp-logo:hover #hover,
+#hp-navbar .hp-logo #normal {
 	display: inherit!important;
 }
 
-.hp-navbar .hp-logo #hover,
-.hp-navbar .hp-logo:hover #normal {
+#hp-navbar .hp-logo #hover,
+#hp-navbar .hp-logo:hover #normal {
 	display: none!important;
 }
 
 #hp-plusi {
+	width: 170px;
+}
+
+#hp-login #hp-plusi {
 	position: absolute;
 	right: 5px;
-	bottom: 135px
+	bottom: 135px;
+}
+
+.hp-circle #hp-plusi {
+	width: 100px;
+	margin-left: -2px;
 }
 
 @media all and (max-width: 480px) {
-	#hp-plusi {
+    #hp-plusi {
 		width: 130px;
+    }
+
+	#hp-login #hp-plusi {
 		bottom: 140px;
 	}
 }
 
 /*============================== Notepad ==============================*/
 
-div#hp-right {
+div.hp-notepad-right {
 	position: relative;
 	background-image: url(../images/vertical.png);
 	background-repeat: repeat-y;
@@ -409,13 +667,13 @@ div#hp-right {
 }
 
 @media (max-width: 767px) {
-    div#hp-right  {
+    div.hp-notepad-right  {
         margin-right: -25px;
         margin-left: -49px;
     }
 }
 
-div#hp-topRight {
+div.hp-notepad-topRight {
 	width: 48px;
 	height: 15px;
 	position: absolute;
@@ -426,7 +684,7 @@ div#hp-topRight {
 	background-position: -50px -15px;
 }
 
-div#hp-bottomRight {
+div.hp-notepad-bottomRight {
 	width: 48px;
 	height: 22px;
 	position: absolute;
@@ -437,14 +695,14 @@ div#hp-bottomRight {
 	background-position: -50px -30px;
 }
 
-div#hp-left {
+div.hp-notepad-left {
 	margin-right: 24px;
 	background-image: url(../images/vertical.png);
 	background-repeat: repeat-y;
 	background-position: 0px 15px;
 }
 
-div#hp-topLeft {
+div.hp-notepad-topLeft {
 	width: 50px;
 	height: 15px;
 	vertical-align: top;
@@ -456,7 +714,7 @@ div#hp-topLeft {
 	background-position: 0px -15px;
 }
 
-div#hp-bottomLeft {
+div.hp-notepad-bottomLeft {
 	width: 50px;
 	height: 22px;
 	position: absolute;
@@ -467,7 +725,7 @@ div#hp-bottomLeft {
 	background-position: 0px -30px;
 }
 
-div#hp-top {
+div.hp-notepad-top {
 	margin-left: 50px;
 	padding-top: 15px;
 	background-image: url(../images/backgrounds.png);
@@ -475,14 +733,14 @@ div#hp-top {
 	background-position: 0px top;
 }
 
-div#hp-bottom {
+div.hp-notepad-bottom {
 	padding-bottom: 22px;
 	background-image: url(../images/backgrounds.png);
 	background-repeat: repeat-x;
 	background-position: 0px bottom;
 }
 
-div#hp-content {
+div.hp-notepad-content {
 	min-height: 500px;
 	padding: 5px 30px 0;
 	background-color: white;
@@ -492,7 +750,7 @@ div#hp-content {
 }
 
 @media (max-width: 767px) {
-    div#hp-content {
+    div.hp-notepad-content {
         padding-right: 5px;
         padding-left: 5px;
     }
@@ -522,9 +780,11 @@ form dl dt {
 	text-align: left !important;
 }
 
+/*
 form dl dd {
 	margin-bottom: 15px;
 }
+*/
 
 form dl dd > .checkbox,
 form dl dd > .radio {
@@ -600,7 +860,6 @@ div.hp-pagination {
 
 .hp-comments {
 	margin-left: 50px;
-	margin-bottom: -15px;
 }
 
 @media (max-width: 767px) {
@@ -681,7 +940,7 @@ div.hp-pagination {
 	height: 120px;
 }
 
-.hp-navbar .hp-avatar {
+#hp-navbar .hp-avatar {
 	height: 32px;
 	width: 32px;
 }
@@ -753,16 +1012,16 @@ table .hp-avatar {
     background-color: #5a5858;
     color: white;
     opacity: 0.93;
-    margin-top: 0;
+    margin: 0;
     padding: 8px 13px;
     float: none;
-    right: 54px;
+    right: 53px;
     left: auto;
     min-width: initial;
 }
 
 .hp-optionsMenu .dropdown {
-    position: inherit;          /* dropdown-menu must be positioned absolute to the content */
+    position: inherit;
 }
 
 .hp-optionsMenu .open>.dropdown-menu {
@@ -820,9 +1079,4 @@ table .hp-avatar {
 
 .hp-optionsTable > tr:hover .dropdown-toggle > .glyphicon {
     color: #76B900
-}
-
-input.hour-time {
-    width: 35px;
-    height: 22px;
 }

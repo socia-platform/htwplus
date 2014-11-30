@@ -70,16 +70,14 @@ function WS() {
      */
     this.createNotificationElement = function(notification) {
         var notificationElement = document.createElement('li');
-        var parentDiv = document.createElement('div');
         var notificationLink = document.createElement('a');
 
+        notificationLink.href = '/notification/' + notification.id;
+        notificationLink.innerHTML = notification.content;
         notificationElement.className = 'notification-element ' + (notification.is_read ? 'read' : 'unread');
         notificationElement.id = 'notification_' + notification.id;
         notificationElement.style.display = 'none';
-        notificationElement.appendChild(parentDiv);
-        notificationLink.href = '/notification/' + notification.id;
-        notificationLink.innerHTML = notification.content;
-        parentDiv.appendChild(notificationLink);
+        notificationElement.appendChild(notificationLink);
 
         return notificationElement;
     };
@@ -128,7 +126,7 @@ function WS() {
                     if (notificationCounters[counterIndex].style.display == 'none') {
                         $(notificationCounters[counterIndex]).fadeIn('slow');
                     }
-                    $('.notification-show-all-read').removeClass('hidden');
+                    $('#hp-notification-read-all').removeClass('disabled');
                 } else {
                     // we have zero unread notifications, hide counter
                     if (notificationCounters[counterIndex].style.display != 'none') {
@@ -177,13 +175,13 @@ function WS() {
      * Deletes obsolete notifications, if number of opened notifications bigger than numbers of notifications.
      */
     this.deleteObsoleteNotifications = function() {
-        var maxLiElements = 11; // 11 because 10 notifications + last li element (show all)
+        var maxLiElements = 12; // 12 because 10 notifications + li element show all, li element read all
         var notificationDropDownLayer = $('#hp-notifications-item');
         while (notificationDropDownLayer.find('li').length > maxLiElements) {
-            notificationDropDownLayer.find('li:nth-last-child(2)').remove();
+            notificationDropDownLayer.find('li:nth-last-child(3)').remove();
         }
-        $('.notification-show-all').removeClass('hidden');
-        $('.nothing-new').remove();
+        $('#hp-notification-show-history').removeClass('disabled');
+        $('#hp-notification-nothing-new').remove();
     };
 }
 

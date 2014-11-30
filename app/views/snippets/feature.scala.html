@@ -1,0 +1,14 @@
+@(title: String, description: String)(content: Html)
+
+
+<div class="row">
+    <div class="hp-feature-picture col-xs-12 col-md-6">
+        @views.html.snippets.notepad{
+            @content
+        }
+    </div>
+    <div class="hp-feature-text col-xs-12 col-md-5 col-md-offset-1">
+        <h1 class="hp-feature-title">@title</h1>
+        <h4 class="hp-feature-description">@description</h4>
+    </div>
+</div>

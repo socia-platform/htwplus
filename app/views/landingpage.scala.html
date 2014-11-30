@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>HTWplus</title>
+    <link rel="stylesheet" href='@routes.Assets.at("bootstrap/css/bootstrap.min.css")'>
+    <link rel="stylesheet" media="all" href='@routes.Assets.at("stylesheets/htwplus.css")'>
+    <link rel="stylesheet" media="all" href='@routes.Assets.at("stylesheets/bootstrap-prettyfile.css")'>
+    <link id="dynamic-favicon" rel="shortcut icon" type="image/png" href='@routes.Assets.at("images/favicon.ico")'>
+    <link href='http://fonts.googleapis.com/css?family=Swanky+and+Moo+Moo' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body id="hp-landingpage">
+    <div class="container-fluid">
+
+        <div id="hp-login" class="row" data-scrollspy-name="hp-login">
+            <div class="col-xs-12">
+                <div id="hp-login-left" class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-5 col-md-offset-1">
+                    <div class="hp-logo">
+                        <img src='@routes.Assets.at("images/logos/logo-white.svg")'/>
+                    </div>
+                    <div id="hp-description">
+                        Das soziale Netzwerk für<br />deine Hochschule!
+                    </div>
+                </div>
+                <div id="hp-login-right" class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-4 col-md-offset-1">
+                    @controllers.Component.loginForm()
+                </div>
+                <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+                    @if(flash.containsKey("success")) {
+                    <div class="alert alert-success fade in">
+                        <button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+                        @flash.get("success")
+                    </div>
+                    }
+                    @if(flash.containsKey("info")) {
+                    <div class="alert alert-info fade in">
+                        <button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+                        @flash.get("info")
+                    </div>
+                    }
+                    @if(flash.containsKey("error")) {
+                    <div class="alert alert-danger fade in">
+                        <button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+                        @flash.get("error")
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div id="hp-navbar" class="row navbar navbar-default">
+            <div class="hp-navbar-container">
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="hp-nav nav navbar-nav">
+                        <li data-scrollspy-target="hp-about">
+                            <a href='javascript:scrollToElement("#hp-about");'>@Messages("landingpage.about")</a>
+                        </li>
+                        <li data-scrollspy-target="hp-features">
+                            <a href='javascript:scrollToElement("#hp-features");'>@Messages("landingpage.features")</a>
+                        </li>
+                        <li data-scrollspy-target="hp-login">
+                            <a href='javascript:scrollToElement("#hp-login");'>
+                                <span class="glyphicon glyphicon-arrow-up"></span>
+                                @Messages("landingpage.to_login")
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- content wrapper -->
+        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-12 col-md-offset-0 col-lg-10 col-lg-offset-1">
+
+            <div id="hp-about" class="hp-section row" data-scrollspy-name="hp-about">
+                <div class="col-md-8 col-md-offset-2">
+                    <div class="hp-circle">
+                        <img id="hp-plusi" src='@routes.Assets.at("images/Plusi/eule_unsicher.png")'>
+                    </div>
+                    <h1>@Messages("landingpage.about.title")</h1>
+                    <br>
+                    <p>@Messages("landingpage.about.description")</p>
+                </div>
+            </div>
+
+            <div id="hp-features-trigger"></div>
+            <div id="hp-features" class="hp-section row" data-scrollspy-name="hp-features">
+                <!-- feature demos -->
+                <div class="hidden-xs hidden-sm col-md-6">
+                    <div id="hp-feature-demo">
+                    @views.html.snippets.notepad{
+                        <!-- Login -->
+                        <div id="hp-feature-demo-login">
+                            <h2>Max Mustermann</h2>
+                            <br>
+                            <img alt="avatar" src="/assets/images/avatars/a11.png" class="img-thumbnail">
+                            <br>
+                            <br>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th style="width:25%;">E-Mail</th>
+                                        <td style="width:75%;">max@@mustermann.de</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Studiengang</th>
+                                        <td>Angewandte Informatik (Bachelor)</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Semester</th>
+                                        <td>1. Semester</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Rolle</th>
+                                        <td>Student</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Friends -->
+                        <div id="hp-feature-demo-friends">
+                            <h2><span rel="tooltip" data-original-title="Hier findest du den aktuellen Status deiner Freundschafts-Anfragen." data-delay="500">
+                                Offene Anfragen</span>
+                            </h2>
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th style="width:30%">Von</th>
+                                    <th style="width:30%">An</th>
+                                    <th>Status</th>
+                                    <th style="width:35px"></th>
+                                </tr>
+                                </thead>
+                                <tbody class="hp-optionsTable">
+                                <tr>
+                                    <td>
+                                        <a href="javascript:;" data-placement="top" data-original-title="Der Dozent" data-content="Rolle: Dozent" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                            Der Dozent
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:;">Mich</a>
+                                    </td>
+                                    <td>
+                                        zu bearbeiten
+                                    </td>
+                                    <td class="hp-optionsMenu">
+                                        <div class="dropdown">
+                                            <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+                                                <span class="glyphicon glyphicon-chevron-down"></span>
+                                            </a>
+                                            <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-ok"></span><br>Anfrage akzeptieren
+                                                </a></li>
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-trash"></span><br>Anfrage ablehnen
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <hr>
+                            <br>
+                            <h2>
+                                <span rel="tooltip" data-original-title="Hier findest du alle Personen, mit denen du befreundet bist." data-delay="500">Meine Freunde</span>
+                            </h2>
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th style="width:36px"></th>
+                                    <th>Name</th>
+                                    <th style="width:35px"></th>
+                                </tr>
+                                </thead>
+                                <tbody class="hp-optionsTable">
+                                <tr>
+                                    <td>
+                                        <a class="pull-left" href="javascript:;">
+                                            <img alt="avatar" src="/assets/images/avatars/a18.png" class="hp-avatar">
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:;" data-placement="top" data-original-title="Erika Mustermann" data-content="Rolle: Student" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                            Erika Mustermann
+                                        </a>
+                                    </td>
+                                    <td class="hp-optionsMenu">
+                                        <div class="dropdown">
+                                            <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+                                                <span class="glyphicon glyphicon-chevron-down"></span>
+                                            </a>
+                                            <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-comment"></span><br>Newsstream
+                                                </a></li>
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-user"></span><br>Profil
+                                                </a></li>
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-remove"></span><br>Freundschaft beenden
+                                                </a></li>
+                                            </ul>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Groups -->
+                        <div id="hp-feature-demo-groups">
+                            <h2>
+                                <span rel="tooltip" data-original-title="Hier findest du den aktuellen Status deiner Gruppen-Anfragen." data-delay="500" data-container="body">
+                                    Offene Anfragen
+                                </span>
+                            </h2>
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th style="width:28px"></th>
+                                    <th style="width:30%">Gruppenname</th>
+                                    <th style="width:30%">Von</th>
+                                    <th>Status</th>
+                                    <th style="width:35px"></th>
+                                </tr>
+                                </thead>
+                                <tbody class="hp-optionsTable">
+                                <tr>
+                                    <td><span class="glyphicon glyphicon-lock"></span></td>
+                                    <td>
+                                        <a class="no-drop" rel="tooltip" data-original-title="Du musst der Gruppe erst beitreten" data-container="body">Erstis WS 14/15</a>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:;">Erika Mustermann</a>
+                                    </td>
+                                    <td>in Bearbeitung</td>
+                                    <td class="hp-optionsMenu">
+                                        <div class="dropdown">
+                                            <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+                                                <span class="glyphicon glyphicon-chevron-down"></span>
+                                            </a>
+                                            <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-ok"></span><br>Einladung akzeptieren
+                                                </a>
+                                                </li>
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-remove"></span><br>Einladung ablehnen
+                                                </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <hr>
+                            <br>
+                            <h2>
+                                <span rel="tooltip" data-original-title="Hier findest du alle Gruppen die du gegründet hast oder denen du beigetreten bist." data-delay="500" data-container="body">
+                                    Meine Kurse
+                                </span>
+                            </h2>
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th style="width:28px"></th>
+                                    <th style="width:auto">Kursname</th>
+                                    <th style="width:35%">Erstellt von</th>
+                                    <th style="width:35px"></th>
+                                </tr>
+                                </thead>
+                                <tbody class="hp-optionsTable">
+                                <tr>
+                                    <td><span class="glyphicon glyphicon-briefcase"></span></td>
+                                    <td><a href="javascript:;">Einführung für WS 14/15</a></td>
+                                    <td>
+                                        <a href="javascript:;" data-placement="top" data-original-title="Der Dozent" data-content="Rolle: Dozent" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                            Der Dozent
+                                        </a>
+                                    </td>
+                                    <td class="hp-optionsMenu">
+                                        <div class="dropdown">
+                                            <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+                                                <span class="glyphicon glyphicon-chevron-down"></span>
+                                            </a>
+                                            <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-info-sign"></span><br>Info
+                                                </a></li>
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-comment"></span><br>Newsstream
+                                                </a></li>
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-file"></span><br>Medien
+                                                </a></li>
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-remove"></span><br>Verlassen
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <hr>
+                            <br>
+                            <h2>
+                                <span rel="tooltip" data-original-title="Hier findest du alle Gruppen die du gegründet hast oder denen du beigetreten bist." data-delay="500" data-container="body">
+                                    Meine Gruppen
+                                </span>
+                            </h2>
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th style="width:28px"></th>
+                                    <th style="width:auto">Gruppenname</th>
+                                    <th style="width:35%">Erstellt von</th>
+                                    <th style="width:35px"></th>
+                                </tr>
+                                </thead>
+                                <tbody class="hp-optionsTable">
+                                <tr>
+                                    <td><span class="glyphicon glyphicon-globe"></span></td>
+                                    <td><a href="javascript:;">Immatrikulationsfeier</a></td>
+                                    <td>
+                                        <a href="javascript:;" data-placement="top" data-original-title="AStA der HTW Berlin" data-content="Rolle: Student" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                            AStA der HTW Berlin
+                                        </a>
+                                    </td>
+                                    <td class="hp-optionsMenu">
+                                        <div class="dropdown">
+                                            <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+                                                <span class="glyphicon glyphicon-chevron-down"></span>
+                                            </a>
+                                            <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-info-sign"></span><br>Info
+                                                </a></li>
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-comment"></span><br>Newsstream
+                                                </a></li>
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-file"></span><br>Medien
+                                                </a></li>
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-remove"></span><br>Verlassen
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Courses -->
+                        <div id="hp-feature-demo-courses">
+                            <h2 class="hp-truncate">
+                                <span class="glyphicon glyphicon-briefcase"></span>
+                                Einführung für WS 14/15
+                            </h2>
+                            <br>
+
+                            <form action="" method="" class="hp-post-form" id="addPost">
+                                <div class="hp-horizontal-form col-xs-12">
+                                    <div class="input-group">
+                                        <dl class=" " id="hp-new-post-content_field">
+                                            <dt><label for="hp-new-post-content">Content</label></dt>
+                                            <dd><textarea id="hp-new-post-content" name="Content" class="form-control" placeholder="Erstelle einen neuen Post..."></textarea></dd>
+                                        </dl>
+                                        <span class="input-group-btn">
+                                            <button type="button" href="javascript:;" class="btn btn-warning">Posten</button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </form>
+                            <br>
+
+                            <div class="well">
+                                <div class="media">
+                                    <a class="pull-left" href="javascript:;"><img alt="avatar" src="/assets/images/avatars/a1.png" class="hp-avatar"></a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading">
+                                            <a href="javascript:;" data-placement="top" data-original-title="Der Dozent" data-content="Rolle: Dozent" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                                Der Dozent</a>
+                                        </h4>
+                                        <small>01.10.2014 08:21</small>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="hp-truncate hp-white-space">Willkommen zu meiner Einführungsveranstaltung!</div>
+                                <hr>
+                                <div class="hp-comments">
+                                    <div class="media">
+                                        <a class="pull-left" href="javascript:;">
+                                            <img alt="avatar" src="/assets/images/avatars/a11.png" class="hp-avatar">
+                                        </a>
+                                        <div class="media-body">
+                                            <h5 class="media-heading">
+                                                <a href="javascript:;" data-placement="top" data-original-title="Max Mustermann" data-content="Rolle: Student" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                                    Max Mustermann
+                                                </a>
+                                                <small>(1.10.2014 08:45)</small>
+                                                <a href="javascript:;" data-toggle="modal" rel="tooltip" data-original-title="Post löschen">
+                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                </a>
+                                            </h5>
+                                            <div class="hp-truncate hp-white-space">Vielen Dank :-)</div>
+                                        </div>
+                                    </div>
+                                    <form action="" method="" class="hp-comment-form">
+                                        <div class="hp-horizontal-form col-xs-12">
+                                            <div class="input-group">
+                                                <dl class=" " id="hp-new-comment-content_field">
+                                                    <dt><label for="hp-new-comment-content">Content</label></dt>
+                                                    <dd>
+                                                        <textarea id="hp-new-comment-content" name="Content" class="form-control" placeholder="Erstelle ein Kommentar..."></textarea>
+                                                    </dd>
+                                                </dl>
+                                    <span class="input-group-btn">
+                                        <button type="button" href="javascript:;" class="btn btn-sm btn-warning commentSubmit">Kommentieren</button>
+                                    </span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+
+                        <!-- File management -->
+                        <div id="hp-feature-demo-filemgmt">
+                            <h2 class="hp-truncate">
+                                <span class="glyphicon glyphicon-globe"></span>
+                                Immatrikulationsfeier
+                            </h2>
+                            <br>
+
+                            <table class="table table-hover table-condensed">
+                                <thead>
+                                <tr>
+                                    <th style="width:23px">
+                                        <input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body" onclick="toggleMediaSelection(this)">
+                                    </th>
+                                    <th>Dateiname</th>
+                                    <th style="width:20%">Datum</th>
+                                    <th style="width:15%">Dateigröße</th>
+                                    <th style="width:35px"></th>
+                                </tr>
+                                </thead>
+                                <form action="" method=""></form>
+                                <tbody id="mediaList" class="hp-optionsTable">
+                                <tr>
+                                    <td><input name="selection" value="255" type="checkbox"></td>
+                                    <td><a href="javascript:;" rel="tooltip" data-delay="500" data-original-title="von AStA der HTW Berlin">flyer.pdf</a></td>
+                                    <td>29.09.2014</td>
+                                    <td>1.79 MiB</td>
+                                    <td class="hp-optionsMenu">
+                                        <div class="dropdown">
+                                            <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+                                                <span class="glyphicon glyphicon-chevron-down"></span>
+                                            </a>
+                                            <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-download"></span><br>Herunterladen
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input name="selection" value="255" type="checkbox"></td>
+                                    <td><a href="javascript:;" rel="tooltip" data-delay="500" data-original-title="von AStA der HTW Berlin">programm.pdf</a></td>
+                                    <td>29.09.2014</td>
+                                    <td>2.16 MiB</td>
+                                    <td class="hp-optionsMenu">
+                                        <div class="dropdown">
+                                            <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+                                                <span class="glyphicon glyphicon-chevron-down"></span>
+                                            </a>
+                                            <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+                                                <li><a href="javascript:;" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-download"></span><br>Herunterladen
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="5">
+                                        <input type="button" class="btn btn-warning btn-sm" value="Auswahl herunterladen">
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                            <hr>
+                            <h4>Neue Dateien hochladen</h4>
+                            <br>
+                            <form action="" method="" id="fileuploadForm">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="prettyFile input-group">
+                                                <input type="file" name="form[files][]" multiple="multiple">
+                                                <div class="input-group" rel="tooltip" data-original-title="Hier klicken, um Dateien auszuwählen!" data-placement="bottom" data-delay="500" data-container="body">
+                                                    <input class="form-control" type="text" placeholder="Dateien zum Hochladen">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-warning">Senden</button>
+                                        </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <small><i>Max. 5 MByte pro Datei &amp; 20 MByte pro Upload möglich.</i></small>
+                            <br>
+                            <br>
+                            <div class="clear"></div>
+                        </div>
+
+                        <!-- Newsstream -->
+                        <div id="hp-feature-demo-newsstream">
+                            <h1>Mein Newsstream</h1><br>
+
+                            <form action="" method="" class="hp-post-form" id="addPost">
+                                <div class="hp-horizontal-form col-xs-12">
+                                    <div class="input-group">
+                                        <dl class=" " id="hp-new-post-content_field">
+                                            <dt><label for="hp-new-post-content">Content</label></dt>
+                                            <dd><textarea id="hp-new-post-content" name="Content" class="form-control" placeholder="Erstelle einen neuen Post..."></textarea></dd>
+                                        </dl>
+                            <span class="input-group-btn">
+                                <button type="button" href="javascript:;" class="btn btn-warning">Posten</button>
+                            </span>
+                                    </div>
+                                </div>
+                            </form>
+                            <br>
+
+                            <div class="well">
+                                <div class="media">
+                                    <a class="pull-left" href="javascript:;"><img alt="avatar" src="/assets/images/avatars/a18.png" class="hp-avatar"></a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading">
+                                            <a href="javascript:;" data-placement="top" data-original-title="Erika Mustermann" data-content="Rolle: Student" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                                Erika Mustermann</a>
+                                                &rarr; <a href="javascript:;" data-placement="top" data-original-title="Max Mustermann" data-content="Rolle: Student" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                                Max Mustermann</a>
+                                        </h4>
+                                        <small>01.10.2014 10:02</small>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="hp-truncate hp-white-space">Hey, hey. Gehst du zur Erstis-Party?</div>
+                                <hr>
+                                <div class="hp-comments">
+                                    <form action="" method="" class="hp-comment-form">
+                                        <div class="hp-horizontal-form col-xs-12">
+                                            <div class="input-group">
+                                                <dl class=" " id="hp-new-comment-content_field">
+                                                    <dt><label for="hp-new-comment-content">Content</label></dt>
+                                                    <dd>
+                                                        <textarea id="hp-new-comment-content" name="Content" class="form-control" placeholder="Erstelle ein Kommentar..."></textarea>
+                                                    </dd>
+                                                </dl>
+                                                <span class="input-group-btn">
+                                                    <button type="button" href="javascript:;" class="btn btn-sm btn-warning commentSubmit">Kommentieren</button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+                            <br>
+                            <div class="well">
+                                <div class="media">
+                                    <a class="pull-left" href="javascript:;"><img alt="avatar" src="/assets/images/avatars/a1.png" class="hp-avatar"></a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading">
+                                            <a href="javascript:;" data-placement="top" data-original-title="Der Dozent" data-content="Rolle: Dozent" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                                Der Dozent</a>
+                                            schrieb in <a href="javascript:;">Einführung für WS 14/15</a>
+                                        </h4>
+                                        <small>01.10.2014 08:21</small>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="hp-truncate hp-white-space">Willkommen zu meiner Einführungsveranstaltung!</div>
+                                <hr>
+                                <div class="hp-comments">
+                                    <div class="media">
+                                        <a class="pull-left" href="/user/918">
+                                            <img alt="avatar" src="/assets/images/avatars/a11.png" class="hp-avatar">
+                                        </a>
+                                        <div class="media-body">
+                                            <h5 class="media-heading">
+                                                <a href="javascript:;" data-placement="top" data-original-title="Max Mustermann" data-content="Rolle: Student" data-delay="500" data-trigger="hover" data-html="true" rel="popover">
+                                                    Max Mustermann
+                                                </a>
+                                                <small>(1.10.2014 08:45)</small>
+                                                <a href="javascript:;" data-toggle="modal" rel="tooltip" data-original-title="Post löschen">
+                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                </a>
+                                            </h5>
+                                            <div class="hp-truncate hp-white-space">Vielen Dank :-)</div>
+                                        </div>
+                                    </div>
+                                    <form action="" method="" class="hp-comment-form">
+                                        <div class="hp-horizontal-form col-xs-12">
+                                            <div class="input-group">
+                                                <dl class=" " id="hp-new-comment-content_field">
+                                                    <dt><label for="hp-new-comment-content">Content</label></dt>
+                                                    <dd>
+                                                        <textarea id="hp-new-comment-content" name="Content" class="form-control" placeholder="Erstelle ein Kommentar..."></textarea>
+                                                    </dd>
+                                                </dl>
+                                    <span class="input-group-btn">
+                                        <button type="button" href="javascript:;" class="btn btn-sm btn-warning commentSubmit">Kommentieren</button>
+                                    </span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+
+                        <!-- Notifications -->
+                        <div id="hp-feature-demo-notifications">
+                            <h1>Neuigkeiten</h1>
+                            <br>
+
+                            <div class="well notification">
+                                <div class="notification-date">
+                                    Neuigkeit erhalten am <span class="hp-bold">01.10.2014</span> um <span class="hp-bold">09:53</span> Uhr
+                                </div>
+                                <div class="notification-read unread"><span class="glyphicon glyphicon-info-sign"></span> Du hast diese Neuigkeit noch nicht angeklickt bzw. gelesen</div>
+                                <div class="hp-truncate hp-white-space">
+                                    <a href="javascript:;"><span class="glyphicon glyphicon-lock"></span>Du wurdest von Erika Mustermann in die Gruppe <span class="hp-bold">Erstis WS 14/15</span> eingeladen</a>
+                                </div>
+                            </div>
+                            <br>
+
+                            <div class="well notification">
+                                <div class="notification-date">
+                                    Neuigkeit erhalten am <span class="hp-bold">01.10.2014</span> um <span class="hp-bold">08:21</span> Uhr
+                                </div>
+                                <div class="notification-read read"><span class="glyphicon glyphicon-ok-sign"></span> Du hast diese Neuigkeit bereits gelesen</div>
+                                <div class="hp-truncate hp-white-space">
+                                    <a href="javascript:;"><span class="glyphicon glyphicon-list"></span>Neues auf dem Newsstream des Kurses <span class="hp-bold">Einführung für WS 14/15</span></a>
+                                </div>
+                            </div>
+                            <br>
+
+                            <div class="well notification">
+                                <div class="notification-date">
+                                    Neuigkeit erstmals am <span class="hp-bold">30.09.2014</span> um <span class="hp-bold">16:32</span> Uhr
+                                </div>
+                                <div class="notification-read read"><span class="glyphicon glyphicon-ok-sign"></span> Du hast diese Neuigkeit bereits gelesen</div>
+                                <div class="hp-truncate hp-white-space">
+                                    <a href="javascript:;"><span class="glyphicon glyphicon-user"></span>Neue Freundschaftsanfrage von <span class="hp-green">Erika Mustermann</span></a>
+                                </div>
+                            </div>
+                            <br>
+                        </div>
+                    }
+                    </div>
+                </div>
+
+                <!-- feature descriptions -->
+                <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-5 col-md-offset-1">
+
+                    <!-- only in combination with demo views -->
+                    <div class="hidden-xs hidden-sm">
+                        <div id="hp-feature-text">
+                            <table><tr><td>
+                                <h1 class="hp-feature-title">@Messages("landingpage.features.login.title")</h1>
+                            </td></tr><tr><td>
+                                <h4 class="hp-feature-description">@Messages("landingpage.features.login.description")</h4>
+                            </td></tr></table>
+                        </div>
+                    </div>
+
+                    <!-- Login -->
+                    <div id="hp-feature-text-login" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <div class="hp-feature-icon"><span class="glyphicon glyphicon-log-in"></span></div>
+                        <table><tr><td>
+                        <h1 class="hp-feature-title">@Messages("landingpage.features.login.title")</h1>
+                            </td></tr><tr><td>
+                        <h4 class="hp-feature-description">@Messages("landingpage.features.login.description")</h4>
+                        </td></tr></table>
+                    </div>
+
+                    <!-- Friends -->
+                    <div id="hp-feature-text-friends" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <div class="hp-feature-icon"><span class="glyphicon glyphicon-user"></span></div>
+                        <table><tr><td>
+                        <h1 class="hp-feature-title">@Messages("landingpage.features.friends.title")</h1>
+                        </td></tr><tr><td>
+                        <h4 class="hp-feature-description">@Messages("landingpage.features.friends.description")</h4>
+                        </td></tr></table>
+                    </div>
+
+                    <!-- Groups -->
+                    <div id="hp-feature-text-groups" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <div class="hp-feature-icon"><span class="glyphicon glyphicon-globe"></span></div>
+                        <table><tr><td>
+                        <h1 class="hp-feature-title">@Messages("landingpage.features.groups.title")</h1>
+                        </td></tr><tr><td>
+                        <h4 class="hp-feature-description">@Messages("landingpage.features.groups.description")</h4>
+                        </td></tr></table>
+                    </div>
+
+                    <!-- Courses -->
+                    <div id="hp-feature-text-courses" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <div class="hp-feature-icon"><span class="glyphicon glyphicon-briefcase"></span></div>
+                        <table><tr><td>
+                        <h1 class="hp-feature-title">@Messages("landingpage.features.courses.title")</h1>
+                        </td></tr><tr><td>
+                        <h4 class="hp-feature-description">@Messages("landingpage.features.courses.description")</h4>
+                        </td></tr></table>
+                    </div>
+
+                    <!-- File management -->
+                    <div id="hp-feature-text-filemgmt" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <div class="hp-feature-icon"><span class="glyphicon glyphicon-file"></span></div>
+                        <table><tr><td>
+                        <h1 class="hp-feature-title">@Messages("landingpage.features.filemgmt.title")</h1>
+                        </td></tr><tr><td>
+                        <h4 class="hp-feature-description">@Messages("landingpage.features.filemgmt.description")</h4>
+                        </td></tr></table>
+                    </div>
+
+                    <!-- Newsstream -->
+                    <div id="hp-feature-text-newsstream" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <div class="hp-feature-icon"><span class="glyphicon glyphicon-home"></span></div>
+                        <table><tr><td>
+                        <h1 class="hp-feature-title">@Messages("landingpage.features.newsstream.title")</h1>
+                        </td></tr><tr><td>
+                        <h4 class="hp-feature-description">@Messages("landingpage.features.newsstream.description")</h4>
+                        </td></tr></table>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div id="hp-feature-text-notifications" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <div class="hp-feature-icon"><span class="glyphicon glyphicon-bell"></span></div>
+                        <table><tr><td>
+                        <h1 class="hp-feature-title">@Messages("landingpage.features.notifications.title")</h1>
+                        </td></tr><tr><td>
+                        <h4 class="hp-feature-description">@Messages("landingpage.features.notifications.description")</h4>
+                        </td></tr></table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div> <!-- end content wrapper -->
+
+    </div> <!-- /container -->
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
+                    <div id="hp-footer">
+                        <div id="hp-footer-links">
+                            <a href="@routes.Application.index()" data-toggle="modal">Home</a> |
+                            <a href="#impressumModal" data-toggle="modal">Impressum</a> |
+                            <a href="#datenschutzModal" data-toggle="modal">Datenschutz</a> |
+                            <a href="@routes.Application.feedback()">Feedback</a> |
+                            <a href="@routes.Application.feedback()">Kontakt</a> |
+                            <a href="@routes.Application.help()">Hilfe</a>
+                        </div>
+                        <div id="hp-footer-logo"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @views.html.snippets.impressumModal()
+        @views.html.snippets.datenschutzModal()
+    </footer>
+
+    <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("bootstrap/js/bootstrap.min.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.linkify.min.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/htwplus.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery-scrollspy.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/vendor/greensock/TweenMax.min.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.scrollmagic.min.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.scrollmagic.debug.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascripts/landingpage.js")'></script>
+
+</body>
+
+</html>

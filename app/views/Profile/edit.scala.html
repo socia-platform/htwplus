@@ -62,10 +62,10 @@
 			</dd>
 		}
         <dt>@Messages("notification.email_notifications")</dt>
-        <dd id="email-notifications">
-            <input type="radio" name="emailNotifications" value="@models.enums.EmailNotifications.NONE"@if(profile.emailNotifications == null || profile.emailNotifications == models.enums.EmailNotifications.NONE) { checked="checked"}> @Messages("notification.email_notifications.none")<br>
+        <dd id="email-notifications" class="radio">
+            <input type="radio"  name="emailNotifications" value="@models.enums.EmailNotifications.NONE"@if(profile.emailNotifications == null || profile.emailNotifications == models.enums.EmailNotifications.NONE) { checked="checked"}> @Messages("notification.email_notifications.none")<br>
             <input type="radio" name="emailNotifications" value="@models.enums.EmailNotifications.COLLECTED_DAILY"@if(profile.emailNotifications !=null && profile.emailNotifications == models.enums.EmailNotifications.COLLECTED_DAILY){ checked="checked"}> @Messages("notification.email_notifications.collected_daily")
-            <input type="number" class="hour-time" min="0" max="23" name="dailyEmailNotificationHour" value="@if(profile.dailyEmailNotificationHour !=null){@profile.dailyEmailNotificationHour}else{18}"> @Messages("notification.email_notifications.oclock")<br>
+            <input type="number" class="form-control input-sm hp-notification-hour" min="0" max="23" name="dailyEmailNotificationHour" value="@if(profile.dailyEmailNotificationHour !=null){@profile.dailyEmailNotificationHour}else{18}"> @Messages("notification.email_notifications.oclock")<br>
             <input type="radio" name="emailNotifications" value="@models.enums.EmailNotifications.HOURLY"@if(profile.emailNotifications !=null && profile.emailNotifications == models.enums.EmailNotifications.HOURLY){ checked="checked"}> @Messages("notification.email_notifications.hourly")<br>
             <input type="radio" name="emailNotifications" value="@models.enums.EmailNotifications.IMMEDIATELY_ALL"@if(profile.emailNotifications !=null && profile.emailNotifications == models.enums.EmailNotifications.IMMEDIATELY_ALL){ checked="checked"}> @Messages("notification.email_notifications.immediately_all")
         </dd>

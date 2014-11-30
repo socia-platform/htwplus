@@ -14,7 +14,7 @@ import play.data.Form;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
-import views.html.index;
+import views.html.landingpage;
 
 /**
  * Controller for authenticate purposes.
@@ -38,8 +38,8 @@ public class AccountController extends BaseController {
 		if (username.contains("@")) {
 			return defaultAuthenticate();
 		} else if (username.length() == 0) {
-			flash("error", Messages.get("authenticate.matriculationNumberMissing"));
-			return badRequest(index.render());
+			flash("error", "Also deine Matrikelnummer brauchen wir schon!");
+			return badRequest(landingpage.render());
 		} else {
 			return LdapAuthenticate();
 		}
@@ -66,7 +66,7 @@ public class AccountController extends BaseController {
 		} catch (LdapService.LdapConnectorException e) {
 			flash("error", e.getMessage());
 			Component.addToContext(Component.ContextIdent.loginForm, form);
-			return badRequest(index.render());
+			return badRequest(landingpage.render());
 		}
 
         // try to find user in DB, set role if found (default STUDENT role)
@@ -110,7 +110,7 @@ public class AccountController extends BaseController {
 		if (loginForm.hasErrors()) {
 			flash("error", loginForm.globalError().message());
 			Component.addToContext(Component.ContextIdent.loginForm, loginForm);
-			return badRequest(index.render());
+			return badRequest(landingpage.render());
 		} else {
 			session().clear();
 			session("email", loginForm.get().email);
