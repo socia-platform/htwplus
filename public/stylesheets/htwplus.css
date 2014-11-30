@@ -27,7 +27,7 @@ hr {
 
 table {
 	table-layout: fixed;
-	margin-bottom: 0px;
+	margin-bottom: 0;
 }
 
 td {
@@ -112,7 +112,7 @@ h1 {
 
 /*============================== Landingpage ==============================*/
 body#hp-landingpage {
-	margin-top: 0px !important;
+	margin-top: 0 !important;
 }
 
 #hp-landingpage div.alert {
@@ -144,11 +144,9 @@ body#hp-landingpage {
 
 #hp-landingpage div#hp-login {
 	padding: 70px 0;
-	background-image: url('http://www.htw-berlin.de/fileadmin/HTW/Zentral/DE/HTW/ZR1_Presse/Pressefotos/130719___Philipp_Meuser_0011_01_1200px_crop.jpg');
-	background-repeat: no-repeat;
-	background-size: 100% auto;
-	background-position: center center;
-	color: white !important;
+    background-size: 100% auto;
+    background: url('http://www.htw-berlin.de/fileadmin/HTW/Zentral/DE/HTW/ZR1_Presse/Pressefotos/130719___Philipp_Meuser_0011_01_1200px_crop.jpg') no-repeat center center;
+    color: white !important;
 	text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
 }
 
@@ -615,7 +613,7 @@ input.hp-notification-hour {
 .hp-nav-tabs > li > a:focus {
 	background-color: #76b900;
 	border: 1px solid #dddddd;
-	padding: 4px 2px 0px 2px;
+	padding: 4px 2px 0 2px;
 }
 
 .hp-nav-tabs .glyphicon:hover {
@@ -693,11 +691,8 @@ input.hp-notification-hour {
 
 div.hp-notepad-right {
 	position: relative;
-	background-image: url(../images/vertical.png);
-	background-repeat: repeat-y;
-	background-position: right 0px;
-	margin: 0 -10px;
-	margin-top: 40px;
+    background: url(../images/vertical.png) repeat-y right 0;
+    margin: 40px -10px 0;
 }
 
 @media (max-width: 767px) {
@@ -713,9 +708,7 @@ div.hp-notepad-topRight {
 	position: absolute;
 	top: 0;
 	right: 0;
-	background-image: url(../images/backgrounds.png);
-	background-repeat: no-repeat;
-	background-position: -50px -15px;
+    background: url(../images/backgrounds.png) no-repeat -50px -15px;
 }
 
 div.hp-notepad-bottomRight {
@@ -724,16 +717,12 @@ div.hp-notepad-bottomRight {
 	position: absolute;
 	bottom: 0;
 	right: 0;
-	background-image: url(../images/backgrounds.png);
-	background-repeat: no-repeat;
-	background-position: -50px -30px;
+    background: url(../images/backgrounds.png) no-repeat -50px -30px;
 }
 
 div.hp-notepad-left {
 	margin-right: 24px;
-	background-image: url(../images/vertical.png);
-	background-repeat: repeat-y;
-	background-position: 0px 15px;
+    background: url(../images/vertical.png) repeat-y 0 15px;
 }
 
 div.hp-notepad-topLeft {
@@ -743,9 +732,7 @@ div.hp-notepad-topLeft {
 	position: absolute;
 	top: 0;
 	left: 0;
-	background-image: url(../images/backgrounds.png);
-	background-repeat: no-repeat;
-	background-position: 0px -15px;
+    background: url(../images/backgrounds.png) no-repeat 0 -15px;
 }
 
 div.hp-notepad-bottomLeft {
@@ -754,24 +741,18 @@ div.hp-notepad-bottomLeft {
 	position: absolute;
 	bottom: 0;
 	left: 0;
-	background-image: url(../images/backgrounds.png);
-	background-repeat: no-repeat;
-	background-position: 0px -30px;
+    background: url(../images/backgrounds.png) no-repeat 0 -30px;
 }
 
 div.hp-notepad-top {
 	margin-left: 50px;
 	padding-top: 15px;
-	background-image: url(../images/backgrounds.png);
-	background-repeat: repeat-x;
-	background-position: 0px top;
+    background: url(../images/backgrounds.png) repeat-x 0 top;
 }
 
 div.hp-notepad-bottom {
 	padding-bottom: 22px;
-	background-image: url(../images/backgrounds.png);
-	background-repeat: repeat-x;
-	background-position: 0px bottom;
+    background: url(../images/backgrounds.png) repeat-x 0 bottom;
 }
 
 div.hp-notepad-content {
@@ -801,10 +782,8 @@ div#hp-footer-links {
 div#hp-footer-logo {
 	height: 46px;
 	width: 200px;
-	background-image: url(../images/backgrounds.png);
-	background-repeat: no-repeat;
-	background-position: right -52px;
-	float: right;
+    background: url(../images/backgrounds.png) no-repeat right -52px;
+    float: right;
 }
 
 
@@ -814,20 +793,14 @@ form dl dt {
 	text-align: left !important;
 }
 
-/*
-form dl dd {
-	margin-bottom: 15px;
-}
-*/
-
 form dl dd > .checkbox,
 form dl dd > .radio {
-	margin-top: 0px;
+	margin-top: 0;
 }
 
 form dl dd > .checkbox:last-child,
 form dl dd > .radio:last-child {
-	margin-bottom: 0px;
+	margin-bottom: 0;
 }
 
 form dl dd > .radio input {
@@ -851,7 +824,7 @@ div.hp-pagination {
 }
 
 .hp-pagination > ul {
-	margin-bottom: 0px;
+	margin-bottom: 0;
 }
 
 .hp-pagination a.active {
@@ -924,7 +897,7 @@ div.hp-pagination {
 
 .well {
 	padding: 15px;
-	margin-bottom: 0px;
+	margin-bottom: 0;
 }
 .well.broadcast {
     border: 1px solid #76b900;
