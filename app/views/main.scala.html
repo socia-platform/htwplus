@@ -14,8 +14,11 @@
 	</head>
 	
 	<body>
-		@views.html.snippets.navi()
-		@views.html.snippets.breadcrumb()
+		@if(user != null){
+			@views.html.snippets.navi()
+			@views.html.snippets.breadcrumb()
+		}
+		
 		<div class="container">
 
 			<div class="row">
