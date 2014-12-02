@@ -3,7 +3,7 @@
 <li class="dropdown" id="hp-notifications-item">
     <a href="#" class="visible-xs dropdown-toggle" data-toggle="dropdown">
         <span class="glyphicon glyphicon-bell"></span>
-        <span class="badge"@if(unreadNotifications < 1){ style="display: none;"}>@unreadNotifications</span>
+        <span class="badge"@if(unreadNotifications < 1){ style="display: none;"} id="hp-notification-count" data-count="@unreadNotifications">@unreadNotifications</span>
         <b class="caret"></b>
     </a>
     <a href="#" class="hidden-xs dropdown-toggle" data-toggle="dropdown">
