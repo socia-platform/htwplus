@@ -177,7 +177,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 			final Account result = (Account) JPA.em()
 				.createQuery("from Account a where a.email = :email")
 				.setParameter("email", email).getSingleResult();
-			if (result != null && Component.md5(password).equals(result.password) && !Play.isProd()) {
+			if (result != null && Component.md5(password).equals(result.password)) {
 				currentAcc = result;
 			}
 			return currentAcc;
