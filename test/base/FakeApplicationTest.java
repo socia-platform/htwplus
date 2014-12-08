@@ -129,7 +129,6 @@ public abstract class FakeApplicationTest {
                     testAccount.email = testAccountEmail;
                     testAccount.avatar = "a1";
                     testAccount.role = AccountRole.STUDENT;
-                    testAccount.isTestAccount = true;
                     testAccount.password = Component.md5(FakeApplicationTest.TEST_ACCOUNT_PASSWORD);
                     testAccount.create();
 

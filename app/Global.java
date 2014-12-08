@@ -14,10 +14,10 @@ import models.enums.AccountRole;
 import models.enums.GroupType;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
+import play.Play;
 import play.Application;
 import play.GlobalSettings;
 import play.Logger;
-import play.api.Play;
 import play.db.jpa.JPA;
 import play.libs.Akka;
 import play.libs.F.*;
@@ -36,7 +36,7 @@ public class Global extends GlobalSettings {
 
 	@Override
 	public void onStart(Application app) {
-		Logger.info("Global - onStart");
+		Logger.info("Application - onStart: "+"Prod? "+Play.isProd()+" Test? "+Play.isTest()+" Dev? "+Play.isDev());
 		super.onStart(app);
 
         // Sets the schedule for cleaning the media temp directory
@@ -140,7 +140,7 @@ public class Global extends GlobalSettings {
 		
 		
 		// prod mode? return 404 page
-		if(Play.mode(play.api.Play.current()).toString().equals("Prod")){
+		if(Play.isProd()){
 			return Promise.pure(play.mvc.Results.redirect(routes.Application.error()));
 		}
 

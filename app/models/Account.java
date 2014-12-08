@@ -7,11 +7,12 @@ import java.util.Set;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import models.base.BaseModel;
 import models.base.IJsonNodeSerializable;
 import models.enums.AccountRole;
-
 import models.enums.EmailNotifications;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
@@ -43,6 +44,7 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 
 import play.Logger;
+import play.Play;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
@@ -101,12 +103,6 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
     public Integer dailyEmailNotificationHour;
 
 	public Boolean approved;
-
-	/**
-	 * True, if this account is a test account.
-	 */
-	@Column(name = "is_test_account", nullable = false, columnDefinition = "boolean default false")
-	public Boolean isTestAccount;
 
     /**
      * Returns an account by account ID.
@@ -181,7 +177,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 			final Account result = (Account) JPA.em()
 				.createQuery("from Account a where a.email = :email")
 				.setParameter("email", email).getSingleResult();
-			if (result != null && Component.md5(password).equals(result.password) && !result.isTestAccount) {
+			if (result != null && Component.md5(password).equals(result.password) && !Play.isProd()) {
 				currentAcc = result;
 			}
 			return currentAcc;
