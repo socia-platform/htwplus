@@ -9,7 +9,6 @@ import models.services.NotificationService;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
-import play.db.jpa.JPA;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.libs.F;

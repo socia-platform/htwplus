@@ -6,9 +6,6 @@
 GET     /                       			controllers.Application.index()
 GET     /stream                    			controllers.Application.stream(page: Integer ?= 1)
 GET		/search								controllers.Application.search()
-GET		/search/accounts					controllers.Application.searchForAccounts(keyword:String,page: Integer ?= 1)
-GET		/search/groups						controllers.Application.searchForGroups(keyword:String,page: Integer ?= 1)
-GET		/search/courses						controllers.Application.searchForCourses(keyword:String,page: Integer ?= 1)
 POST    /login                  			controllers.AccountController.authenticate()
 GET     /logout                 			controllers.AccountController.logout()
 GET     /help                 				controllers.Application.help()
@@ -93,6 +90,7 @@ GET		/admin/media/						controllers.AdminController.viewMediaTemp()
 GET		/admin/media/clean					controllers.AdminController.cleanMediaTemp()
 GET     /admin/broadcast_notification       controllers.AdminController.broadcastNotificationForm()
 POST    /admin/broadcast_notification       controllers.AdminController.broadcastNotification()
+
 
 
 # No route found? take this

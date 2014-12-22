@@ -1,9 +1,5 @@
 package controllers;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import models.Account;
 import models.Group;
 import models.Post;
@@ -16,7 +12,6 @@ import play.mvc.Result;
 import play.mvc.Security;
 import views.html.error;
 import views.html.help;
-import views.html.searchresult;
 import views.html.stream;
 import views.html.feedback;
 import controllers.Navigation.Level;
@@ -27,7 +22,6 @@ public class Application extends BaseController {
 	
 	static Form<Post> postForm = Form.form(Post.class);
 	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
-	static final int SEARCH_LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.search.limit"));
 	static final int PAGE = 1;
 	
 	public static Result javascriptRoutes() {
@@ -62,48 +56,10 @@ public class Application extends BaseController {
 	
 	@Security.Authenticated(Secured.class)
 	public static Result search(){
-		List<Group> groupResults = null;
-		List<Group> courseResults = null;
-		List<Account> accResults = null;
-		String keyword = "";
-		final Set<Map.Entry<String, String[]>> entries = request()
-				.queryString().entrySet();
-		for (Map.Entry<String, String[]> entry : entries) {
-			if (entry.getKey().equals("keyword")) {
-				keyword = entry.getValue()[0];
-				Logger.info("Keyword: " +keyword.isEmpty());
-				Navigation.set("Suchergebnisse");
-				courseResults = Group.courseSearch(keyword, SEARCH_LIMIT, 0);
-				groupResults = Group.groupSearch(keyword, SEARCH_LIMIT, 0);
-				accResults = Account.accountSearch(keyword, SEARCH_LIMIT, 0);
-			}
 
-		}
-		return ok(searchresult.render(groupResults, courseResults, accResults, keyword,Group.countCourseSearch(keyword), Group.countGroupSearch(keyword), Account.countAccountSearch(keyword),SEARCH_LIMIT, 0));
-	}
-	
-	@Security.Authenticated(Secured.class)
-	public static Result searchForCourses(final String keyword, int page){
-		Navigation.set("Suchergebnisse für Kurse");
-		List<Group> courses = Group.courseSearch(keyword, SEARCH_LIMIT, page);
-		return ok(searchresult.render(null, courses, null, keyword, Group.countCourseSearch(keyword), 0, 0, SEARCH_LIMIT, page));
+		return redirect(routes.Application.index());
 	}
 
-	@Security.Authenticated(Secured.class)
-	public static Result searchForGroups(final String keyword, int page){
-		Navigation.set("Suchergebnisse für Gruppen");
-		Logger.info("Keyword: " +keyword);
-		List<Group> groups = Group.groupSearch(keyword, SEARCH_LIMIT, page);
-		return ok(searchresult.render(groups, null, null, keyword, 0, Group.countGroupSearch(keyword), 0, SEARCH_LIMIT, page));
-	}
-	
-	@Security.Authenticated(Secured.class)
-	public static Result searchForAccounts(final String keyword, int page){
-		Navigation.set("Suchergebnisse für Personen");
-		List<Account> accounts = Account.accountSearch(keyword, SEARCH_LIMIT, page);
-		return ok(searchresult.render(null, null, accounts, keyword, 0, 0, Account.countAccountSearch(keyword), SEARCH_LIMIT, page));
-	}
-	
 	public static Result error() {
 		Navigation.set("404");
 		return ok(error.render());

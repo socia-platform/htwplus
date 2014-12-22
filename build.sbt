@@ -11,12 +11,12 @@ libraryDependencies ++= Seq(
   cache,
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "org.hibernate" % "hibernate-entitymanager" % "4.3.6.Final",
-  "org.hibernate" % "hibernate-search" % "4.5.1.Final",
   "org.hibernate" % "hibernate-core" % "4.3.6.Final",
   "org.hibernate" % "hibernate-commons-annotations" % "3.2.0.Final",
   "org.apache.directory.api" % "api-all" % "1.0.0-M20",
   "commons-io" % "commons-io" % "2.4",
-  "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0"
+  "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0",
+  "org.elasticsearch" % "elasticsearch" % "1.4.1"
 )
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)

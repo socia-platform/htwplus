@@ -1,8 +1,6 @@
 import java.util.concurrent.TimeUnit;
 
 import models.services.EmailService;
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.Search;
 
 import controllers.Component;
 import controllers.MediaController;
@@ -63,18 +61,6 @@ public class Global extends GlobalSettings {
             Akka.system().dispatcher()
         );
 		
-		JPA.withTransaction(new play.libs.F.Callback0() {
-			@Override
-			public void invoke() throws Throwable {
-                FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(JPA.em());
-                try {
-                    fullTextEntityManager.createIndexer(Group.class).startAndWait();
-                    fullTextEntityManager.createIndexer(Account.class).startAndWait();
-                } catch (InterruptedException e) {
-                    Logger.error(e.getMessage());
-                }
-			}
-		});
 		InitialData.insert(app);
 	}
 
