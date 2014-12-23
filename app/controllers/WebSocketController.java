@@ -48,7 +48,6 @@ public class WebSocketController extends BaseController {
                 in.onClose(new F.Callback0() {
                     public void invoke() {
                         WebSocketService.getInstance().stopActor(account);
-                        Logger.info("[WS] Disconnected User ID: " + account.id);
                     }
                 });
             }

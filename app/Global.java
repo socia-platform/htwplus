@@ -79,12 +79,16 @@ public class Global extends GlobalSettings {
 	}
 
     /**
-     * Returns the next full hour of the current time
+     * Returns the next full hour of the current time.
+     * If the current hour is 23, the next hour is 0 otherwise
+     * current hour + 1.
      *
      * @return Next hour of current time
      */
     public static int getNextHour() {
-        return (new DateTime()).getHourOfDay() + 1;
+        return (new DateTime()).getHourOfDay() < 23
+                ? (new DateTime()).getHourOfDay() + 1
+                : 0;
     }
 
     /**
