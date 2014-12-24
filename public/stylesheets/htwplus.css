@@ -104,7 +104,7 @@ h1 {
 
 .hp-chat-collapsed {
     width: 50px;
-    height: 115px;
+    height: 135px;
 }
 
 .hp-chat-expanded {
@@ -127,11 +127,12 @@ h1 {
 #hp-chat-list-online-friends {
     list-style-type: none;
     padding: 0;
+    margin: 0;
 }
 
 #hp-chat-icon {
     color: white !important;
-    margin: 10px;
+    margin: 0 10px 10px 10px;
     font-size: 14pt;
     vertical-align: text-top;
 }
@@ -139,9 +140,10 @@ h1 {
 #hp-chat-icon span {
     font-family: Verdana, Arial, 'Helvetica Neue', Helvetica, sans-serif;
     margin-left: 10px;
+    font-size: 22px;
 }
 
-.hp-easy-chat {
+#hp-chat-list-collapsed {
     -moz-transform: rotate(90deg);
     -ms-transform: rotate(90deg);
     -o-transform: rotate(90deg);
@@ -151,6 +153,20 @@ h1 {
     font-size: 24px;
 }
 
+#hp-chat-list-collapsed #hp-chat-list-collapsed-title {
+    width: 64px;
+    float: left;
+}
+
+#hp-chat-list-collapsed #hp-chat-list-collapsed-counter {
+    font-size: 14px;
+    width: 42px;
+    clear: right;
+    height: 34px;
+    padding-top: 8px;
+    text-align: center;
+}
+
 #hp-chat-list-online, #hp-chat-list-offline {
     white-space: normal;
     font-weight: bold;
@@ -158,6 +174,7 @@ h1 {
 
 #hp-chat-list-online-friends li:hover:after {
     content: "\e111";
+    font-size: 10px;
     margin-left: 4px;
     font-family: "Glyphicons Halflings", Verdana, Arial, Helvetica, sans-serif;
 }
@@ -216,15 +233,49 @@ h1 {
     height: 300px;
 }
 
-.hp-chat-window input {
+.hp-chat-window textarea {
     width: 288px;
+    height: 47px;
     color: #5a5858;
 }
 
-.hp-chat-window .hp-chat-window-name {
+.hp-chat-window .hp-chat-window-title {
     text-align: left;
     font-weight: bold;
     margin: 3px 0 3px 0;
+}
+
+.hp-chat-window .hp-chat-window-title div {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.hp-chat-window .hp-chat-window-title .hp-chat-window-title-name {
+    width: 241px;
+}
+
+.hp-chat-window .hp-chat-window-title .hp-chat-window-title-button {
+    width: 18px;
+    border: 1px solid #66a000;
+    border-radius: 4px;
+    text-align: center;
+    height: 17px;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.hp-chat-window .hp-chat-window-title .hp-chat-window-title-button:hover {
+    background-color: #558600;
+    border-color: #3f6200;
+}
+
+.hp-chat-window-collapsed-new-message .hp-chat-window-title .hp-chat-window-title-button {
+    background-color: #ff5f00;
+    border-color: #e65600;
+}
+.hp-chat-window-collapsed-new-message .hp-chat-window-title .hp-chat-window-title-button:hover {
+    background-color: #cc4c00;
+    border-color: #a83f00;
 }
 
 .hp-chat-window .hp-chat-window-content {

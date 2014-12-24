@@ -7,7 +7,13 @@ function Chat() {
     var chat = this;
     this.maxChars = 2000;
     this.onlineFriends = [];
-    this.messages = { user: 'You', textAreaPlaceholder: 'Enter a message...' };
+    this.messages = {
+        user: 'You',
+        textAreaPlaceholder: 'Enter a message...',
+        textAreaPlaceholderOffline: 'Unfortunately your friend is currently offline...',
+        online: 'online',
+        offline: 'offline'
+    };
 
     /**
      * Updates the friends list.
@@ -31,7 +37,9 @@ function Chat() {
                     // then we can ignore, or he is going offline, then we have to remove him from the array.
                     if (status == "FriendOffline") {
                         this.onlineFriends.splice(i, 1);
+                        this.setStatusChatWindow(friends.id, friends.name, this.messages.offline);
                     }
+
                     found = true;
                     break;
                 }
@@ -40,15 +48,22 @@ function Chat() {
             // if the friend was not found, then he is coming online, add him to the onlineFriends array
             if (!found) {
                 this.onlineFriends.push(friends);
+                this.setStatusChatWindow(friends.id, friends.name, this.messages.online);
             }
         }
 
-        // update the HTML list
-        var chatList = $('#hp-chat-list').find('>ul');
-        chatList.empty();
+        // update the HTML list by removing all children from HTML list
+        // and append all new list elements
+        var chatList = document.getElementById('hp-chat-list').getElementsByTagName('ul')[0];
+        var chatListOnline = document.getElementById('hp-chat-list-online');
+        var chatListOffline = document.getElementById('hp-chat-list-offline');
+        while (chatList.hasChildNodes()) {
+            chatList.removeChild(chatList.lastChild);
+        }
+
         if (this.onlineFriends.length > 0) {
-            $('#hp-chat-list-online').removeClass('hidden');
-            $('#hp-chat-list-offline').addClass('hidden');
+            chatListOnline.classList.remove('hidden');
+            chatListOffline.classList.add('hidden');
             for (i = 0; i < this.onlineFriends.length; i++) {
                 var friend = this.onlineFriends[i];
                 var liElement = document.createElement('li');
@@ -60,12 +75,14 @@ function Chat() {
                     var friendName = e.currentTarget.getAttribute('data-friend-name');
                     chat.getChatWindow(friendId, friendName);
                 }, false);
-                chatList.append(liElement);
+                chatList.appendChild(liElement);
             }
         } else {
-            $('#hp-chat-list-online').addClass('hidden');
-            $('#hp-chat-list-offline').removeClass('hidden');
+            chatListOnline.classList.add('hidden');
+            chatListOffline.classList.remove('hidden');
         }
+
+        document.getElementById('hp-chat-list-collapsed-counter').innerHTML = '(' + this.onlineFriends.length.toString() + ')';
     };
 
     /**
@@ -139,6 +156,28 @@ function Chat() {
     };
 
     /**
+     * Sets a status of a friend, if a chat window is already available.
+     *
+     * @param friendId Account ID of friend
+     * @param friendName Name of friend
+     * @param status Status of friend
+     */
+    this.setStatusChatWindow = function(friendId, friendName, status) {
+        var chatWindow = document.getElementById('hp-chat-window-' + friendId);
+        if (chatWindow == undefined) {
+            return;
+        }
+
+        var chatWindowTitle = chatWindow.getElementsByClassName('hp-chat-window-title-name')[0];
+        var chatWindowInput = chatWindow.getElementsByTagName('textarea')[0];
+        chatWindowTitle.innerHTML = status == this.messages.offline ? friendName + ' (' + status + ')' : friendName;
+        chatWindowInput.readOnly = status == this.messages.offline;
+        chatWindowInput.setAttribute('placeholder',
+            status == this.messages.offline ? this.messages.textAreaPlaceholderOffline : this.messages.textAreaPlaceholder
+        );
+    };
+
+    /**
      * Returns a dynamically created chat window.
      * If a specific chat window is not appended to the DOM already, it is
      * created dynamically and appended then. Otherwise it is just returned.
@@ -149,20 +188,32 @@ function Chat() {
      */
     this.getChatWindow = function(friendId, friendName) {
         // return #hp-chat-window-<friendId> if already appended to DOM
-        var foundElement = document.getElementById('hp-chat-window-' + friendId);
-        if (foundElement != undefined) {
-            return foundElement;
+        var chatWindow = document.getElementById('hp-chat-window-' + friendId);
+        if (chatWindow != undefined) {
+            return chatWindow;
         }
 
         // create a new chat window with all its elements and attributes
-        var chatWindow = document.createElement('div');
+        chatWindow = document.createElement('div');
         var chatTitle = document.createElement('div');
         var chatContent = document.createElement('div');
         var chatInput = document.createElement('textarea');
+        var chatTitleName = document.createElement('div');
+        var chatTitleMinimize = document.createElement('div');
+        var chatTitleClose = document.createElement('div');
         chatWindow.className = 'hp-chat-window hidden-xs hp-chat-window-expanded';
         chatWindow.id = 'hp-chat-window-' + friendId;
-        chatTitle.className = 'hp-chat-window-name';
-        chatTitle.innerHTML = friendName;
+
+        // title
+        chatTitle.className = 'hp-chat-window-title';
+        chatTitleName.className = 'hp-chat-window-title-name';
+        chatTitleName.innerHTML = friendName;
+        chatTitleMinimize.className = 'hp-chat-window-title-button';
+        chatTitleMinimize.innerHTML = '_';
+        chatTitleClose.className = 'hp-chat-window-title-button';
+        chatTitleClose.innerHTML = '&times;';
+
+        // content and text area
         chatContent.className = 'hp-chat-window-content well';
         chatInput.className = 'form-control';
         chatInput.setAttribute('maxlength', this.maxChars.toString());
@@ -186,36 +237,42 @@ function Chat() {
             }
         }, false);
 
+        // append all title elements to the title div
+        chatTitle.appendChild(chatTitleName);
+        chatTitle.appendChild(chatTitleMinimize);
+        chatTitle.appendChild(chatTitleClose);
+
         // append all newly created elements to the main div
         chatWindow.appendChild(chatTitle);
         chatWindow.appendChild(chatContent);
         chatWindow.appendChild(chatInput);
 
-        // Add mouse events to chat window:
-        // On mouse over change cursor to pointer if cursor is on name,
-        // on click on name toggle chat panel to be visible.
-        chatWindow.addEventListener('mouseover', function(e) {
-            var currentElement = e.currentTarget;
-            var relativeY = e.pageY - currentElement.getBoundingClientRect().top;
-            currentElement.style.cursor = (relativeY >= 0 && relativeY <= 28) ? 'pointer' : 'default';
-        }, false);
-        chatWindow.addEventListener('click', function(e) {
-            var currentElement = e.currentTarget;
-            var relativeY = e.pageY - currentElement.getBoundingClientRect().top;
-            if (relativeY >= 0 && relativeY <= 28) {
-                if (currentElement.classList.contains('hp-chat-window-collapsed')) {
-                    currentElement.classList.remove('hp-chat-window-collapsed');
-                    currentElement.classList.remove('hp-chat-window-collapsed-new-message');
-                    currentElement.classList.add('hp-chat-window-expanded');
-                } else {
-                    currentElement.classList.remove('hp-chat-window-expanded');
-                    currentElement.classList.add('hp-chat-window-collapsed');
-                }
+        // add mouse events to chat window title buttons
+        chatTitleMinimize.addEventListener('click', function(e) {
+            var chatWindow = e.currentTarget.parentNode.parentNode;
+            if (chatWindow.classList.contains('hp-chat-window-collapsed')) {
+                chatWindow.classList.remove('hp-chat-window-collapsed');
+                chatWindow.classList.remove('hp-chat-window-collapsed-new-message');
+                chatWindow.classList.add('hp-chat-window-expanded');
+                e.currentTarget.innerHTML = '_';
+            } else {
+                chatWindow.classList.remove('hp-chat-window-expanded');
+                chatWindow.classList.add('hp-chat-window-collapsed');
+                e.currentTarget.innerHTML = '&EmptySmallSquare;';
             }
         }, false);
+        chatTitleClose.addEventListener('click', function(e) {
+            var chatWindow = e.currentTarget.parentNode.parentNode;
+            chatWindow.parentNode.removeChild(chatWindow);
+        });
 
-        // append chat window to bottom "#hp-chats" container
-        document.getElementById('hp-chats').appendChild(chatWindow);
+        // append chat window to bottom "#hp-chats" container before first node (if exists)
+        var chats = document.getElementById('hp-chats');
+        if (chats.hasChildNodes()) {
+            chats.insertBefore(chatWindow, chats.childNodes[0]);
+        } else {
+            chats.appendChild(chatWindow);
+        }
         chatWindow.getElementsByTagName('textarea')[0].focus();
 
         return chatWindow;
@@ -230,12 +287,12 @@ function Chat() {
         if (currentElement.classList.contains('hp-chat-collapsed')) {
             currentElement.classList.remove('hp-chat-collapsed');
             currentElement.classList.add('hp-chat-expanded');
-            currentElement.getElementsByClassName('hp-easy-chat')[0].style.display = 'none';
+            document.getElementById('hp-chat-list-collapsed').style.display = 'none';
             document.getElementById('hp-chat-list').classList.remove('hidden');
         } else {
             currentElement.classList.remove('hp-chat-expanded');
             currentElement.classList.add('hp-chat-collapsed');
-            currentElement.getElementsByClassName('hp-easy-chat')[0].style.display = 'block';
+            document.getElementById('hp-chat-list-collapsed').style.display = 'block';
             document.getElementById('hp-chat-list').classList.add('hidden');
         }
     }, false);

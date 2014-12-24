@@ -65,6 +65,7 @@ chat.chat=Chat
 chat.friends_online=Freunde (Online):
 chat.friends_offline=Leider sind keine deiner Freunde zurzeit online.
 chat.type_message=Gebe eine Nachricht ein...
+chat.type_message_offline=Leider ist dein Freund jetzt offline...
 
 # --- notifications
 notification.title=Übersicht
