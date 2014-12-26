@@ -214,3 +214,7 @@ $(document).ready(function () {
     webSocket = new WS();
     webSocket.updateNewNotificationCounter();
 });
+
+$(window).on('beforeunload', function() {
+    webSocket.socket.close();
+});

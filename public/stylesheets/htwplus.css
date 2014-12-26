@@ -220,6 +220,10 @@ h1 {
 }
 
 .hp-chat-window-collapsed-new-message {
+    height: 32px;
+    margin-top: 268px;
+    opacity: 0.6;
+    filter: alpha(opacity=60);
     background-color: #ff5f00;
     border-color: #e65600;
 }
@@ -262,6 +266,19 @@ h1 {
     height: 17px;
     font-size: 10px;
     cursor: pointer;
+}
+
+.hp-chat-window-title-button-close:before {
+    content: '\00D7';
+}
+
+.hp-chat-window-title-button-minimize:before {
+    content: '\005F';
+}
+
+.hp-chat-window-collapsed .hp-chat-window-title-button-minimize:before,
+.hp-chat-window-collapsed-new-message .hp-chat-window-title-button-minimize:before {
+    content: '\25FB';
 }
 
 .hp-chat-window .hp-chat-window-title .hp-chat-window-title-button:hover {

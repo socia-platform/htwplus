@@ -71,9 +71,11 @@ function Chat() {
                 liElement.setAttribute('data-friend-name', friend.name);
                 liElement.innerHTML = friend.name;
                 liElement.addEventListener('click', function(e) {
-                    var friendId = e.currentTarget.getAttribute('data-friend-id');
-                    var friendName = e.currentTarget.getAttribute('data-friend-name');
-                    chat.getChatWindow(friendId, friendName);
+                    var friend = {
+                        id: e.currentTarget.getAttribute('data-friend-id'),
+                        name: e.currentTarget.getAttribute('data-friend-name')
+                    };
+                    chat.getChatWindow(friend);
                 }, false);
                 chatList.appendChild(liElement);
             }
@@ -104,33 +106,23 @@ function Chat() {
     /**
      * Sends a chat message to a friend.
      *
-     * @param friendId Account ID of friend
+     * @param friend Account of friend
      * @param chatWindow Origin chat window
      */
-    this.sendChat = function(friendId, chatWindow) {
+    this.sendChat = function(friend, chatWindow) {
         var chatInput = chatWindow.getElementsByTagName('textarea')[0];
-        var chatContent = chatWindow.getElementsByClassName('hp-chat-window-content')[0];
-        var chatMessageElement = document.createElement('div');
         var textMessage = chatInput.value;
-
         if (textMessage.length > this.maxChars) {
             textMessage = textMessage.substr(0, this.maxChars);
         }
-
-        var webSocketMessage = {
-            'method': 'SendChat',
-            'recipient': friendId,
-            'text': textMessage
-        };
-
         chatInput.value = '';
-        chatMessageElement.className = 'hp-chat-you';
-        chatMessageElement.setAttribute('data-name', this.messages.user);
-        chatMessageElement.innerHTML = this.htmlMessage(textMessage);
-        webSocket.send(webSocketMessage);
 
-        chatContent.appendChild(chatMessageElement);
-        chatContent.scrollTop = chatContent.scrollHeight;
+        // send WebSocket message
+        webSocket.send({'method': 'SendChat', 'recipient': friend.id, 'text': textMessage});
+
+        var htmlMessage = this.htmlMessage(textMessage);
+        this.addToChatStorage(friend, null, htmlMessage);
+        this.appendChatContent(chatWindow, null, htmlMessage);
     };
 
     /**
@@ -140,18 +132,146 @@ function Chat() {
      * @param textMessage Text message from friend
      */
     this.receiveChat = function(sender, textMessage) {
-        var chatWindow = this.getChatWindow(sender.id, sender.name);
+        var chatWindow = this.getChatWindow(sender);
+        var htmlMessage = this.htmlMessage(textMessage);
+        this.addToChatStorage(sender, sender, htmlMessage);
+        this.appendChatContent(chatWindow, sender, htmlMessage);
+
+        var chatWindowStatus = 'expanded';
+        if (chatWindow.classList.contains('hp-chat-window-collapsed-new-message')) {
+            chatWindowStatus = chatWindow.classList.contains('hp-chat-window-collapsed-new-message')
+                ? 'collapsed-new-message' : 'collapsed';
+        }
+        this.setChatStorageWindowStatus(sender, chatWindowStatus);
+    };
+
+    /**
+     * Appends a new chat message to a chat window.
+     *
+     * @param chatWindow Chat window
+     * @param sender Account ID of friend if receiving message or null, if sending message
+     * @param htmlMessage HTML converted message
+     */
+    this.appendChatContent = function(chatWindow, sender, htmlMessage) {
         var chatContent = chatWindow.getElementsByClassName('hp-chat-window-content')[0];
         var chatMessageElement = document.createElement('div');
-        chatMessageElement.className = 'hp-chat-partner';
-        chatMessageElement.innerHTML = this.htmlMessage(textMessage);
-        chatMessageElement.setAttribute('data-name', sender.name);
+        chatMessageElement.className = sender == null ? 'hp-chat-you' : 'hp-chat-partner';
+        chatMessageElement.innerHTML = htmlMessage;
+        chatMessageElement.setAttribute('data-name', sender ? sender.name : this.messages.user);
         chatContent.appendChild(chatMessageElement);
         chatContent.scrollTop = chatContent.scrollHeight;
 
-        // if current chat window is collapsed let it blink
-        if (chatWindow.classList.contains('hp-chat-window-collapsed')) {
+        // notify the user (if chat window is collapsed
+        this.blinkChatWindow(chatWindow, 3);
+    };
+
+    /**
+     * Blinks a collapsed chat window for count times.
+     *
+     * @param chatWindow The chat window to blink
+     * @param count Blink count
+     */
+    this.blinkChatWindow = function(chatWindow, count) {
+        // if chat window is not collapsed, abort
+        if (!chatWindow.classList.contains('hp-chat-window-collapsed')) {
+            return;
+        }
+
+        if (chatWindow.classList.contains('hp-chat-window-collapsed-new-message')) {
+            chatWindow.classList.remove('hp-chat-window-collapsed-new-message');
+        } else {
             chatWindow.classList.add('hp-chat-window-collapsed-new-message');
+            count--;
+        }
+
+        // blink again, if blinking times are not run out
+        if (count > 0) {
+            window.setTimeout(function() { chat.blinkChatWindow(chatWindow, count); }, 750);
+        }
+    };
+
+    /**
+     * Returns chat storage for a friend or an empty list, if not available yet.
+     * If session storage is not supported, it returns null.
+     *
+     * @param friend Account of friend
+     * @returns {*}
+     */
+    this.getChatStorage = function(friend) {
+        // if we have no session storage support, return null
+        if (typeof(Storage) == 'undefined') {
+            return null;
+        }
+
+        var chatStorage = sessionStorage.getItem(friend.id.toString());
+        if (chatStorage == null) {
+            chatStorage = { windowStatus: 'expanded', friend: friend, messages: [] };
+        } else {
+            chatStorage = JSON.parse(chatStorage);
+        }
+
+        return chatStorage;
+    };
+
+    /**
+     * Sets the window status for a chat storage.
+     *
+     * @param friend Account of friend
+     * @param status Status of chat window
+     */
+    this.setChatStorageWindowStatus = function(friend, status) {
+        var chatStorage = this.getChatStorage(friend);
+
+        // if null is returned, session storage is not available, abort
+        if (chatStorage == null) {
+            return;
+        }
+
+        chatStorage.windowStatus = status;
+        sessionStorage.setItem(friend.id.toString(), JSON.stringify(chatStorage));
+    };
+
+    /**
+     * Adds a chat message to the session storage.
+     *
+     * @param friend Account of friend
+     * @param sender Account of sender (friendId or null for own user)
+     * @param message Text message
+     */
+    this.addToChatStorage = function(friend, sender, message) {
+        var chatStorage = this.getChatStorage(friend);
+
+        // if null is returned, session storage is not available, abort
+        if (chatStorage == null) {
+            return;
+        }
+
+        // if our array has more than 10 elements, remove the first one
+        var chatMessages = chatStorage.messages;
+        if (chatMessages.length >= 10) {
+            chatMessages = chatMessages.splice(1, chatMessages.length - 1);
+        }
+        chatMessages.push({s: sender ? sender.id : null, m: message});
+        chatStorage.messages = chatMessages;
+
+        sessionStorage.setItem(friend.id.toString(), JSON.stringify(chatStorage));
+    };
+
+    /**
+     * Loads previous chats if available on session storage.
+     */
+    this.loadPreviousChats = function () {
+        // if we have no session storage support, return null
+        if (typeof(Storage) == 'undefined') {
+            return;
+        }
+
+        // load all chat storage elements
+        for (var i = 0; i < sessionStorage.length; i++) {
+            var chatStorage = this.getChatStorage({ id: sessionStorage.key(i) });
+            if (chatStorage.windowStatus != 'closed') {
+                this.getChatWindow(chatStorage.friend);
+            }
         }
     };
 
@@ -182,13 +302,12 @@ function Chat() {
      * If a specific chat window is not appended to the DOM already, it is
      * created dynamically and appended then. Otherwise it is just returned.
      *
-     * @param friendId Account ID of friend
-     * @param friendName Name of friend
+     * @param friend Account of friend
      * @returns {HTMLElement}
      */
-    this.getChatWindow = function(friendId, friendName) {
+    this.getChatWindow = function(friend) {
         // return #hp-chat-window-<friendId> if already appended to DOM
-        var chatWindow = document.getElementById('hp-chat-window-' + friendId);
+        var chatWindow = document.getElementById('hp-chat-window-' + friend.id);
         if (chatWindow != undefined) {
             return chatWindow;
         }
@@ -202,16 +321,14 @@ function Chat() {
         var chatTitleMinimize = document.createElement('div');
         var chatTitleClose = document.createElement('div');
         chatWindow.className = 'hp-chat-window hidden-xs hp-chat-window-expanded';
-        chatWindow.id = 'hp-chat-window-' + friendId;
+        chatWindow.id = 'hp-chat-window-' + friend.id;
 
         // title
         chatTitle.className = 'hp-chat-window-title';
         chatTitleName.className = 'hp-chat-window-title-name';
-        chatTitleName.innerHTML = friendName;
-        chatTitleMinimize.className = 'hp-chat-window-title-button';
-        chatTitleMinimize.innerHTML = '_';
-        chatTitleClose.className = 'hp-chat-window-title-button';
-        chatTitleClose.innerHTML = '&times;';
+        chatTitleName.innerHTML = friend.name;
+        chatTitleMinimize.className = 'hp-chat-window-title-button hp-chat-window-title-button-minimize';
+        chatTitleClose.className = 'hp-chat-window-title-button hp-chat-window-title-button-close';
 
         // content and text area
         chatContent.className = 'hp-chat-window-content well';
@@ -225,7 +342,7 @@ function Chat() {
         var isShiftPressed = false;
         chatInput.addEventListener('keydown', function(e) {
             if (e.keyCode == 13 && !isShiftPressed) {
-                chat.sendChat(friendId, chatWindow);
+                chat.sendChat(friend, chatWindow);
                 e.preventDefault();
             } else if (e.keyCode == 16) {
                 isShiftPressed = true;
@@ -250,20 +367,21 @@ function Chat() {
         // add mouse events to chat window title buttons
         chatTitleMinimize.addEventListener('click', function(e) {
             var chatWindow = e.currentTarget.parentNode.parentNode;
-            if (chatWindow.classList.contains('hp-chat-window-collapsed')) {
+            if (chatWindow.classList.contains('hp-chat-window-collapsed') || chatWindow.classList.contains('hp-chat-window-collapsed-new-message')) {
                 chatWindow.classList.remove('hp-chat-window-collapsed');
                 chatWindow.classList.remove('hp-chat-window-collapsed-new-message');
                 chatWindow.classList.add('hp-chat-window-expanded');
-                e.currentTarget.innerHTML = '_';
+                chat.setChatStorageWindowStatus(friend, 'expanded');
             } else {
                 chatWindow.classList.remove('hp-chat-window-expanded');
                 chatWindow.classList.add('hp-chat-window-collapsed');
-                e.currentTarget.innerHTML = '&EmptySmallSquare;';
+                chat.setChatStorageWindowStatus(friend, 'collapsed');
             }
         }, false);
         chatTitleClose.addEventListener('click', function(e) {
             var chatWindow = e.currentTarget.parentNode.parentNode;
             chatWindow.parentNode.removeChild(chatWindow);
+            chat.setChatStorageWindowStatus(friend, 'closed');
         });
 
         // append chat window to bottom "#hp-chats" container before first node (if exists)
@@ -273,6 +391,19 @@ function Chat() {
         } else {
             chats.appendChild(chatWindow);
         }
+
+        // append chats from session storage, if available
+        var chatStorage = this.getChatStorage(friend);
+        if (chatStorage != null) {
+            for (var i = 0; i < chatStorage.messages.length; i++) {
+                var message = chatStorage.messages[i];
+                this.appendChatContent(chatWindow, message.s ? chatStorage.friend : null, message.m);
+            }
+            chatWindow.classList.remove('hp-chat-window-expanded');
+            chatWindow.classList.add('hp-chat-window-' + chatStorage.windowStatus);
+        }
+
+        // set focus to textarea input
         chatWindow.getElementsByTagName('textarea')[0].focus();
 
         return chatWindow;
