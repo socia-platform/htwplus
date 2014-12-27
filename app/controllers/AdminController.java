@@ -3,9 +3,15 @@ package controllers;
 import static play.data.Form.form;
 
 import models.Account;
+import models.Group;
 import models.Post;
 import models.enums.AccountRole;
+import models.services.ElasticsearchService;
 import models.services.NotificationService;
+import org.elasticsearch.action.index.IndexResponse;
+import static org.elasticsearch.common.xcontent.XContentFactory.*;
+
+import org.elasticsearch.client.Client;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -18,6 +24,7 @@ import play.mvc.With;
 import views.html.Admin.*;
 import play.libs.F.Promise;
 
+import java.io.IOException;
 import java.util.*;
 
 @Security.Authenticated(Secured.class)
@@ -76,6 +83,78 @@ public class AdminController extends BaseController {
 		return ok(createAccount.render(accountForm));
 		
 	}
+
+    public static Result indexing() {
+        return ok(indexing.render());
+    }
+
+    public static Result indexAccounts() throws IOException {
+        List<Account> accountList = Account.all();
+        Client client = ElasticsearchService.getInstance().getClient();
+        for (Account i : accountList) {
+
+        IndexResponse response = client.prepareIndex("htwplus", "user", i.id.toString())
+                .setSource(jsonBuilder()
+                                .startObject()
+                                .field("name", i.name)
+                                .endObject()
+                )
+                .execute()
+                .actionGet();
+
+            Logger.info(i.name+"indexiert? "+response.isCreated());
+        }
+        return ok(indexing.render());
+    }
+
+    public static Result indexGroups() throws IOException {
+        List<Group> groupList = Group.all();
+        Client client = ElasticsearchService.getInstance().getClient();
+
+        for (Group iGroup: groupList) {
+            IndexResponse indexResponse = client.prepareIndex("htwplus","group", iGroup.id.toString())
+                    .setSource(jsonBuilder()
+                            .startObject()
+                            .field("title", iGroup.title)
+                            .field("grouptype", iGroup.groupType)
+                            .endObject())
+                    .execute()
+                    .actionGet();
+            Logger.info(iGroup.title+"indexiert? "+indexResponse.isCreated());
+        }
+        return ok(indexing.render());
+    }
+
+    public static Result indexPosts() throws IOException {
+        List<Post> postList = Post.allWithoutAdmin();
+        Client client = ElasticsearchService.getInstance().getClient();
+
+        for (Post iPost: postList) {
+            IndexResponse indexResponse = null;
+                    if(iPost.parent != null) {
+                        indexResponse = client.prepareIndex("htwplus","post", iPost.id.toString())
+                                .setSource(jsonBuilder()
+                                        .startObject()
+                                        .field("content", iPost.content)
+                                        .field("parent_id", iPost.parent.id)
+                                        .endObject())
+                                .execute()
+                                .actionGet();
+                    } else {
+                        indexResponse = client.prepareIndex("htwplus","post", iPost.id.toString())
+                                .setSource(jsonBuilder()
+                                        .startObject()
+                                        .field("content", iPost.content)
+                                        .endObject())
+                                .execute()
+                                .actionGet();
+                    }
+
+
+            Logger.info(iPost.id+"indexiert? "+indexResponse.isCreated());
+        }
+        return ok(indexing.render());
+    }
 	
 	public static Result viewMediaTemp() {
 		//https://issues.apache.org/jira/browse/IO-373

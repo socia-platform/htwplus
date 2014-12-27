@@ -1,6 +1,19 @@
+@(users: List[Account], groups: List[Group], courses: List[Group], posts: List[Post], postForm: Form[Post])
+@import play._
 @main("Searchresult"){
 
-	<h1>Suchergebnis für</h1>
+	<h1>Hier gibt es noch nichts zu sehen.</h1>
 	<br />
+    @views.html.snippets.listAccounts(users)
+        <br />
+    @views.html.Group.snippets.listGroups(groups, Component.currentAccount)
+    <br />
+    @views.html.Group.snippets.listCourses(courses, Component.currentAccount)
+    <br />
+    @if(posts != null) {
+        @for(post <- posts) {
+            @views.html.snippets.postView(post, postForm, models.Post.STREAM, Play.application().configuration().getInt("htwplus.comments.init"))
+        }
+    }
 
 } 

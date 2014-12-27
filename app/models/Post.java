@@ -383,4 +383,12 @@ public class Post extends BaseNotifiable implements INotifiable {
 
         return new Notification();
     }
+
+    /**
+     * Get all posts except error posts (from Admin)
+     * @return
+     */
+    public static List<Post> allWithoutAdmin() {
+        return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
+    }
 }

@@ -90,6 +90,10 @@ GET		/admin/media/						controllers.AdminController.viewMediaTemp()
 GET		/admin/media/clean					controllers.AdminController.cleanMediaTemp()
 GET     /admin/broadcast_notification       controllers.AdminController.broadcastNotificationForm()
 POST    /admin/broadcast_notification       controllers.AdminController.broadcastNotification()
+GET     /admin/indexing                     controllers.AdminController.indexing()
+GET     /admin/indexing/accounts            controllers.AdminController.indexAccounts()
+GET     /admin/indexing/groups              controllers.AdminController.indexGroups()
+GET     /admin/indexing/posts               controllers.AdminController.indexPosts()
 
 
 

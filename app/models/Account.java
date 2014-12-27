@@ -126,6 +126,19 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
     }
 
     /**
+     * Retrieve a User by loginname
+     */
+    public static Account findByName(String name) {
+        try{
+            return (Account) JPA.em()
+                    .createQuery("from Account a where a.name = :name")
+                    .setParameter("name", name).getSingleResult();
+        } catch (NoResultException exp) {
+            return null;
+        }
+    }
+
+    /**
      * Authenticates a user by email and password.
      * @param email of the user who wants to be authenticate
      * @param password of the user should match to the email ;) 
@@ -197,5 +210,9 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
         node.put("name", this.name);
 
         return node;
+    }
+
+    public static List<Account> getAllNames(){
+        return JPA.em().createQuery("SELECT a.id, a.name FROM Account a").getResultList();
     }
 }

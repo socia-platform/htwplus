@@ -3,9 +3,14 @@ package controllers;
 import models.Account;
 import models.Group;
 import models.Post;
+import models.services.ElasticsearchService;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
 import play.Logger;
 import play.Play;
 import play.Routes;
+import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
@@ -15,6 +20,13 @@ import views.html.help;
 import views.html.stream;
 import views.html.feedback;
 import controllers.Navigation.Level;
+import org.elasticsearch.action.search.SearchResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import static play.data.Form.form;
 
 
 @Transactional
@@ -55,9 +67,44 @@ public class Application extends BaseController {
 	}
 	
 	@Security.Authenticated(Secured.class)
-	public static Result search(){
+	public static Result search() throws ExecutionException, InterruptedException {
+        DynamicForm form = form().bindFromRequest();
+        String keyword = form.field("keyword").value();
+        Logger.info("Searching for: "+keyword);
 
-		return redirect(routes.Application.index());
+        List<Account> accountList = new ArrayList<>();
+        List<Group> groupList = new ArrayList<>();
+        List<Group> courseList = new ArrayList<>();
+        List<Post> postList =new ArrayList<>();
+
+        QueryBuilder qb = QueryBuilders.multiMatchQuery(keyword,"name","content","title");
+        SearchResponse response = ElasticsearchService.getInstance().getClient().prepareSearch("htwplus")
+                .setQuery(qb)
+                .execute()
+                .get();
+
+        for (SearchHit searchHit : response.getHits().getHits()) {
+            Logger.info(searchHit.type()+" "+searchHit.getId());
+            switch (searchHit.type()) {
+                case "user":
+                    accountList.add(Account.findById(Long.parseLong(searchHit.getId())));
+                    break;
+                case "post":
+                    postList.add(Post.findById(Long.parseLong(searchHit.getId())));
+                    break;
+                case "group":
+                    if (searchHit.getSource().get("grouptype").equals("course")) {
+                        courseList.add(Group.findById(Long.parseLong(searchHit.getId())));
+                    } else {
+                        groupList.add(Group.findById(Long.parseLong(searchHit.getId())));
+                    }
+
+                    break;
+                default: Logger.info("Kein passenden case zu ID "+searchHit.getId()+" gefunden");
+            }
+        }
+
+        return ok(views.html.searchresult.render(accountList, groupList, courseList, postList, postForm));
 	}
 
 	public static Result error() {

@@ -178,6 +178,42 @@ $(document).ready(function () {
 		});
 	});
 
+    $(function() {
+        $("#autocomplete").autocomplete({
+            source: function(request, response) {
+                var name = { "query": request.term.toLowerCase(), "fields": ["name","title"], "operator": "and" }
+                var postData = { "query": { "multi_match": name }
+                };
+                $.ajax({
+                    url: "http://localhost:9200/_search",
+                    type: "POST",
+                    dataType: "JSON",
+                    data: JSON.stringify(postData),
+                    success: function(data) {
+                        response($.map(data.hits.hits, function(item) {
+                            var label = '';
+                            if(item._type === 'user') {
+                                label = item._source.name;
+                            }
+                            if(item._type === 'group') {
+                                label = item._source.title;
+                            }
+                            return {
+                                label: label,
+                                id: item._id,
+                                type: item._type
+                            }
+                        }));
+                    }
+                });
+            },
+            select: function( event, ui ) {
+            window.location.href = window.location.origin + "/"+ui.item.type+"/" + ui.item.id
+            },
+            minLength: 2
+        })
+    });
+
 	autolinkUrls();
 });
 

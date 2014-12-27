@@ -8,7 +8,6 @@ html {
 }
 
 body {
-	margin-top: 80px;
 	overflow-x: hidden;
 }
 
@@ -692,7 +691,7 @@ input.hp-notification-hour {
 div.hp-notepad-right {
 	position: relative;
     background: url(../images/vertical.png) repeat-y right 0;
-    margin: 40px -10px 0;
+    margin: 120px -10px 0;
 }
 
 @media (max-width: 767px) {
@@ -1086,4 +1085,14 @@ table .hp-avatar {
 
 .hp-optionsTable > tr:hover .dropdown-toggle > .glyphicon {
     color: #76B900
+}
+
+/*===========*/
+
+.ui-autocomplete {
+    z-index: 2000;
+    background: white;
+}
+.ui-state-focus {
+    background: #76B900;
 }
