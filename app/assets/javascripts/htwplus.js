@@ -178,33 +178,44 @@ $(document).ready(function () {
 		});
 	});
 
+    var client = new $.es.Client({
+        hosts: 'localhost:9200'
+    });
+
     $(function() {
         $("#autocomplete").autocomplete({
             source: function(request, response) {
-                var name = { "query": request.term.toLowerCase(), "fields": ["name","title"], "operator": "and" }
-                var postData = { "query": { "multi_match": name }
-                };
-                $.ajax({
-                    url: "http://localhost:9200/_search",
-                    type: "POST",
-                    dataType: "JSON",
-                    data: JSON.stringify(postData),
-                    success: function(data) {
-                        response($.map(data.hits.hits, function(item) {
-                            var label = '';
-                            if(item._type === 'user') {
-                                label = item._source.name;
+                client.search({
+                    index: 'htwplus',
+                    body: {
+                        query: {
+                            multi_match: {
+                                query: request.term,
+                                operator: 'and',
+                                fields: [
+                                    'name',
+                                    'title'
+                                ]
                             }
-                            if(item._type === 'group') {
-                                label = item._source.title;
-                            }
-                            return {
-                                label: label,
-                                id: item._id,
-                                type: item._type
-                            }
-                        }));
+                        }
                     }
+                }).then(function (resp) {
+                    response($.map(resp.hits.hits, function(item) {
+                        var label = '';
+                        if(item._type === 'user') {
+                            label = item._source.name;
+                        }
+                        if(item._type === 'group') {
+                            label = item._source.title;
+                        }
+                        return {
+                            label: label,
+                            id: item._id,
+                            type: item._type
+                        }
+                    }));
+                }, function (err) {
+                    console.trace(err.message);
                 });
             },
             select: function( event, ui ) {

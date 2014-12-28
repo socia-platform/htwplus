@@ -12,6 +12,14 @@
         </tr>
 	</thead>
 	<tbody class="hp-optionsTable">
+        @if(courses.isEmpty) {
+            <tr>
+                <td></td>
+                <td>- keine Treffer -</td>
+                <td></td>
+                <td class="hp-optionsMenu"></td>
+            </tr>
+        }
 		@for(course <- courses) {
 		<tr>
 			<td>

@@ -34,6 +34,7 @@ public class AdminController extends BaseController {
 
 	static Form<Account> accountForm = form(Account.class);
     static Form<Post> postForm = form(Post.class);
+    static Client client = ElasticsearchService.getInstance().getClient();
 	
 	public static Result index(){
 		return ok(index.render());
@@ -90,7 +91,6 @@ public class AdminController extends BaseController {
 
     public static Result indexAccounts() throws IOException {
         List<Account> accountList = Account.all();
-        Client client = ElasticsearchService.getInstance().getClient();
         for (Account i : accountList) {
 
         IndexResponse response = client.prepareIndex("htwplus", "user", i.id.toString())
@@ -109,14 +109,12 @@ public class AdminController extends BaseController {
 
     public static Result indexGroups() throws IOException {
         List<Group> groupList = Group.all();
-        Client client = ElasticsearchService.getInstance().getClient();
 
         for (Group iGroup: groupList) {
             IndexResponse indexResponse = client.prepareIndex("htwplus","group", iGroup.id.toString())
                     .setSource(jsonBuilder()
                             .startObject()
                             .field("title", iGroup.title)
-                            .field("grouptype", iGroup.groupType)
                             .endObject())
                     .execute()
                     .actionGet();
@@ -127,29 +125,15 @@ public class AdminController extends BaseController {
 
     public static Result indexPosts() throws IOException {
         List<Post> postList = Post.allWithoutAdmin();
-        Client client = ElasticsearchService.getInstance().getClient();
 
         for (Post iPost: postList) {
-            IndexResponse indexResponse = null;
-                    if(iPost.parent != null) {
-                        indexResponse = client.prepareIndex("htwplus","post", iPost.id.toString())
-                                .setSource(jsonBuilder()
-                                        .startObject()
-                                        .field("content", iPost.content)
-                                        .field("parent_id", iPost.parent.id)
-                                        .endObject())
-                                .execute()
-                                .actionGet();
-                    } else {
-                        indexResponse = client.prepareIndex("htwplus","post", iPost.id.toString())
-                                .setSource(jsonBuilder()
-                                        .startObject()
-                                        .field("content", iPost.content)
-                                        .endObject())
-                                .execute()
-                                .actionGet();
-                    }
-
+            IndexResponse indexResponse = client.prepareIndex("htwplus","post", iPost.id.toString())
+                    .setSource(jsonBuilder()
+                            .startObject()
+                            .field("content", iPost.content)
+                            .endObject())
+                    .execute()
+                    .actionGet();
 
             Logger.info(iPost.id+"indexiert? "+indexResponse.isCreated());
         }

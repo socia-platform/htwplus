@@ -3,6 +3,7 @@ package controllers;
 import models.Account;
 import models.Group;
 import models.Post;
+import models.enums.GroupType;
 import models.services.ElasticsearchService;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -68,43 +69,61 @@ public class Application extends BaseController {
 	
 	@Security.Authenticated(Secured.class)
 	public static Result search() throws ExecutionException, InterruptedException {
-        DynamicForm form = form().bindFromRequest();
-        String keyword = form.field("keyword").value();
-        Logger.info("Searching for: "+keyword);
+        String keyword = form().bindFromRequest().field("keyword").value();
+        Logger.info("searching for: "+keyword);
 
         List<Account> accountList = new ArrayList<>();
         List<Group> groupList = new ArrayList<>();
         List<Group> courseList = new ArrayList<>();
         List<Post> postList =new ArrayList<>();
 
+        /**
+         * Build ES Query.
+         * Search for keyword on each field: account.name, post.content, group.title
+         */
         QueryBuilder qb = QueryBuilders.multiMatchQuery(keyword,"name","content","title");
+
+        /**
+         * Execute search with given query
+         */
         SearchResponse response = ElasticsearchService.getInstance().getClient().prepareSearch("htwplus")
                 .setQuery(qb)
                 .execute()
                 .get();
 
+        /**
+         * Iterate over response and add each searchHit to one list.
+         * Pay attention to view rights for post.content.
+         */
         for (SearchHit searchHit : response.getHits().getHits()) {
-            Logger.info(searchHit.type()+" "+searchHit.getId());
             switch (searchHit.type()) {
                 case "user":
                     accountList.add(Account.findById(Long.parseLong(searchHit.getId())));
                     break;
                 case "post":
-                    postList.add(Post.findById(Long.parseLong(searchHit.getId())));
+                    Post post = Post.findById(Long.parseLong(searchHit.getId()));
+                    if (Secured.viewPost(post))
+                        postList.add(post);
                     break;
                 case "group":
-                    if (searchHit.getSource().get("grouptype").equals("course")) {
-                        courseList.add(Group.findById(Long.parseLong(searchHit.getId())));
-                    } else {
-                        groupList.add(Group.findById(Long.parseLong(searchHit.getId())));
+                    Group group = Group.findById(Long.parseLong(searchHit.getId()));
+                    switch (group.groupType) {
+                        case course:
+                            courseList.add(Group.findById(Long.parseLong(searchHit.getId())));
+                            break;
+                        case open:
+                            groupList.add(Group.findById(Long.parseLong(searchHit.getId())));
+                            break;
+                        case close:
+                            groupList.add(Group.findById(Long.parseLong(searchHit.getId())));
+                            break;
                     }
-
                     break;
-                default: Logger.info("Kein passenden case zu ID "+searchHit.getId()+" gefunden");
+                default: Logger.info("no matching case for ID: "+searchHit.getId());
             }
         }
 
-        return ok(views.html.searchresult.render(accountList, groupList, courseList, postList, postForm));
+        return ok(views.html.searchresult.render(keyword, accountList, groupList, courseList, postList, postForm));
 	}
 
 	public static Result error() {

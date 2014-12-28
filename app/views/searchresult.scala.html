@@ -1,19 +1,27 @@
-@(users: List[Account], groups: List[Group], courses: List[Group], posts: List[Post], postForm: Form[Post])
+@(keyword: String, users: List[Account], groups: List[Group], courses: List[Group], posts: List[Post], postForm: Form[Post])
+@import helper._
 @import play._
 @main("Searchresult"){
 
-	<h1>Hier gibt es noch nichts zu sehen.</h1>
+	<h1>Suchergebnisse für '@truncate(keyword,30)'</h1>
 	<br />
     @views.html.snippets.listAccounts(users)
-        <br />
+    <br />
     @views.html.Group.snippets.listGroups(groups, Component.currentAccount)
     <br />
     @views.html.Group.snippets.listCourses(courses, Component.currentAccount)
     <br />
     @if(posts != null) {
+        <hr/>
+        <h4>Posts und Kommentare:</h4>
+        @if(posts.isEmpty) {
+            - keine Treffer -
+        }
         @for(post <- posts) {
             @views.html.snippets.postView(post, postForm, models.Post.STREAM, Play.application().configuration().getInt("htwplus.comments.init"))
         }
+    <br />
     }
+
 
 } 
