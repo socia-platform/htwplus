@@ -1,5 +1,6 @@
 import java.util.concurrent.TimeUnit;
 
+import models.services.ElasticsearchService;
 import models.services.EmailService;
 
 import controllers.Component;
@@ -63,6 +64,11 @@ public class Global extends GlobalSettings {
 		
 		InitialData.insert(app);
 	}
+
+    @Override
+    public void onStop(Application app) {
+        ElasticsearchService.getInstance().closeClient();
+    }
 
     /**
      * Returns the next full hour of the current time

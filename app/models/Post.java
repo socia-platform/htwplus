@@ -1,10 +1,12 @@
 package models;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
 
+import models.services.ElasticsearchService;
 import org.hibernate.annotations.Type;
 
 import models.base.BaseModel;
@@ -54,7 +56,12 @@ public class Post extends BaseNotifiable implements INotifiable {
 		
 	public void create() {
 		JPA.em().persist(this);
-	}
+        try {
+            ElasticsearchService.indexPost(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	@Override
 	public void update() {
@@ -390,5 +397,12 @@ public class Post extends BaseNotifiable implements INotifiable {
      */
     public static List<Post> allWithoutAdmin() {
         return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
+    }
+
+    public static long indexAllPosts() throws IOException {
+        final long start = System.currentTimeMillis();
+        for (Post post: allWithoutAdmin()) ElasticsearchService.indexPost(post);
+        return (System.currentTimeMillis() - start) / 100;
+
     }
 }

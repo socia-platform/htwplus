@@ -1,5 +1,6 @@
 package models;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,7 @@ import models.base.IJsonNodeSerializable;
 import models.enums.AccountRole;
 import models.enums.EmailNotifications;
 
+import models.services.ElasticsearchService;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
@@ -83,7 +85,12 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public void create() {
 		this.name = firstname+" "+lastname;
 		JPA.em().persist(this);
-	}
+        try {
+            ElasticsearchService.indexAccount(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	@Override
 	public void update() throws PersistenceException {
@@ -214,5 +221,12 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
     public static List<Account> getAllNames(){
         return JPA.em().createQuery("SELECT a.id, a.name FROM Account a").getResultList();
+    }
+
+    public static long indexAllAccounts() throws IOException {
+        final long start = System.currentTimeMillis();
+        for (Account account: all()) ElasticsearchService.indexAccount(account);
+        return (System.currentTimeMillis() - start) / 100;
+
     }
 }

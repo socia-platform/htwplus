@@ -187,18 +187,7 @@ $(document).ready(function () {
             source: function(request, response) {
                 client.search({
                     index: 'htwplus',
-                    body: {
-                        query: {
-                            multi_match: {
-                                query: request.term,
-                                operator: 'and',
-                                fields: [
-                                    'name',
-                                    'title'
-                                ]
-                            }
-                        }
-                    }
+                    body: { query: { multi_match: { query: request.term, operator: 'and', fields: [ 'name', 'title' ] }}}
                 }).then(function (resp) {
                     response($.map(resp.hits.hits, function(item) {
                         var label = '';

@@ -1,5 +1,6 @@
 package models;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,6 +13,7 @@ import models.base.INotifiable;
 import models.enums.GroupType;
 import models.enums.LinkType;
 
+import models.services.ElasticsearchService;
 import play.data.validation.ValidationError;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
@@ -79,8 +81,13 @@ public class Group extends BaseNotifiable implements INotifiable {
 
 	@Override
 	public void create() {
-		JPA.em().persist(this);
-	}
+        JPA.em().persist(this);
+        try {
+            ElasticsearchService.indexGroup(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	@Override
 	public void update() {
@@ -173,5 +180,12 @@ public class Group extends BaseNotifiable implements INotifiable {
         }
 
         return controllers.routes.GroupController.index().toString();
+    }
+
+    public static long indexAllGroups() throws IOException {
+        final long start = System.currentTimeMillis();
+        for (Group group: all()) ElasticsearchService.indexGroup(group);
+        return (System.currentTimeMillis() - start) / 100;
+
     }
 }

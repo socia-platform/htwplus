@@ -3,7 +3,6 @@ package controllers;
 import models.Account;
 import models.Group;
 import models.Post;
-import models.enums.GroupType;
 import models.services.ElasticsearchService;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -11,7 +10,6 @@ import org.elasticsearch.search.SearchHit;
 import play.Logger;
 import play.Play;
 import play.Routes;
-import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
@@ -26,8 +24,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
-import static play.data.Form.form;
 
 
 @Transactional
@@ -69,7 +65,7 @@ public class Application extends BaseController {
 	
 	@Security.Authenticated(Secured.class)
 	public static Result search() throws ExecutionException, InterruptedException {
-        String keyword = form().bindFromRequest().field("keyword").value();
+        String keyword = Form.form().bindFromRequest().field("keyword").value();
         Logger.info("searching for: "+keyword);
 
         List<Account> accountList = new ArrayList<>();
@@ -102,6 +98,9 @@ public class Application extends BaseController {
                     break;
                 case "post":
                     Post post = Post.findById(Long.parseLong(searchHit.getId()));
+                    // comment? add parent if possible
+                    if (post.parent != null)
+                        post = post.parent;
                     if (Secured.viewPost(post))
                         postList.add(post);
                     break;
@@ -144,7 +143,7 @@ public class Application extends BaseController {
 		
 		// Guest case
 		if(account == null) {
-			account = Account.findByEmail("admin@htwplus.de");
+			account = Account.findByEmail(play.Play.application().configuration().getString("htwplus.admin.mail"));
 		}
 		
 		Form<Post> filledForm = postForm.bindFromRequest();
@@ -161,9 +160,7 @@ public class Application extends BaseController {
 
 		return redirect(controllers.routes.Application.index());
 	}
-	
-		
-		
+
 	public static Result defaultRoute(String path) {
 		Logger.info(path+" nicht gefunden");
 		return redirect(controllers.routes.Application.index());
