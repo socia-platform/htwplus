@@ -185,26 +185,30 @@ $(document).ready(function () {
     $(function() {
         $("#autocomplete").autocomplete({
             source: function(request, response) {
-                client.search({
-                    index: 'htwplus',
-                    body: { query: { multi_match: { query: request.term, operator: 'and', fields: [ 'name', 'title' ] }}}
-                }).then(function (resp) {
-                    response($.map(resp.hits.hits, function(item) {
-                        var label = '';
-                        if(item._type === 'user') {
-                            label = item._source.name;
-                        }
-                        if(item._type === 'group') {
-                            label = item._source.title;
-                        }
-                        return {
-                            label: label,
-                            id: item._id,
-                            type: item._type
-                        }
-                    }));
-                }, function (err) {
-                    console.trace(err.message);
+                $.ajax({
+                    url: "http://localhost:9000/suggestions",
+                    type: "GET",
+                    dataType: "JSON",
+                    data: 'query='+request.term.toLowerCase(),
+                    success: function(data) {
+                        response($.map(data.hits.hits, function(item) {
+                            var label = '';
+                            if(item._type === 'user') {
+                                label = item._source.name;
+                            }
+                            if(item._type === 'group') {
+                                label = item._source.title;
+                            }
+                            return {
+                                label: label,
+                                id: item._id,
+                                type: item._type
+                            }
+                        }));
+                    },
+                    error: function(xhr) {
+                        response()
+                    }
                 });
             },
             select: function( event, ui ) {

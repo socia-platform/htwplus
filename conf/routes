@@ -6,6 +6,7 @@
 GET     /                       			controllers.Application.index()
 GET     /stream                    			controllers.Application.stream(page: Integer ?= 1)
 GET		/search								controllers.Application.search()
+GET     /suggestions                        controllers.Application.searchSuggestions(query: String)
 POST    /login                  			controllers.AccountController.authenticate()
 GET     /logout                 			controllers.AccountController.logout()
 GET     /help                 				controllers.Application.help()

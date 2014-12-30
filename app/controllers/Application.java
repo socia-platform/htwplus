@@ -1,5 +1,6 @@
 package controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import models.Account;
 import models.Group;
 import models.Post;
@@ -10,10 +11,13 @@ import org.elasticsearch.search.SearchHit;
 import play.Logger;
 import play.Play;
 import play.Routes;
+import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
+import play.libs.Json;
 import play.mvc.Result;
 import play.mvc.Security;
+import views.html.Admin.index;
 import views.html.error;
 import views.html.help;
 import views.html.stream;
@@ -24,6 +28,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static play.data.Form.form;
 
 
 @Transactional
@@ -62,6 +68,25 @@ public class Application extends BaseController {
 		Account currentAccount = Component.currentAccount();
 		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, page),postForm,Post.countStream(currentAccount), LIMIT, page));
 	}
+
+    public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
+        /**
+         * Build ES Query.
+         * Search for q on each field: account.name, group.title
+         */
+        QueryBuilder qb = QueryBuilders.multiMatchQuery(query,"name","title");
+
+        /**
+         * Execute search with given query
+         */
+        SearchResponse response = ElasticsearchService.getInstance().getClient().prepareSearch("htwplus")
+                .setQuery(qb)
+                .execute()
+                .get();
+
+        // return SearchResponse (it's JSON)
+        return ok(response.toString());
+    }
 	
 	@Security.Authenticated(Secured.class)
 	public static Result search() throws ExecutionException, InterruptedException {
