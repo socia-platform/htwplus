@@ -178,10 +178,6 @@ $(document).ready(function () {
 		});
 	});
 
-    var client = new $.es.Client({
-        hosts: 'localhost:9200'
-    });
-
     $(function() {
         $("#autocomplete").autocomplete({
             source: function(request, response) {

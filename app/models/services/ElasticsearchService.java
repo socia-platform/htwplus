@@ -1,5 +1,6 @@
 package models.services;
 
+import com.typesafe.config.ConfigFactory;
 import models.Account;
 import models.Group;
 import models.Post;
@@ -19,6 +20,10 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 public class ElasticsearchService {
     private static ElasticsearchService instance = null;
     private static Client client = null;
+    private static final String ES_SETTINGS = ConfigFactory.load().getString("elasticsearch.settings");
+    private static final String ES_USER_MAPPING = ConfigFactory.load().getString("elasticsearch.userMapping");
+    private static final String ES_GROUP_MAPPING = ConfigFactory.load().getString("elasticsearch.groupMapping");
+    private static final String ES_POST_MAPPING = ConfigFactory.load().getString("elasticsearch.postMapping");
 
     private ElasticsearchService() {
         client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
@@ -40,8 +45,28 @@ public class ElasticsearchService {
         client.close();
     }
 
+    public static void createAnalyzer() throws IOException {
+        getInstance().getClient().admin().indices().prepareCreate("htwplus")
+                .setSettings(ES_SETTINGS)
+                .execute().actionGet();
+    }
+
+    public static void createMapping() throws IOException {
+        getInstance().getClient().admin().indices().preparePutMapping("htwplus").setType("user")
+                .setSource(ES_USER_MAPPING)
+                .execute().actionGet();
+
+        getInstance().getClient().admin().indices().preparePutMapping("htwplus").setType("post")
+                .setSource(ES_POST_MAPPING)
+                .execute().actionGet();
+
+        getInstance().getClient().admin().indices().preparePutMapping("htwplus").setType("group")
+                .setSource(ES_GROUP_MAPPING)
+                .execute().actionGet();
+    }
+
     public static void indexPost(Post post) throws IOException {
-        IndexResponse indexResponse = client.prepareIndex("htwplus","post", post.id.toString())
+        IndexResponse indexResponse = getInstance().getClient().prepareIndex("htwplus", "post", post.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("content", post.content)
@@ -49,7 +74,7 @@ public class ElasticsearchService {
                 .execute()
                 .actionGet();
 
-        Logger.info(post.id+" indexed? "+indexResponse.isCreated());
+        Logger.info(post.id + " indexiert? "+indexResponse.isCreated());
     }
 
     public static void indexGroup(Group group) throws IOException {
@@ -60,11 +85,11 @@ public class ElasticsearchService {
                         .endObject())
                 .execute()
                 .actionGet();
-        Logger.info(group.title + " indexed? " + indexResponse.isCreated());
+        Logger.info(group.title + " indexiert? " + indexResponse.isCreated());
     }
 
     public static void indexAccount(Account account) throws IOException {
-        IndexResponse response = client.prepareIndex("htwplus", "user", account.id.toString())
+        IndexResponse response = getInstance().getClient().prepareIndex("htwplus", "user", account.id.toString())
                 .setSource(jsonBuilder()
                                 .startObject()
                                 .field("name", account.name)
@@ -73,6 +98,6 @@ public class ElasticsearchService {
                 .execute()
                 .actionGet();
 
-        Logger.info(account.name+" indexiert? "+response.isCreated());
+        Logger.info(account.name + " indexiert? "+response.isCreated());
     }
 }

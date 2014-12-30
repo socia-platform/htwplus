@@ -5,6 +5,7 @@ import models.Account;
 import models.Group;
 import models.Post;
 import models.services.ElasticsearchService;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -74,7 +75,7 @@ public class Application extends BaseController {
          * Build ES Query.
          * Search for q on each field: account.name, group.title
          */
-        QueryBuilder qb = QueryBuilders.multiMatchQuery(query,"name","title");
+        QueryBuilder qb = QueryBuilders.multiMatchQuery(query,"name","title").operator(MatchQueryBuilder.Operator.AND);
 
         /**
          * Execute search with given query

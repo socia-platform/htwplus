@@ -1,5 +1,6 @@
 import java.util.concurrent.TimeUnit;
 
+import com.typesafe.config.ConfigFactory;
 import models.services.ElasticsearchService;
 import models.services.EmailService;
 
@@ -11,6 +12,7 @@ import models.Group;
 import models.Post;
 import models.enums.AccountRole;
 import models.enums.GroupType;
+import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequestBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import play.Play;
@@ -63,11 +65,14 @@ public class Global extends GlobalSettings {
         );
 		
 		InitialData.insert(app);
+
 	}
 
     @Override
     public void onStop(Application app) {
+        Logger.info("closing ES client...");
         ElasticsearchService.getInstance().closeClient();
+        Logger.info("ES client closed");
     }
 
     /**

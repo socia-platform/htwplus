@@ -8,10 +8,7 @@ import models.Post;
 import models.enums.AccountRole;
 import models.services.ElasticsearchService;
 import models.services.NotificationService;
-import org.elasticsearch.action.index.IndexResponse;
-import static org.elasticsearch.common.xcontent.XContentFactory.*;
 
-import org.elasticsearch.client.Client;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -34,7 +31,6 @@ public class AdminController extends BaseController {
 
 	static Form<Account> accountForm = form(Account.class);
     static Form<Post> postForm = form(Post.class);
-    static Client client = ElasticsearchService.getInstance().getClient();
 
 	public static Result index(){
 		return ok(index.render());
@@ -89,9 +85,15 @@ public class AdminController extends BaseController {
         return ok(indexing.render());
     }
 
+    public static Result indexSettings() throws IOException {
+        ElasticsearchService.createAnalyzer();
+        ElasticsearchService.createMapping();
+        return ok(indexing.render());
+    }
+
     public static Result indexAccounts() throws IOException {
         long time = Account.indexAllAccounts();
-        String out = "All Accounts indexed. It took "+Long.toString(time)+"ms";
+        String out = "Alle Accounts indexiert ("+Long.toString(time)+"ms)";
         Logger.info(out);
         flash("info",out);
         return ok(indexing.render());
@@ -99,7 +101,7 @@ public class AdminController extends BaseController {
 
     public static Result indexGroups() throws IOException {
         long time = Group.indexAllGroups();
-        String out = "All Groups indexed. It took "+Long.toString(time)+"ms";
+        String out = "Alle Gruppen indexiert ("+Long.toString(time)+"ms)";
         Logger.info(out);
         flash("info",out);
         return ok(indexing.render());
@@ -107,7 +109,7 @@ public class AdminController extends BaseController {
 
     public static Result indexPosts() throws IOException {
         long time = Post.indexAllPosts();
-        String out = "All Posts indexed. It took "+Long.toString(time)+"ms";
+        String out = "Alle Posts indexiert ("+Long.toString(time)+"ms)";
         Logger.info(out);
         flash("info",out);
         return ok(indexing.render());
