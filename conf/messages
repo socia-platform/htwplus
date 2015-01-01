@@ -119,3 +119,6 @@ admin.broadcast_notification.success=Broadcast Nachrichten werden erzeugt und de
 admin.broadcast_notification.intro=Wähle einen oder mehrere Empfänger dieser Nachricht aus. Sollte kein expliziter Empfänger ausgewählt sein, wird die Nachricht an sämtliche User verschickt.
 admin.broadcast_notification.error.no_message=Bitte gebe zumindest eine Broadcast Nachricht ein
 admin.indexing=Indexieren
+
+# --- search
+search.headline={0} Ergebnis(se) für {1}

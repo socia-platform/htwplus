@@ -10,12 +10,10 @@ import play.Play;
 import play.Routes;
 import play.data.Form;
 import play.db.jpa.Transactional;
+import play.libs.F;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.error;
-import views.html.help;
-import views.html.stream;
-import views.html.feedback;
+import views.html.*;
 import controllers.Navigation.Level;
 import org.elasticsearch.action.search.SearchResponse;
 
@@ -71,14 +69,34 @@ public class Application extends BaseController {
 	@Security.Authenticated(Secured.class)
 	public static Result search() throws ExecutionException, InterruptedException {
         String keyword = Form.form().bindFromRequest().field("keyword").value();
-        Logger.info("searching for: "+keyword);
+        String mode = Form.form().bindFromRequest().field("mode").value();
+        Logger.info("searching for: "+keyword+" on "+mode);
+
+        if (keyword == null) return ok(search.render());
+        if (mode == null) mode = "all";
 
         List<Account> accountList = new ArrayList<>();
         List<Group> groupList = new ArrayList<>();
         List<Group> courseList = new ArrayList<>();
         List<Post> postList =new ArrayList<>();
+        SearchResponse response = null;
 
-        SearchResponse response = ElasticsearchService.doMultiSearch(keyword,"name","title","content");
+        /**
+         * Select fields for search
+         */
+
+        switch (mode) {
+            case "user":
+                response = ElasticsearchService.doMultiSearch(keyword, "name");
+                break;
+            case "group":
+                response = ElasticsearchService.doMultiSearch(keyword, "title");
+                break;
+            case "post":
+                response = ElasticsearchService.doMultiSearch(keyword, "content");
+                break;
+            default: response = ElasticsearchService.doMultiSearch(keyword, "name", "title", "content");
+        }
 
         /**
          * Iterate over response and add each searchHit to one list.
@@ -115,7 +133,7 @@ public class Application extends BaseController {
             }
         }
 
-        return ok(views.html.searchresult.render(keyword, accountList, groupList, courseList, postList, postForm));
+        return ok(views.html.searchresult.render(keyword, mode, accountList, groupList, courseList, postList, postForm, response.getTookInMillis(), response.getHits().totalHits()));
 	}
 
 	public static Result error() {

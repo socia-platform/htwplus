@@ -115,7 +115,6 @@ public class ElasticsearchService {
         QueryBuilder qb = QueryBuilders.multiMatchQuery(query, fields).operator(MatchQueryBuilder.Operator.AND);
         SearchResponse response = ElasticsearchService.getInstance().getClient().prepareSearch(ES_INDEX)
                 .setQuery(qb)
-                .addHighlightedField("content",0,300)
                 .execute()
                 .get();
 

@@ -1,26 +1,52 @@
-@(keyword: String, users: List[Account], groups: List[Group], courses: List[Group], posts: List[Post], postForm: Form[Post])
+@(keyword: String, mode: String, users: List[Account], groups: List[Group], courses: List[Group], posts: List[Post], postForm: Form[Post], duration: Long, hits: Long)
 @import helper._
 @import play._
 @main("Searchresult"){
+    <span></span>
 
-	<h1>Suchergebnisse für '@truncate(keyword,30)'</h1>
+	<h1>@Html(Messages("search.headline", hits, truncate(keyword,30))) <small><sup >| @duration ms</sup></small></h1>
 	<br />
-    @views.html.snippets.listAccounts(users)
-    <br />
-    @views.html.Group.snippets.listGroups(groups, Component.currentAccount)
-    <br />
-    @views.html.Group.snippets.listCourses(courses, Component.currentAccount)
-    <br />
-    @if(posts != null) {
-        <hr/>
-        <h4>Posts und Kommentare:</h4>
-        @if(posts.isEmpty) {
-            - keine Treffer -
-        }
-        @for(post <- posts) {
-            @views.html.snippets.postView(post, postForm, models.Post.STREAM, Play.application().configuration().getInt("htwplus.comments.init"))
-        }
-    <br />
+    @if(mode.equals("all")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+    <a href='/search?keyword=@keyword&mode=all'>Alles</a><span> | </span>
+    @if(mode.equals("user")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+    <a href='/search?keyword=@keyword&mode=user'>Personen</a><span> | </span>
+    @if(mode.equals("group")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+    <a href='/search?keyword=@keyword&mode=group'>Gruppen</a><span> | </span>
+    @if(mode.equals("course")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+    <a href='/search?keyword=@keyword&mode=course'>Kursen</a><span> | </span>
+    @if(mode.equals("post")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+    <a href='/search?keyword=@keyword&mode=post'>Post und Kommentare</a>
+    <br/>
+
+    @if(mode.equals("user") || mode.equals("all")){
+        @views.html.snippets.listAccounts(users)
+        <br />
     }
+    @if(mode.equals("group") || mode.equals("all")){
+        @views.html.Group.snippets.listGroups(groups, Component.currentAccount)
+        <br />
+    }
+
+    @if(mode.equals("course") || mode.equals("all")){
+        @views.html.Group.snippets.listCourses(courses, Component.currentAccount)
+        <br />
+    }
+
+    @if(mode.equals("post") || mode.equals("all")){
+        @if(posts != null) {
+            <hr/>
+            <h4>Posts und Kommentare:</h4>
+            @if(posts.isEmpty) {
+                - keine Treffer -
+            }
+            @for(post <- posts) {
+                @views.html.snippets.postView(post, postForm, models.Post.STREAM, Play.application().configuration().getInt("htwplus.comments.init"))
+            }
+            <br />
+        }
+    }
+
+
+
 
 } 
