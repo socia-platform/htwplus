@@ -3,11 +3,13 @@ package models;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.persistence.*;
 
 import models.enums.AccountRole;
 import models.services.ElasticsearchService;
+import org.elasticsearch.action.search.SearchResponse;
 import org.hibernate.annotations.Type;
 
 import models.base.BaseModel;
@@ -406,5 +408,22 @@ public class Post extends BaseNotifiable implements INotifiable {
         for (Post post: allWithoutAdmin()) ElasticsearchService.indexPost(post);
         return (System.currentTimeMillis() - start) / 100;
 
+    }
+
+    /**
+     * Search for posts and comments
+     * @param keyword String to search for
+     * @return SearchResponse (JSON) with ElasticSearch SearchHits
+     */
+    public static SearchResponse findBySearch(String keyword) {
+        SearchResponse response = null;
+        try {
+            return ElasticsearchService.doSearch(keyword, "content");
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return response;
     }
 }

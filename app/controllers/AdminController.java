@@ -9,6 +9,8 @@ import models.enums.AccountRole;
 import models.services.ElasticsearchService;
 import models.services.NotificationService;
 
+import org.elasticsearch.client.transport.NoNodeAvailableException;
+import org.elasticsearch.indices.IndexAlreadyExistsException;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -86,8 +88,16 @@ public class AdminController extends BaseController {
     }
 
     public static Result indexSettings() throws IOException {
-        ElasticsearchService.createAnalyzer();
-        ElasticsearchService.createMapping();
+        try {
+            ElasticsearchService.createAnalyzer();
+            ElasticsearchService.createMapping();
+        } catch(NoNodeAvailableException nnae) {
+            Logger.error(nnae.getMessage());
+            flash("error",nnae.getMessage());
+        } catch(IndexAlreadyExistsException iaee) {
+            Logger.info("index "+iaee.getMessage());
+            flash("info","index "+iaee.getMessage());
+        }
         return ok(indexing.render());
     }
 

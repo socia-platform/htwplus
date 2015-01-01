@@ -17,7 +17,7 @@
     @if(mode.equals("post")){ <span class="glyphicon glyphicon-chevron-right"></span> }
     <a href='/search?keyword=@keyword&mode=post'>Post und Kommentare</a>
     <br/>
-
+    <br />
     @if(mode.equals("user") || mode.equals("all")){
         @views.html.snippets.listAccounts(users)
         <br />

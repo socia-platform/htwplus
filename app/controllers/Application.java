@@ -10,7 +10,6 @@ import play.Play;
 import play.Routes;
 import play.data.Form;
 import play.db.jpa.Transactional;
-import play.libs.F;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.*;
@@ -61,8 +60,7 @@ public class Application extends BaseController {
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        SearchResponse response = ElasticsearchService.doMultiSearch(query,"name","title");
-
+        SearchResponse response = ElasticsearchService.doSearch(query,"name","title");
         return ok(response.toString());
     }
 	
@@ -84,18 +82,20 @@ public class Application extends BaseController {
         /**
          * Select fields for search
          */
-
         switch (mode) {
             case "user":
-                response = ElasticsearchService.doMultiSearch(keyword, "name");
+                response = Account.findBySearch(keyword);
                 break;
             case "group":
-                response = ElasticsearchService.doMultiSearch(keyword, "title");
+                response = Group.findBySearch(keyword);
+                break;
+            case "course":
+                response = Group.findBySearch(keyword);
                 break;
             case "post":
-                response = ElasticsearchService.doMultiSearch(keyword, "content");
+                response = Post.findBySearch(keyword);
                 break;
-            default: response = ElasticsearchService.doMultiSearch(keyword, "name", "title", "content");
+            default: response = ElasticsearchService.doSearch(keyword, "name", "title", "content");
         }
 
         /**

@@ -107,7 +107,7 @@ public class ElasticsearchService {
         Logger.info(account.name + " indexiert? "+response.isCreated());
     }
 
-    public static SearchResponse doMultiSearch(String query, String... fields) throws ExecutionException, InterruptedException {
+    public static SearchResponse doSearch(String query, String... fields) throws ExecutionException, InterruptedException {
         /**
          * Build ES Query.
          * Search with query on given fields.
