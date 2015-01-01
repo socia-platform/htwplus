@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import models.enums.AccountRole;
 import models.services.ElasticsearchService;
 import org.hibernate.annotations.Type;
 
@@ -57,6 +58,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	public void create() {
 		JPA.em().persist(this);
         try {
+            if (!this.account.role.equals(AccountRole.ADMIN))
             ElasticsearchService.indexPost(this);
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,24 +1,17 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import models.Account;
 import models.Group;
 import models.Post;
 import models.services.ElasticsearchService;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import play.Logger;
 import play.Play;
 import play.Routes;
-import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
-import play.libs.Json;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.Admin.index;
 import views.html.error;
 import views.html.help;
 import views.html.stream;
@@ -30,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static play.data.Form.form;
-
 
 @Transactional
 public class Application extends BaseController {
@@ -39,6 +30,7 @@ public class Application extends BaseController {
 	static Form<Post> postForm = Form.form(Post.class);
 	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
 	static final int PAGE = 1;
+
 	
 	public static Result javascriptRoutes() {
 		response().setContentType("text/javascript");
@@ -71,21 +63,8 @@ public class Application extends BaseController {
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        /**
-         * Build ES Query.
-         * Search for q on each field: account.name, group.title
-         */
-        QueryBuilder qb = QueryBuilders.multiMatchQuery(query,"name","title").operator(MatchQueryBuilder.Operator.AND);
+        SearchResponse response = ElasticsearchService.doMultiSearch(query,"name","title");
 
-        /**
-         * Execute search with given query
-         */
-        SearchResponse response = ElasticsearchService.getInstance().getClient().prepareSearch("htwplus")
-                .setQuery(qb)
-                .execute()
-                .get();
-
-        // return SearchResponse (it's JSON)
         return ok(response.toString());
     }
 	
@@ -99,19 +78,7 @@ public class Application extends BaseController {
         List<Group> courseList = new ArrayList<>();
         List<Post> postList =new ArrayList<>();
 
-        /**
-         * Build ES Query.
-         * Search for keyword on each field: account.name, post.content, group.title
-         */
-        QueryBuilder qb = QueryBuilders.multiMatchQuery(keyword,"name","content","title");
-
-        /**
-         * Execute search with given query
-         */
-        SearchResponse response = ElasticsearchService.getInstance().getClient().prepareSearch("htwplus")
-                .setQuery(qb)
-                .execute()
-                .get();
+        SearchResponse response = ElasticsearchService.doMultiSearch(keyword,"name","title","content");
 
         /**
          * Iterate over response and add each searchHit to one list.
