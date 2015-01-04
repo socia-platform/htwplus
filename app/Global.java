@@ -1,6 +1,5 @@
 import java.util.concurrent.TimeUnit;
 
-import com.typesafe.config.ConfigFactory;
 import models.services.ElasticsearchService;
 import models.services.EmailService;
 
@@ -12,7 +11,6 @@ import models.Group;
 import models.Post;
 import models.enums.AccountRole;
 import models.enums.GroupType;
-import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequestBuilder;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.joda.time.DateTime;

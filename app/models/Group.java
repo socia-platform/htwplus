@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import javax.persistence.*;
 
@@ -15,7 +14,6 @@ import models.enums.GroupType;
 import models.enums.LinkType;
 
 import models.services.ElasticsearchService;
-import org.elasticsearch.action.search.SearchResponse;
 import play.data.validation.ValidationError;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
@@ -189,22 +187,5 @@ public class Group extends BaseNotifiable implements INotifiable {
         for (Group group: all()) ElasticsearchService.indexGroup(group);
         return (System.currentTimeMillis() - start) / 100;
 
-    }
-
-    /**
-     * Search for groups
-     * @param keyword String to search for
-     * @return SearchResponse (JSON) with ElasticSearch SearchHits
-     */
-    public static SearchResponse findBySearch(String keyword) {
-        SearchResponse response = null;
-        try {
-            return ElasticsearchService.doSearch(keyword, "title");
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return response;
     }
 }

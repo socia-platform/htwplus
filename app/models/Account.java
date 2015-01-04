@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import javax.persistence.*;
 
@@ -16,7 +15,6 @@ import models.enums.AccountRole;
 import models.enums.EmailNotifications;
 
 import models.services.ElasticsearchService;
-import org.elasticsearch.action.search.SearchResponse;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
@@ -230,22 +228,5 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
         for (Account account: all()) ElasticsearchService.indexAccount(account);
         return (System.currentTimeMillis() - start) / 100;
 
-    }
-
-    /**
-     * Search for users
-     * @param keyword String to search for
-     * @return SearchResponse (JSON) with ElasticSearch SearchHits
-     */
-    public static SearchResponse findBySearch(String keyword) {
-        SearchResponse response = null;
-        try {
-            return ElasticsearchService.doSearch(keyword, "name");
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return response;
     }
 }

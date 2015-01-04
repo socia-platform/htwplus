@@ -84,16 +84,16 @@ public class Application extends BaseController {
          */
         switch (mode) {
             case "user":
-                response = Account.findBySearch(keyword);
+                response = ElasticsearchService.doSearch(keyword, "name");
                 break;
             case "group":
-                response = Group.findBySearch(keyword);
+                response = ElasticsearchService.doSearch(keyword, "title");
                 break;
             case "course":
-                response = Group.findBySearch(keyword);
+                response = ElasticsearchService.doSearch(keyword, "title");
                 break;
             case "post":
-                response = Post.findBySearch(keyword);
+                response = ElasticsearchService.doSearch(keyword, "content");
                 break;
             default: response = ElasticsearchService.doSearch(keyword, "name", "title", "content");
         }
