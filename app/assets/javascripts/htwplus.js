@@ -191,10 +191,10 @@ $(document).ready(function () {
                             var label = '';
                             var groupType = '';
                             if(item._type === 'user') {
-                                label = item._source.name;
+                                label = item.highlight.name;
                             }
                             if(item._type === 'group') {
-                                label = item._source.title;
+                                label = item.highlight.title;
                                 groupType = item._source.grouptype;
                             }
                             return {

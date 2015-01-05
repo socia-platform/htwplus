@@ -5,6 +5,7 @@ import models.Account;
 import models.Group;
 import models.Post;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -114,11 +115,16 @@ public class ElasticsearchService {
          * Build ES Query.
          * Search with query on given fields.
          */
-        QueryBuilder qb = QueryBuilders.multiMatchQuery(query, fields).operator(MatchQueryBuilder.Operator.AND);
-        SearchResponse response = ElasticsearchService.getInstance().getClient().prepareSearch(ES_INDEX)
-                .setQuery(qb)
-                .execute()
-                .get();
+        QueryBuilder qb = QueryBuilders.multiMatchQuery(query, fields).operator(MatchQueryBuilder.Operator.OR);
+        SearchRequestBuilder searchRequest = ElasticsearchService.getInstance().getClient().prepareSearch(ES_INDEX)
+                .setQuery(qb);
+
+        // add highlighting on given fields.
+        for (String field : fields) {
+            searchRequest.addHighlightedField(field);
+        }
+
+        SearchResponse response = searchRequest.setHighlighterPreTags("<strong>").setHighlighterPostTags("</strong>").execute().get();
 
         return response;
     }
