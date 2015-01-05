@@ -91,6 +91,7 @@ public class AdminController extends BaseController {
         try {
             ElasticsearchService.createAnalyzer();
             ElasticsearchService.createMapping();
+            flash("success","Mapping und Anazyler erfolgreich erstellt!");
         } catch(NoNodeAvailableException nnae) {
             Logger.error(nnae.getMessage());
             flash("error",nnae.getMessage());

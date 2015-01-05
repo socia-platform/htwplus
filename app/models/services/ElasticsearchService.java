@@ -88,6 +88,7 @@ public class ElasticsearchService {
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("title", group.title)
+                        .field("grouptype", group.groupType)
                         .endObject())
                 .execute()
                 .actionGet();
@@ -99,6 +100,7 @@ public class ElasticsearchService {
                 .setSource(jsonBuilder()
                                 .startObject()
                                 .field("name", account.name)
+                                .field("avatar", account.avatar)
                                 .endObject()
                 )
                 .execute()

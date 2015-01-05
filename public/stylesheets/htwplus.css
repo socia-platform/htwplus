@@ -9,13 +9,12 @@ html {
 
 body {
 	overflow-x: hidden;
-    padding-top: 80px;
 }
 
-div.alert {
+div.alert-container {
 	margin-left: -10px;
     margin-right: -10px;
-    margin-top: 20px;
+    margin-top: 120px;
 }
 
 a {
@@ -1094,7 +1093,27 @@ table .hp-avatar {
 .ui-autocomplete {
     z-index: 2000;
     background: white;
+    list-style: none;
+    padding: 0px;
+    border: 1px solid black;
+    width: 400px;
+}
+.ui-menu-item {
+    padding: 5px;
+    cursor: pointer;
+}
+.autocomplete-avatar {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+.search-icon {
+    margin-left: 5px;
+    margin-right: 18px;
 }
 .ui-state-focus {
     background: #76B900;
+}
+.ui-helper-hidden-accessible {
+    display: none;
 }

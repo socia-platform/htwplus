@@ -179,7 +179,7 @@ $(document).ready(function () {
 	});
 
     $(function() {
-        $("#autocomplete").autocomplete({
+        $(".hp-easy-search").autocomplete({
             source: function(request, response) {
                 $.ajax({
                     url: "http://localhost:9000/suggestions",
@@ -189,16 +189,21 @@ $(document).ready(function () {
                     success: function(data) {
                         response($.map(data.hits.hits, function(item) {
                             var label = '';
+                            var groupType = '';
                             if(item._type === 'user') {
                                 label = item._source.name;
                             }
                             if(item._type === 'group') {
                                 label = item._source.title;
+                                groupType = item._source.grouptype;
                             }
                             return {
                                 label: label,
                                 id: item._id,
-                                type: item._type
+                                type: item._type,
+                                avatar: item._source.avatar,
+                                groupType: groupType
+
                             }
                         }));
                     },
@@ -211,7 +216,29 @@ $(document).ready(function () {
             window.location.href = window.location.origin + "/"+ui.item.type+"/" + ui.item.id
             },
             minLength: 2
-        })
+        }).autocomplete( "instance" )._renderItem = function( ul, item ) {
+            if(item.type === 'user') {
+                return $( "<li>" )
+                    .append( "<img class='autocomplete-avatar' src='/assets/images/avatars/" + item.avatar + ".png' alt='avatar'>" + item.label)
+                    .appendTo( ul );
+            }
+            if(item.groupType === 'open') {
+                return $( "<li>" )
+                    .append( "<span class='glyphicon glyphicon-globe search-icon'></span>" +item.label)
+                    .appendTo( ul );
+            }
+            if(item.groupType === 'close') {
+                return $( "<li>" )
+                    .append( "<span class='glyphicon glyphicon-lock search-icon'></span>" +item.label)
+                    .appendTo( ul );
+            }
+            if(item.groupType === 'course') {
+                return $( "<li>" )
+                    .append( "<span class='glyphicon glyphicon-briefcase search-icon'></span>" +item.label)
+                    .appendTo( ul );
+            }
+
+        };
     });
 
 	autolinkUrls();
