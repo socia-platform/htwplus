@@ -54,6 +54,7 @@ GET		/user/:id							controllers.ProfileController.view(id:Long)
 GET		/user/:id/edit						controllers.ProfileController.edit(id:Long)
 GET		/user/:id/editPassword				controllers.ProfileController.editPassword(id:Long)
 POST	/user/:id/updatePassword			controllers.ProfileController.updatePassword(id:Long)
+POST    /user/:id/tempavatar                controllers.ProfileController.uploadTempAvatar(id:Long)
 POST	/user/:id/edit						controllers.ProfileController.update(id:Long)
 GET		/user/:id/stream					controllers.ProfileController.stream(id:Long,page: Integer ?= 1)
 
