@@ -145,7 +145,7 @@ body#hp-landingpage {
 #hp-landingpage div#hp-login {
 	padding: 70px 0;
     background-size: 100% auto;
-    background: url('http://www.htw-berlin.de/fileadmin/HTW/Zentral/DE/HTW/ZR1_Presse/Pressefotos/130719___Philipp_Meuser_0011_01_1200px_crop.jpg') no-repeat center center;
+    background: url('../images/130719___Philipp_Meuser_0011_01_1200px_crop.jpg') no-repeat center center;
     color: white !important;
 	text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
 }

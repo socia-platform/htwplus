@@ -143,7 +143,7 @@ function buildScenes() {
 $(window).load(function() {
 	// load banner dimensions
     var newImg = new Image();
-    newImg.src = 'http://www.htw-berlin.de/fileadmin/HTW/Zentral/DE/HTW/ZR1_Presse/Pressefotos/130719___Philipp_Meuser_0011_01_1200px_crop.jpg';
+    newImg.src = window.location.origin + '/public/images/130719___Philipp_Meuser_0011_01_1200px_crop.jpg';
     imgHeight = newImg.height;
     imgWidth = newImg.width;
 
