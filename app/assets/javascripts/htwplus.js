@@ -186,6 +186,7 @@ $(document).ready(function () {
     var autoSuggestResult = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
+        limit: 10,
         remote: {
             url: '/suggestions?query=',
             replace: function(url, uriEncodedQuery) {

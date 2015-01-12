@@ -1,9 +1,8 @@
 package models.services;
 
 import com.typesafe.config.ConfigFactory;
-import models.Account;
-import models.Group;
-import models.Post;
+import models.*;
+import models.enums.LinkType;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -13,9 +12,11 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import play.Logger;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -77,6 +78,7 @@ public class ElasticsearchService {
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("content", post.content)
+                        .field("owner", post.owner.id)
                         .endObject())
                 .execute()
                 .actionGet();
@@ -90,6 +92,8 @@ public class ElasticsearchService {
                         .startObject()
                         .field("title", group.title)
                         .field("grouptype", group.groupType)
+                        .field("owner", group.owner.id)
+                        .field("member", GroupAccount.findAccountsIdByGroup(group, LinkType.establish))
                         .endObject())
                 .execute()
                 .actionGet();
@@ -102,6 +106,7 @@ public class ElasticsearchService {
                                 .startObject()
                                 .field("name", account.name)
                                 .field("avatar", account.avatar)
+                                .field("friends", Friendship.findFriendsId(account))
                                 .endObject()
                 )
                 .execute()
@@ -110,21 +115,42 @@ public class ElasticsearchService {
         Logger.info(account.name + " indexiert? "+response.isCreated());
     }
 
-    public static SearchResponse doSearch(String query, String... fields) throws ExecutionException, InterruptedException {
-        /**
-         * Build ES Query.
-         * Search with query on given fields.
-         */
-        QueryBuilder qb = QueryBuilders.multiMatchQuery(query, fields).operator(MatchQueryBuilder.Operator.OR);
-        SearchRequestBuilder searchRequest = ElasticsearchService.getInstance().getClient().prepareSearch(ES_INDEX)
-                .setQuery(qb);
+    /**
+     * Build search query based on all provided fields
+     * @param query - Terms to search for (e.g. 'informatik')
+     * @param currentAccountId - AccountId from user who is logged in (for scoring)
+     * @param mustFields - All fields to search on
+     * @param scoringFields - All fields which affect the scoring
+     * @return - JSON response from Elasticsearch
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    public static SearchResponse doSearch(String query, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
 
-        // add highlighting on given fields.
-        for (String field : fields) {
+         // Build searchQuery by provided fields (mustFields) to search on
+        QueryBuilder searchQuery = QueryBuilders.multiMatchQuery(query, mustFields.toArray(new String[mustFields.size()])).operator(MatchQueryBuilder.Operator.OR);
+
+        // Build scoringQuery by provided fields (shouldFields) to increase the scoring of a better matching hit
+        QueryBuilder scoringQuery = QueryBuilders.multiMatchQuery(currentAccountId, scoringFields.toArray(new String[scoringFields.size()])).operator(MatchQueryBuilder.Operator.OR);
+
+        // Build completeQuery with search- and scoringQuery
+        QueryBuilder completeQuery = QueryBuilders.boolQuery().must(searchQuery).should(scoringQuery);
+
+        // Build searchRequest which will be executed after fields to highlight are added.
+        SearchRequestBuilder searchRequest = ElasticsearchService.getInstance().getClient().prepareSearch(ES_INDEX)
+                .setFetchSource(new String[]{"title", "grouptype", "name", "avatar", "content"}, new String[]{})
+                .setQuery(completeQuery);
+
+        // Add highlighting on all fields to search on
+        for (String field : mustFields) {
             searchRequest.addHighlightedField(field);
         }
 
-        SearchResponse response = searchRequest.setHighlighterPreTags("<strong>").setHighlighterPostTags("</strong>").execute().get();
+        // Define html tags for highlighting
+        searchRequest = searchRequest.setHighlighterPreTags("<strong>").setHighlighterPostTags("</strong>");
+
+        // Execute searchRequest
+        SearchResponse response = searchRequest.execute().get();
 
         return response;
     }

@@ -19,6 +19,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import static java.util.Arrays.asList;
 
 
 @Transactional
@@ -60,12 +61,13 @@ public class Application extends BaseController {
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        SearchResponse response = ElasticsearchService.doSearch(query,"name","title");
+        SearchResponse response = ElasticsearchService.doSearch(query, Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
         return ok(response.toString());
     }
 	
 	@Security.Authenticated(Secured.class)
 	public static Result search() throws ExecutionException, InterruptedException {
+        Account currentAccount = Component.currentAccount();
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();
         Logger.info("searching for: "+keyword+" on "+mode);
@@ -84,18 +86,18 @@ public class Application extends BaseController {
          */
         switch (mode) {
             case "user":
-                response = ElasticsearchService.doSearch(keyword, "name");
+                response = ElasticsearchService.doSearch(keyword, currentAccount.id.toString(), asList("name"), asList("friends"));
                 break;
             case "group":
-                response = ElasticsearchService.doSearch(keyword, "title");
+                response = ElasticsearchService.doSearch(keyword, currentAccount.id.toString(), asList("title"), asList("members"));
                 break;
             case "course":
-                response = ElasticsearchService.doSearch(keyword, "title");
+                response = ElasticsearchService.doSearch(keyword, currentAccount.id.toString(), asList("title"), asList("member"));
                 break;
             case "post":
-                response = ElasticsearchService.doSearch(keyword, "content");
+                response = ElasticsearchService.doSearch(keyword, currentAccount.id.toString(), asList("content"), asList("post.owner"));
                 break;
-            default: response = ElasticsearchService.doSearch(keyword, "name", "title", "content");
+            default: response = ElasticsearchService.doSearch(keyword, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.members", "post.owner"));
         }
 
         /**
