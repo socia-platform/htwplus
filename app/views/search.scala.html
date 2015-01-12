@@ -1,0 +1,13 @@
+@main("Suche"){
+
+	<h1>Suche</h1>
+	<br />
+    <!-- Search -->
+    <form class="hidden-xs hp-search-form navbar-form navbar-left" role="search" action="@routes.Application.search" method="GET">
+        <div class="form-group">
+            <input id="autocomplete" class="form-control hp-easy-search" rel="tooltip" data-placement="bottom" type="text" placeholder="EasySearch" name="keyword">
+            <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+        </div>
+    </form>
+
+} 

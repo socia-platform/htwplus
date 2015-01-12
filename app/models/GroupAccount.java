@@ -151,10 +151,10 @@ public class GroupAccount extends BaseModel {
 	}
 	
 	/**
-	 * Retrieve Accounts from Group with given LinkType.
-	 */
-	public static List<Account> findAccountsByGroup(final Group group, final LinkType type) {
-		@SuppressWarnings("unchecked")
+     * Retrieve Accounts from Group with given LinkType.
+     */
+    public static List<Account> findAccountsByGroup(final Group group, final LinkType type) {
+        @SuppressWarnings("unchecked")
         List<Account> accounts = (List<Account>) JPA
                 .em()
                 .createQuery(
@@ -162,7 +162,21 @@ public class GroupAccount extends BaseModel {
                 .setParameter(1, group.id).setParameter(2, type)
                 .getResultList();
         return accounts;
-	}
+    }
+
+    /**
+     * Retrieve AccountsId from Group with given LinkType.
+     */
+    public static List<Long> findAccountsIdByGroup(final Group group, final LinkType type) {
+        @SuppressWarnings("unchecked")
+        List<Long> accounts = (List<Long>) JPA
+                .em()
+                .createQuery(
+                        "SELECT ga.account.id FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
+                .setParameter(1, group.id).setParameter(2, type)
+                .getResultList();
+        return accounts;
+    }
 
     /**
      * Returns a group account by account and group.

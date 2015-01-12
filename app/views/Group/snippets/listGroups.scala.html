@@ -12,6 +12,14 @@
 		</tr>
 	</thead>
 	<tbody class="hp-optionsTable">
+        @if(groups.isEmpty) {
+            <tr>
+                <td></td>
+                <td>- keine Treffer -</td>
+                <td></td>
+                <td class="hp-optionsMenu"></td>
+            </tr>
+        }
 		@for(group <- groups) {
 		<tr>
 			<td>

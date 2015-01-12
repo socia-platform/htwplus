@@ -45,9 +45,10 @@ public class GroupController extends BaseController {
 		
 	@Transactional(readOnly=true)
 	public static Result view(Long id, int page) {
-		Logger.info("Show group with id: " +id);
 		Group group = Group.findById(id);
+        Logger.info("Show group with id: " +id+group.type);
 		if(!Secured.viewGroup(group)){
+            flash("error", "Du hast keine Berechtigung dazu.");
 			return redirect(controllers.routes.Application.index());
 		}
 		

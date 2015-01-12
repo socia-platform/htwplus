@@ -1,18 +1,21 @@
 package models;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
 
-import org.hibernate.annotations.Type;
-
+import models.enums.AccountRole;
+import models.services.ElasticsearchService;
 import models.base.BaseModel;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import play.Logger;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
+
+import org.hibernate.annotations.Type;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
@@ -54,7 +57,13 @@ public class Post extends BaseNotifiable implements INotifiable {
 		
 	public void create() {
 		JPA.em().persist(this);
-	}
+        try {
+            if (!this.account.role.equals(AccountRole.ADMIN))
+            ElasticsearchService.indexPost(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	@Override
 	public void update() {
@@ -382,5 +391,20 @@ public class Post extends BaseNotifiable implements INotifiable {
         }
 
         return new Notification();
+    }
+
+    /**
+     * Get all posts except error posts (from Admin)
+     * @return
+     */
+    public static List<Post> allWithoutAdmin() {
+        return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
+    }
+
+    public static long indexAllPosts() throws IOException {
+        final long start = System.currentTimeMillis();
+        for (Post post: allWithoutAdmin()) ElasticsearchService.indexPost(post);
+        return (System.currentTimeMillis() - start) / 100;
+
     }
 }
