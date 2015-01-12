@@ -48,6 +48,21 @@
                         <div class="hp-easy-feedback">Feedback</div>
                     </a>
 
+					<div id="hp-chat" class="btn btn-success hidden-xs hp-chat-collapsed">
+						<span id="hp-chat-icon" class="glyphicon glyphicon-comment"><span>@Messages("chat.chat")</span></span><br />
+						<div id="hp-chat-list-collapsed">
+							<div id="hp-chat-list-collapsed-title">@Messages("chat.chat")</div>
+							<div id="hp-chat-list-collapsed-counter">(0)</div>
+						</div>
+						<div id="hp-chat-list" class="hidden well">
+							<div id="hp-chat-list-online" class="hidden">@Messages("chat.friends_online")</div>
+							<div id="hp-chat-list-offline" class="hidden">@Messages("chat.friends_offline")</div>
+							<ul id="hp-chat-list-online-friends"></ul>
+						</div>
+					</div>
+
+					<div id="hp-chats"></div>
+
                     @views.html.snippets.notepad{ @content }
 
 				</div> <!-- /col-xs-9 -->
@@ -86,7 +101,18 @@
         <script type="text/javascript" src='@routes.Assets.at("javascripts/notification.js")'></script>
         <script type="text/javascript" src='@routes.Assets.at("javascripts/typeahead.bundle.min.js")'></script>
         <script type="text/javascript" src='@routes.Assets.at("javascripts/handlebars-v2.0.0.js")'></script>
-
+		<script type="text/javascript" src='@routes.Assets.at("javascripts/chat.js")'></script>
+        <script type="text/javascript" src='@routes.Assets.at("javascripts/websocket.js")'></script>
+		<script type="text/javascript">
+			$(document).ready(function () {
+				if (chat instanceof Chat) {
+					chat.messages.user = '@user.name';
+					chat.messages.textAreaPlaceholder = '@Messages("chat.type_message")';
+					chat.messages.textAreaPlaceholderOffline = '@Messages("chat.type_message_offline")';
+					chat.loadPreviousChats();
+				}
+			});
+		</script>
 	</body>
 </html>
 

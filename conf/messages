@@ -60,6 +60,13 @@ ldap.noConnection=Keine Verbindung zum LDAP-Server möglich. Bitte versuche es s
 ldap.wrongCredentials=Ungültiges Passwort und/oder Matrikelnummer.
 ldap.generalError=Es gab ein Problem bei der Verbindung zum LDAP-Server. Bitte versuche es später noch einmal.
 
+# --- Chat
+chat.chat=Chat
+chat.friends_online=Freunde (Online):
+chat.friends_offline=Leider sind keine deiner Freunde zurzeit online.
+chat.type_message=Gebe eine Nachricht ein...
+chat.type_message_offline=Leider ist dein Freund jetzt offline...
+
 # --- notifications
 notification.title=Übersicht
 notification.news=Neuigkeiten
