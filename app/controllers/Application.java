@@ -20,6 +20,7 @@ import views.html.searchresult;
 import views.html.stream;
 import views.html.feedback;
 import controllers.Navigation.Level;
+import models.services.AvatarService;
 
 
 @Transactional
@@ -43,6 +44,8 @@ public class Application extends BaseController {
 
 	@Security.Authenticated(Secured.class)
 	public static Result index() {
+		AvatarService a = AvatarService.getInstance();
+		Logger.info(a.test);
 		Navigation.set(Level.STREAM);
 		Account currentAccount = Component.currentAccount();
 		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount), LIMIT, PAGE));

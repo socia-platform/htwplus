@@ -2,6 +2,7 @@ package controllers;
 
 import models.*;
 import models.enums.EmailNotifications;
+import models.services.AvatarService;
 import play.Play;
 import play.data.Form;
 import play.mvc.Http.MultipartFormData;
@@ -270,8 +271,15 @@ public class ProfileController extends BaseController {
 
 	public static Result uploadTempAvatar(Long id) {
 
+		Account currentUser = Component.currentAccount();
+
+		AvatarService avtService = AvatarService.getInstance();
+
 		MultipartFormData body = request().body().asMultipartFormData();
-		MultipartFormData.FilePart avatar = body.getFile("avatar");
+		MultipartFormData.FilePart avatar = body.getFile("avatarimage");
+
+
+		currentUser.setTempAvatar(avatar.getFile());
 
 		Logger.info(avatar.getFilename());
 
