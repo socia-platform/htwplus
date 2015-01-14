@@ -189,6 +189,7 @@ $(document).ready(function () {
         limit: 10,
         remote: {
             url: '/suggestions?query=',
+            rateLimitWait: 0,
             replace: function(url, uriEncodedQuery) {
                 return url + uriEncodedQuery.toLowerCase();
             },

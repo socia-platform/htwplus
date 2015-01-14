@@ -54,6 +54,8 @@ public class Post extends BaseNotifiable implements INotifiable {
             inverseJoinColumns = { @JoinColumn(name = "account_id", referencedColumnName = "id") }
     )
     public List<Account> broadcastPostRecipients;
+
+    public String searchContent;
 		
 	public void create() {
 		JPA.em().persist(this);
@@ -131,7 +133,7 @@ public class Post extends BaseNotifiable implements INotifiable {
             query = limit(query, limit, offset);
             return query.getResultList();
 	}
-	
+
 	public static int countStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final boolean isVisitor) {
 		final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, isVisitor,"");
         return ((Number) query.getSingleResult()).intValue();

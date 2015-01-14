@@ -40,7 +40,9 @@
                 - keine Treffer -
             }
             @for(post <- posts) {
-                @views.html.snippets.postView(post, postForm, models.Post.STREAM, Play.application().configuration().getInt("htwplus.comments.init"))
+                @post.owner.name schrieb: @Html(post.searchContent)
+                <br />
+                <br />
             }
             <br />
         }

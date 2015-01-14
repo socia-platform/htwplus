@@ -4,7 +4,9 @@ import models.Account;
 import models.Group;
 import models.Post;
 import models.services.ElasticsearchService;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.highlight.HighlightField;
 import play.Logger;
 import play.Play;
 import play.Routes;
@@ -18,6 +20,7 @@ import org.elasticsearch.action.search.SearchResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import static java.util.Arrays.asList;
 
@@ -111,11 +114,16 @@ public class Application extends BaseController {
                     break;
                 case "post":
                     Post post = Post.findById(Long.parseLong(searchHit.getId()));
-                    // comment? add parent if possible
-                    if (post.parent != null)
-                        post = post.parent;
-                    if (Secured.viewPost(post))
+                    Post postParent = null;
+                    // comment? check parent post
+                    if (post.parent != null) {
+                        postParent = post.parent;
+                    }
+                    if (Secured.viewPost(post) || Secured.viewPost(postParent)) {
+                        post.searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
                         postList.add(post);
+                    }
+
                     break;
                 case "group":
                     Group group = Group.findById(Long.parseLong(searchHit.getId()));
