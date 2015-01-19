@@ -5,8 +5,23 @@
 @main("Searchresult"){
 @defining(Component.currentAccount()) { currentUser =>
 
-    <h2>@Html(Messages("search.headline", truncate(keyword,30))) <small><sup >| @{(searchLimit*currentPage)-(searchLimit-1)}-@{(searchLimit*currentPage)} von @searchHits in @searchDuration ms</sup></small></h2>
-	<br />
+    <h2>@Html(Messages("search.headline", truncate(keyword,30)))
+        <small>
+            <sup >|
+                @if(searchHits == 0) {
+                    @searchHits
+                }
+                @if(searchLimit*currentPage > searchHits) {
+                    @{(searchLimit*currentPage)-(searchLimit-1)}-@searchHits
+                }
+                @if(searchLimit*currentPage < searchHits) {
+                    @{(searchLimit*currentPage)-(searchLimit-1)}-@{(searchLimit*currentPage)}
+                }
+                von @searchHits
+            </sup>
+        </small>
+    </h2>
+    <br />
     @if(searchMode.equals("all")){ <span class="glyphicon glyphicon-chevron-right"></span> }
     <a href='/search?keyword=@keyword&mode=all'>Alles @if(searchMode.equals("all")) { (@searchHits)}</a><span> | </span>
     @if(searchMode.equals("user")){ <span class="glyphicon glyphicon-chevron-right"></span> }
