@@ -61,12 +61,12 @@ public class Application extends BaseController {
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        SearchResponse response = ElasticsearchService.doSearch(query, Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
+        SearchResponse response = ElasticsearchService.doSearch(query, 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
         return ok(response.toString());
     }
 	
 	@Security.Authenticated(Secured.class)
-	public static Result search() throws ExecutionException, InterruptedException {
+	public static Result search(int page) throws ExecutionException, InterruptedException {
         Account currentAccount = Component.currentAccount();
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();
@@ -75,10 +75,8 @@ public class Application extends BaseController {
         if (keyword == null) return ok(search.render());
         if (mode == null) mode = "all";
 
-        List<Account> accountList = new ArrayList<>();
-        List<Group> groupList = new ArrayList<>();
-        List<Group> courseList = new ArrayList<>();
-        List<Post> postList =new ArrayList<>();
+        List<Object> resultList =new ArrayList<>();
+
         SearchResponse response = null;
 
         /**
@@ -86,20 +84,20 @@ public class Application extends BaseController {
          */
         switch (mode) {
             case "user":
-                response = ElasticsearchService.doSearch(keyword, currentAccount.id.toString(), asList("name"), asList("friends"));
+                response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("name"), asList("friends"));
                 break;
             case "group":
-                response = ElasticsearchService.doSearch(keyword, currentAccount.id.toString(), asList("title"), asList("members"));
+                response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("title"), asList("members"));
                 break;
             case "course":
-                response = ElasticsearchService.doSearch(keyword, currentAccount.id.toString(), asList("title"), asList("member"));
+                response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("title"), asList("member"));
                 break;
             case "post":
-                response = ElasticsearchService.doSearch(keyword, currentAccount.id.toString(), asList("content"), asList("post.owner"));
+                response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("content"), asList("post.owner"));
                 break;
-            default: response = ElasticsearchService.doSearch(keyword, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.members", "post.owner"));
+            default: response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.members", "post.owner"));
         }
-
+        
         /**
          * Iterate over response and add each searchHit to one list.
          * Pay attention to view rights for post.content.
@@ -107,35 +105,29 @@ public class Application extends BaseController {
         for (SearchHit searchHit : response.getHits().getHits()) {
             switch (searchHit.type()) {
                 case "user":
-                    accountList.add(Account.findById(Long.parseLong(searchHit.getId())));
+                    resultList.add(Account.findById(Long.parseLong(searchHit.getId())));
                     break;
                 case "post":
                     Post post = Post.findById(Long.parseLong(searchHit.getId()));
-                    // comment? add parent if possible
-                    if (post.parent != null)
-                        post = post.parent;
-                    if (Secured.viewPost(post))
-                        postList.add(post);
+                    Post postParent = null;
+                    // comment? check parent post
+                    if (post.parent != null) {
+                        postParent = post.parent;
+                    }
+                    if (Secured.viewPost(post) || Secured.viewPost(postParent)) {
+                        post.searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
+                        resultList.add(post);
+                    }
                     break;
                 case "group":
                     Group group = Group.findById(Long.parseLong(searchHit.getId()));
-                    switch (group.groupType) {
-                        case course:
-                            courseList.add(Group.findById(Long.parseLong(searchHit.getId())));
-                            break;
-                        case open:
-                            groupList.add(Group.findById(Long.parseLong(searchHit.getId())));
-                            break;
-                        case close:
-                            groupList.add(Group.findById(Long.parseLong(searchHit.getId())));
-                            break;
-                    }
+                    resultList.add(Group.findById(Long.parseLong(searchHit.getId())));
                     break;
                 default: Logger.info("no matching case for ID: "+searchHit.getId());
             }
         }
 
-        return ok(views.html.searchresult.render(keyword, mode, accountList, groupList, courseList, postList, postForm, response.getTookInMillis(), response.getHits().totalHits()));
+        return ok(views.html.searchresult.render(keyword, mode, page, LIMIT, resultList, response.getTookInMillis(), response.getHits().totalHits()));
 	}
 
 	public static Result error() {

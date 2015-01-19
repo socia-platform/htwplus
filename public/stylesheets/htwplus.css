@@ -1372,3 +1372,17 @@ table .hp-avatar {
     background-color: #0097cf;
     color: #fff;
 }
+.searchresult-container .hp-avatar {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+
+.group-result .glyphicon {
+    margin-left: 7px;
+    margin-right: 12px;
+}
+
+.searchresult-container {
+    margin-top: 10px;
+}
