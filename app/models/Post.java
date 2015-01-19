@@ -235,6 +235,10 @@ public class Post extends BaseNotifiable implements INotifiable {
 		return this.account != null;
 	}
 
+    public boolean belongsToPost() {
+        return this.parent != null;
+    }
+
 	/**
 	 * @param account Account (current user)
 	 * @return List of Posts

@@ -125,10 +125,10 @@ public class ElasticsearchService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public static SearchResponse doSearch(String query, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
+    public static SearchResponse doSearch(String query, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
 
          // Build searchQuery by provided fields (mustFields) to search on
-        QueryBuilder searchQuery = QueryBuilders.multiMatchQuery(query, mustFields.toArray(new String[mustFields.size()])).operator(MatchQueryBuilder.Operator.OR);
+        QueryBuilder searchQuery = QueryBuilders.multiMatchQuery(query, mustFields.toArray(new String[mustFields.size()]));
 
         // Build scoringQuery by provided fields (shouldFields) to increase the scoring of a better matching hit
         QueryBuilder scoringQuery = QueryBuilders.multiMatchQuery(currentAccountId, scoringFields.toArray(new String[scoringFields.size()])).operator(MatchQueryBuilder.Operator.OR);
@@ -148,6 +148,9 @@ public class ElasticsearchService {
 
         // Define html tags for highlighting
         searchRequest = searchRequest.setHighlighterPreTags("<strong>").setHighlighterPostTags("</strong>");
+
+        // Enable pagination
+        searchRequest = searchRequest.setFrom((page * 10) - 10);
 
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();

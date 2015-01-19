@@ -121,4 +121,4 @@ admin.broadcast_notification.error.no_message=Bitte gebe zumindest eine Broadcas
 admin.indexing=Indexieren
 
 # --- search
-search.headline={0} Ergebnis(se) für {1}
+search.headline=Suchergebnisse für <b>{0}</b>

@@ -1,54 +1,83 @@
-@(keyword: String, mode: String, users: List[Account], groups: List[Group], courses: List[Group], posts: List[Post], postForm: Form[Post], duration: Long, hits: Long)
+@(keyword: String, searchMode: String, currentPage: Int, searchLimit: Int, searchResults: List[Object], searchDuration: Long, searchHits: Long)
 @import helper._
 @import play._
+@import models.enums._
 @main("Searchresult"){
-    <span></span>
+@defining(Component.currentAccount()) { currentUser =>
 
-	<h1>@Html(Messages("search.headline", hits, truncate(keyword,30))) <small><sup >| @duration ms</sup></small></h1>
+    <h2>@Html(Messages("search.headline", truncate(keyword,30))) <small><sup >| @{(searchLimit*currentPage)-(searchLimit-1)}-@{(searchLimit*currentPage)} von @searchHits in @searchDuration ms</sup></small></h2>
 	<br />
-    @if(mode.equals("all")){ <span class="glyphicon glyphicon-chevron-right"></span> }
-    <a href='/search?keyword=@keyword&mode=all'>Alles</a><span> | </span>
-    @if(mode.equals("user")){ <span class="glyphicon glyphicon-chevron-right"></span> }
-    <a href='/search?keyword=@keyword&mode=user'>Personen</a><span> | </span>
-    @if(mode.equals("group")){ <span class="glyphicon glyphicon-chevron-right"></span> }
-    <a href='/search?keyword=@keyword&mode=group'>Gruppen</a><span> | </span>
-    @if(mode.equals("course")){ <span class="glyphicon glyphicon-chevron-right"></span> }
-    <a href='/search?keyword=@keyword&mode=course'>Kursen</a><span> | </span>
-    @if(mode.equals("post")){ <span class="glyphicon glyphicon-chevron-right"></span> }
-    <a href='/search?keyword=@keyword&mode=post'>Post und Kommentare</a>
+    @if(searchMode.equals("all")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+    <a href='/search?keyword=@keyword&mode=all'>Alles @if(searchMode.equals("all")) { (@searchHits)}</a><span> | </span>
+    @if(searchMode.equals("user")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+    <a href='/search?keyword=@keyword&mode=user'>Personen @if(searchMode.equals("user")) { (@searchHits)}</a><span> | </span>
+    @if(searchMode.equals("group")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+    <a href='/search?keyword=@keyword&mode=group'>Gruppen und Kurse @if(searchMode.equals("group")) { (@searchHits)}</a><span> | </span>
+    @if(searchMode.equals("post")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+    <a href='/search?keyword=@keyword&mode=post'>Post und Kommentare @if(searchMode.equals("post")) { (@searchHits)}</a>
     <br/>
     <br />
-    @if(mode.equals("user") || mode.equals("all")){
-        @views.html.snippets.listAccounts(users)
-        <br />
-    }
-    @if(mode.equals("group") || mode.equals("all")){
-        @views.html.Group.snippets.listGroups(groups, Component.currentAccount)
-        <br />
-    }
 
-    @if(mode.equals("course") || mode.equals("all")){
-        @views.html.Group.snippets.listCourses(courses, Component.currentAccount)
-        <br />
-    }
+    @for(result <- searchResults) {
 
-    @if(mode.equals("post") || mode.equals("all")){
-        @if(posts != null) {
-            <hr/>
-            <h4>Posts und Kommentare:</h4>
-            @if(posts.isEmpty) {
-                - keine Treffer -
+        @result match {
+            case account: Account => {
+                @if(searchMode.equals("user") || searchMode.equals("all")) {
+                    <div class="well searchresult-container">
+                        <div class="account-result">
+                            @views.html.snippets.userLinkAvatar(account)
+                            @views.html.snippets.userLink(account)
+                        </div>
+                    </div>
+                }
             }
-            @for(post <- posts) {
-                @post.owner.name schrieb: @Html(post.searchContent)
-                <br />
-                <br />
+
+            case group: Group => {
+                @if(searchMode.equals("group") || searchMode.equals("all")) {
+                    <div class="well searchresult-container">
+                        <div class="group-result">
+                            @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
+                            @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
+                            @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
+                            @if(Secured.isOwnerOfGroup(group, currentUser)) {
+                            <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
+                            } else {
+                            @if(Secured.viewGroup(group)) {
+                            <a href="@routes.GroupController.view(group.id)">@group.title</a>
+                            } else {
+                            <a class="no-drop" rel="tooltip" data-original-title="Du musst @if(group.groupType.equals(GroupType.course)) {dem Kurs}else{der Gruppe} erst beitreten" data-container="body">@group.title</a>
+                            }
+                            }
+                        </div>
+                    </div>
+                }
             }
-            <br />
+
+            case post: Post => {
+                @if(searchMode.equals("post") || searchMode.equals("all")) {
+                    <div class="well searchresult-container">
+                        <div class="post-result">
+                            @views.html.snippets.userLinkAvatar(post.owner)
+                            <div class="media-body">
+                                <div class="media-heading">
+                                    @views.html.snippets.userLink(post.owner)
+                                    @if(post.belongsToGroup){schrieb einen <a href="@routes.PostController.view(post.id)">Post</a> in <a href="@routes.GroupController.view(post.group.id)">@truncate(post.group.title,50)</a>}
+                                    @if(post.belongsToPost){schrieb ein Kommentar zu einem <a href="@routes.PostController.view(post.parent.id)">Post</a>}
+                                    @if(post.belongsToAccount && currentUser != post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(post.account)}
+                                    @if(post.belongsToAccount && currentUser == post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(currentUser)}
+                                    <small>am @post.createdAt.format("dd.MM.yyyy HH:mm")</small>
+                                </div>
+
+                            </div>
+                            <div class="hp-truncate hp-white-space" id="@post.id">@Html(post.searchContent)</div>
+                        </div>
+                    </div>
+                }
+            }
+
+            case _ => { @result }
         }
     }
-
-
-
-
-} 
+}
+@views.html.pagination(searchHits.toInt, searchLimit, currentPage, "/search?keyword="+keyword+"&mode="+searchMode+"", "&")
+}
