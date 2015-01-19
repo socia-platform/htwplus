@@ -73,7 +73,10 @@ public class Application extends BaseController {
         String mode = Form.form().bindFromRequest().field("mode").value();
         Logger.info("searching for: "+keyword+" on "+mode);
 
-        if (keyword == null) return ok(search.render());
+        if (keyword == null || keyword.isEmpty()) {
+            flash("info","Nach was suchst du?");
+            return ok(search.render());
+        }
         if (mode == null) mode = "all";
 
         List<Object> resultList =new ArrayList<>();
