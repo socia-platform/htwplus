@@ -5,6 +5,7 @@ import models.Group;
 import models.Post;
 import models.services.ElasticsearchService;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import play.Logger;
 import play.Play;
 import play.Routes;
@@ -17,6 +18,7 @@ import controllers.Navigation.Level;
 import org.elasticsearch.action.search.SearchResponse;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import static java.util.Arrays.asList;
@@ -69,7 +71,7 @@ public class Application extends BaseController {
 	public static Result search(int page) throws ExecutionException, InterruptedException {
         Navigation.set("Suche");
         Account currentAccount = Component.currentAccount();
-        String keyword = Form.form().bindFromRequest().field("keyword").value();
+        String keyword = Form.form().bindFromRequest().field("keyword").value().toLowerCase();
         String mode = Form.form().bindFromRequest().field("mode").value();
         Logger.info("searching for: "+keyword+" on "+mode);
 
@@ -82,25 +84,12 @@ public class Application extends BaseController {
         List<Object> resultList =new ArrayList<>();
 
         SearchResponse response = null;
+        long userCount = 0;
+        long groupCount = 0;
+        long postCount = 0;
 
-        /**
-         * Select fields for search
-         */
-        switch (mode) {
-            case "user":
-                response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("name"), asList("friends"));
-                break;
-            case "group":
-                response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("title"), asList("members"));
-                break;
-            case "course":
-                response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("title"), asList("member"));
-                break;
-            case "post":
-                response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("content"), asList("post.owner"));
-                break;
-            default: response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.members", "post.owner"));
-        }
+        response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.members", "post.owner"));
+
         
         /**
          * Iterate over response and add each searchHit to one list.
@@ -131,7 +120,23 @@ public class Application extends BaseController {
             }
         }
 
-        return ok(views.html.searchresult.render(keyword, mode, page, LIMIT, resultList, response.getTookInMillis(), response.getHits().totalHits()));
+        Terms terms = response.getAggregations().get("types");
+        Collection<Terms.Bucket> buckets = terms.getBuckets();
+        for (Terms.Bucket bucket : buckets) {
+            switch (bucket.getKey()) {
+                case "user":
+                    userCount = bucket.getDocCount();
+                    break;
+                case "group":
+                    groupCount = bucket.getDocCount();
+                    break;
+                case "post":
+                    postCount = bucket.getDocCount();
+                    break;
+            }
+        }
+
+        return ok(views.html.searchresult.render(keyword, mode, page, LIMIT, resultList, response.getTookInMillis(), response.getHits().totalHits(), userCount, groupCount, postCount));
 	}
 
 	public static Result error() {

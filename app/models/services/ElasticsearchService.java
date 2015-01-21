@@ -12,6 +12,8 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import play.Logger;
 
@@ -151,6 +153,9 @@ public class ElasticsearchService {
 
         // Enable pagination
         searchRequest = searchRequest.setFrom((page * 10) - 10);
+
+        // Add term aggregation for facet count
+        searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("types").field("_type"));
 
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
