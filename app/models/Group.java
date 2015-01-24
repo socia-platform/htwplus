@@ -91,9 +91,11 @@ public class Group extends BaseNotifiable implements INotifiable {
 
 	@Override
 	public void update() {
-		// this.id = id;
-		// createdAt seems to be overwritten (null) - quickfix? (Iven)
-		// this.createdAt = findById(id).createdAt;
+        try {
+            ElasticsearchService.indexGroup(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 		JPA.em().merge(this);
 	}
 
