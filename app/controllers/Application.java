@@ -71,7 +71,7 @@ public class Application extends BaseController {
 	public static Result search(int page) throws ExecutionException, InterruptedException {
         Navigation.set("Suche");
         Account currentAccount = Component.currentAccount();
-        String keyword = Form.form().bindFromRequest().field("keyword").value().toLowerCase();
+        String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();
         Logger.info("searching for: "+keyword+" on "+mode);
 
@@ -88,7 +88,7 @@ public class Application extends BaseController {
         long groupCount = 0;
         long postCount = 0;
 
-        response = ElasticsearchService.doSearch(keyword, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.members", "post.owner"));
+        response = ElasticsearchService.doSearch(keyword.toLowerCase(), page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.members", "post.owner"));
 
         
         /**
