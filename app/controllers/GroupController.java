@@ -40,7 +40,10 @@ public class GroupController extends BaseController {
     @Transactional(readOnly=true)
     public static Result view(Long id) {
         Group group = Group.findById(id);
-        Logger.info("Show group with id: " +id+group.type);
+        if (group == null) {
+            Logger.error("No group found with id: " + id);
+            return redirect(controllers.routes.GroupController.index());
+        }
         Navigation.set(Level.GROUPS, "Info", group.title, controllers.routes.GroupController.view(group.id));
 
         return ok(view.render(group));
@@ -50,20 +53,16 @@ public class GroupController extends BaseController {
 	public static Result stream(Long id, int page) {
 		Group group = Group.findById(id);
         Logger.info("Show group with id: " +id+group.type);
-		if(!Secured.viewGroup(group)){
-            flash("error", "Du hast keine Berechtigung dazu.");
-			return redirect(controllers.routes.Application.index());
+
+        if(!Secured.viewGroup(group)){
+			return redirect(routes.GroupController.view(group.id));
 		}
-		
-		if (group == null) {
-			Logger.error("No group found with id: " +id);
-			return redirect(controllers.routes.GroupController.index());
-		} else {
-			Navigation.set(Level.GROUPS, "Newsstream", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
-			Logger.info("Found group with id: " +id);
-			List<Post> posts = Post.getPostsForGroup(group, LIMIT, page);
-			return ok(stream.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page));
-		}
+
+        Navigation.set(Level.GROUPS, "Newsstream", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
+        List<Post> posts = Post.getPostsForGroup(group, LIMIT, page);
+
+        return ok(stream.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page));
+
 	}
 	
 	@Transactional(readOnly=true)
