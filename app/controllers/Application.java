@@ -88,7 +88,7 @@ public class Application extends BaseController {
         long groupCount = 0;
         long postCount = 0;
 
-        response = ElasticsearchService.doSearch(keyword.toLowerCase(), page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.members", "post.owner"));
+        response = ElasticsearchService.doSearch(keyword.toLowerCase(), page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.member", "post.owner"));
 
         
         /**

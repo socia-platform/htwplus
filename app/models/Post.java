@@ -60,7 +60,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	public void create() {
 		JPA.em().persist(this);
         try {
-            if (!this.account.role.equals(AccountRole.ADMIN))
+            if (!this.owner.role.equals(AccountRole.ADMIN))
             ElasticsearchService.indexPost(this);
         } catch (IOException e) {
             e.printStackTrace();
@@ -82,6 +82,10 @@ public class Post extends BaseNotifiable implements INotifiable {
         }
 
         Notification.deleteReferences(this);
+
+        // Delete Elasticsearch document
+        ElasticsearchService.deletePost(this);
+
         JPA.em().remove(this);
 	}
 	
@@ -94,7 +98,10 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 		
 	public static Post findById(Long id) {
-		return JPA.em().find(Post.class, id);
+		Post post = JPA.em().find(Post.class, id);
+        // quickfix to prevent autoflush modifications
+        JPA.em().detach(post);
+        return post;
 	}
 
 	@SuppressWarnings("unchecked")

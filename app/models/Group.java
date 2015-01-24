@@ -112,6 +112,10 @@ public class Group extends BaseNotifiable implements INotifiable {
 		
 		// Delete Notifications
         Notification.deleteReferences(this);
+
+        // Delete Elasticsearch document
+        ElasticsearchService.deleteGroup(this);
+
 		JPA.em().remove(this);
 	}
 
