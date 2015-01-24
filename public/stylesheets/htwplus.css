@@ -8,7 +8,7 @@ html {
 }
 
 body {
-	margin-top: 80px;
+	margin-top: 91px;
 	overflow-x: hidden;
 }
 
@@ -108,6 +108,10 @@ h1 {
 
 .hp-focus-search {
 	cursor: pointer;	
+}
+
+.hp-container {
+    margin-top: 15px;
 }
 
 /*============================== Landingpage ==============================*/
@@ -692,7 +696,7 @@ input.hp-notification-hour {
 div.hp-notepad-right {
 	position: relative;
     background: url(../images/vertical.png) repeat-y right 0;
-    margin: 40px -10px 0;
+    margin: 20px -10px 0;
 }
 
 @media (max-width: 767px) {
