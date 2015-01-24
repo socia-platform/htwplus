@@ -272,7 +272,7 @@ $(document).ready(function () {
             }
 
         }).on('typeahead:selected', function($e, datum){
-            window.location.href = window.location.origin + "/"+datum.type+"/" + datum.id + "/stream"
+            window.location.href = window.location.origin + "/"+datum.type+"/" + datum.id + '/stream'
         });
 });
 
