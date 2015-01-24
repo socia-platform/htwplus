@@ -3,6 +3,8 @@ package models.services;
 import com.typesafe.config.ConfigFactory;
 import models.*;
 import models.enums.LinkType;
+import org.elasticsearch.action.delete.DeleteAction;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -161,5 +163,17 @@ public class ElasticsearchService {
         SearchResponse response = searchRequest.execute().get();
 
         return response;
+    }
+
+    public static void deleteGroup(Group group) {
+        DeleteResponse response = client.prepareDelete(ES_INDEX, "group", group.id.toString())
+                .execute()
+                .actionGet();
+    }
+
+    public static void deletePost(Post post) {
+        DeleteResponse response = client.prepareDelete(ES_INDEX, "post", post.id.toString())
+                .execute()
+                .actionGet();
     }
 }
