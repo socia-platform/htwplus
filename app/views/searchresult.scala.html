@@ -46,10 +46,10 @@
                                 @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
                                 @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
                                 @if(Secured.isOwnerOfGroup(group, currentUser)) {
-                                <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
+                                <a href="@routes.GroupController.stream(group.id)"><b>@group.title</b></a>
                                 } else {
                                 @if(Secured.viewGroup(group)) {
-                                <a href="@routes.GroupController.view(group.id)">@group.title</a>
+                                <a href="@routes.GroupController.stream(group.id)">@group.title</a>
                                 } else {
                                 <a class="no-drop" rel="tooltip" data-original-title="Du musst @if(group.groupType.equals(GroupType.course)) {dem Kurs}else{der Gruppe} erst beitreten" data-container="body">@group.title</a>
                                 }
@@ -67,7 +67,7 @@
                                 <div class="media-body">
                                     <div class="media-heading">
                                         @views.html.snippets.userLink(post.owner)
-                                        @if(post.belongsToGroup){schrieb einen <a href="@routes.PostController.view(post.id)">Post</a> in <a href="@routes.GroupController.view(post.group.id)">@truncate(post.group.title,50)</a>}
+                                        @if(post.belongsToGroup){schrieb einen <a href="@routes.PostController.view(post.id)">Post</a> in <a href="@routes.GroupController.stream(post.group.id)">@truncate(post.group.title,50)</a>}
                                         @if(post.belongsToPost){schrieb ein Kommentar zu einem <a href="@routes.PostController.view(post.parent.id)">Post</a>}
                                         @if(post.belongsToAccount && currentUser != post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(post.account)}
                                         @if(post.belongsToAccount && currentUser == post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(currentUser)}
