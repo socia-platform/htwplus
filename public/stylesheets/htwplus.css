@@ -8,6 +8,7 @@ html {
 }
 
 body {
+	margin-top: 91px;
 	overflow-x: hidden;
 }
 
@@ -356,6 +357,10 @@ h1 {
 
 .hp-focus-search {
 	cursor: pointer;	
+}
+
+.hp-container {
+    margin-top: 15px;
 }
 
 /*============================== Landingpage ==============================*/
@@ -731,6 +736,7 @@ div[id*='hp-feature-text-'] table {
     line-height: 40px !important;
     border-bottom: 1px solid #eee;
     background-color: rgba(255, 255, 255, 0.9);
+    white-space: nowrap;
 }
 
 .hp-breadcrumb .breadcrumb {
@@ -857,24 +863,19 @@ input.hp-notification-hour {
 	width: 50px;
 }
 
-.hp-nav-tabs > li > a,
+.hp-nav-tabs > li > a {
+    border-bottom-color: #dddddd !important;
+    padding: 4px 2px 0 2px;
+}
+
 .hp-nav-tabs > li > a:hover,
 .hp-nav-tabs > li > a:focus {
 	background-color: #76b900;
-	border: 1px solid #dddddd;
-	padding: 4px 2px 0 2px;
 }
 
-.hp-nav-tabs .glyphicon:hover {
-	color: #5a5858;
-}
-
-.hp-nav-tabs li.active>a {
+.hp-nav-tabs li.active > a {
+    border-bottom-color: transparent !important;
     box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.125);
-}
-
-.hp-nav-tabs li.deactive>a {
-    border-bottom-color: #dddddd;
 }
 
 /*============================== Logo ==============================*/
@@ -941,7 +942,7 @@ input.hp-notification-hour {
 div.hp-notepad-right {
 	position: relative;
     background: url(../images/vertical.png) repeat-y right 0;
-    margin: 40px -10px 0;
+    margin: 20px -10px 0;
 }
 
 @media (max-width: 767px) {
