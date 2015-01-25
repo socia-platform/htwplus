@@ -27,7 +27,7 @@ error.max.strict=Must be strictly less than {0}
 error.minLength=Minimum length is {0}
 error.maxLength=Maximum length is {0}
 error.email=Bitte eine gültige Adresse eingeben
-error.pattern=Must satisfy {0}
+error.pattern=Es gibt mindestens ein ungültiges Zeichen.
 error.sessionExpired=Deine Sitzung ist abgelaufen.
 
 # --- authenticate

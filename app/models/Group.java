@@ -16,6 +16,7 @@ import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.data.validation.ValidationError;
 import play.data.validation.Constraints.Required;
+import play.data.validation.Constraints.Pattern;
 import play.db.jpa.JPA;
 
 @Entity
@@ -28,6 +29,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     @Required
 	@Column(unique = true)
+    @Pattern(value="^[A-Za-z0-9.!#$%&'+=?_{|}~-]+$")
 	public String title;
 
 	public String description;
