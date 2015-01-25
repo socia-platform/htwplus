@@ -141,11 +141,13 @@ function buildScenes() {
  * window listener & main stuff
  */
 $(window).load(function() {
-	// load banner dimensions
+	// load banner dimensions (aspect ratio will be needed)
     var newImg = new Image();
-    newImg.src = window.location.origin + '/public/images/130719___Philipp_Meuser_0011_01_1200px_crop.jpg';
-    imgHeight = newImg.height;
-    imgWidth = newImg.width;
+    //newImg.src = window.location.origin.toString() + '/assets/images/LandingpageBackground/default_medium.jpg';
+    //imgHeight = newImg.height;
+    //imgWidth = newImg.width;
+    imgWidth = 4;
+    imgHeight = 3;
 
 	// apply scrollspy for sections, will activate items on hp-navbar if corresponding section is reached while scrolling
     $('.hp-section').each(function() {
