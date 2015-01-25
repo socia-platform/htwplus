@@ -108,7 +108,7 @@ public class Application extends BaseController {
                         postParent = post.parent;
                     }
                     if (Secured.viewPost(post) || Secured.viewPost(postParent)) {
-                        post.searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
+                        post.searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string().replace("</script>","<|script>");
                         resultList.add(post);
                     }
                     break;
