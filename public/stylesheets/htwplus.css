@@ -398,25 +398,32 @@ body#hp-landingpage {
 #hp-landingpage div#hp-login {
 	padding: 70px 0;
     background-size: 100% auto;
-    background: url('../images/130719___Philipp_Meuser_0011_01_1200px_crop.jpg') no-repeat center center;
+    background: url('../images/LandingpageBackground/default_small.jpg') no-repeat center center;
     color: white !important;
 	text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
 }
 
+@media (min-width: 992px) {
+    #hp-landingpage div#hp-login {
+        background: url('../images/LandingpageBackground/default_medium.jpg') no-repeat center center;
+    }
+}
+
+@media (min-width: 1900px) {
+    #hp-landingpage div#hp-login {
+        background: url('../images/LandingpageBackground/default_large.jpg') no-repeat center center;
+    }
+}
+
 #hp-landingpage div#hp-login .hp-logo img {
 	margin: 0;
-	padding: 0 50px;
+	padding: 0;
+    max-height: 300px;
 }
 
 @media (min-width: 992px) {
     #hp-landingpage div#hp-login {
        	padding: 150px 0;
-    }
-    #hp-landingpage div#hp-login .hp-logo {
-       	margin-top: 30px;
-    }
-    #hp-landingpage div#hp-login .hp-logo img {
-        padding: 0;
     }
 }
 
@@ -433,11 +440,11 @@ body#hp-landingpage {
 @media (max-width: 991px) {
     #hp-landingpage div#hp-login > div {
         margin: -70px 0;
-        padding-top: 80px;
+        padding-top: 50px;
         padding-bottom: 80px;
     }
     #hp-landingpage div#hp-login #hp-login-right {
-        margin-top: 30px;
+        margin-top: 80px;
     }
 }
 
@@ -893,11 +900,12 @@ input.hp-notification-hour {
 
 #hp-navbar .hp-logo {
 	height: 50px;
-	padding: 15px 15px 12px 10px
+	padding: 5px;
+    padding-right: 15px;
 }
 
 #hp-navbar .hp-logo img {
-	height: 23px;
+	height: 100%;
 	width: auto;
 	margin: 0;
 }

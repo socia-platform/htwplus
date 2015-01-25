@@ -6,13 +6,9 @@
 		<div class="navbar-header">
 			@defining(if(Navigation.getLevel() == Navigation.Level.STREAM){"active"} else {"deactive"}) { status =>
 				<a href="@Navigation.getLevelRoute(Navigation.Level.STREAM)">
-					<div class="visible-xs-block hp-logo @status">
-						<!-- <img id="normal" src="@routes.Assets.at("images/logos/logo-white-small.svg")">
-						<img id="hover" src="@routes.Assets.at("images/logos/logo-gray-small.svg")"> -->
-					</div>
-					<div class="hidden-xs hp-logo @status">
-						<!-- <img id="normal" src="@routes.Assets.at("images/logos/logo-white.svg")">
-						<img id="hover" src="@routes.Assets.at("images/logos/logo-gray.svg")"> -->
+					<div class="hp-logo @status">
+						<img id="normal" src="@routes.Assets.at("images/logos/logo-white-small.svg")">
+						<img id="hover" src="@routes.Assets.at("images/logos/logo-gray-small.svg")">
 					</div>
 				</a>
 			}
