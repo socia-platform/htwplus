@@ -98,10 +98,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 		
 	public static Post findById(Long id) {
-		Post post = JPA.em().find(Post.class, id);
-        // quickfix to prevent autoflush modifications
-        JPA.em().detach(post);
-        return post;
+        return JPA.em().find(Post.class, id);
 	}
 
 	@SuppressWarnings("unchecked")

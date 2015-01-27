@@ -96,6 +96,7 @@ GET     /admin/indexing/accounts            controllers.AdminController.indexAcc
 GET     /admin/indexing/groups              controllers.AdminController.indexGroups()
 GET     /admin/indexing/posts               controllers.AdminController.indexPosts()
 GET     /admin/indexing/indexSettings       controllers.AdminController.indexSettings()
+GET     /admin/indexing/indexDelete         controllers.AdminController.indexDelete()
 
 
 

@@ -63,7 +63,7 @@ public class Application extends BaseController {
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        SearchResponse response = ElasticsearchService.doSearch(query, 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
+        SearchResponse response = ElasticsearchService.doSearch("(title:"+ query.toLowerCase() +") OR (name:"+ query.toLowerCase() +")", "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
         return ok(response.toString());
     }
 	
@@ -88,7 +88,7 @@ public class Application extends BaseController {
         long groupCount = 0;
         long postCount = 0;
 
-        response = ElasticsearchService.doSearch(keyword.toLowerCase(), page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.member", "post.owner"));
+        response = ElasticsearchService.doSearch("(content:"+ keyword.toLowerCase() +" AND viewable:"+ currentAccount.id +") OR (title:"+ keyword.toLowerCase() +") OR (name:"+ keyword.toLowerCase() +")", mode, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.member", "post.owner"));
 
         
         /**
@@ -101,19 +101,9 @@ public class Application extends BaseController {
                     resultList.add(Account.findById(Long.parseLong(searchHit.getId())));
                     break;
                 case "post":
-                    Post post = Post.findById(Long.parseLong(searchHit.getId()));
-                    Post postParent = null;
-                    // comment? check parent post
-                    if (post.parent != null) {
-                        postParent = post.parent;
-                    }
-                    if (Secured.viewPost(post) || Secured.viewPost(postParent)) {
-                        post.searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string().replace("</script>","<|script>");
-                        resultList.add(post);
-                    }
+                    resultList.add(Post.findById(Long.parseLong(searchHit.getId())));
                     break;
                 case "group":
-                    Group group = Group.findById(Long.parseLong(searchHit.getId()));
                     resultList.add(Group.findById(Long.parseLong(searchHit.getId())));
                     break;
                 default: Logger.info("no matching case for ID: "+searchHit.getId());
@@ -136,7 +126,7 @@ public class Application extends BaseController {
             }
         }
 
-        return ok(views.html.searchresult.render(keyword, mode, page, LIMIT, resultList, response.getTookInMillis(), response.getHits().totalHits(), userCount, groupCount, postCount));
+        return ok(views.html.searchresult.render(keyword, mode, page, LIMIT, resultList, response.getTookInMillis(), userCount+groupCount+postCount, userCount, groupCount, postCount));
 	}
 
 	public static Result error() {
