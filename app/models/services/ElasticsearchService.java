@@ -56,7 +56,7 @@ public class ElasticsearchService {
     }
 
     public static void deleteIndex() {
-        getInstance().getClient().admin().indices().delete(new DeleteIndexRequest("htwplus")).actionGet();
+        getInstance().getClient().admin().indices().delete(new DeleteIndexRequest(ES_INDEX)).actionGet();
     }
     public static void createAnalyzer() throws IOException {
         getInstance().getClient().admin().indices().prepareCreate(ES_INDEX)
@@ -79,37 +79,12 @@ public class ElasticsearchService {
     }
 
     public static void indexPost(Post post) throws IOException {
-        List<Long> viewableIds = new ArrayList<>();
-
-        // add all account ids from all members of post.group
-        if(post.group != null) {
-            viewableIds.addAll(GroupAccount.findAccountIdsByGroup(post.group, LinkType.establish));
-        }
-
-        // wenn ein post auf einem stream steht, können es alle freunde dieses accounts sehen und der account selber
-        if(post.account != null) {
-            viewableIds.addAll(Friendship.findFriendsId(post.account));
-            viewableIds.add(post.account.id);
-        }
-
-        // multiple options if this post is a comment
-        if(post.parent != null) {
-            if(post.parent.group != null) {
-                viewableIds.addAll(GroupAccount.findAccountIdsByGroup(post.parent.group, LinkType.establish));
-            }
-            // wenn ein kommentar auf dem stream eines users gepostet ist, können alle freunde das sehen
-            if(post.parent.account != null) {
-                viewableIds.addAll(Friendship.findFriendsId(post.parent.account));
-            }
-        }
-
-
         IndexResponse indexResponse = getInstance().getClient().prepareIndex(ES_INDEX, "post", post.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("content", post.content)
                         .field("owner", post.owner.id)
-                        .field("viewable", viewableIds)
+                        .field("viewable", post.findAllowedToViewAccountIds())
                         .endObject())
                 .execute()
                 .actionGet();
@@ -193,7 +168,7 @@ public class ElasticsearchService {
 
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
-Logger.info(searchRequest.toString());
+
         return response;
     }
 
