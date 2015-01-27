@@ -194,7 +194,7 @@ public class GroupAccount extends BaseModel {
     /**
      * Retrieve AccountsId from Group with given LinkType.
      */
-    public static List<Long> findAccountsIdByGroup(final Group group, final LinkType type) {
+    public static List<Long> findAccountIdsByGroup(final Group group, final LinkType type) {
         @SuppressWarnings("unchecked")
         List<Long> accounts = (List<Long>) JPA
                 .em()

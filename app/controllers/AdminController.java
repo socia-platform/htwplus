@@ -87,6 +87,12 @@ public class AdminController extends BaseController {
         return ok(indexing.render());
     }
 
+    public static Result indexDelete() {
+        ElasticsearchService.deleteIndex();
+        flash("info","index gelöscht");
+        return ok(indexing.render());
+    }
+
     public static Result indexSettings() throws IOException {
         try {
             ElasticsearchService.createAnalyzer();

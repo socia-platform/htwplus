@@ -1,9 +1,10 @@
 package models.services;
 
 import com.typesafe.config.ConfigFactory;
+import controllers.Component;
 import models.*;
 import models.enums.LinkType;
-import org.elasticsearch.action.delete.DeleteAction;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -11,15 +12,12 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import play.Logger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -57,6 +55,9 @@ public class ElasticsearchService {
         client.close();
     }
 
+    public static void deleteIndex() {
+        getInstance().getClient().admin().indices().delete(new DeleteIndexRequest("htwplus")).actionGet();
+    }
     public static void createAnalyzer() throws IOException {
         getInstance().getClient().admin().indices().prepareCreate(ES_INDEX)
                 .setSettings(ES_SETTINGS)
@@ -78,11 +79,37 @@ public class ElasticsearchService {
     }
 
     public static void indexPost(Post post) throws IOException {
+        List<Long> viewableIds = new ArrayList<>();
+
+        // add all account ids from all members of post.group
+        if(post.group != null) {
+            viewableIds.addAll(GroupAccount.findAccountIdsByGroup(post.group, LinkType.establish));
+        }
+
+        // wenn ein post auf einem stream steht, können es alle freunde dieses accounts sehen und der account selber
+        if(post.account != null) {
+            viewableIds.addAll(Friendship.findFriendsId(post.account));
+            viewableIds.add(post.account.id);
+        }
+
+        // multiple options if this post is a comment
+        if(post.parent != null) {
+            if(post.parent.group != null) {
+                viewableIds.addAll(GroupAccount.findAccountIdsByGroup(post.parent.group, LinkType.establish));
+            }
+            // wenn ein kommentar auf dem stream eines users gepostet ist, können alle freunde das sehen
+            if(post.parent.account != null) {
+                viewableIds.addAll(Friendship.findFriendsId(post.parent.account));
+            }
+        }
+
+
         IndexResponse indexResponse = getInstance().getClient().prepareIndex(ES_INDEX, "post", post.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("content", post.content)
                         .field("owner", post.owner.id)
+                        .field("viewable", viewableIds)
                         .endObject())
                 .execute()
                 .actionGet();
@@ -97,7 +124,7 @@ public class ElasticsearchService {
                         .field("title", group.title)
                         .field("grouptype", group.groupType)
                         .field("owner", group.owner.id)
-                        .field("member", GroupAccount.findAccountsIdByGroup(group, LinkType.establish))
+                        .field("member", GroupAccount.findAccountIdsByGroup(group, LinkType.establish))
                         .endObject())
                 .execute()
                 .actionGet();
@@ -129,10 +156,10 @@ public class ElasticsearchService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public static SearchResponse doSearch(String query, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
+    public static SearchResponse doSearch(String query, String filter, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
 
          // Build searchQuery by provided fields (mustFields) to search on
-        QueryBuilder searchQuery = QueryBuilders.multiMatchQuery(query, mustFields.toArray(new String[mustFields.size()]));
+        QueryBuilder searchQuery = QueryBuilders.queryString(query);
 
         // Build scoringQuery by provided fields (shouldFields) to increase the scoring of a better matching hit
         QueryBuilder scoringQuery = QueryBuilders.multiMatchQuery(currentAccountId, scoringFields.toArray(new String[scoringFields.size()])).operator(MatchQueryBuilder.Operator.OR);
@@ -159,9 +186,14 @@ public class ElasticsearchService {
         // Add term aggregation for facet count
         searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("types").field("_type"));
 
+        if (!filter.equals("all")) {
+            FilterBuilder filterQuery = FilterBuilders.typeFilter(filter);
+            searchRequest.setPostFilter(filterQuery);
+        }
+
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
-
+Logger.info(searchRequest.toString());
         return response;
     }
 
