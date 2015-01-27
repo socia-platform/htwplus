@@ -132,7 +132,7 @@ function buildScenes() {
             .offset($('#hp-feature-demo').innerHeight() + 500 * (i + 1))
             .triggerHook(1);
     }
-    TweenMax.set('#hp-feature-text', {opacity: 1, y: 0,});
+    TweenMax.set('#hp-feature-text', {opacity: 1, y: 0});
 
     resizeScenes();
 }
