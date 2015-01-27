@@ -19,39 +19,44 @@
 			@views.html.snippets.breadcrumb()
 		}
 		
-		<div class="container">
+		<div class="hp-container container">
+
+			@if(!flash.isEmpty()) {
+				<div class="row">
+					<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
+						@if(flash.containsKey("success")) {
+							<div class="alert alert-success fade in">
+								<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+								@flash.get("success")
+							</div>
+						}
+						@if(flash.containsKey("info")) {
+							<div class="alert alert-info fade in">
+								<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+								@flash.get("info")
+							</div>
+						}
+						@if(flash.containsKey("error")) {
+							<div class="alert alert-danger fade in">
+								<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+								@flash.get("error")
+							</div>
+						}
+					</div>
+				</div>
+			}
 
 			<div class="row">
 				<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
+					<a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
+						<span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
+						<div class="hp-easy-feedback">Feedback</div>
+					</a>
+					@views.html.snippets.notepad{ @content }
+				</div>
+			</div>
 
-				@if(flash.containsKey("success")) {
-					<div class="alert alert-success fade in">
-						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
-						@flash.get("success")
-					</div>
-				}
-				@if(flash.containsKey("info")) {
-					<div class="alert alert-info fade in">
-						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
-						@flash.get("info")
-					</div>
-				}
-				@if(flash.containsKey("error")) {
-					<div class="alert alert-danger fade in">
-						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
-						@flash.get("error")
-					</div>
-				}
-                    <a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
-                        <span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
-                        <div class="hp-easy-feedback">Feedback</div>
-                    </a>
-
-                    @views.html.snippets.notepad{ @content }
-
-				</div> <!-- /col-xs-9 -->
-			</div> <!-- /row -->
-		</div> <!-- /container -->
+		</div>
 	
 		<footer>
 			<div class="container">
