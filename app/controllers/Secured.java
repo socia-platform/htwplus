@@ -451,40 +451,4 @@ public class Secured extends Security.Authenticator {
 		return notification.recipient.equals(Component.currentAccount());
 	}
 
-    /**
-     * Returns true, if the currently logged in account is allowed to view a specific post.
-     *
-     * @param post Post to view
-     * @return True, if logged in account is allowed to view post
-     */
-    public static boolean isAllowedToSeePost(Post post, Account account) {
-
-        if (post == null) {
-            return false;
-        }
-
-        if(post.belongsToAccount()) {
-            return post.account.equals(account) || Secured.isFriend(post.account);
-        }
-
-        if (post.belongsToGroup()) {
-            switch (post.group.groupType) {
-                case open:
-                    return true;
-
-                case close:
-                    if (Secured.isMemberOfGroup(post.group, account)) {
-                        return true;
-                    }
-                case course:
-                    if (Secured.isMemberOfGroup(post.group, account)) {
-                        return true;
-                    }
-                default:
-                    return false;
-            }
-        }
-
-        return false;
-    }
 }

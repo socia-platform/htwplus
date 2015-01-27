@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.*;
 
 import models.enums.AccountRole;
+import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import models.base.BaseModel;
 import models.base.BaseNotifiable;
@@ -54,8 +55,6 @@ public class Post extends BaseNotifiable implements INotifiable {
             inverseJoinColumns = { @JoinColumn(name = "account_id", referencedColumnName = "id") }
     )
     public List<Account> broadcastPostRecipients;
-
-    public String searchContent;
 		
 	public void create() {
 		JPA.em().persist(this);
@@ -239,9 +238,9 @@ public class Post extends BaseNotifiable implements INotifiable {
 		return this.account != null;
 	}
 
-    public boolean belongsToPost() {
-        return this.parent != null;
-    }
+    public boolean belongsToPost() { return this.parent != null; }
+
+    public boolean isMine() { return this.account == this.owner; }
 
 	/**
 	 * @param account Account (current user)
@@ -416,5 +415,50 @@ public class Post extends BaseNotifiable implements INotifiable {
         for (Post post: allWithoutAdmin()) ElasticsearchService.indexPost(post);
         return (System.currentTimeMillis() - start) / 100;
 
+    }
+
+    /**
+     * Collect all AccountIds, which are able to view this.post
+     * @return List of AccountIds
+     */
+    public List<Long> findAllowedToViewAccountIds(){
+
+        List<Long> viewableIds = new ArrayList<>();
+
+        // everybody can see his own post
+        if(this.isMine()) {
+            viewableIds.add(this.owner.id);
+        }
+
+        // everybody from post.group can see this post
+        if(this.belongsToGroup()) {
+            viewableIds.addAll(GroupAccount.findAccountIdsByGroup(this.group, LinkType.establish));
+        }
+
+        // every friend from post.account can see this post
+        if(this.belongsToAccount()) {
+            viewableIds.addAll(Friendship.findFriendsId(this.account));
+        }
+
+        // multiple options if post is a comment
+        if(this.belongsToPost()) {
+
+            // everybode can see his own comment
+            if(this.parent.account == this.owner) {
+                viewableIds.add(this.owner.id);
+            }
+
+            // every member from post.parent.group can see this post
+            if(this.parent.group != null) {
+                viewableIds.addAll(GroupAccount.findAccountIdsByGroup(this.parent.group, LinkType.establish));
+            }
+
+            // every friend from post.parent.account can see this post
+            if(this.parent.account != null) {
+                viewableIds.addAll(Friendship.findFriendsId(this.parent.account));
+            }
+        }
+
+        return viewableIds;
     }
 }
