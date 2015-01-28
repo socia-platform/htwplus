@@ -6,7 +6,9 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import controllers.Component;
 import models.enums.AccountRole;
+import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import models.base.BaseModel;
@@ -230,9 +232,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 		return Post.countCommentsForPost(this.id);
 	}
 	
-	public boolean belongsToGroup() {
-		return this.group != null;
-	}
+	public boolean belongsToGroup() { return this.group != null; }
 		
 	public boolean belongsToAccount() {
 		return this.account != null;
@@ -240,7 +240,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     public boolean belongsToPost() { return this.parent != null; }
 
-    public boolean isMine() { return this.account == this.owner; }
+    public boolean isMine() { return this.account.equals(this.owner); }
 
 	/**
 	 * @param account Account (current user)
@@ -443,8 +443,8 @@ public class Post extends BaseNotifiable implements INotifiable {
         // multiple options if post is a comment
         if(this.belongsToPost()) {
 
-            // everybode can see his own comment
-            if(this.parent.account == this.owner) {
+            // everybody can see his own comment
+            if(this.parent.account.equals(this.owner)) {
                 viewableIds.add(this.owner.id);
             }
 
@@ -458,7 +458,20 @@ public class Post extends BaseNotifiable implements INotifiable {
                 viewableIds.addAll(Friendship.findFriendsId(this.parent.account));
             }
         }
-
         return viewableIds;
+    }
+
+    public boolean isPublic() {
+
+        // post in public group
+        if(this.belongsToGroup()) {
+            return this.group.groupType.equals(GroupType.open);
+        }
+
+        // comment in public group
+        if(this.belongsToPost() && this.parent.belongsToGroup()) {
+            return this.parent.group.groupType.equals(GroupType.open);
+        }
+        return false;
     }
 }
