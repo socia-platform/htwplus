@@ -83,7 +83,7 @@ public class Application extends BaseController {
         }
         if (mode == null) mode = "all";
 
-        Pattern pt = Pattern.compile("[^a-zA-Z0-9]");
+        Pattern pt = Pattern.compile("[^a-zA-Z0-9\u00C0-\u00FF]");
         Matcher match= pt.matcher(keyword);
         while(match.find())
         {
