@@ -3,6 +3,7 @@ package models.services;
 import com.typesafe.config.ConfigFactory;
 import controllers.Component;
 import models.*;
+import models.enums.GroupType;
 import models.enums.LinkType;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -84,6 +85,7 @@ public class ElasticsearchService {
                         .startObject()
                         .field("content", post.content)
                         .field("owner", post.owner.id)
+                        .field("public", post.isPublic())
                         .field("viewable", post.findAllowedToViewAccountIds())
                         .endObject())
                 .execute()
@@ -168,6 +170,8 @@ public class ElasticsearchService {
 
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
+
+        Logger.info(searchRequest.toString());
 
         return response;
     }

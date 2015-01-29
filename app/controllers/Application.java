@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static java.util.Arrays.asList;
 
 
@@ -73,13 +76,27 @@ public class Application extends BaseController {
         Account currentAccount = Component.currentAccount();
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();
-        Logger.info("searching for: "+keyword+" on "+mode);
 
         if (keyword == null || keyword.isEmpty()) {
             flash("info","Nach was suchst du?");
             return ok(search.render());
         }
         if (mode == null) mode = "all";
+
+        Pattern pt = Pattern.compile("[^a-zA-Z0-9]");
+        Matcher match= pt.matcher(keyword);
+        while(match.find())
+        {
+            String s = match.group();
+            keyword=keyword.replaceAll("\\"+s, "");
+        }
+
+        if(keyword.isEmpty()){
+            flash("info","Dein Suchwort enthält ungültige Zeichen!");
+            return ok(search.render());
+        }
+
+        Logger.info("searching for: "+keyword+" on "+mode);
 
         List<Object> resultList =new ArrayList<>();
 
@@ -88,9 +105,8 @@ public class Application extends BaseController {
         long groupCount = 0;
         long postCount = 0;
 
-        response = ElasticsearchService.doSearch("(content:"+ keyword.toLowerCase() +" AND viewable:"+ currentAccount.id +") OR (title:"+ keyword.toLowerCase() +") OR (name:"+ keyword.toLowerCase() +")", mode, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.member", "post.owner"));
+        response = ElasticsearchService.doSearch("(content:"+ keyword.toLowerCase() +" AND (viewable:"+ currentAccount.id +" OR public:true)) OR (title:"+ keyword.toLowerCase() +") OR (name:"+ keyword.toLowerCase() +")", mode, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.member", "post.owner"));
 
-        
         /**
          * Iterate over response and add each searchHit to one list.
          * Pay attention to view rights for post.content.
