@@ -776,6 +776,10 @@ div.hp-notepad-content {
 	-webkit-box-sizing: content-box;
 }
 
+div.hp-notepad-content > *:last-child {
+    margin-bottom: 0;
+}
+
 @media (max-width: 767px) {
     div.hp-notepad-content {
         padding-right: 5px;

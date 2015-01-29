@@ -202,9 +202,6 @@ $(window).resize(function() {
 	truncateBreadcrumb();
 });
 
-$(window).load(function() {
-});
-
 $('[rel="tooltip"]').tooltip();
 $('[rel="popover"]').popover();
 
