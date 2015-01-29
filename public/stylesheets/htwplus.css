@@ -406,6 +406,10 @@ div[id*='hp-feature-text-'] table {
 
 /*============================== Navigation ==============================*/
 
+#hp-navbar {
+    max-height: 51px;
+}
+
 .hp-navbar-container {
 	max-width: 1000px;
 	margin: 0 auto;
@@ -649,7 +653,7 @@ input.hp-notification-hour {
 }
 
 #hp-navbar .hp-logo {
-	height: 50px;
+	height: 49px;
 	padding: 5px;
     padding-right: 15px;
 }
