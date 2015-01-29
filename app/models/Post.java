@@ -234,9 +234,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	
 	public boolean belongsToGroup() { return this.group != null; }
 		
-	public boolean belongsToAccount() {
-		return this.account != null;
-	}
+	public boolean belongsToAccount() { return this.account != null; }
 
     public boolean belongsToPost() { return this.parent != null; }
 
@@ -425,11 +423,6 @@ public class Post extends BaseNotifiable implements INotifiable {
 
         List<Long> viewableIds = new ArrayList<>();
 
-        // everybody can see his own post
-        if(this.isMine()) {
-            viewableIds.add(this.owner.id);
-        }
-
         // everybody from post.group can see this post
         if(this.belongsToGroup()) {
             viewableIds.addAll(GroupAccount.findAccountIdsByGroup(this.group, LinkType.establish));
@@ -438,24 +431,29 @@ public class Post extends BaseNotifiable implements INotifiable {
         // every friend from post.account can see this post
         if(this.belongsToAccount()) {
             viewableIds.addAll(Friendship.findFriendsId(this.account));
+
+            // everybody can see his own post
+            if(this.isMine()) {
+                viewableIds.add(this.owner.id);
+            }
         }
 
         // multiple options if post is a comment
         if(this.belongsToPost()) {
 
-            // everybody can see his own comment
-            if(this.parent.account.equals(this.owner)) {
-                viewableIds.add(this.owner.id);
-            }
-
             // every member from post.parent.group can see this post
-            if(this.parent.group != null) {
+            if(this.parent.belongsToGroup()) {
                 viewableIds.addAll(GroupAccount.findAccountIdsByGroup(this.parent.group, LinkType.establish));
             }
 
             // every friend from post.parent.account can see this post
-            if(this.parent.account != null) {
+            if(this.parent.belongsToAccount()) {
                 viewableIds.addAll(Friendship.findFriendsId(this.parent.account));
+
+                // everybody can see his own comment
+                if(this.parent.isMine()) {
+                    viewableIds.add(this.owner.id);
+                }
             }
         }
         return viewableIds;
