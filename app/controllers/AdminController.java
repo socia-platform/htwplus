@@ -11,6 +11,7 @@ import models.services.NotificationService;
 
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.indices.IndexAlreadyExistsException;
+import org.elasticsearch.indices.IndexMissingException;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -88,8 +89,14 @@ public class AdminController extends BaseController {
     }
 
     public static Result indexDelete() {
-        ElasticsearchService.deleteIndex();
-        flash("info","index gelöscht");
+        try {
+            ElasticsearchService.deleteIndex();
+            flash("info","index gelöscht");
+        } catch(IndexMissingException ime) {
+            Logger.info("index "+ime.getMessage());
+            flash("error","index "+ime.getMessage());
+        }
+
         return ok(indexing.render());
     }
 
@@ -103,7 +110,7 @@ public class AdminController extends BaseController {
             flash("error",nnae.getMessage());
         } catch(IndexAlreadyExistsException iaee) {
             Logger.info("index "+iaee.getMessage());
-            flash("info","index "+iaee.getMessage());
+            flash("error","index "+iaee.getMessage());
         }
         return ok(indexing.render());
     }
