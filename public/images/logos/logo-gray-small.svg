@@ -2,9 +2,27 @@
 <!-- Generator: Adobe Illustrator 15.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="51.023px" height="51.024px" viewBox="0 0 51.023 51.024" enable-background="new 0 0 51.023 51.024" xml:space="preserve">
-<polygon fill="#3E3D40" points="48.606,14.156 37.229,14.156 37.229,2.647 28.265,2.647 28.265,14.156 16.886,14.156 16.886,23.121 
-	28.265,23.121 28.265,34.629 37.229,34.629 37.229,23.121 48.606,23.121 "/>
-<polygon fill="#3E3D40" points="30.499,39.417 30.499,43.874 7.075,43.874 7.075,20.886 11.766,20.886 11.766,16.392 2.581,16.392 
-	2.581,48.368 34.993,48.368 34.993,39.417 "/>
+	 width="32px" height="32px" viewBox="18.386 -0.812 32 32" enable-background="new 18.386 -0.812 32 32" xml:space="preserve">
+<g id="white" display="none">
+	<rect x="18.386" y="10.703" display="inline" fill="#FFFFFF" width="11.479" height="8.97"/>
+	<rect x="29.866" y="19.673" display="inline" fill="#FFFFFF" width="9.044" height="11.515"/>
+	<rect x="29.866" y="-0.812" display="inline" fill="#FFFFFF" width="9.044" height="11.515"/>
+	<rect x="38.91" y="10.703" display="inline" fill="#FFFFFF" width="11.477" height="8.97"/>
+</g>
+<g id="grey">
+	<rect x="18.386" y="10.703" fill="#3E3D40" width="11.479" height="8.97"/>
+	<rect x="29.866" y="19.673" fill="#3E3D40" width="9.044" height="11.515"/>
+	<rect x="29.866" y="-0.812" fill="#3E3D40" width="9.044" height="11.515"/>
+	<rect x="38.91" y="10.703" fill="#3E3D40" width="11.477" height="8.97"/>
+</g>
+<g id="green" display="none">
+	<rect x="18.386" y="10.703" display="inline" fill="#76B900" width="11.479" height="8.97"/>
+	<rect x="29.866" y="19.673" display="inline" fill="#76B900" width="9.044" height="11.515"/>
+	<rect x="29.866" y="-0.812" display="inline" fill="#76B900" width="9.044" height="11.515"/>
+	<rect x="38.91" y="10.703" display="inline" fill="#76B900" width="11.477" height="8.97"/>
+</g>
+<g display="none">
+	<path display="inline" fill="#FF5F00" d="M42.005,22.153h5.338v5.298h-5.338V22.153z M47.303,0.9l-0.477,17.026H42.52L42.045,0.9
+		H47.303z"/>
+</g>
 </svg>
