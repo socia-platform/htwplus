@@ -1,13 +1,15 @@
 package controllers;
 
+import com.typesafe.config.ConfigFactory;
 import models.Account;
 import models.Group;
 import models.Post;
 import models.services.ElasticsearchService;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.apache.commons.lang3.*;
 import play.Logger;
-import play.Play;
 import play.Routes;
 import play.data.Form;
 import play.db.jpa.Transactional;
@@ -31,7 +33,7 @@ import static java.util.Arrays.asList;
 public class Application extends BaseController {
 	
 	static Form<Post> postForm = Form.form(Post.class);
-	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
+	static final int LIMIT = ConfigFactory.load().getInt("htwplus.post.limit");
 	static final int PAGE = 1;
 
 	
@@ -66,7 +68,7 @@ public class Application extends BaseController {
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        SearchResponse response = ElasticsearchService.doSearch("(title:"+ query.toLowerCase() +") OR (name:"+ query.toLowerCase() +")", "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
+        SearchResponse response = ElasticsearchService.doSearch("searchSuggestions", query, "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
         return ok(response.toString());
     }
 	
@@ -83,16 +85,17 @@ public class Application extends BaseController {
         }
         if (mode == null) mode = "all";
 
-        Pattern pt = Pattern.compile("[^a-zA-Z0-9\u00C0-\u00FF]");
+        Pattern pt = Pattern.compile("[^ a-zA-Z0-9\u00C0-\u00FF]");
         Matcher match= pt.matcher(keyword);
         while(match.find())
         {
             String s = match.group();
             keyword=keyword.replaceAll("\\"+s, "");
+            flash("info","Dein Suchwort enthielt ungültige Zeichen, die für die Suche entfernt wurden!");
         }
 
         if(keyword.isEmpty()){
-            flash("info","Dein Suchwort enthält ungültige Zeichen!");
+            flash("info","Dein Suchwort bestand nur aus ungültigen Zeichen!");
             return ok(search.render());
         }
 
@@ -100,12 +103,17 @@ public class Application extends BaseController {
 
         List<Object> resultList =new ArrayList<>();
 
-        SearchResponse response = null;
+        SearchResponse response;
         long userCount = 0;
         long groupCount = 0;
         long postCount = 0;
 
-        response = ElasticsearchService.doSearch("(content:"+ keyword.toLowerCase() +" AND (viewable:"+ currentAccount.id +" OR public:true)) OR (title:"+ keyword.toLowerCase() +") OR (name:"+ keyword.toLowerCase() +")", mode, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "group.member", "post.owner"));
+        try {
+            response = ElasticsearchService.doSearch("search", keyword.toLowerCase(), mode, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
+        } catch (NoNodeAvailableException nna) {
+            flash("error", "Leider steht die Suche zur Zeit nicht zur Verfügung!");
+            return ok(search.render());
+        }
 
         /**
          * Iterate over response and add each searchHit to one list.
@@ -117,7 +125,12 @@ public class Application extends BaseController {
                     resultList.add(Account.findById(Long.parseLong(searchHit.getId())));
                     break;
                 case "post":
-                    resultList.add(Post.findById(Long.parseLong(searchHit.getId())));
+                    Post post = Post.findById(Long.parseLong(searchHit.getId()));
+                    String searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
+                    post.searchContent = StringEscapeUtils.escapeHtml4(searchContent)
+                            .replace("[startStrong]","<strong>")
+                            .replace("[endStrong]","</strong>");
+                    resultList.add(post);
                     break;
                 case "group":
                     resultList.add(Group.findById(Long.parseLong(searchHit.getId())));

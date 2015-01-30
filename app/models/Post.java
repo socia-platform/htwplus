@@ -57,6 +57,9 @@ public class Post extends BaseNotifiable implements INotifiable {
             inverseJoinColumns = { @JoinColumn(name = "account_id", referencedColumnName = "id") }
     )
     public List<Account> broadcastPostRecipients;
+
+    @Transient
+    public String searchContent;
 		
 	public void create() {
 		JPA.em().persist(this);
@@ -428,9 +431,14 @@ public class Post extends BaseNotifiable implements INotifiable {
             viewableIds.addAll(GroupAccount.findAccountIdsByGroup(this.group, LinkType.establish));
         }
 
-        // every friend from post.account can see this post
+
         if(this.belongsToAccount()) {
+
+            // every friend from post.account can see this post
             viewableIds.addAll(Friendship.findFriendsId(this.account));
+
+            // the owner of this.account can see this post
+            viewableIds.add(this.account.id);
 
             // everybody can see his own post
             if(this.isMine()) {
