@@ -44,6 +44,9 @@ public class GroupController extends BaseController {
             Logger.error("No group found with id: " + id);
             return redirect(controllers.routes.GroupController.index());
         }
+        if (Secured.viewGroup(group)) {
+            return redirect(routes.GroupController.stream(group.id, PAGE));
+        }
         Navigation.set(Level.GROUPS, "Info", group.title, controllers.routes.GroupController.view(group.id));
 
         return ok(view.render(group));

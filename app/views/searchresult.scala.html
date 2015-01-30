@@ -45,15 +45,7 @@
                                 @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
                                 @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
                                 @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
-                                @if(Secured.isOwnerOfGroup(group, currentUser)) {
-                                <a href="@routes.GroupController.stream(group.id)"><b>@group.title</b></a>
-                                } else {
-                                @if(Secured.viewGroup(group)) {
-                                <a href="@routes.GroupController.stream(group.id)">@group.title</a>
-                                } else {
-                                <a class="no-drop" rel="tooltip" data-original-title="Du musst @if(group.groupType.equals(GroupType.course)) {dem Kurs}else{der Gruppe} erst beitreten" data-container="body">@group.title</a>
-                                }
-                                }
+                                <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
                             </div>
                         </div>
                     }
