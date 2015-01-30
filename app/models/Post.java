@@ -57,6 +57,9 @@ public class Post extends BaseNotifiable implements INotifiable {
             inverseJoinColumns = { @JoinColumn(name = "account_id", referencedColumnName = "id") }
     )
     public List<Account> broadcastPostRecipients;
+
+    @Transient
+    public String searchContent;
 		
 	public void create() {
 		JPA.em().persist(this);

@@ -8,8 +8,8 @@ import models.services.ElasticsearchService;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.apache.commons.lang3.*;
 import play.Logger;
-import play.Play;
 import play.Routes;
 import play.data.Form;
 import play.db.jpa.Transactional;
@@ -68,7 +68,7 @@ public class Application extends BaseController {
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        SearchResponse response = ElasticsearchService.doSearch(query, "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
+        SearchResponse response = ElasticsearchService.doSearch("searchSuggestions", query, "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
         return ok(response.toString());
     }
 	
@@ -109,7 +109,7 @@ public class Application extends BaseController {
         long postCount = 0;
 
         try {
-            response = ElasticsearchService.doSearch(keyword.toLowerCase(), mode, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
+            response = ElasticsearchService.doSearch("search", keyword.toLowerCase(), mode, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
         } catch (NoNodeAvailableException nna) {
             flash("error", "Leider steht die Suche zur Zeit nicht zur Verfügung!");
             return ok(search.render());
@@ -125,7 +125,12 @@ public class Application extends BaseController {
                     resultList.add(Account.findById(Long.parseLong(searchHit.getId())));
                     break;
                 case "post":
-                    resultList.add(Post.findById(Long.parseLong(searchHit.getId())));
+                    Post post = Post.findById(Long.parseLong(searchHit.getId()));
+                    String searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
+                    post.searchContent = StringEscapeUtils.escapeHtml4(searchContent)
+                            .replace("[startStrong]","<strong>")
+                            .replace("[endStrong]","</strong>");
+                    resultList.add(post);
                     break;
                 case "group":
                     resultList.add(Group.findById(Long.parseLong(searchHit.getId())));

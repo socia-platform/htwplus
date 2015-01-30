@@ -95,6 +95,9 @@ public class AdminController extends BaseController {
         } catch(IndexMissingException ime) {
             Logger.info("index "+ime.getMessage());
             flash("error","index "+ime.getMessage());
+        } catch(NoNodeAvailableException nna) {
+            Logger.error(nna.getMessage());
+            flash("error",nna.getMessage());
         }
 
         return ok(indexing.render());
