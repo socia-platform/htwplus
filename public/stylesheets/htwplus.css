@@ -677,7 +677,6 @@ div[id*='hp-feature-text-'] table {
 	width: 600px;
 	max-height: 470px;
 	left: -150px;
-	overflow-y: auto;
 }
 
 @media (max-width: 767px) {
