@@ -16,9 +16,6 @@ HTWplus
   - change database settings
   - change media.path and media.tempPath
   - edit 'General Settings' if you want
-  
-- edit persistence.xml
-  - if you are running a unix based OS, change 'hibernate.search.default.indexBase' value to an absolute path
 
 **start htwplus**
 - open a shell
