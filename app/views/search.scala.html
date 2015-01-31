@@ -1,13 +1,13 @@
 @main("Suche"){
+        <h2>Suche:</h2>
 	<br />
     <div id="hp-search-home">
-        <form class="hp-search-form hp-search-form-home navbar-form" role="search" action="@routes.Application.search(1)" method="GET">
+        <form class="hp-search-form navbar-form" role="search" action="@routes.Application.search(1)" method="GET">
             <div class="form-group">
-                <input id="autocomplete" class="form-control hp-easy-search hp-search-home" rel="tooltip" data-placement="bottom" type="text" placeholder="EasySearch" name="keyword">
+                <input id="autocomplete" class="form-control hp-easy-search" rel="tooltip" data-placement="bottom" type="text" placeholder="EasySearch" name="keyword">
                 <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
             </div>
         </form>
-        <blockquote>"Oft ist suchen einfach; finden nicht immer."<small><sub>Walter Ludin (*1945)</sub></small></blockquote>
     </div>
 
 } 
