@@ -719,6 +719,14 @@ div[id*='hp-feature-text-'] table {
 	padding-right: 20px;
 	background-color: #E0F2BF;
 }
+#hp-search-home > .hp-search-form input {
+    width: 275px;
+}
+
+#hp-search-home {
+  margin: auto;
+  width: 300px;
+}
 
 .hp-search-form button {
 	background: transparent;
@@ -1413,16 +1421,4 @@ table .hp-avatar {
 
 .searchresult-container {
     margin-top: 10px;
-}
-
-#hp-search-home {
-    width: 590px;
-    margin: auto;
-}
-#hp-search-home blockquote {
-    float:left;
-}
-
-.hp-search-form-home {
-    float: left;
 }

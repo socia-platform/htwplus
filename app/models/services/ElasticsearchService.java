@@ -187,8 +187,6 @@ public class ElasticsearchService {
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
 
-        Logger.info(searchRequest.toString());
-
         return response;
     }
 

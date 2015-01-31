@@ -99,9 +99,9 @@ public class Application extends BaseController {
             return ok(search.render());
         }
 
-        Logger.info("searching for: "+keyword+" on "+mode);
+        Logger.info(currentAccount.id + " is searching for: "+keyword+" on mode: "+mode);
 
-        List<Object> resultList =new ArrayList<>();
+        List<Object> resultList = new ArrayList<>();
 
         SearchResponse response;
         long userCount = 0;
@@ -154,6 +154,8 @@ public class Application extends BaseController {
                     break;
             }
         }
+
+        Logger.info("found: "+userCount+" users, "+groupCount+" groups and "+postCount+" posts.");
 
         return ok(views.html.searchresult.render(keyword, mode, page, LIMIT, resultList, response.getTookInMillis(), userCount+groupCount+postCount, userCount, groupCount, postCount));
 	}
