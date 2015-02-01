@@ -112,10 +112,6 @@ public class Secured extends Security.Authenticator {
 	public static boolean viewGroup(Group group) {
 		Account current = Component.currentAccount();
 
-		if (group == null) {
-			return false;
-		}
-
 		if (Secured.isAdmin()) {
 			return true;
 		}
@@ -454,4 +450,5 @@ public class Secured extends Security.Authenticator {
 	public static boolean hasAccessToNotification(Notification notification) {
 		return notification.recipient.equals(Component.currentAccount());
 	}
+
 }

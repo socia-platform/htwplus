@@ -78,7 +78,7 @@ function updateScenes() {
 function resizeScenes() {
     $('#hp-feature-text').css('height', $(window).height() - 110);
     $('#hp-feature-demo .hp-notepad-content').css('height', $(window).height() - 160);
-    resizeRings();
+    //resizeRings();
 }
 
 function changeText(element) {

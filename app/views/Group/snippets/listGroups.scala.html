@@ -12,6 +12,14 @@
 		</tr>
 	</thead>
 	<tbody class="hp-optionsTable">
+        @if(groups.isEmpty) {
+            <tr>
+                <td></td>
+                <td>- keine Treffer -</td>
+                <td></td>
+                <td class="hp-optionsMenu"></td>
+            </tr>
+        }
 		@for(group <- groups) {
 		<tr>
 			<td>
@@ -20,10 +28,10 @@
 			</td>
 			<td>	
 				@if(Secured.isOwnerOfGroup(group, user)) {
-					<a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
+					<a href="@routes.GroupController.stream(group.id)"><b>@group.title</b></a>
 				} else {
 					@if(Secured.viewGroup(group)) {
-						<a href="@routes.GroupController.view(group.id)">@group.title</a>
+						<a href="@routes.GroupController.stream(group.id)">@group.title</a>
 					} else {
 						<a class="no-drop" rel="tooltip" data-original-title="Du musst der Gruppe erst beitreten" data-container="body">@group.title</a>
 					}

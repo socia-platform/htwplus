@@ -194,7 +194,86 @@ $(document).ready(function () {
 		});
 	});
 
-	autolinkUrls();
+    autolinkUrls();
+
+    /*
+     * SEARCH: AutoSuggestion
+     */
+    var autoSuggestResult = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        limit: 10,
+        remote: {
+            url: '/suggestions?query=',
+            rateLimitWait: 0,
+            replace: function(url, uriEncodedQuery) {
+                return url + uriEncodedQuery.toLowerCase();
+            },
+            filter: function(parsedResponse) {
+                var result = [];
+                $.map(parsedResponse.hits.hits, function(item) {
+                    var label = '';
+                    var hLabel = '';
+                    var groupType = '';
+                    var groupIcon = '';
+                    if(item._type === 'user') {
+                        label = item._source.name;
+                        hLabel = item.highlight.name;
+                    }
+                    if(item._type === 'group') {
+                        label = item._source.title;
+                        hLabel = item.highlight.title;
+                        groupType = item._source.grouptype;
+                        if(groupType === 'open') groupIcon = 'globe'
+                        if(groupType === 'close') groupIcon = 'lock'
+                        if(groupType === 'course') groupIcon = 'briefcase'
+                    }
+                    result.push({
+                        label: label,
+                        hLabel: hLabel,
+                        id: item._id,
+                        type: item._type,
+                        avatar: item._source.avatar,
+                        groupType: groupType,
+                        groupIcon: groupIcon
+                    });
+                });
+                return result;
+            }
+        }
+    });
+
+    autoSuggestResult.initialize();
+
+    $('.hp-easy-search').typeahead(
+        {
+            hint: true,
+            highlight: false,
+            minLength: 2
+        },
+        {
+            name: 'accounts-and-groups',
+            displayKey: 'label',
+            source: autoSuggestResult.ttAdapter(),
+
+            templates: {
+                empty: [
+                    '<div class="autosuggest-empty-message">',
+                    'Kein Gruppe oder Person gefunden.',
+                    '</div>'
+                ].join('\n'),
+                suggestion: Handlebars.compile("" +
+                    "{{#if avatar}} " +
+                    "<img class='autosuggest-user-avatar' src='/assets/images/avatars/{{avatar}}.png' alt='picture'>{{{hLabel}}}" +
+                    "{{/if}}" +
+                    "{{#if groupIcon}}" +
+                    "<span class='glyphicon glyphicon-{{groupIcon}} autosuggest-group-icon'></span>{{{hLabel}}}" +
+                    "{{/if}}")
+            }
+
+        }).on('typeahead:selected', function($e, datum){
+            window.location.href = window.location.origin + "/"+datum.type+"/" + datum.id + '/stream'
+        });
 });
 
 $(window).resize(function() {

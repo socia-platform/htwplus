@@ -1,34 +1,41 @@
 package controllers;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.typesafe.config.ConfigFactory;
 import models.Account;
 import models.Group;
 import models.Post;
+import models.services.ElasticsearchService;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.apache.commons.lang3.*;
 import play.Logger;
-import play.Play;
 import play.Routes;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.error;
-import views.html.help;
-import views.html.searchresult;
-import views.html.stream;
-import views.html.feedback;
+import views.html.*;
 import controllers.Navigation.Level;
+import org.elasticsearch.action.search.SearchResponse;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.util.Arrays.asList;
 
 
 @Transactional
 public class Application extends BaseController {
 	
 	static Form<Post> postForm = Form.form(Post.class);
-	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
-	static final int SEARCH_LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.search.limit"));
+	static final int LIMIT = ConfigFactory.load().getInt("htwplus.post.limit");
 	static final int PAGE = 1;
+
 	
 	public static Result javascriptRoutes() {
 		response().setContentType("text/javascript");
@@ -59,51 +66,100 @@ public class Application extends BaseController {
 		Account currentAccount = Component.currentAccount();
 		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, page),postForm,Post.countStream(currentAccount), LIMIT, page));
 	}
-	
-	@Security.Authenticated(Secured.class)
-	public static Result search(){
-		List<Group> groupResults = null;
-		List<Group> courseResults = null;
-		List<Account> accResults = null;
-		String keyword = "";
-		final Set<Map.Entry<String, String[]>> entries = request()
-				.queryString().entrySet();
-		for (Map.Entry<String, String[]> entry : entries) {
-			if (entry.getKey().equals("keyword")) {
-				keyword = entry.getValue()[0];
-				Logger.info("Keyword: " +keyword.isEmpty());
-				Navigation.set("Suchergebnisse");
-				courseResults = Group.courseSearch(keyword, SEARCH_LIMIT, 0);
-				groupResults = Group.groupSearch(keyword, SEARCH_LIMIT, 0);
-				accResults = Account.accountSearch(keyword, SEARCH_LIMIT, 0);
-			}
 
-		}
-		return ok(searchresult.render(groupResults, courseResults, accResults, keyword,Group.countCourseSearch(keyword), Group.countGroupSearch(keyword), Account.countAccountSearch(keyword),SEARCH_LIMIT, 0));
-	}
+    public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
+        SearchResponse response = ElasticsearchService.doSearch("searchSuggestions", query, "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
+        return ok(response.toString());
+    }
 	
 	@Security.Authenticated(Secured.class)
-	public static Result searchForCourses(final String keyword, int page){
-		Navigation.set("Suchergebnisse für Kurse");
-		List<Group> courses = Group.courseSearch(keyword, SEARCH_LIMIT, page);
-		return ok(searchresult.render(null, courses, null, keyword, Group.countCourseSearch(keyword), 0, 0, SEARCH_LIMIT, page));
+	public static Result search(int page) throws ExecutionException, InterruptedException {
+        Navigation.set("Suche");
+        Account currentAccount = Component.currentAccount();
+        String keyword = Form.form().bindFromRequest().field("keyword").value();
+        String mode = Form.form().bindFromRequest().field("mode").value();
+
+        if (keyword == null || keyword.isEmpty()) {
+            flash("info","Nach was suchst du?");
+            return ok(search.render());
+        }
+        if (mode == null) mode = "all";
+
+        Pattern pt = Pattern.compile("[^ a-zA-Z0-9\u00C0-\u00FF]");
+        Matcher match= pt.matcher(keyword);
+        while(match.find())
+        {
+            String s = match.group();
+            keyword=keyword.replaceAll("\\"+s, "");
+            flash("info","Dein Suchwort enthielt ungültige Zeichen, die für die Suche entfernt wurden!");
+        }
+
+        if(keyword.isEmpty()){
+            flash("info","Dein Suchwort bestand nur aus ungültigen Zeichen!");
+            return ok(search.render());
+        }
+
+        Logger.info(currentAccount.id + " is searching for: "+keyword+" on mode: "+mode);
+
+        List<Object> resultList = new ArrayList<>();
+
+        SearchResponse response;
+        long userCount = 0;
+        long groupCount = 0;
+        long postCount = 0;
+
+        try {
+            response = ElasticsearchService.doSearch("search", keyword.toLowerCase(), mode, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
+        } catch (NoNodeAvailableException nna) {
+            flash("error", "Leider steht die Suche zur Zeit nicht zur Verfügung!");
+            return ok(search.render());
+        }
+
+        /**
+         * Iterate over response and add each searchHit to one list.
+         * Pay attention to view rights for post.content.
+         */
+        for (SearchHit searchHit : response.getHits().getHits()) {
+            switch (searchHit.type()) {
+                case "user":
+                    resultList.add(Account.findById(Long.parseLong(searchHit.getId())));
+                    break;
+                case "post":
+                    Post post = Post.findById(Long.parseLong(searchHit.getId()));
+                    String searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
+                    post.searchContent = StringEscapeUtils.escapeHtml4(searchContent)
+                            .replace("[startStrong]","<strong>")
+                            .replace("[endStrong]","</strong>");
+                    resultList.add(post);
+                    break;
+                case "group":
+                    resultList.add(Group.findById(Long.parseLong(searchHit.getId())));
+                    break;
+                default: Logger.info("no matching case for ID: "+searchHit.getId());
+            }
+        }
+
+        Terms terms = response.getAggregations().get("types");
+        Collection<Terms.Bucket> buckets = terms.getBuckets();
+        for (Terms.Bucket bucket : buckets) {
+            switch (bucket.getKey()) {
+                case "user":
+                    userCount = bucket.getDocCount();
+                    break;
+                case "group":
+                    groupCount = bucket.getDocCount();
+                    break;
+                case "post":
+                    postCount = bucket.getDocCount();
+                    break;
+            }
+        }
+
+        Logger.info("found: "+userCount+" users, "+groupCount+" groups and "+postCount+" posts.");
+
+        return ok(views.html.searchresult.render(keyword, mode, page, LIMIT, resultList, response.getTookInMillis(), userCount+groupCount+postCount, userCount, groupCount, postCount));
 	}
 
-	@Security.Authenticated(Secured.class)
-	public static Result searchForGroups(final String keyword, int page){
-		Navigation.set("Suchergebnisse für Gruppen");
-		Logger.info("Keyword: " +keyword);
-		List<Group> groups = Group.groupSearch(keyword, SEARCH_LIMIT, page);
-		return ok(searchresult.render(groups, null, null, keyword, 0, Group.countGroupSearch(keyword), 0, SEARCH_LIMIT, page));
-	}
-	
-	@Security.Authenticated(Secured.class)
-	public static Result searchForAccounts(final String keyword, int page){
-		Navigation.set("Suchergebnisse für Personen");
-		List<Account> accounts = Account.accountSearch(keyword, SEARCH_LIMIT, page);
-		return ok(searchresult.render(null, null, accounts, keyword, 0, 0, Account.countAccountSearch(keyword), SEARCH_LIMIT, page));
-	}
-	
 	public static Result error() {
 		Navigation.set("404");
 		return ok(error.render());
@@ -122,7 +178,7 @@ public class Application extends BaseController {
 		
 		// Guest case
 		if(account == null) {
-			account = Account.findByEmail("admin@htwplus.de");
+			account = Account.findByEmail(play.Play.application().configuration().getString("htwplus.admin.mail"));
 		}
 		
 		Form<Post> filledForm = postForm.bindFromRequest();
@@ -139,9 +195,7 @@ public class Application extends BaseController {
 
 		return redirect(controllers.routes.Application.index());
 	}
-	
-		
-		
+
 	public static Result defaultRoute(String path) {
 		Logger.info(path+" nicht gefunden");
 		return redirect(controllers.routes.Application.index());

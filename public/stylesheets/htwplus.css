@@ -21,6 +21,13 @@ a {
 	outline: none!important;
 }
 
+a.disabled {
+    pointer-events: none;
+    cursor: default;
+    color: grey;
+    text-decoration: line-through;
+}
+
 hr {
 	border-bottom: 1px solid #ffffff
 }
@@ -424,7 +431,6 @@ div[id*='hp-feature-text-'] table {
 	width: 600px;
 	max-height: 470px;
 	left: -150px;
-	overflow-y: auto;
 }
 
 @media (max-width: 767px) {
@@ -464,9 +470,16 @@ div[id*='hp-feature-text-'] table {
 }
 
 .hp-navbar-container > .hp-search-form input {
-	width: 150px;
 	padding-right: 20px;
 	background-color: #E0F2BF;
+}
+#hp-search-home > .hp-search-form input {
+    width: 275px;
+}
+
+#hp-search-home {
+  margin: auto;
+  width: 300px;
 }
 
 .hp-search-form button {
@@ -474,6 +487,8 @@ div[id*='hp-feature-text-'] table {
 	border: 0;
 	margin-left: -28px;
 	outline: none;
+    position: relative;
+    top: 7px;
 }
 
 .hp-search-form button .glyphicon:hover {
@@ -1094,4 +1109,61 @@ table .hp-avatar {
 
 .hp-optionsTable > tr:hover .dropdown-toggle > .glyphicon {
     color: #76B900
+}
+
+
+/*========= AutoSuggestion ==========*/
+
+.autosuggest-user-avatar {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+
+.autosuggest-group-icon {
+    margin-left: 5px;
+    margin-right: 18px;
+}
+
+.autosuggest-empty-message {
+    margin-left: 5px;
+}
+
+.typeahead:focus {
+    border: 2px solid #0097cf;
+}
+.tt-query {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+.tt-hint {
+    color: #999;
+}
+.tt-dropdown-menu {
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    padding: 8px 0;
+    width: 422px;
+}
+.tt-suggestion {
+    padding: 5px;
+    cursor: pointer;
+}
+.tt-suggestion.tt-cursor {
+    background-color: #0097cf;
+    color: #fff;
+}
+.searchresult-container .hp-avatar {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+
+.group-result .glyphicon {
+    margin-left: 7px;
+    margin-right: 12px;
+}
+
+.searchresult-container {
+    margin-top: 10px;
 }

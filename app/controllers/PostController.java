@@ -38,7 +38,7 @@ public class PostController extends BaseController {
 		}
 		
 		if(post.belongsToGroup()) {
-			Navigation.set(Level.GROUPS, "Post", post.group.title, controllers.routes.GroupController.view(post.group.id, PAGE));
+			Navigation.set(Level.GROUPS, "Post", post.group.title, controllers.routes.GroupController.stream(post.group.id, PAGE));
 		}
 		
 		if(post.belongsToAccount()) {
@@ -76,7 +76,7 @@ public class PostController extends BaseController {
 				flash("info", Messages.get("post.join_group_first"));
 			}
             
-			return redirect(controllers.routes.GroupController.view(group.id, PAGE));
+			return redirect(controllers.routes.GroupController.stream(group.id, PAGE));
 		}
 		
 		if (target.equals(Post.PROFILE)) {
@@ -203,7 +203,7 @@ public class PostController extends BaseController {
 			
 			//verify redirect
 			if (post.group != null) {
-				routesTo = controllers.routes.GroupController.view(post.group.id, PAGE);
+				routesTo = controllers.routes.GroupController.stream(post.group.id, PAGE);
 			}
 			
 			if (post.account != null) {
@@ -212,7 +212,7 @@ public class PostController extends BaseController {
 			
 			if (post.parent != null) {
 				if (post.parent.group != null) {
-					routesTo = controllers.routes.GroupController.view(post.parent.group.id, PAGE);
+					routesTo = controllers.routes.GroupController.stream(post.parent.group.id, PAGE);
 				} else if (post.parent.account != null) {
 					routesTo = controllers.routes.Application.index();
 				}

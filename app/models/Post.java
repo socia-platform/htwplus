@@ -1,18 +1,24 @@
 package models;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
 
-import org.hibernate.annotations.Type;
-
+import controllers.Component;
+import models.enums.AccountRole;
+import models.enums.GroupType;
+import models.enums.LinkType;
+import models.services.ElasticsearchService;
 import models.base.BaseModel;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import play.Logger;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
+
+import org.hibernate.annotations.Type;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
@@ -51,10 +57,19 @@ public class Post extends BaseNotifiable implements INotifiable {
             inverseJoinColumns = { @JoinColumn(name = "account_id", referencedColumnName = "id") }
     )
     public List<Account> broadcastPostRecipients;
+
+    @Transient
+    public String searchContent;
 		
 	public void create() {
 		JPA.em().persist(this);
-	}
+        try {
+            if (!this.owner.role.equals(AccountRole.ADMIN))
+            ElasticsearchService.indexPost(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	@Override
 	public void update() {
@@ -71,6 +86,10 @@ public class Post extends BaseNotifiable implements INotifiable {
         }
 
         Notification.deleteReferences(this);
+
+        // Delete Elasticsearch document
+        ElasticsearchService.deletePost(this);
+
         JPA.em().remove(this);
 	}
 	
@@ -83,7 +102,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 		
 	public static Post findById(Long id) {
-		return JPA.em().find(Post.class, id);
+        return JPA.em().find(Post.class, id);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -122,7 +141,7 @@ public class Post extends BaseNotifiable implements INotifiable {
             query = limit(query, limit, offset);
             return query.getResultList();
 	}
-	
+
 	public static int countStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final boolean isVisitor) {
 		final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, isVisitor,"");
         return ((Number) query.getSingleResult()).intValue();
@@ -216,13 +235,13 @@ public class Post extends BaseNotifiable implements INotifiable {
 		return Post.countCommentsForPost(this.id);
 	}
 	
-	public boolean belongsToGroup() {
-		return this.group != null;
-	}
+	public boolean belongsToGroup() { return this.group != null; }
 		
-	public boolean belongsToAccount() {
-		return this.account != null;
-	}
+	public boolean belongsToAccount() { return this.account != null; }
+
+    public boolean belongsToPost() { return this.parent != null; }
+
+    public boolean isMine() { return this.account.equals(this.owner); }
 
 	/**
 	 * @param account Account (current user)
@@ -382,5 +401,83 @@ public class Post extends BaseNotifiable implements INotifiable {
         }
 
         return new Notification();
+    }
+
+    /**
+     * Get all posts except error posts (from Admin)
+     * @return
+     */
+    public static List<Post> allWithoutAdmin() {
+        return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
+    }
+
+    public static long indexAllPosts() throws IOException {
+        final long start = System.currentTimeMillis();
+        for (Post post: allWithoutAdmin()) ElasticsearchService.indexPost(post);
+        return (System.currentTimeMillis() - start) / 100;
+
+    }
+
+    /**
+     * Collect all AccountIds, which are able to view this.post
+     * @return List of AccountIds
+     */
+    public List<Long> findAllowedToViewAccountIds(){
+
+        List<Long> viewableIds = new ArrayList<>();
+
+        // everybody from post.group can see this post
+        if(this.belongsToGroup()) {
+            viewableIds.addAll(GroupAccount.findAccountIdsByGroup(this.group, LinkType.establish));
+        }
+
+
+        if(this.belongsToAccount()) {
+
+            // every friend from post.account can see this post
+            viewableIds.addAll(Friendship.findFriendsId(this.account));
+
+            // the owner of this.account can see this post
+            viewableIds.add(this.account.id);
+
+            // everybody can see his own post
+            if(this.isMine()) {
+                viewableIds.add(this.owner.id);
+            }
+        }
+
+        // multiple options if post is a comment
+        if(this.belongsToPost()) {
+
+            // every member from post.parent.group can see this post
+            if(this.parent.belongsToGroup()) {
+                viewableIds.addAll(GroupAccount.findAccountIdsByGroup(this.parent.group, LinkType.establish));
+            }
+
+            // every friend from post.parent.account can see this post
+            if(this.parent.belongsToAccount()) {
+                viewableIds.addAll(Friendship.findFriendsId(this.parent.account));
+
+                // everybody can see his own comment
+                if(this.parent.isMine()) {
+                    viewableIds.add(this.owner.id);
+                }
+            }
+        }
+        return viewableIds;
+    }
+
+    public boolean isPublic() {
+
+        // post in public group
+        if(this.belongsToGroup()) {
+            return this.group.groupType.equals(GroupType.open);
+        }
+
+        // comment in public group
+        if(this.belongsToPost() && this.parent.belongsToGroup()) {
+            return this.parent.group.groupType.equals(GroupType.open);
+        }
+        return false;
     }
 }

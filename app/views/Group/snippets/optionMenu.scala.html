@@ -14,7 +14,7 @@
         </a></li>
 
         @if(Secured.isMemberOfGroup(group, user)) {
-        <li><a href="@routes.GroupController.view(group.id)" data-toggle="modal">
+        <li><a href="@routes.GroupController.stream(group.id)" data-toggle="modal">
             <span class="glyphicon glyphicon-comment"></span><br>Newsstream
         </a></li>
 

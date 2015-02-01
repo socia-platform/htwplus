@@ -1,0 +1,51 @@
+@(group: Group, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer)
+@import helper._
+@import models.enums._
+@import play._
+
+@main("Group View") {
+
+	<!-- Start infoModal -->
+	<div id="infoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+		@views.html.Group.snippets.infoModal(group)    
+	</div>
+	<!-- Ende infoModal -->
+	
+	<!-- Start confirmDeleteGroupModal -->
+	<div id="confirmDeleteGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		@views.html.Group.snippets.deleteGroupModal(group)   
+	</div>
+	<!-- End confirmDeleteGroupModal -->
+	
+	<!-- Start confirmLeaveGroupModal -->
+	<div id="confirmLeaveGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		@views.html.Group.snippets.leaveGroupModal(group)
+	</div>
+	<!-- End confirmDeleteGroupModal -->
+	
+	@views.html.Group.snippets.navTabs(group)
+	
+	<div class="clear">
+		<h2 class="hp-truncate">
+			@if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
+			@if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
+			@if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
+			@group.title
+		</h2>
+		<br />
+		<br />
+				
+		@views.html.snippets.postForm(group.id, models.Post.GROUP, postForm) 
+		
+		@if(posts != null) {
+			@for(post <- posts) {
+				@if(post.parent == null){
+					@views.html.snippets.postView(post, postForm,  models.Post.GROUP, Play.application().configuration().getInt("htwplus.comments.init"))
+				}
+			}
+		}
+		
+		@views.html.pagination(count, limit, currentPage, routes.GroupController.stream(group.id).toString, "?")
+	
+	</div>
+}

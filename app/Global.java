@@ -1,8 +1,7 @@
 import java.util.concurrent.TimeUnit;
 
+import models.services.ElasticsearchService;
 import models.services.EmailService;
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.Search;
 
 import controllers.Component;
 import controllers.MediaController;
@@ -12,6 +11,8 @@ import models.Group;
 import models.Post;
 import models.enums.AccountRole;
 import models.enums.GroupType;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
+import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import play.Play;
@@ -63,20 +64,16 @@ public class Global extends GlobalSettings {
             Akka.system().dispatcher()
         );
 		
-		JPA.withTransaction(new play.libs.F.Callback0() {
-			@Override
-			public void invoke() throws Throwable {
-                FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(JPA.em());
-                try {
-                    fullTextEntityManager.createIndexer(Group.class).startAndWait();
-                    fullTextEntityManager.createIndexer(Account.class).startAndWait();
-                } catch (InterruptedException e) {
-                    Logger.error(e.getMessage());
-                }
-			}
-		});
 		InitialData.insert(app);
+
 	}
+
+    @Override
+    public void onStop(Application app) {
+        Logger.info("closing ES client...");
+        ElasticsearchService.getInstance().closeClient();
+        Logger.info("ES client closed");
+    }
 
     /**
      * Returns the next full hour of the current time
@@ -190,7 +187,18 @@ public class Global extends GlobalSettings {
                         group.description = "Du hast Wünsche, Ideen, Anregungen, Kritik oder Probleme mit der Seite? Hier kannst du es loswerden!";
                         group.createWithGroupAccount(admin);
                     }
-                    // Generate indexes
+
+                    // try creating elasticsearch analyzer and mapping
+                    try {
+                        ElasticsearchService.createAnalyzer();
+                        ElasticsearchService.createMapping();
+                    } catch(NoNodeAvailableException nnae) {
+                        Logger.error(nnae.getMessage());
+                    } catch(IndexAlreadyExistsException iaee) {
+                        Logger.info("index "+iaee.getMessage());
+                    }
+
+
 				}
 			});
 		}

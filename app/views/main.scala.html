@@ -48,15 +48,15 @@
 
 			<div class="row">
 				<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
-					<a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
-						<span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
-						<div class="hp-easy-feedback">Feedback</div>
-					</a>
-					@views.html.snippets.notepad{ @content }
-				</div>
-			</div>
+                    <a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
+                        <span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
+                        <div class="hp-easy-feedback">Feedback</div>
+                    </a>
+                    @views.html.snippets.notepad{ @content }
 
-		</div>
+				</div> <!-- /col-xs-9 -->
+			</div> <!-- /row -->
+		</div> <!-- /container -->
 	
 		<footer>
 			<div class="container">
@@ -79,14 +79,17 @@
 			@views.html.snippets.impressumModal()
 			@views.html.snippets.datenschutzModal()
 		</footer>
-	
+
 		<script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
         <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.js")'></script>
+        <script type="text/javascript" src='@routes.Assets.at("javascripts/collapse.js")'></script>
         <script type="text/javascript" src='@routes.Assets.at("bootstrap/js/bootstrap.min.js")'></script>
         <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.linkify.min.js")'></script>
         <script type="text/javascript" src='@routes.Assets.at("javascripts/htwplus.js")'></script>
         <script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>
         <script type="text/javascript" src='@routes.Assets.at("javascripts/notification.js")'></script>
+        <script type="text/javascript" src='@routes.Assets.at("javascripts/typeahead.bundle.min.js")'></script>
+        <script type="text/javascript" src='@routes.Assets.at("javascripts/handlebars-v2.0.0.js")'></script>
 
 	</body>
 </html>

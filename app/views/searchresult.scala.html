@@ -1,109 +1,83 @@
-@(groups: List[Group], courses: List[Group], users: List[Account], keyword: String, courseCount: Integer, groupCount: Integer, accountCount: Integer, limit: Integer, currentPage: Integer)
+@(keyword: String, searchMode: String, currentPage: Int, searchLimit: Int, searchResults: List[Object], searchDuration: Long, searchHits: Long, searchUserHits: Long, searchGroupHits: Long, searchPostHits: Long)
 @import helper._
+@import play._
 @import models.enums._
-
+@import java.math.BigInteger; var paginationSearchHits=0;
 @main("Searchresult"){
+@defining(Component.currentAccount()) { currentUser =>
 
-	<h1>Suchergebnis für '@truncate(keyword,30)'</h1>
-	<br />
 
-	@defining(Component.currentAccount()) { user =>
-	
-		@if(courses != null && courses.size != 0) {
-		
-			<!-- Start confirmDeleteCourseModal -->
-			@for(course <- courses) {
-				<div class="modal fade" id="confirmDeleteGroup@course.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-					@views.html.Group.snippets.deleteGroupModal(course)
-				</div>
-			}
-			<!-- End confirmDeleteCourseModal -->
-			
-			<!-- Start infoModal -->
-			@for(course <- courses) {
-			<div class="modal fade" id="infoModal@course.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-				@views.html.Group.snippets.infoModal(course)
-			</div>
-			}
-			<!-- Ende infoModal -->
-			
-			<!-- Start confirmLeaveCourseModal -->
-			@for(course <- courses) {
-			<div class="modal fade" id="confirmLeaveGroup@course.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-				@views.html.Group.snippets.leaveGroupModal(course)
-			</div>
-			}
-			<!-- End confirmDeleteCourseModal -->
-			
-			
-			<!-- list all found courses -->
-			@views.html.Group.snippets.listCourses(courses, user)
-			@if(courseCount > 10 && keyword != null && groups != null && users != null){
-				<h4><a href="@routes.Application.searchForCourses(keyword)">Weitere Kurse (@{courseCount - limit}) anzeigen</a></h4><br />
-			} 
-			@if(groups == null && users == null){
-				@views.html.pagination(courseCount, limit, currentPage, routes.Application.searchForCourses(keyword).toString, "&")
-			}
-			
-		}
-		
-		@if(groups != null && groups.size != 0) {
-			
-			<!-- Start confirmDeleteGroupModal -->
-			@for(group <- groups) {
-				<div class="modal fade" id="confirmDeleteGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-					@views.html.Group.snippets.deleteGroupModal(group)
-				</div>
-			}
-			<!-- End confirmDeleteGroupModal -->
-			
-			<!-- Start infoModal -->
-			@for(group <- groups) {
-			<div class="modal fade" id="infoModal@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-				@views.html.Group.snippets.infoModal(group)
-			</div>
-			}
-			<!-- Ende infoModal -->
-			
-			<!-- Start confirmLeaveGroupModal -->
-			@for(group <- groups) {
-			<div class="modal fade" id="confirmLeaveGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-				@views.html.Group.snippets.leaveGroupModal(group)
-			</div>
-			}
-			<!-- End confirmDeleteGroupModal -->
-			
-			
-			<!-- list all found groups -->
-			@views.html.Group.snippets.listGroups(groups, user)
-			@if(groupCount > 10 && keyword != null && courses != null && users != null){
-				<h4><a href="@routes.Application.searchForGroups(keyword)">Weitere Gruppen (@{groupCount - limit}) anzeigen</a></h4><br />
-			}
-			@if(courses == null && users == null){
-				@views.html.pagination(groupCount, limit, currentPage, routes.Application.searchForGroups(keyword).toString, "&")
-			}
-			
-			
-		}
-		
-		@if(users != null && users.size != 0) {
-			
-			<!-- list all found persons -->
-			@views.html.snippets.listAccounts(users)
-			@if(accountCount > 10 && keyword != null && courses != null && groups != null){
-				<h4><a href="@routes.Application.searchForAccounts(keyword)">Weitere Personen (@{accountCount - limit}) anzeigen</a></h4><br />
-			}
-			@if(courses == null && groups == null){
-				@views.html.pagination(accountCount, limit, currentPage, routes.Application.searchForAccounts(keyword).toString, "&")
-			}
-		}
-		
-		@if(courses != null && groups != null && users != null){
-			@if(courses.size == 0 && groups.size == 0 && users.size == 0) {
-		
-				<h4><i>Uff, ne. <br />Ich habe mich ja bemüht, aber irgendwie konnte ich nichts finden :-/</i></h4>
-			}
-		}
-	
-	}
-} 
+
+    <h2>@searchHits @Html(Messages("search.headline", truncate(keyword,30)))</h2>
+    <br />
+
+    @if(searchHits != 0) {
+
+        @if(searchMode.equals("all")){ @{paginationSearchHits = searchHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
+        <a class="@if(searchHits == 0) {disabled}" href='/search?keyword=@keyword&mode=all'>Alles (@searchHits)</a><span> | </span>
+        @if(searchMode.equals("user")){ @{paginationSearchHits = searchUserHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
+        <a class="@if(searchUserHits == 0) {disabled}" href='/search?keyword=@keyword&mode=user'>Personen (@searchUserHits)</a><span> | </span>
+        @if(searchMode.equals("group")){ @{paginationSearchHits = searchGroupHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
+        <a class="@if(searchGroupHits == 0) {disabled}" href='/search?keyword=@keyword&mode=group'>Gruppen und Kurse (@searchGroupHits)</a><span> | </span>
+        @if(searchMode.equals("post")){ @{paginationSearchHits = searchPostHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
+        <a class="@if(searchPostHits == 0) {disabled}" href='/search?keyword=@keyword&mode=post'>Post und Kommentare (@searchPostHits)</a>
+        <br/>
+        <br />
+
+        @for(result <- searchResults) {
+
+            @result match {
+                case account: Account => {
+                    @if(searchMode.equals("user") || searchMode.equals("all")) {
+                        <div class="well searchresult-container">
+                            <div class="account-result">
+                                @views.html.snippets.userLinkAvatar(account)
+                                @views.html.snippets.userLink(account)
+                            </div>
+                        </div>
+                    }
+                }
+
+                case group: Group => {
+                    @if(searchMode.equals("group") || searchMode.equals("all")) {
+                        <div class="well searchresult-container">
+                            <div class="group-result">
+                                @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
+                                @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
+                                @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
+                                <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
+                            </div>
+                        </div>
+                    }
+                }
+
+                case post: Post => {
+                    @if(searchMode.equals("post") || searchMode.equals("all")) {
+                        <div class="well searchresult-container">
+                            <div class="post-result">
+                                @views.html.snippets.userLinkAvatar(post.owner)
+                                <div class="media-body">
+                                    <div class="media-heading">
+                                        @views.html.snippets.userLink(post.owner)
+                                        @if(post.belongsToGroup){schrieb einen <a href="@routes.PostController.view(post.id)">Post</a> in <a href="@routes.GroupController.stream(post.group.id)">@truncate(post.group.title,50)</a>}
+                                        @if(post.belongsToPost){schrieb ein Kommentar zu einem <a href="@routes.PostController.view(post.parent.id)">Post</a>}
+                                        @if(post.belongsToAccount && currentUser != post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(post.account)}
+                                        @if(post.belongsToAccount && currentUser == post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(currentUser)}
+                                        <small>am @post.createdAt.format("dd.MM.yyyy HH:mm")</small>
+                                    </div>
+
+                                </div>
+                                <div class="hp-truncate hp-white-space" id="@post.id">@Html(post.searchContent)</div>
+                            </div>
+                        </div>
+                    }
+                }
+
+                case _ => { @result }
+            }
+        }
+    @views.html.pagination(paginationSearchHits, searchLimit, currentPage, "/search?keyword="+keyword+"&mode="+searchMode+"", "&")
+    }
+}
+
+}
