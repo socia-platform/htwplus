@@ -413,6 +413,10 @@ div[id*='hp-feature-text-'] table {
 
 /*============================== Navigation ==============================*/
 
+#hp-navbar {
+    max-height: 51px;
+}
+
 .hp-navbar-container {
 	max-width: 1000px;
 	margin: 0 auto;
@@ -645,6 +649,11 @@ input.hp-notification-hour {
 	background-color: #76b900;
 }
 
+.hp-nav-tabs > li > a > .glyphicon:hover,
+.hp-nav-tabs > li > a > .glyphicon:focus {
+    color: rgb(90,88,88);
+}
+
 .hp-nav-tabs li.active > a {
     border-bottom-color: transparent !important;
     box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.125);
@@ -664,7 +673,7 @@ input.hp-notification-hour {
 }
 
 #hp-navbar .hp-logo {
-	height: 50px;
+	height: 49px;
 	padding: 5px;
     padding-right: 15px;
 }
@@ -785,6 +794,10 @@ div.hp-notepad-content {
 	box-sizing: content-box;
 	-moz-box-sizing: content-box;
 	-webkit-box-sizing: content-box;
+}
+
+div.hp-notepad-content > *:last-child {
+    margin-bottom: 0;
 }
 
 @media (max-width: 767px) {

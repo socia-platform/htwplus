@@ -32,7 +32,7 @@ public class NotificationController extends BaseController {
      * @return Html rendered instance
      */
     @Transactional(readOnly = true)
-	private static Html getNotifications() {
+	public static Html getNotifications() {
 		Account account = Component.currentAccount();
 		
 		if (account == null) {

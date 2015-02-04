@@ -37,7 +37,8 @@ function truncateBreadcrumb() {
 	var lastBreadcrumb = $("#hp-navbar-breadcrumb .breadcrumb > li:last-child");
 	var index = 3;	// first breadcrumb item which is hidden
 	// hide breadcrumb items while last item isn't visible
-	while (lastBreadcrumb.position().left + lastBreadcrumb.width() > $("#hp-navbar-breadcrumb .breadcrumb").width()) {
+	while (lastBreadcrumb.length &&
+	       lastBreadcrumb.position().left + lastBreadcrumb.width() > $("#hp-navbar-breadcrumb .breadcrumb").width()) {
 		$("#hp-navbar-breadcrumb #hp-navbar-breadcrumb-truncate").removeClass("hidden");
 		$("#hp-navbar-breadcrumb .breadcrumb > li:nth-child("+index+")").addClass("hidden");
 		index++;
@@ -279,9 +280,6 @@ $(document).ready(function () {
 $(window).resize(function() {
 	resizeRings();
 	truncateBreadcrumb();
-});
-
-$(window).load(function() {
 });
 
 $('[rel="tooltip"]').tooltip();
