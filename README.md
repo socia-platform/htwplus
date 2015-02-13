@@ -1,6 +1,6 @@
 # HTWplus
 
-HTWplus is a straightforward and lightweight social network. It offers essential social networking functionalities: Friendships, groups, a personal newsfeed and file sharing. It is build with the Play Framework 2, PostgreSQL and Elasticsearch. 
+HTWplus is a straightforward and lightweight social network. It offers essential social networking functionalities: Friendships, groups, a personal newsfeed and file sharing. It is built with the Play Framework 2, PostgreSQL and Elasticsearch.
 
 ## Installation
 
@@ -11,7 +11,6 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 * Git
 * PostgreSQL
 * Elasticsearch
-* 
 
 ### Setup
 
@@ -32,4 +31,4 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 ### Initialize Elasticsearch
 
 * Browse to http://localhost:9000/admin/indexing
-* Excecute all Options, but DELETE Index
+* Excecute all options, but DELETE Index
