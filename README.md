@@ -1,23 +1,35 @@
-HTWplus
-=====================================
+# HTWplus
 
-**How to start a local instance**
+HTWplus is a straightforward and lightweight social network. It offers essential social networking functionalities: Friendships, groups, a personal newsfeed and file sharing. It is build with the Play Framework 2, PostgreSQL and Elasticsearch. 
 
-**preparations**
-- install git (http://git-scm.com/downloads)
-- install activator (https://www.playframework.com/download) 
-- install postgresql (http://www.postgresql.org/download/) or mysql (http://dev.mysql.com/downloads/) database
+## Installation
 
-**setup**
-- clone htwplus repository
-- rename conf/application.sample.conf to application.conf
-- rename conf/META-INF/persistence.sample.xml to persistence.xml
-- edit application.conf 
-  - change database settings
-  - change media.path and media.tempPath
-  - edit 'General Settings' if you want
+### Requirements
 
-**start htwplus**
-- open a shell
-- navigate to your htwplus repository
-- type 'activator' or 'activator -jvm-debug 9999' for debug mode
+* JDK 7 or higher
+* Activator (https://www.playframework.com/download)
+* Git
+* PostgreSQL
+* Elasticsearch
+* 
+
+### Setup
+
+* Clone this repository
+* Copy conf/application.sample.conf to application.conf
+* Edit the application.conf
+ * Provide database settings
+ * Provide media.path and media.tempPath
+* Copy conf/META-INF/persistence.sample.xml to persistence.xml
+
+### Run
+
+* Open the repository directory in shell
+* Execute `activator run` (`activator -jvm-debug 9999` for debug mode)
+* Browse to http://localhost:9000/
+* Login as admin (user: admin@htwplus.de, password: 123456)
+
+### Initialize Elasticsearch
+
+* Browse to http://localhost:9000/admin/indexing
+* Excecute all Options, but DELETE Index
