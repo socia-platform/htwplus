@@ -2,7 +2,7 @@
 function resizeRings() {
 	$('.hp-notepad-content').each(function() {
 		var offset = ($(this).height() + parseInt($(this).css('padding-top'))) % 12.0;
-		if (offset != 0)
+		if (offset !== 0)
 			$(this).css('padding-bottom', (12.0 - offset) + "px");
 		else
 			$(this).css('padding-bottom', '0');
@@ -19,26 +19,26 @@ function toggleMediaSelection(parent) {
 
 function autolinkUrls() {
     $('.hp-truncate').each(function(){
-    	$(this).linkify({
-		  tagName: 'a',
-		  target: '_blank',
-		  newLine: '\n',
-		  linkClass: 'hp-postLink',
-		  linkAttributes: null
+		$(this).linkify({
+			tagName: 'a', 
+			target: '_blank', 
+			newLine: '\n', 
+			linkClass: 'hp-postLink', 
+			linkAttributes: null
 		});
 	});
 	$('.hp-postLink').each(function(){
         if (!$(this).find("span").length)
-    	    $(this).append(" <span class='glyphicon glyphicon-share-alt'></span>");
-	})
+			$(this).append(" <span class='glyphicon glyphicon-share-alt'></span>");
+	});
 }
 
 function truncateBreadcrumb() {
 	var lastBreadcrumb = $("#hp-navbar-breadcrumb .breadcrumb > li:last-child");
 	var index = 3;	// first breadcrumb item which is hidden
 	// hide breadcrumb items while last item isn't visible
-	while (lastBreadcrumb.length &&
-	       lastBreadcrumb.position().left + lastBreadcrumb.width() > $("#hp-navbar-breadcrumb .breadcrumb").width()) {
+	while (lastBreadcrumb.length && 
+		lastBreadcrumb.position().left + lastBreadcrumb.width() > $("#hp-navbar-breadcrumb .breadcrumb").width()) {
 		$("#hp-navbar-breadcrumb #hp-navbar-breadcrumb-truncate").removeClass("hidden");
 		$("#hp-navbar-breadcrumb .breadcrumb > li:nth-child("+index+")").addClass("hidden");
 		index++;
@@ -121,14 +121,14 @@ $(document).ready(function () {
 	 * AJAX loading indicator
 	 */
 	$.ajaxSetup({
-	    beforeSend:function(){
-	        $(".loading").show();
-	        $(".loading").css('display', 'inline-block');
-	    },
-	    complete:function(){
-	        $(".loading").hide();
+		beforeSend:function(){
+			$(".loading").show();
+			$(".loading").css('display', 'inline-block');
+		}, 
+		complete:function(){
+			$(".loading").hide();
 			autolinkUrls();
-	    }
+		}
 	});
 
 	/*
@@ -137,10 +137,10 @@ $(document).ready(function () {
 	$('.hp-comment-form').each(function(){
 		var context = $(this);
 		$(".commentSubmit", this).click(function(){
-			if(context.serializeArray()[0].value == ""){
+			if(context.serializeArray()[0].value === ""){
 				$(context).find('textarea').animate({opacity:0},200,"linear",function(){
-					  $(this).animate({opacity:1},200);
-					  $(this).focus();
+					$(this).animate({opacity:1},200);
+					$(this).focus();
 				});
 			} else {
 				$.ajax({
@@ -190,7 +190,7 @@ $(document).ready(function () {
 				$(context).addClass('open');
 				$(context).removeClass('unloaded');
 			}
-			window.setTimeout("resizeRings()", 400);
+			window.setTimeout(resizeRings(), 400);
 			return false;
 		});
 	});
@@ -225,9 +225,9 @@ $(document).ready(function () {
                         label = item._source.title;
                         hLabel = item.highlight.title;
                         groupType = item._source.grouptype;
-                        if(groupType === 'open') groupIcon = 'globe'
-                        if(groupType === 'close') groupIcon = 'lock'
-                        if(groupType === 'course') groupIcon = 'briefcase'
+                        if(groupType === 'open') groupIcon = 'globe';
+                        if(groupType === 'close') groupIcon = 'lock';
+                        if(groupType === 'course') groupIcon = 'briefcase';
                     }
                     result.push({
                         label: label,
@@ -273,7 +273,7 @@ $(document).ready(function () {
             }
 
         }).on('typeahead:selected', function($e, datum){
-            window.location.href = window.location.origin + "/"+datum.type+"/" + datum.id + '/stream'
+            window.location.href = window.location.origin + "/"+datum.type+"/" + datum.id + '/stream';
         });
 });
 
