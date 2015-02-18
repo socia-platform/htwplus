@@ -8,7 +8,7 @@ html {
 }
 
 body {
-	margin-top: 80px;
+	margin-top: 91px;
 	overflow-x: hidden;
 }
 
@@ -19,6 +19,13 @@ div.alert {
 
 a {
 	outline: none!important;
+}
+
+a.disabled {
+    pointer-events: none;
+    cursor: default;
+    color: grey;
+    text-decoration: line-through;
 }
 
 hr {
@@ -110,6 +117,10 @@ h1 {
 	cursor: pointer;	
 }
 
+.hp-container {
+    margin-top: 15px;
+}
+
 /*============================== Landingpage ==============================*/
 body#hp-landingpage {
 	margin-top: 0 !important;
@@ -145,25 +156,32 @@ body#hp-landingpage {
 #hp-landingpage div#hp-login {
 	padding: 70px 0;
     background-size: 100% auto;
-    background: url('http://www.htw-berlin.de/fileadmin/HTW/Zentral/DE/HTW/ZR1_Presse/Pressefotos/130719___Philipp_Meuser_0011_01_1200px_crop.jpg') no-repeat center center;
+    background: url('../images/LandingpageBackground/default_small.jpg') no-repeat center center;
     color: white !important;
 	text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
 }
 
+@media (min-width: 992px) {
+    #hp-landingpage div#hp-login {
+        background: url('../images/LandingpageBackground/default_medium.jpg') no-repeat center center;
+    }
+}
+
+@media (min-width: 1900px) {
+    #hp-landingpage div#hp-login {
+        background: url('../images/LandingpageBackground/default_large.jpg') no-repeat center center;
+    }
+}
+
 #hp-landingpage div#hp-login .hp-logo img {
 	margin: 0;
-	padding: 0 50px;
+	padding: 0;
+    max-height: 300px;
 }
 
 @media (min-width: 992px) {
     #hp-landingpage div#hp-login {
        	padding: 150px 0;
-    }
-    #hp-landingpage div#hp-login .hp-logo {
-       	margin-top: 30px;
-    }
-    #hp-landingpage div#hp-login .hp-logo img {
-        padding: 0;
     }
 }
 
@@ -180,11 +198,11 @@ body#hp-landingpage {
 @media (max-width: 991px) {
     #hp-landingpage div#hp-login > div {
         margin: -70px 0;
-        padding-top: 80px;
+        padding-top: 50px;
         padding-bottom: 80px;
     }
     #hp-landingpage div#hp-login #hp-login-right {
-        margin-top: 30px;
+        margin-top: 80px;
     }
 }
 
@@ -395,6 +413,10 @@ div[id*='hp-feature-text-'] table {
 
 /*============================== Navigation ==============================*/
 
+#hp-navbar {
+    max-height: 51px;
+}
+
 .hp-navbar-container {
 	max-width: 1000px;
 	margin: 0 auto;
@@ -413,7 +435,6 @@ div[id*='hp-feature-text-'] table {
 	width: 600px;
 	max-height: 470px;
 	left: -150px;
-	overflow-y: auto;
 }
 
 @media (max-width: 767px) {
@@ -453,9 +474,16 @@ div[id*='hp-feature-text-'] table {
 }
 
 .hp-navbar-container > .hp-search-form input {
-	width: 150px;
 	padding-right: 20px;
 	background-color: #E0F2BF;
+}
+#hp-search-home > .hp-search-form input {
+    width: 275px;
+}
+
+#hp-search-home {
+  margin: auto;
+  width: 300px;
 }
 
 .hp-search-form button {
@@ -463,6 +491,8 @@ div[id*='hp-feature-text-'] table {
 	border: 0;
 	margin-left: -28px;
 	outline: none;
+    position: relative;
+    top: 7px;
 }
 
 .hp-search-form button .glyphicon:hover {
@@ -482,6 +512,7 @@ div[id*='hp-feature-text-'] table {
     line-height: 40px !important;
     border-bottom: 1px solid #eee;
     background-color: rgba(255, 255, 255, 0.9);
+    white-space: nowrap;
 }
 
 .hp-breadcrumb .breadcrumb {
@@ -608,24 +639,24 @@ input.hp-notification-hour {
 	width: 50px;
 }
 
-.hp-nav-tabs > li > a,
+.hp-nav-tabs > li > a {
+    border-bottom-color: #dddddd !important;
+    padding: 4px 2px 0 2px;
+}
+
 .hp-nav-tabs > li > a:hover,
 .hp-nav-tabs > li > a:focus {
 	background-color: #76b900;
-	border: 1px solid #dddddd;
-	padding: 4px 2px 0 2px;
 }
 
-.hp-nav-tabs .glyphicon:hover {
-	color: #5a5858;
+.hp-nav-tabs > li > a > .glyphicon:hover,
+.hp-nav-tabs > li > a > .glyphicon:focus {
+    color: rgb(90,88,88);
 }
 
-.hp-nav-tabs li.active>a {
+.hp-nav-tabs li.active > a {
+    border-bottom-color: transparent !important;
     box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.125);
-}
-
-.hp-nav-tabs li.deactive>a {
-    border-bottom-color: #dddddd;
 }
 
 /*============================== Logo ==============================*/
@@ -642,12 +673,13 @@ input.hp-notification-hour {
 }
 
 #hp-navbar .hp-logo {
-	height: 50px;
-	padding: 15px 15px 12px 10px
+	height: 49px;
+	padding: 5px;
+    padding-right: 15px;
 }
 
 #hp-navbar .hp-logo img {
-	height: 23px;
+	height: 100%;
 	width: auto;
 	margin: 0;
 }
@@ -692,7 +724,7 @@ input.hp-notification-hour {
 div.hp-notepad-right {
 	position: relative;
     background: url(../images/vertical.png) repeat-y right 0;
-    margin: 40px -10px 0;
+    margin: 20px -10px 0;
 }
 
 @media (max-width: 767px) {
@@ -762,6 +794,10 @@ div.hp-notepad-content {
 	box-sizing: content-box;
 	-moz-box-sizing: content-box;
 	-webkit-box-sizing: content-box;
+}
+
+div.hp-notepad-content > *:last-child {
+    margin-bottom: 0;
 }
 
 @media (max-width: 767px) {
@@ -1086,4 +1122,61 @@ table .hp-avatar {
 
 .hp-optionsTable > tr:hover .dropdown-toggle > .glyphicon {
     color: #76B900
+}
+
+
+/*========= AutoSuggestion ==========*/
+
+.autosuggest-user-avatar {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+
+.autosuggest-group-icon {
+    margin-left: 5px;
+    margin-right: 18px;
+}
+
+.autosuggest-empty-message {
+    margin-left: 5px;
+}
+
+.typeahead:focus {
+    border: 2px solid #0097cf;
+}
+.tt-query {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+.tt-hint {
+    color: #999;
+}
+.tt-dropdown-menu {
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    padding: 8px 0;
+    width: 422px;
+}
+.tt-suggestion {
+    padding: 5px;
+    cursor: pointer;
+}
+.tt-suggestion.tt-cursor {
+    background-color: #0097cf;
+    color: #fff;
+}
+.searchresult-container .hp-avatar {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+
+.group-result .glyphicon {
+    margin-left: 7px;
+    margin-right: 12px;
+}
+
+.searchresult-container {
+    margin-top: 10px;
 }

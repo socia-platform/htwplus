@@ -1,5 +1,6 @@
 package models;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
+import models.services.ElasticsearchService;
 import play.db.jpa.JPA;
 
 import models.enums.LinkType;
@@ -55,12 +57,30 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 	@Override
 	public void update() {
 		JPA.em().merge(this);
+
+        // each account document contains information about their friends
+        // if a user accepts a friendship -> (re)index this.account document
+        try {
+            ElasticsearchService.indexAccount(this.account);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 
 	@Override
 	public void delete() {
+        JPA.em().remove(this);
+
         Notification.deleteReferences(this);
-		JPA.em().remove(this);
+
+        // each account document contains information about their friends
+        // if a user deletes his friendship -> (re)index this.account document
+        try {
+            ElasticsearchService.indexAccount(this.account);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 	}
 
 	public static Friendship findRequest(Account me, Account potentialFriend) {
@@ -119,7 +139,12 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 
 	@SuppressWarnings("unchecked")
 	public static List<Account> findFriends(final Account account){
-		return (List<Account>) JPA.em().createQuery("SELECT fs.friend FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2 ORDER BY fs.friend.firstname ASC")
+        return (List<Account>) JPA.em().createQuery("SELECT fs.friend FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2 ORDER BY fs.friend.firstname ASC")
+                .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList();
+    }
+
+    public static List<Long> findFriendsId(final Account account){
+        return (List<Long>) JPA.em().createQuery("SELECT fs.friend.id FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
                 .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList();
     }
 	

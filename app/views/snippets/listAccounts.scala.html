@@ -11,6 +11,13 @@
 		</tr>
 	</thead>
 	<tbody class="hp-optionsTable">
+        @if(users.isEmpty) {
+            <tr>
+                <td></td>
+                <td>- keine Treffer -</td>
+                <td class="hp-optionsMenu"></td>
+            </tr>
+        }
 		@for(user <- users) {	
 			<tr>
 				<td>@views.html.snippets.userLinkAvatar(user)</td>

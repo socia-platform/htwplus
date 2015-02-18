@@ -27,7 +27,7 @@ error.max.strict=Must be strictly less than {0}
 error.minLength=Minimum length is {0}
 error.maxLength=Maximum length is {0}
 error.email=Bitte eine gültige Adresse eingeben
-error.pattern=Must satisfy {0}
+error.pattern=Es gibt mindestens ein ungültiges Zeichen.
 error.sessionExpired=Deine Sitzung ist abgelaufen.
 
 # --- authenticate
@@ -118,3 +118,7 @@ admin.broadcast_notification.send=Broadcast Nachricht senden
 admin.broadcast_notification.success=Broadcast Nachrichten werden erzeugt und den Empfängern zugestellt
 admin.broadcast_notification.intro=Wähle einen oder mehrere Empfänger dieser Nachricht aus. Sollte kein expliziter Empfänger ausgewählt sein, wird die Nachricht an sämtliche User verschickt.
 admin.broadcast_notification.error.no_message=Bitte gebe zumindest eine Broadcast Nachricht ein
+admin.indexing=Indexieren
+
+# --- search
+search.headline=Suchergebnisse für <b>{0}</b>

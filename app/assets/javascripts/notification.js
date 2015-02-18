@@ -156,7 +156,7 @@ function WS() {
         var oldTitle = document.getElementsByTagName('title')[0];
         link.id = 'dynamic-favicon';
         link.rel = 'shortcut icon';
-        link.href = count < 1 ? '/assets/images/favicon.ico' : '/assets/images/favicon_unread.ico';
+        link.href = count < 1 ? '/assets/images/favicon.png' : '/assets/images/favicon_unread.png';
 
         this.originalTitle = this.originalTitle == undefined ? document.title : this.originalTitle;
         title.innerHTML = count < 1 ? this.originalTitle : '(' + count.toString() + ') ' + this.originalTitle;

@@ -3,8 +3,10 @@ package models;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+import models.services.ElasticsearchService;
 import play.db.jpa.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import models.base.BaseModel;
@@ -43,18 +45,43 @@ public class GroupAccount extends BaseModel {
 
 	@Override
 	public void create() {
-		JPA.em().persist(this);
-	}
+        JPA.em().persist(this);
+
+        // each group document contains information about their member
+        // if a user create or join to this.group -> (re)index this.group document
+        try {
+            ElasticsearchService.indexGroup(this.group);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	@Override
 	public void update() {
 		JPA.em().merge(this);
+
+        // each group document contains information about their member
+        // if a user gets access to this.group -> (re)index this.group document
+        try {
+            ElasticsearchService.indexGroup(this.group);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 
 	@Override
 	public void delete() {
+        JPA.em().remove(this);
+
         Notification.deleteReferencesForAccountId(this.group, this.account.id);
-		JPA.em().remove(this);
+
+        // each group document contains information about their member
+        // if a user leaves this.group -> (re)index this.group document
+        try {
+            ElasticsearchService.indexGroup(this.group);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 	
 	/**
@@ -151,10 +178,10 @@ public class GroupAccount extends BaseModel {
 	}
 	
 	/**
-	 * Retrieve Accounts from Group with given LinkType.
-	 */
-	public static List<Account> findAccountsByGroup(final Group group, final LinkType type) {
-		@SuppressWarnings("unchecked")
+     * Retrieve Accounts from Group with given LinkType.
+     */
+    public static List<Account> findAccountsByGroup(final Group group, final LinkType type) {
+        @SuppressWarnings("unchecked")
         List<Account> accounts = (List<Account>) JPA
                 .em()
                 .createQuery(
@@ -162,7 +189,21 @@ public class GroupAccount extends BaseModel {
                 .setParameter(1, group.id).setParameter(2, type)
                 .getResultList();
         return accounts;
-	}
+    }
+
+    /**
+     * Retrieve AccountsId from Group with given LinkType.
+     */
+    public static List<Long> findAccountIdsByGroup(final Group group, final LinkType type) {
+        @SuppressWarnings("unchecked")
+        List<Long> accounts = (List<Long>) JPA
+                .em()
+                .createQuery(
+                        "SELECT ga.account.id FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
+                .setParameter(1, group.id).setParameter(2, type)
+                .getResultList();
+        return accounts;
+    }
 
     /**
      * Returns a group account by account and group.
