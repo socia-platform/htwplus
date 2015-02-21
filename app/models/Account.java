@@ -15,6 +15,7 @@ import models.base.BaseModel;
 import models.base.IJsonNodeSerializable;
 import models.enums.AccountRole;
 import models.enums.EmailNotifications;
+import models.services.FileService;
 
 import models.services.ElasticsearchService;
 import play.data.validation.Constraints.Email;
@@ -174,8 +175,8 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	}
 
 	public void setTempAvatar(File file) {
-		FileService fileService = FileService.getInstance();
-		fileService.saveFile(file);
+		FileService fileService = new FileService("tempavatar");
+		fileService.saveFile(file, "hallo.jpg");
 	}
 	
 	public static boolean isOwner(Long accountId, Account currentUser) {

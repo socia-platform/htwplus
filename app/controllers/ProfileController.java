@@ -271,19 +271,27 @@ public class ProfileController extends BaseController {
 
 	public static Result uploadTempAvatar(Long id) {
 
-		Account currentUser = Component.currentAccount();
-
-		AvatarService avtService = AvatarService.getInstance();
-
+		ObjectNode result = Json.newObject();
 		MultipartFormData body = request().body().asMultipartFormData();
+		
+		if(body == null) {
+			result.put("error", "No file attached");
+			return badRequest(result);
+		}
+		
 		MultipartFormData.FilePart avatar = body.getFile("avatarimage");
-
-
+		
+		if(avatar == null) {
+			result.put("error", "No file with key 'avatarimage'");
+			return badRequest(result);
+		}
+		
+		
+		Account currentUser = Component.currentAccount();
 		currentUser.setTempAvatar(avatar.getFile());
 
 		Logger.info(avatar.getFilename());
 
-		ObjectNode result = Json.newObject();
 		result.put("exampleField1", "foobar");
 		result.put("exampleField2", "Hello world!");
 		return ok(result);
