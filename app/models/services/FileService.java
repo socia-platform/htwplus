@@ -11,8 +11,9 @@ public class FileService {
 
     private String path;
     private String realm;
+    private File file;
 
-    public FileService(String realm) {
+    public FileService(String realm, File file) {
         this.path = Play.application().configuration().getString("media.fileStore");
         if(this.path ==  null) {
             throw new PlayException(
@@ -20,16 +21,38 @@ public class FileService {
                     "The configuration key 'media.fileStore' is not set");
         }
         this.realm = realm;
+        this.file = file;
         Validate.notNull(this.realm, "The realm cannot be null");
+        Validate.notNull(this.file, "The file cannot be null");
     }
     
+    public boolean validateSize(long size) {
+        long fileSize = file.length();
+        if(fileSize > size){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public void saveFile(File file, String fileName) {
+        this.saveFile(fileName, false);
+    }
+
+    public void saveFile(String fileName, boolean overwrite) {
         String path = this.buildPath(fileName);
         Logger.info(path);
         File newFile = new File(path);
-        newFile.getParentFile().mkdirs();
-        boolean result = file.renameTo(newFile);
         
+        if(overwrite) {
+            if(newFile.exists()) {
+                newFile.delete();
+            }
+        }
+
+        newFile.getParentFile().mkdirs();
+        boolean result = this.file.renameTo(newFile);
+
         if(!result) {
             throw new PlayException(
                     "File Error",
@@ -40,4 +63,13 @@ public class FileService {
     private String buildPath(String fileName) {
         return this.path + "/" + this.realm + "/" + fileName;
     }
+
+    public static long MBAsByte(long size) {
+        return (size * 1024 * 1024);
+    }
+
+    public static long KBAsByte(long size) {
+        return (size * 1024);
+    }
+    
 }

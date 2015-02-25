@@ -1,6 +1,8 @@
 package models;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +18,7 @@ import models.base.IJsonNodeSerializable;
 import models.enums.AccountRole;
 import models.enums.EmailNotifications;
 import models.services.FileService;
+import models.base.ValidationException;
 
 import models.services.ElasticsearchService;
 import play.data.validation.Constraints.Email;
@@ -23,6 +26,7 @@ import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import controllers.Component;
 import play.libs.Json;
+import play.Logger;
 
 @Entity
 public class Account extends BaseModel implements IJsonNodeSerializable {
@@ -174,9 +178,20 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		return url;
 	}
 
-	public void setTempAvatar(File file) {
-		FileService fileService = new FileService("tempavatar");
-		fileService.saveFile(file, "hallo.jpg");
+	public void setTempAvatar(File file) throws ValidationException {
+		FileService fileService = new FileService("tempavatar", file);
+		String path = file.getPath();
+		Logger.info(path);
+		try {
+			Logger.info(Files.probeContentType(Paths.get("E:\\Dev\\Java\\htwplus\\public\\media\\filestore\\tempavatar\\hallo")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		boolean valSize = fileService.validateSize(FileService.MBAsByte(3));
+		if(!valSize) {
+			throw new ValidationException("File to big.");
+		}
+		fileService.saveFile("hallo.jpg", true);
 	}
 	
 	public static boolean isOwner(Long accountId, Account currentUser) {

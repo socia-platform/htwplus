@@ -1,6 +1,7 @@
 package controllers;
 
 import models.*;
+import models.base.ValidationException;
 import models.enums.EmailNotifications;
 import models.services.AvatarService;
 import play.Play;
@@ -288,10 +289,14 @@ public class ProfileController extends BaseController {
 		
 		
 		Account currentUser = Component.currentAccount();
-		currentUser.setTempAvatar(avatar.getFile());
+		try {
+			currentUser.setTempAvatar(avatar.getFile());
+		} catch (ValidationException e) {
+			result.put("error", e.getMessage());
+			return badRequest(result);
+		}
 
-		Logger.info(avatar.getFilename());
-
+		//Logger.info(avatar.getFilename());
 		result.put("exampleField1", "foobar");
 		result.put("exampleField2", "Hello world!");
 		return ok(result);
