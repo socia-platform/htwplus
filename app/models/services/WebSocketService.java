@@ -5,8 +5,10 @@ import akka.actor.Props;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.Account;
+import models.ChatMessage;
 import models.Friendship;
 import models.actors.WebSocketActor;
+import models.base.BaseModel;
 import play.Logger;
 import play.db.jpa.JPA;
 import play.libs.Akka;
@@ -135,6 +137,20 @@ public class WebSocketService {
 
         ActorRef stoppingActorRef = this.accountActor.remove(account.id);
         Akka.system().stop(stoppingActorRef);
+    }
+
+    /**
+     * Helper method to store a BaseModel object transactional.
+     *
+     * @param baseModel BaseModel instance
+     */
+    private void storeBaseModelTransactional(final BaseModel baseModel) {
+        JPA.withTransaction(new play.libs.F.Callback0() {
+            @Override
+            public void invoke() throws Throwable {
+                baseModel.create();
+            }
+        });
     }
 
     /**
@@ -361,10 +377,12 @@ public class WebSocketService {
             return this.errorResponse("User not found");
         }
 
+        ChatMessage chatMessage = new ChatMessage(sender, recipient, text);
 
         ActorRef recipientActor = this.getActorForAccount(recipient);
         // check, if the recipient is online
         if (recipientActor == null) {
+            this.storeBaseModelTransactional(chatMessage);
             return this.errorResponse("Recipient not online");
         }
 
@@ -377,12 +395,14 @@ public class WebSocketService {
             return this.errorResponse("You must be a friend of the recipient");
         }
 
-
         ObjectNode node = this.successResponseTemplate(WebSocketService.WS_METHOD_RECEIVE_CHAT);
         node.put("sender", Json.toJson(sender.getAsJson()));
         node.put("text", this.getEscapedChatMessage(text));
 
         recipientActor.tell(Json.toJson(node), senderActor);
+
+        chatMessage.isTransmitted = true;
+        this.storeBaseModelTransactional(chatMessage);
 
         return Json.toJson("OK");
     }
