@@ -248,7 +248,7 @@ $(document).ready(function () {
     $('.hp-easy-search').typeahead(
         {
             hint: true,
-            highlight: false,
+            highlight: true,
             minLength: 2
         },
         {

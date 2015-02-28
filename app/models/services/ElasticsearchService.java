@@ -132,6 +132,7 @@ public class ElasticsearchService {
 
     /**
      * Build search query based on all provided fields
+     * @param caller - Define normal search or autocomplete
      * @param query - Terms to search for (e.g. 'informatik')
      * @param filter - Filter for searchfacets (e.g. user, group, comment)
      * @param page - Which results should be shown (e.g. 1: 1-10 ; 2: 11-20 etc.)
@@ -153,8 +154,10 @@ public class ElasticsearchService {
         // Build completeQuery with search- and scoringQuery
         QueryBuilder completeQuery = QueryBuilders.boolQuery().must(searchQuery).should(scoringQuery);
 
+        // Build viewableFilter to show authorized posts only
         FilterBuilder viewableFilter = FilterBuilders.boolFilter().should(FilterBuilders.termFilter("viewable", currentAccountId),FilterBuilders.termFilter("public", true));
 
+        // Build filteredQuery to apply viewableFilter to completeQuery
         QueryBuilder filteredQuery = QueryBuilders.filteredQuery(completeQuery, viewableFilter);
 
         // Build searchRequest which will be executed after fields to highlight are added.
@@ -168,8 +171,6 @@ public class ElasticsearchService {
         }
 
         // Define html tags for highlighting
-        if (caller.equals("searchSuggestions"))
-            searchRequest = searchRequest.setHighlighterPreTags("<strong>").setHighlighterPostTags("</strong>");
         if (caller.equals("search"))
             searchRequest = searchRequest.setHighlighterPreTags("[startStrong]").setHighlighterPostTags("[endStrong]");
 
