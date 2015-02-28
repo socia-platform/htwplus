@@ -162,7 +162,6 @@ public class ElasticsearchService {
 
         // Build searchRequest which will be executed after fields to highlight are added.
         SearchRequestBuilder searchRequest = ElasticsearchService.getInstance().getClient().prepareSearch(ES_INDEX)
-                .setFetchSource(new String[]{"title", "grouptype", "name", "avatar", "content"}, new String[]{})
                 .setQuery(filteredQuery);
 
         // Add highlighting on all fields to search on
@@ -180,6 +179,7 @@ public class ElasticsearchService {
         // Add term aggregation for facet count
         searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("types").field("_type"));
 
+        // Apply PostFilter if request mode is not 'all'
         if (!filter.equals("all")) {
             FilterBuilder filterQuery = FilterBuilders.typeFilter(filter);
             searchRequest.setPostFilter(filterQuery);
