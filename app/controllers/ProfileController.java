@@ -286,8 +286,7 @@ public class ProfileController extends BaseController {
 			result.put("error", "No file with key 'avatarimage'");
 			return badRequest(result);
 		}
-		
-		
+
 		Account currentUser = Component.currentAccount();
 		try {
 			currentUser.setTempAvatar(avatar.getFile());

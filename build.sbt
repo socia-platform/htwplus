@@ -16,7 +16,8 @@ libraryDependencies ++= Seq(
   "org.apache.directory.api" % "api-all" % "1.0.0-M20",
   "commons-io" % "commons-io" % "2.4",
   "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0",
-  "org.elasticsearch" % "elasticsearch" % "1.4.1"
+  "org.elasticsearch" % "elasticsearch" % "1.4.1",
+  "eu.medsea.mimeutil" % "mime-util" % "2.1.3"
 )
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)

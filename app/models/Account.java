@@ -180,17 +180,10 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	public void setTempAvatar(File file) throws ValidationException {
 		FileService fileService = new FileService("tempavatar", file);
-		String path = file.getPath();
-		Logger.info(path);
-		try {
-			Logger.info(Files.probeContentType(Paths.get("E:\\Dev\\Java\\htwplus\\public\\media\\filestore\\tempavatar\\hallo")));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		boolean valSize = fileService.validateSize(FileService.MBAsByte(3));
-		if(!valSize) {
+		if(!fileService.validateSize(FileService.MBAsByte(3))) {
 			throw new ValidationException("File to big.");
 		}
+		fileService.getMagicMimeType();
 		fileService.saveFile("hallo.jpg", true);
 	}
 	

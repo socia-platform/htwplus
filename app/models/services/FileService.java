@@ -4,8 +4,10 @@ import play.Play;
 import play.Logger;
 import play.api.PlayException;
 import org.apache.commons.lang.Validate;
-
+import eu.medsea.mimeutil.MimeUtil;
+import eu.medsea.mimeutil.MimeType;
 import java.io.File;
+import java.util.Collection;
 
 public class FileService {
 
@@ -33,6 +35,26 @@ public class FileService {
         } else {
             return true;
         }
+    }
+    
+    public boolean validateExtension(String[] extensions){
+        
+        
+        return true;
+    }
+    
+    public String getMagicMimeType() {
+        MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.MagicMimeMimeDetector");
+        Collection<MimeType> mimeTypes = MimeUtil.getMimeTypes(file);
+        String result;
+        if(!mimeTypes.isEmpty()){
+            result = mimeTypes.iterator().next().toString();
+        } else {
+            result = null;
+        }
+
+        Logger.info(result);
+        return result;
     }
 
     public void saveFile(File file, String fileName) {
