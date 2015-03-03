@@ -3,6 +3,7 @@
  *
  * @constructor
  */
+/* jshint ignore:start */
 function Chat() {
     var chat = this;
     this.maxChars = 2000;
@@ -428,3 +429,4 @@ function Chat() {
         }
     }, false);
 }
+/* jshint ignore:end */

@@ -95,19 +95,19 @@
 		</footer>
 
 		<script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
-        <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.js")'></script>
+        <script type="text/javascript" src='@routes.Assets.at("bower_components/jquery/dist/jquery.min.js")'></script>
         <script type="text/javascript" src='@routes.Assets.at("bootstrap/js/bootstrap.min.js")'></script>
-        <script type="text/javascript" src='@routes.Assets.at("javascripts/jquery.linkify.min.js")'></script>
-        <script type="text/javascript" src='@routes.Assets.at("javascripts/htwplus.js")'></script>
-        <script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>
-        <script type="text/javascript" src='@routes.Assets.at("javascripts/notification.js")'></script>
-        <script type="text/javascript" src='@routes.Assets.at("javascripts/typeahead.bundle.min.js")'></script>
-        <script type="text/javascript" src='@routes.Assets.at("javascripts/handlebars-v2.0.0.js")'></script>
+        <script type="text/javascript" src='@routes.Assets.at("bower_components/jQuery-linkify/dist/jquery.linkify.min.js")'></script>
+        <script type="text/javascript" src='@routes.Assets.at("bower_components/typehead.js/dist/typeahead.bundle.min.js")'></script>
+        <script type="text/javascript" src='@routes.Assets.at("bower_components/handlebars/handlebars.min.js")'></script>
+
+		<script type="text/javascript" src='@routes.Assets.at("javascripts/htwplus.js")'></script>
+		<script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>
 		<script type="text/javascript" src='@routes.Assets.at("javascripts/chat.js")'></script>
         <script type="text/javascript" src='@routes.Assets.at("javascripts/websocket.js")'></script>
 		<script type="text/javascript">
 			$(document).ready(function () {
-				if (chat instanceof Chat) {
+				if (chat instanceof Chat) {run
 					chat.messages.user = '@user.name';
 					chat.messages.textAreaPlaceholder = '@Messages("chat.type_message")';
 					chat.messages.textAreaPlaceholderOffline = '@Messages("chat.type_message_offline")';

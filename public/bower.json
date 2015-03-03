@@ -1,0 +1,21 @@
+{
+  "name": "HTWplus",
+  "version": "1.0.0",
+  "homepage": "https://github.com/socia-platform/htwplus",
+  "authors": [
+    "HTWplus"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "handlebars": "=2.0.0",
+    "typehead.js": "=0.10.5",
+    "jQuery-linkify": "=1.1.7",
+    "jquery": "=1.11.0",
+    "jquery-scrollspy": "",
+    "gsap": "=1.14.2",
+    "ScrollMagic": "=1.1.2"
+  },
+  "resolutions": {
+    "gsap": "=1.14.2"
+  }
+}

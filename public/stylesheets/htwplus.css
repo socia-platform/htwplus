@@ -12,10 +12,9 @@ body {
 	overflow-x: hidden;
 }
 
-div.alert-container {
+div.alert {
 	margin-left: -10px;
     margin-right: -10px;
-    margin-top: 120px;
 }
 
 a {
