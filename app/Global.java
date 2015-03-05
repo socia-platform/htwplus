@@ -81,7 +81,7 @@ public class Global extends GlobalSettings {
      * @return Next hour of current time
      */
     public static int getNextHour() {
-        return (new DateTime()).getHourOfDay() + 1;
+        return (new DateTime()).plusHours(1).getHourOfDay();
     }
 
     /**
