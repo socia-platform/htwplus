@@ -3,6 +3,7 @@ package controllers;
 
 import java.util.Date;
 
+import com.typesafe.config.ConfigFactory;
 import models.*;
 import models.enums.AccountRole;
 import play.Logger;
@@ -274,6 +275,58 @@ public class Secured extends Security.Authenticator {
 		// is Comment
 		return post.parent != null && Secured.isAllowedToDeletePost(post.parent, account);
 	}
+
+    /**
+     * Returns true, if currently logged in account is allowed to edit a specific post.
+     * ! This does not consider the time limit, see {@code isPostStillEditable}!
+     *
+     * @param post Post
+     * @param account Account
+     * @return true, if logged in account is allowed to edit post
+     */
+    public static boolean isAllowedToEditPost(Post post, Account account) {
+        if (post == null) {
+            return false;
+        }
+
+        if (Secured.isAdmin()) {
+            return true;
+        }
+
+        if (Secured.isOwnerOfPost(post, account)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true if the post is still editable by the given account
+     *
+     * @param post Post
+     * @param account Account
+     * @return true, if post still editable (or admin account)
+     */
+    public static boolean isPostStillEditable(Post post, Account account) {
+        if(!isAllowedToEditPost(post, account)) {
+            return false;
+        }
+
+        if (post == null) {
+            return false;
+        }
+
+        if (Secured.isAdmin()) {
+            return true;
+        }
+
+        int limit = ConfigFactory.load().getInt("htwplus.post.editTimeLimit"); // the limit in minutes
+        if (new Date(post.createdAt.getTime() + 1000 * 60 * limit).compareTo(new Date(System.currentTimeMillis())) < 0) { // older than X minutes ?
+                return false;
+        }
+
+        return true;
+    }
 
 	/**
 	 * Returns true, if an account is the owner of a post.
