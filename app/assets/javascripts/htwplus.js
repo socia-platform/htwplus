@@ -285,7 +285,10 @@ $(window).resize(function() {
 $('body').tooltip({
     selector: '[rel=tooltip]'
 });
-$('[rel="popover"]').popover();
+$('body').popover({
+    trigger: 'hover',
+    selector: '[rel="popover"]'
+});
 
 $('.hp-focus-search').click(function() {
     $('.hp-easy-search').focus();
