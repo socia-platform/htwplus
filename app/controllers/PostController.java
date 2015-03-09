@@ -177,7 +177,7 @@ public class PostController extends BaseController {
         Post post = Post.findById(postId);
         Account account = Component.currentAccount();
 
-        if(!Secured.isPostStillEditable(post, account)) {
+        if(!Secured.isPostStillEditableWithTolerance(post, account)) {
             return badRequest();
         } else {
             Form<Post> filledForm = postForm.bindFromRequest();

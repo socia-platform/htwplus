@@ -323,7 +323,36 @@ public class Secured extends Security.Authenticator {
 
         int limit = ConfigFactory.load().getInt("htwplus.post.editTimeLimit"); // the limit in minutes
         if (new Date(post.createdAt.getTime() + 1000 * 60 * limit).compareTo(new Date(System.currentTimeMillis())) < 0) { // older than X minutes ?
-                return false;
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns true if the post is still editable by the given account.
+     * This includes the {@code isAllowedToEditPost} check
+     *
+     * @param post Post
+     * @param account Account
+     * @return true, if post still editable (or admin account)
+     */
+    public static boolean isPostStillEditableWithTolerance(Post post, Account account) {
+        if(!isAllowedToEditPost(post, account)) {
+            return false;
+        }
+
+        if (post == null) {
+            return false;
+        }
+
+        if (Secured.isAdmin()) {
+            return true;
+        }
+
+        int limit = ConfigFactory.load().getInt("htwplus.post.editTimeLimit") + ConfigFactory.load().getInt("htwplus.post.editTimeLimitTolerance"); // the limit in minutes
+        if (new Date(post.createdAt.getTime() + 1000 * 60 * limit).compareTo(new Date(System.currentTimeMillis())) < 0) { // older than X minutes ?
+            return false;
         }
 
         return true;
