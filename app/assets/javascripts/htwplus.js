@@ -282,7 +282,9 @@ $(window).resize(function() {
 	truncateBreadcrumb();
 });
 
-$('[rel="tooltip"]').tooltip();
+$('body').tooltip({
+    selector: '[rel=tooltip]'
+});
 $('[rel="popover"]').popover();
 
 $('.hp-focus-search').click(function() {
