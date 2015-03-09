@@ -50,6 +50,11 @@ function showAllBreadcrumbItems() {
 	$("#hp-navbar-breadcrumb #hp-navbar-breadcrumb-truncate").addClass("hidden");
 }
 
+function replaceContentWithLoadingIndicator(element) {
+    element.html("<div class=\"loading\"></div>");
+    element.find(".loading").show();
+}
+
 /*
  *  Options Menu
  */
@@ -109,9 +114,12 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                         post_container.addClass("hp-white-space");
                     }
                 });
+
+                replaceContentWithLoadingIndicator(post_container);
                 return false;
             });
         });
+        replaceContentWithLoadingIndicator(post_container);
         return false;
     }
 });
