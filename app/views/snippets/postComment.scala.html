@@ -17,7 +17,7 @@
 			}
             @if(Secured.isAllowedToEditPost(comment, Component.currentAccount())) {
                 @if(Secured.isPostStillEditable(comment, Component.currentAccount())) {
-                    <a class="hp-post-edit" style="text-decoration: none;" rel="tooltip" data-original-title="Kommentar löschen">
+                    <a id="hp-editPost_@comment.id" class="hp-post-edit" style="text-decoration: none;" rel="tooltip" data-original-title="Kommentar löschen">
                         <span class="glyphicon glyphicon-pencil"></span>
                     </a>
                 } else {

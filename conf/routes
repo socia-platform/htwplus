@@ -43,6 +43,8 @@ GET		/post/olderComments				    controllers.PostController.getOlderComments(id:L
 GET		/post/:id							controllers.PostController.view(id:Long)
 POST	/post/:id/addComment				controllers.PostController.addComment(id:Long)
 POST	/:target/:id/addPost				controllers.PostController.addPost(id:Long, target:String)
+GET     /post/:id/getEditForm               controllers.PostController.getEditForm(id:Long)
+POST    /post/:id/updatePost                controllers.PostController.updatePost(id:Long)
 GET		/post/:postId/deletePost			controllers.PostController.deletePost(postId:Long)
 
 

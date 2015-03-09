@@ -23,7 +23,7 @@
                     }
                     @if(Secured.isAllowedToEditPost(post, currentUser)){
                         @if(Secured.isPostStillEditable(post, currentUser)) {
-                            <a class="hp-post-edit" style="text-decoration: none;" rel="tooltip" data-original-title="Post bearbeiten">
+                            <a id="hp-editPost_@post.id" class="hp-post-edit" style="text-decoration: none;" rel="tooltip" data-original-title="Post bearbeiten">
                                 <span class="glyphicon glyphicon-pencil"></span>
                             </a>
                         } else {

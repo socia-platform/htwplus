@@ -86,6 +86,36 @@ $(".hp-optionsTable>tr>td>input").on("click", function(e) {
     e.stopPropagation();
 });
 
+/*
+ * EDIT COMMENTS
+ */
+$('body').on('click', 'a.hp-post-edit', function(e) {
+    if($(e.currentTarget).hasClass("disabled"))
+        return false;
+    else {
+        var post_id = e.currentTarget.id.split("_")[1];
+        var post_container = $("#"+post_id);
+
+        post_container.load("/post/"+post_id+"/getEditForm", function() {
+            post_container.removeClass("hp-white-space");
+            post_container.find(".commentSubmit").click(function () {
+                var form = post_container.find("form");
+                $.ajax({
+                    url: form.attr('action'),
+                    type: "POST",
+                    data: form.serialize(),
+                    success: function (data) {
+                        post_container.html(data);
+                        post_container.addClass("hp-white-space");
+                    }
+                });
+                return false;
+            });
+        });
+        return false;
+    }
+});
+
 
 /*
  *  prevent click action for disabled list items

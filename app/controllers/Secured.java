@@ -301,7 +301,8 @@ public class Secured extends Security.Authenticator {
     }
 
     /**
-     * Returns true if the post is still editable by the given account
+     * Returns true if the post is still editable by the given account.
+     * This includes the {@code isAllowedToEditPost} check
      *
      * @param post Post
      * @param account Account
