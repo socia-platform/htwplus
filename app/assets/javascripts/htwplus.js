@@ -101,25 +101,29 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
         var post_id = e.currentTarget.id.split("_")[1];
         var post_container = $("#"+post_id);
 
-        post_container.load("/post/"+post_id+"/getEditForm", function() {
-            post_container.removeClass("hp-white-space");
-            post_container.find(".commentSubmit").click(function () {
-                var form = post_container.find("form");
-                $.ajax({
-                    url: form.attr('action'),
-                    type: "POST",
-                    data: form.serialize(),
-                    success: function (data) {
-                        post_container.html(data);
-                        post_container.addClass("hp-white-space");
-                    }
-                });
-
-                replaceContentWithLoadingIndicator(post_container);
-                return false;
-            });
-        });
         replaceContentWithLoadingIndicator(post_container);
+        post_container.load("/post/"+post_id+"/getEditForm", function(response, status, xhr) {
+            if (status == "error") {
+                window.location.reload(); // reload if there was an error
+            } else {
+                post_container.removeClass("hp-white-space");
+                post_container.find(".commentSubmit").click(function () {
+                    var form = post_container.find("form");
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: "POST",
+                        data: form.serialize(),
+                        success: function (data) {
+                            post_container.html(data);
+                            post_container.addClass("hp-white-space");
+                        }
+                    });
+
+                    replaceContentWithLoadingIndicator(post_container);
+                    return false;
+                });
+            }
+        });
         return false;
     }
 });
