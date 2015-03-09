@@ -104,6 +104,7 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
         replaceContentWithLoadingIndicator(post_container);
         post_container.load("/post/"+post_id+"/getEditForm", function(response, status, xhr) {
             if (status == "error") {
+                console.log("Error when trying to edit post: ["+status+"]");
                 window.location.reload(); // reload if there was an error
             } else {
                 post_container.removeClass("hp-white-space");
@@ -116,6 +117,10 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                         success: function (data) {
                             post_container.html(data);
                             post_container.addClass("hp-white-space");
+                        },
+                        error: function(xhr, status, errorThrown) {
+                            console.log("Error when submitting edited post: ["+status+"] " + errorThrown);
+                            window.location.reload();
                         }
                     });
 
