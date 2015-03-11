@@ -102,12 +102,14 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
         var post_container = $("#"+post_id);
 
         replaceContentWithLoadingIndicator(post_container);
+        var removed_classes = post_container.attr("class");
+        post_container.attr("class", ""); // remove the classes (preventing linkify and whitespace stuff to apply)
+
         post_container.load("/post/"+post_id+"/getEditForm", function(response, status, xhr) {
             if (status == "error") {
                 console.log("Error when trying to edit post: ["+status+"]");
                 window.location.reload(); // reload if there was an error
             } else {
-                post_container.removeClass("hp-white-space");
                 post_container.find(".commentSubmit").click(function () {
                     var form = post_container.find("form");
                     $.ajax({
@@ -116,7 +118,7 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                         data: form.serialize(),
                         success: function (data) {
                             post_container.html(data);
-                            post_container.addClass("hp-white-space");
+                            post_container.attr("class", removed_classes);
                         },
                         error: function(xhr, status, errorThrown) {
                             console.log("Error when submitting edited post: ["+status+"] " + errorThrown);
