@@ -285,8 +285,13 @@ $(window).resize(function() {
 $(window).load(function() {
 });
 
-$('[rel="tooltip"]').tooltip();
-$('[rel="popover"]').popover();
+$('body').tooltip({
+    selector: '[rel=tooltip]'
+});
+$('body').popover({
+    trigger: 'hover',
+    selector: '[rel="popover"]'
+});
 
 $('.hp-focus-search').click(function() {
     $('.hp-easy-search').focus();
