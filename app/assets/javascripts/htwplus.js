@@ -50,9 +50,17 @@ function showAllBreadcrumbItems() {
 	$("#hp-navbar-breadcrumb #hp-navbar-breadcrumb-truncate").addClass("hidden");
 }
 
+/** replaces the content of the given element with a loading indicator, and returns the old content (as html) **/
 function replaceContentWithLoadingIndicator(element) {
+    var old_content = element.html();
     element.html("<div class=\"loading\"></div>");
     element.find(".loading").show();
+    return old_content;
+}
+
+/** show an error before/above the given element **/
+function showErrorBeforeElement(element, error_message) {
+    element.before('<div class="alert alert-danger"><a data-dismiss="alert" class="close" href="#">×</a> <strong>'+error_message+'</div>');
 }
 
 /*
@@ -101,14 +109,15 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
         var post_id = e.currentTarget.id.split("_")[1];
         var post_container = $("#"+post_id);
 
-        replaceContentWithLoadingIndicator(post_container);
+        var old_content = replaceContentWithLoadingIndicator(post_container);
         var removed_classes = post_container.attr("class");
         post_container.attr("class", ""); // remove the classes (preventing linkify and whitespace stuff to apply)
 
         post_container.load("/post/"+post_id+"/getEditForm", function(response, status, xhr) {
             if (status == "error") {
                 console.log("Error when trying to edit post: ["+status+"]");
-                window.location.reload(); // reload if there was an error
+                showErrorBeforeElement(post_container, "<strong>Ein Fehler ist aufgetreten!</strong> Bitte laden Sie die Seite neu! (Vielleicht ist der Bearbeitungszeitraum zuende?)");
+                post_container.html(old_content); // put back removed content
             } else {
                 post_container.find(".commentSubmit").click(function () {
                     var form = post_container.find("form");
@@ -122,7 +131,8 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                         },
                         error: function(xhr, status, errorThrown) {
                             console.log("Error when submitting edited post: ["+status+"] " + errorThrown);
-                            window.location.reload();
+                            showErrorBeforeElement(post_container, "<strong>Ein Fehler ist aufgetreten!</strong> Bitte laden Sie die Seite neu! (Vielleicht ist der Bearbeitungszeitraum zuende?)");
+                            post_container.html(old_content); // put back removed content
                         }
                     });
 
