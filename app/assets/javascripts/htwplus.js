@@ -60,7 +60,7 @@ function replaceContentWithLoadingIndicator(element) {
 
 /** show an error before/above the given element **/
 function showErrorBeforeElement(element, error_message) {
-    element.before('<div class="alert alert-danger"><a data-dismiss="alert" class="close" href="#">×</a> <strong>'+error_message+'</div>');
+    element.before('<div class="alert alert-danger"><a data-dismiss="alert" class="close" href="#">×</a>'+error_message+'</div>');
 }
 
 /*
@@ -116,7 +116,10 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
         post_container.load("/post/"+post_id+"/getEditForm", function(response, status, xhr) {
             if (status == "error") {
                 console.log("Error when trying to edit post: ["+status+"]");
-                showErrorBeforeElement(post_container, "<strong>Ein Fehler ist aufgetreten!</strong> Bitte laden Sie die Seite neu! (Vielleicht ist der Bearbeitungszeitraum zuende?)");
+                showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                $(".hp-reload").click(function() {
+                    window.location.reload();
+                });
                 post_container.html(old_content); // put back removed content
             } else {
                 post_container.find(".commentSubmit").click(function () {
@@ -131,7 +134,10 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                         },
                         error: function(xhr, status, errorThrown) {
                             console.log("Error when submitting edited post: ["+status+"] " + errorThrown);
-                            showErrorBeforeElement(post_container, "<strong>Ein Fehler ist aufgetreten!</strong> Bitte laden Sie die Seite neu! (Vielleicht ist der Bearbeitungszeitraum zuende?)");
+                            showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                            $(".hp-reload").click(function() {
+                                window.location.reload();
+                            });
                             post_container.html(old_content); // put back removed content
                         }
                     });
