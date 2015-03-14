@@ -4,29 +4,58 @@
 <ul class="nav nav-tabs hp-nav-tabs pull-right">
 	@if(Secured.isFriend(user) || Component.currentAccount() == user) {
 		@defining(if(Navigation.getTitle().equals("Newsstream")){"active"} else {"deactive"}) { status =>
-			<li class="@status"><a href="@routes.ProfileController.stream(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Newsstream" data-container="body"><span class="glyphicon glyphicon-comment"></span></a></li>
+			<li class="@status">
+                <a href="@routes.ProfileController.stream(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Dein öffentlicher Newsstream" data-container="body">
+                    <span class="glyphicon glyphicon-comment"></span>
+                    <span class="hidden-xs"> Newsstream</span>
+                </a>
+            </li>
 		}
 	} else {
 		@if(Component.currentAccount() != user) {
-			<li><a href="@routes.FriendshipController.requestFriend(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Freundschaftsanfrage senden" data-container="body"><span class="glyphicon glyphicon-envelope"></span></a></li>
+			<li>
+                <a href="@routes.FriendshipController.requestFriend(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Sende eine Freundschaftsanfrage" data-container="body">
+                    <span class="glyphicon glyphicon-envelope"></span>
+                    <span class="hidden-xs"> Hinzufügen</span>
+                </a>
+            </li>
 		}
 	}
 	@defining(if(Navigation.getTitle().equals("Profil") || Navigation.getTitle().equals("Ich")){"active"} else {"deactive"}) { status =>
 		@if(Component.currentAccount() == user){
-			<li class="@status"><a href="@routes.ProfileController.me()" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Profil ansehen" data-container="body"><span class="glyphicon glyphicon-user"></span></a></li>
+			<li class="@status">
+                <a href="@routes.ProfileController.me()" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Sieh dir dein Profil an" data-container="body">
+                    <span class="glyphicon glyphicon-user"></span>
+                    <span class="hidden-xs"> Profil</span>
+                </a>
+            </li>
 		} else {
-			<li class="@status"><a href="@routes.ProfileController.view(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Profil ansehen" data-container="body"><span class="glyphicon glyphicon-user"></span></a></li>
-		}
-		
+            <li class="@status">
+                <a href="@routes.ProfileController.view(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Sie dir das Profil an" data-container="body">
+                    <span class="glyphicon glyphicon-user"></span>
+                    <span class="hidden-xs"> Profil</span>
+                </a>
+            </li>
+        }
 	}
 	@if(Secured.isFriend(user)) {
 		@defining(if(Navigation.getTitle().equals("Editieren")){"active"} else {"deactive"}) { status =>
-			<li class="@status"><a href="#confirmDeleteFriend@user.id" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Freundschaft beenden" data-container="body" data-toggle="modal"><span class="glyphicon glyphicon-remove"></span></a></li>
+			<li class="@status">
+                <a href="#confirmDeleteFriend@user.id" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Beende die Freundschaft" data-container="body" data-toggle="modal">
+                    <span class="glyphicon glyphicon-remove"></span>
+                    <span class="hidden-xs"> Entfernen</span>
+                </a>
+            </li>
 		}
 	}
 	@if(Secured.isOwnerOfAccount(user.id)) {
 		@defining(if(Navigation.getTitle().equals("Editieren")){"active"} else {"deactive"}) { status =>
-			<li class="@status"><a href="@routes.ProfileController.edit(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Profil bearbeiten" data-container="body"><span class="glyphicon glyphicon-pencil"></span></a></li>
+			<li class="@status">
+                <a href="@routes.ProfileController.edit(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Profil bearbeiten" data-container="body">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    <span class="hidden-xs"> Einladung</span>
+                </a>
+            </li>
 		}
 	}
 </ul>

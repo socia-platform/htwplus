@@ -12,10 +12,9 @@ body {
 	overflow-x: hidden;
 }
 
-div.alert-container {
+div.alert {
 	margin-left: -10px;
     margin-right: -10px;
-    margin-top: 120px;
 }
 
 a {
@@ -878,7 +877,13 @@ input.hp-notification-hour {
 }
 
 .hp-nav-tabs > li {
-	width: 50px;
+	width: 100px;
+}
+
+@media (max-width: 767px) {
+    .hp-nav-tabs > li {
+        width: 50px;
+    }
 }
 
 .hp-nav-tabs > li > a {
@@ -1408,6 +1413,11 @@ table .hp-avatar {
     background-color: #0097cf;
     color: #fff;
 }
+.tt-suggestions strong, em {
+    font-weight: bold;
+    font-style: normal;
+}
+
 .searchresult-container .hp-avatar {
     width: 25px;
     height: 25px;
