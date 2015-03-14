@@ -636,7 +636,13 @@ input.hp-notification-hour {
 }
 
 .hp-nav-tabs > li {
-	width: 50px;
+	width: 100px;
+}
+
+@media (max-width: 767px) {
+    .hp-nav-tabs > li {
+        width: 50px;
+    }
 }
 
 .hp-nav-tabs > li > a {
