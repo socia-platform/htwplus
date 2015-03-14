@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/socia-platform/htwplus",
   "devDependencies": {
-    "bower": ""
+    "bower": "",
+    "grunt": "^0.4.5"
   }
 }
