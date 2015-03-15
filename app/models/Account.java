@@ -17,10 +17,12 @@ import models.base.BaseModel;
 import models.base.IJsonNodeSerializable;
 import models.enums.AccountRole;
 import models.enums.EmailNotifications;
+import models.services.AvatarService;
 import models.services.FileService;
 import models.base.ValidationException;
 
 import models.services.ElasticsearchService;
+import play.mvc.Http.MultipartFormData;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
@@ -178,13 +180,36 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		return url;
 	}
 
-	public void setTempAvatar(File file) throws ValidationException {
-		FileService fileService = new FileService("tempavatar", file);
-		if(!fileService.validateSize(FileService.MBAsByte(3))) {
+	public void setTempAvatar(MultipartFormData.FilePart filePart) throws ValidationException {
+		FileService fileService = new FileService("tempavatar");
+		fileService.setFilePart(filePart);
+		if(!fileService.validateSize(FileService.MBAsByte(20))) {
 			throw new ValidationException("File to big.");
 		}
-		fileService.getMagicMimeType();
-		fileService.saveFile("hallo.jpg", true);
+		String[] allowedContentTypes = { FileService.MIME_JPEG };
+		if(!fileService.validateContentType(allowedContentTypes)) {
+			throw new ValidationException("Content Type is not supported.");
+		}
+
+		fileService.saveFile(this.getTempAvatarName(), true);
+	}
+	
+	public File getTempAvatar() {
+		FileService fileService = new FileService("tempavatar");
+		return fileService.openFile(this.getTempAvatarName());
+	}
+	
+	public void saveAvatar(){
+		FileService fileService = new FileService("tempavatar");
+		File file = fileService.openFile(this.getTempAvatarName());
+		AvatarService avatarService = new AvatarService(file);
+		avatarService.pad();
+		avatarService.saveFile();
+	}
+	
+	private String getTempAvatarName(){
+		String fileName = this.id.toString() + ".jpg";
+		return fileName;
 	}
 	
 	public static boolean isOwner(Long accountId, Account currentUser) {

@@ -17,7 +17,8 @@ libraryDependencies ++= Seq(
   "commons-io" % "commons-io" % "2.4",
   "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0",
   "org.elasticsearch" % "elasticsearch" % "1.4.1",
-  "eu.medsea.mimeutil" % "mime-util" % "2.1.3"
+  "eu.medsea.mimeutil" % "mime-util" % "2.1.3",
+  "org.imgscalr" % "imgscalr-lib" % "4.2"
 )
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)

@@ -19,6 +19,8 @@ import play.Logger;
 import play.libs.Json;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.io.File;
+
 @Transactional
 @Security.Authenticated(Secured.class)
 public class ProfileController extends BaseController {
@@ -270,7 +272,7 @@ public class ProfileController extends BaseController {
 		}
 	}
 
-	public static Result uploadTempAvatar(Long id) {
+	public static Result createTempAvatar(Long id) {
 
 		ObjectNode result = Json.newObject();
 		MultipartFormData body = request().body().asMultipartFormData();
@@ -281,7 +283,7 @@ public class ProfileController extends BaseController {
 		}
 		
 		MultipartFormData.FilePart avatar = body.getFile("avatarimage");
-		
+
 		if(avatar == null) {
 			result.put("error", "No file with key 'avatarimage'");
 			return badRequest(result);
@@ -289,15 +291,36 @@ public class ProfileController extends BaseController {
 
 		Account currentUser = Component.currentAccount();
 		try {
-			currentUser.setTempAvatar(avatar.getFile());
+			currentUser.setTempAvatar(avatar);
 		} catch (ValidationException e) {
 			result.put("error", e.getMessage());
 			return badRequest(result);
 		}
-
-		//Logger.info(avatar.getFilename());
+		
 		result.put("exampleField1", "foobar");
 		result.put("exampleField2", "Hello world!");
+		return ok(result);
+	}
+	
+	public static Result getTempAvatar(Long id) {
+
+		ObjectNode result = Json.newObject();
+		Account account = Account.findById(id);
+		
+		if (!Secured.editAccount(account)) {
+			result.put("error", "Not allowed.");
+			return forbidden(result);
+		}
+
+		File tempAvatar = account.getTempAvatar();
+		return ok(tempAvatar);
+	}
+
+	public static Result createAvatar(long id) {
+		ObjectNode result = Json.newObject();
+		Account account = Account.findById(id);
+		account.saveAvatar();
+		result.put("status", "saved");
 		return ok(result);
 	}
 }

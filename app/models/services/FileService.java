@@ -6,16 +6,25 @@ import play.api.PlayException;
 import org.apache.commons.lang.Validate;
 import eu.medsea.mimeutil.MimeUtil;
 import eu.medsea.mimeutil.MimeType;
+import play.mvc.Http;
+import play.mvc.Http.MultipartFormData.FilePart;
+import play.api.libs.MimeTypes;
+
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 
+
 public class FileService {
+    
+    public static String MIME_JPEG = "image/jpeg";
 
     private String path;
     private String realm;
     private File file;
+    private FilePart filePart;
 
-    public FileService(String realm, File file) {
+    public FileService(String realm) {
         this.path = Play.application().configuration().getString("media.fileStore");
         if(this.path ==  null) {
             throw new PlayException(
@@ -23,12 +32,17 @@ public class FileService {
                     "The configuration key 'media.fileStore' is not set");
         }
         this.realm = realm;
-        this.file = file;
         Validate.notNull(this.realm, "The realm cannot be null");
+    }
+    
+    public void setFilePart(FilePart filePart){
+        this.filePart = filePart;
+        this.file = this.filePart.getFile();
         Validate.notNull(this.file, "The file cannot be null");
     }
     
     public boolean validateSize(long size) {
+        Validate.notNull(this.file, "The file property is null.");
         long fileSize = file.length();
         if(fileSize > size){
             return false;
@@ -37,13 +51,18 @@ public class FileService {
         }
     }
     
-    public boolean validateExtension(String[] extensions){
-        
-        
-        return true;
+    public boolean validateContentType(String[] contentTypes){
+        MimeTypes.defaultTypes();
+        String type = this.filePart.getContentType();
+        if(Arrays.asList(contentTypes).contains(type)) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
     public String getMagicMimeType() {
+        Validate.notNull(this.file, "The file property is null.");
         MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.MagicMimeMimeDetector");
         Collection<MimeType> mimeTypes = MimeUtil.getMimeTypes(file);
         String result;
@@ -62,6 +81,7 @@ public class FileService {
     }
 
     public void saveFile(String fileName, boolean overwrite) {
+        Validate.notNull(this.file, "The file property is null.");
         String path = this.buildPath(fileName);
         Logger.info(path);
         File newFile = new File(path);
@@ -79,6 +99,16 @@ public class FileService {
             throw new PlayException(
                     "File Error",
                     "The file could not be stored");
+        }
+    }
+    
+    public File openFile(String fileName){
+        String path = this.buildPath(fileName);
+        File file = new File(path);
+        if(file.exists()){
+            return file;
+        } else {
+            return null;
         }
     }
     
