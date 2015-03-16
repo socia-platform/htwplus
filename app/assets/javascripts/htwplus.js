@@ -50,6 +50,19 @@ function showAllBreadcrumbItems() {
 	$("#hp-navbar-breadcrumb #hp-navbar-breadcrumb-truncate").addClass("hidden");
 }
 
+/** replaces the content of the given element with a loading indicator, and returns the old content (as html) **/
+function replaceContentWithLoadingIndicator(element) {
+    var old_content = element.html();
+    element.html("<div class=\"loading\"></div>");
+    element.find(".loading").show();
+    return old_content;
+}
+
+/** show an error before/above the given element **/
+function showErrorBeforeElement(element, error_message) {
+    element.before('<div class="alert alert-danger"><a data-dismiss="alert" class="close" href="#">×</a>'+error_message+'</div>');
+}
+
 /*
  *  Options Menu
  */
@@ -84,6 +97,58 @@ $(".hp-optionsTable>tr>td>a").on("click", function(e) {
 $(".hp-optionsTable>tr>td>input").on("click", function(e) {
     // checkbox in media list
     e.stopPropagation();
+});
+
+/*
+ * EDIT COMMENTS
+ */
+$('body').on('click', 'a.hp-post-edit', function(e) {
+    if($(e.currentTarget).hasClass("disabled"))
+        return false;
+    else {
+        var post_id = e.currentTarget.id.split("_")[1];
+        var post_container = $("#"+post_id);
+
+        var old_content = replaceContentWithLoadingIndicator(post_container);
+        var removed_classes = post_container.attr("class");
+        post_container.attr("class", ""); // remove the classes (preventing linkify and whitespace stuff to apply)
+
+        post_container.load("/post/"+post_id+"/getEditForm", function(response, status, xhr) {
+            if (status == "error") {
+                console.log("Error when trying to edit post: ["+status+"]");
+                showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                $(".hp-reload").click(function() {
+                    window.location.reload();
+                });
+                post_container.html(old_content); // put back removed content
+            } else {
+                post_container.find(".commentSubmit").click(function () {
+                    var form = post_container.find("form");
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: "POST",
+                        data: form.serialize(),
+                        success: function (data) {
+                            post_container.html(data);
+                            post_container.attr("class", removed_classes);
+                        },
+                        error: function(xhr, status, errorThrown) {
+                            console.log("Error when submitting edited post: ["+status+"] " + errorThrown);
+                            showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                            $(".hp-reload").click(function() {
+                                window.location.reload();
+                            });
+                            post_container.html(old_content); // put back removed content
+                        }
+                    });
+
+                    replaceContentWithLoadingIndicator(post_container);
+                    return false;
+                });
+            }
+        });
+        return false;
+    }
 });
 
 
