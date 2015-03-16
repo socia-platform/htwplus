@@ -41,7 +41,7 @@
                 }
 	 		}
 	 		@if(Secured.addComment(post)) {
-	 			@form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form", 'id -> "addComment-@post.id") {
+	 			@form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form", 'id -> ("addComment-"+post.id)) {
 					<div class="hp-horizontal-form col-xs-12">
 						<div class="input-group">
 							@textarea(postForm("Content"), 'class -> "form-control", 'id -> "hp-new-comment-content", 'placeholder -> "Erstelle ein Kommentar...")
