@@ -18,8 +18,11 @@ import controllers.Navigation.Level;
 import play.Logger;
 import play.libs.Json;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import org.apache.commons.lang.StringUtils;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Transactional
 @Security.Authenticated(Secured.class)
@@ -318,9 +321,22 @@ public class ProfileController extends BaseController {
 
 	public static Result createAvatar(long id) {
 		ObjectNode result = Json.newObject();
+		
 		Account account = Account.findById(id);
-		account.saveAvatar();
-		result.put("status", "saved");
+		if (!Secured.editAccount(account)) {
+			result.put("error", "Not allowed.");
+			return forbidden(result);
+		}
+		
+		Form<Account.AvatarForm> form = Form.form(Account.AvatarForm.class).bindFromRequest();
+
+		if(form.hasErrors()){
+			result.put("error", form.errorsAsJson());
+			return badRequest(result);
+		}
+
+		account.saveAvatar(form.get());
+		result.put("success", "saved");
 		return ok(result);
 	}
 }

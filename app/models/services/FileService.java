@@ -6,11 +6,13 @@ import play.api.PlayException;
 import org.apache.commons.lang.Validate;
 import eu.medsea.mimeutil.MimeUtil;
 import eu.medsea.mimeutil.MimeType;
+import play.api.libs.Files;
 import play.mvc.Http;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.api.libs.MimeTypes;
 
 import java.io.File;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -33,6 +35,10 @@ public class FileService {
         }
         this.realm = realm;
         Validate.notNull(this.realm, "The realm cannot be null");
+    }
+    
+    public File getFile(){
+        return this.file;
     }
     
     public void setFilePart(FilePart filePart){
@@ -107,6 +113,19 @@ public class FileService {
         File file = new File(path);
         if(file.exists()){
             return file;
+        } else {
+            return null;
+        }
+    }
+
+    public File copyFile(String originFileName, String destFileName){
+        String origPath = this.buildPath(originFileName);
+        File origFile = new File(origPath);
+        if(origFile.exists()){
+            String destPath = this.buildPath(destFileName);
+            File destFile = new File(destPath);
+            Files.copyFile(origFile, destFile, true);
+            return destFile;
         } else {
             return null;
         }

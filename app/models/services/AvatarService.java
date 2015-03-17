@@ -2,8 +2,12 @@ package models.services;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImagingOpException;
 import java.io.File;
 import java.io.IOException;
+
+import models.base.FileOperationException;
+import play.Logger;
 
 import org.imgscalr.Scalr;
 
@@ -11,34 +15,72 @@ import org.imgscalr.Scalr;
  * This class handles all avatar aka profile picture related functionalities
  */
 public class AvatarService {
+
+    final static Logger.ALogger logger = Logger.of(AvatarService.class);
     
-    private BufferedImage image;
-    private File file;
+    static public int MIN_HEIGHT = 600;
+    static public int MIN_WIDTH = 600;
     
-    public AvatarService(File file){
-        this.file = file;
+    static public int AVATAR_WIDTH = 600;
+    static public int AVATAR_HEIGHT = 600;
+    static public int THUMB_WIDTH = 72;
+    static public int THUMB_HEIGHT = 72;
+    
+    private AvatarService(){};
+    
+    static public boolean validateSize(File file){
+        BufferedImage image;
         try {
-            this.image = ImageIO.read(file);
+            image = ImageIO.read(file);
+            if(image.getWidth() < MIN_WIDTH) {
+                return false;
+            }
+            if(image.getHeight() < MIN_HEIGHT) {
+                return false;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return true;
     }
     
-    public void pad(){
-        //image = Scalr.pad(image, 50);
-        //image = Scalr.resize(image, 400);
-        //image = Scalr.crop(image, 382, 94, 1860, 1046);
-        image = Scalr.resize(image, Scalr.Method.ULTRA_QUALITY, 40);
-    }
-    
-    
-    public void saveFile() {
+    static public void crop(File file, int x, int y, int width, int height) throws FileOperationException {
+        BufferedImage image;
         try {
-            ImageIO.write(this.image, "jpg", this.file);
-        } catch (IOException e) {
-            e.printStackTrace();
+            image = ImageIO.read(file);
+            image = Scalr.crop(image, x, y, width, height);
+            ImageIO.write(image, "jpg", file);
+            image.flush();
+        } catch (IOException | IllegalArgumentException e){
+            logger.error(e.getMessage(), e);
+            throw new FileOperationException("Cropping failed");
         }
     }
-  
+    
+    static public void resizeToAvatar(File file) throws FileOperationException {
+        AvatarService.resize(file, AVATAR_WIDTH, AVATAR_HEIGHT);
+    }
+
+    static public void resizeToThumbnail(File file) throws FileOperationException {
+        AvatarService.resize(file, THUMB_WIDTH, THUMB_HEIGHT);
+    }
+
+    static public void resize(File file, int width, int height) throws FileOperationException {
+        BufferedImage image;
+        try {
+            image = ImageIO.read(file);
+            image = Scalr.resize(image, 
+                    Scalr.Method.ULTRA_QUALITY, 
+                    Scalr.Mode.FIT_EXACT, 
+                    width, 
+                    height);
+            ImageIO.write(image, "jpg", file);
+            image.flush();
+        } catch (IOException | IllegalArgumentException e) {
+            logger.error(e.getMessage(), e);
+            throw new FileOperationException("Resizing failed");
+        }
+    }
+    
 }
 

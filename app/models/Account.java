@@ -14,6 +14,7 @@ import javax.persistence.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import models.base.BaseModel;
+import models.base.FileOperationException;
 import models.base.IJsonNodeSerializable;
 import models.enums.AccountRole;
 import models.enums.EmailNotifications;
@@ -22,16 +23,19 @@ import models.services.FileService;
 import models.base.ValidationException;
 
 import models.services.ElasticsearchService;
+import play.Logger;
+import play.data.validation.Constraints;
 import play.mvc.Http.MultipartFormData;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import controllers.Component;
 import play.libs.Json;
-import play.Logger;
 
 @Entity
 public class Account extends BaseModel implements IJsonNodeSerializable {
+
+	private final static Logger.ALogger logger = Logger.of(Account.class);
 
 	public String loginname;
 
@@ -190,6 +194,9 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		if(!fileService.validateContentType(allowedContentTypes)) {
 			throw new ValidationException("Content Type is not supported.");
 		}
+		if(!AvatarService.validateSize(fileService.getFile())){
+			throw new ValidationException("Image Resolution is to little.");
+		}
 
 		fileService.saveFile(this.getTempAvatarName(), true);
 	}
@@ -199,12 +206,27 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		return fileService.openFile(this.getTempAvatarName());
 	}
 	
-	public void saveAvatar(){
+	public void saveAvatar(AvatarForm avatarForm){
 		FileService fileService = new FileService("tempavatar");
-		File file = fileService.openFile(this.getTempAvatarName());
-		AvatarService avatarService = new AvatarService(file);
-		avatarService.pad();
-		avatarService.saveFile();
+		File avatarFile = fileService.copyFile(this.getTempAvatarName(), this.getAvatarName());
+		try {
+			AvatarService.crop(avatarFile, avatarForm.x, avatarForm.y, avatarForm.width, avatarForm.height);
+			File thumbFile = fileService.copyFile(this.getAvatarName(), this.getThumbName());
+			AvatarService.resizeToAvatar(avatarFile);
+			AvatarService.resizeToThumbnail(thumbFile);
+		} catch (FileOperationException e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	private String getAvatarName(){
+		String fileName = this.id.toString() + "_avatar.jpg";
+		return fileName;
+	}
+
+	private String getThumbName(){
+		String fileName = this.id.toString() + "_thumb.jpg";
+		return fileName;
 	}
 	
 	private String getTempAvatarName(){
@@ -259,7 +281,8 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
         return node;
     }
-
+	
+	@SuppressWarnings("unchecked")
     public static List<Account> getAllNames(){
         return JPA.em().createQuery("SELECT a.id, a.name FROM Account a").getResultList();
     }
@@ -270,4 +293,23 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
         return (System.currentTimeMillis() - start) / 100;
 
     }
+
+	static public class AvatarForm {
+
+		@Constraints.Required
+		public Integer x;
+		
+		@Constraints.Required
+		public Integer y;
+
+		@Constraints.Required
+		public Integer width;
+
+		@Constraints.Required
+		public Integer height;
+		
+		// ToDo Validate Square Geo
+
+	}
+
 }
