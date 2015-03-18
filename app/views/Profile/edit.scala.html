@@ -9,12 +9,26 @@
 <h2>Profil bearbeiten</h2>
 <br>
 
+
+<div class="modal fade" id="cropper-example-2-modal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-body">
+				<div id="cropper-example-2">
+					<img src="@routes.ProfileController.getTempAvatar(profile.id)" width="100%" alt="Picture">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+	
+<form action="@routes.ProfileController.createTempAvatar(profile.id)" id="hp-avatar-upload"></form>
+<button class="btn btn-primary" type="button" data-target="#cropper-example-2-modal" data-toggle="modal">Launch the demo</button>
+	
 @form(routes.ProfileController.update(profile.id), 'class -> "ajaxForm") {
 	<dl class="dl-horizontal">
 		<dt>Profilbild</dt>
 		<dd>
-			<input id="hp-avatar-upload" type="file" name="avatarimage" data-url="@routes.ProfileController.createTempAvatar(profile.id)">
-			<span id="hp-avatar-upload-progress"></span>
 		</dd>
 
 		@inputText(

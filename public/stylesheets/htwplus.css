@@ -1011,6 +1011,15 @@ table .hp-avatar {
     margin-top: -4px;
 }
 
+#hp-avatar-upload {
+    min-height: 200px;
+    width: 200px;
+    background-color: #808080;
+    
+}
+
+
+
 /*============================== Token ==============================*/
 
 #token-input {

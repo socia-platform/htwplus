@@ -1,28 +1,39 @@
 $(document).ready(function () {
-    $('#hp-avatar-upload').fileupload({
-        dataType: 'json',
-        add: function(e, data) {
-                var uploadErrors = [];
-                var acceptFileTypes = /^image\/(gif|jpe?g|png)$/i;
-                if(data.originalFiles[0]['type'].length && !acceptFileTypes.test(data.originalFiles[0]['type'])) {
-                    uploadErrors.push('Not an accepted file type');
-                }
-                if(data.originalFiles[0]['size'] > 50000000) {
-                    uploadErrors.push('Filesize is too big');
-                }
-                if(uploadErrors.length > 0) {
-                    alert(uploadErrors.join("\n"));
-                } else {
-                    data.submit();
-                }
-        },
-        autoUpload: false,
-        progressall: function (e, data) {
-            var progress = parseInt(data.loaded / data.total * 100, 10);
-            $('#hp-avatar-upload-progress').html(progress + '%');
-        },
-        done: function (e, data) {
-            //$('#hp-avatar-upload-progress').html("Done");
-        }
+
+    var avatarDropzone = new Dropzone("#hp-avatar-upload", {
+        paramName: "avatarimage",
+        maxFiles: 1,
+        maxFilesize: 20,
+        createImageThumbnails: false,
+        acceptedFiles: ".jpg",
+        
+    });
+    avatarDropzone.on("complete", function(file) {
+        avatarDropzone.removeFile(file);
+    });
+    avatarDropzone.on("error", function(file) {
+        //alert("hallo");
+    });
+
+    var $image = $('#cropper-example-2 > img'),
+        canvasData,
+        cropBoxData;
+
+    $('#cropper-example-2-modal').on('shown.bs.modal', function () {
+        $image.cropper({
+            zoomable: false,
+            aspectRatio: 1/1,
+            built: function () {
+                $image.cropper('setCanvasData', canvasData);
+                $image.cropper('setCropBoxData', cropBoxData);
+            }
+        });
+    }).on('hidden.bs.modal', function () {
+        canvasData = $image.cropper('getCanvasData');
+        cropBoxData = $image.cropper('getCropBoxData');
+        $.post( "ajax/test.html", function( data ) {
+            $( ".result" ).html( data );
+        });
+        $image.cropper('destroy');
     });
 });

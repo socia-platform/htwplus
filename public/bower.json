@@ -13,7 +13,9 @@
     "jquery": "=1.11.0",
     "jquery-scrollspy": "",
     "gsap": "=1.14.2",
-    "ScrollMagic": "=1.1.2"
+    "ScrollMagic": "=1.1.2",
+    "dropzone": "=4.0.1",
+    "cropper": "=0.9.0"
   },
   "resolutions": {
     "gsap": "=1.14.2"
