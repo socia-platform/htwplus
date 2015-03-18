@@ -1,8 +1,6 @@
 function WS() {
     this.debug = false;
-    this.targetUrl = window.location.protocol === 'https:'
-        ? 'wss://' + window.location.host + '/websocket'
-        : 'ws://' + window.location.host + '/websocket';
+    this.targetUrl = window.location.protocol === 'https:' ? 'wss://' + window.location.host + '/websocket' : 'ws://' + window.location.host + '/websocket';
     this.socket = window.MozWebSocket ? new window.MozWebSocket(this.targetUrl) : new window.WebSocket(this.targetUrl);
 
     var ws = this;
@@ -48,8 +46,8 @@ function WS() {
      * @param data The message to send
      */
     this.send = function(data) {
+        var sendingJson = JSON.stringify(data);
         if (ws.debug) {
-            var sendingJson = JSON.stringify(data);
             console.log('WS Send: ' + sendingJson);
         }
 
@@ -158,7 +156,7 @@ function WS() {
         link.rel = 'shortcut icon';
         link.href = count < 1 ? '/assets/images/favicon.png' : '/assets/images/favicon_unread.png';
 
-        this.originalTitle = this.originalTitle == undefined ? document.title : this.originalTitle;
+        this.originalTitle = this.originalTitle === undefined ? document.title : this.originalTitle;
         title.innerHTML = count < 1 ? this.originalTitle : '(' + count.toString() + ') ' + this.originalTitle;
 
         if (oldLink) {
