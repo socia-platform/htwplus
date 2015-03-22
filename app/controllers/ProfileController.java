@@ -339,4 +339,18 @@ public class ProfileController extends BaseController {
 		result.put("success", "saved");
 		return ok(result);
 	}
+
+	public static Result getAvatar(long id) {
+		Account account = Account.findById(id);
+		File avatar = account.getAvatar(false);
+		response().setHeader("Content-disposition","inline");
+		return ok(avatar);
+	}
+
+	public static Result getThumb(long id) {
+		Account account = Account.findById(id);
+		File avatar = account.getAvatar(true);
+		response().setHeader("Content-disposition","inline");
+		return ok(avatar);
+	}
 }

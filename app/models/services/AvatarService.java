@@ -2,6 +2,7 @@ package models.services;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.awt.image.ImagingOpException;
 import java.io.File;
 import java.io.IOException;
@@ -23,8 +24,8 @@ public class AvatarService {
     
     static public int AVATAR_WIDTH = 600;
     static public int AVATAR_HEIGHT = 600;
-    static public int THUMB_WIDTH = 72;
-    static public int THUMB_HEIGHT = 72;
+    static public int THUMB_WIDTH = 140;
+    static public int THUMB_HEIGHT = 140;
     
     private AvatarService(){};
     

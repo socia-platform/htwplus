@@ -219,6 +219,15 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		}
 	}
 
+	public File getAvatar(boolean thumb) {
+		FileService fileService = new FileService("tempavatar");
+		if(!thumb) {
+			return fileService.openFile(this.getAvatarName());
+		} else {
+			return fileService.openFile(this.getThumbName());
+		}
+	}
+	
 	private String getAvatarName(){
 		String fileName = this.id.toString() + "_avatar.jpg";
 		return fileName;

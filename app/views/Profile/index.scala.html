@@ -17,10 +17,10 @@
 
 	<h2>@user.name</h2>
 	<br />
-	<img alt="avatar" src="@user.getAvatarUrl()" class="img-thumbnail" />
+		
+	<img alt="avatar" src="@routes.ProfileController.getAvatar(user.id)" class="hp-avatar-large" />
 	<br />
 }
-
 <br />
 <table class="table">
 	<tr>
