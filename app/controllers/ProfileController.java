@@ -263,4 +263,9 @@ public class ProfileController extends BaseController {
 			return redirect(controllers.routes.ProfileController.me());
 		}
 	}
+
+    @Transactional
+    public static Result deleteProfile(Long id) {
+        return badRequest("not yet implemented");
+    }
 }

@@ -6,6 +6,7 @@
 @main("Editieren") {
 
 @views.html.Profile.snippets.navTabs(profile)
+@views.html.Profile.snippets.deleteModal(profile)
 <h2>Profil bearbeiten</h2>
 <br>
 
@@ -77,6 +78,9 @@
       		}
 		</dd>
 	</dl>
+    <div>
+        <a id="hp-delete-account" href="#hp-deleteModal" data-toggle="modal"><button class="btn btn-danger">ACCOUNT LÖSCHEN</button></a>
+    </div>
 	<div class="pull-right">
 		<input type="hidden" id="avatar" name="avatar" value="">
 		<input type="submit" class="btn btn-warning" value="Speichern">

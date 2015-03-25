@@ -1185,3 +1185,9 @@ table .hp-avatar {
 .searchresult-container {
     margin-top: 10px;
 }
+
+/*========= Other stuff ==========*/
+
+#hp-delete-account {
+    margin-left: 180px;
+}

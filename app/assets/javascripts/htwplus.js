@@ -198,6 +198,23 @@ $(document).ready(function () {
     autolinkUrls();
 
     /*
+     * Confirm account deletion
+     */
+    $("#hp-confirmAccountDelete").click(function() {
+        var enteredText = $("#hp-confirmDeleteText").val();
+
+        if(enteredText.toLowerCase() !== "hiermit lösche ich meinen account von dieser wundervollen website") {
+            console.log(enteredText);
+            $("#hp-confirmDeleteText").animate({opacity:0.3},100,"linear",function(){
+                $(this).animate({opacity:1},200);
+                $(this).focus();
+            });
+        } else {
+            window.location.href = $(this).attr("data-hp-deletelink");
+        }
+    });
+
+    /*
      * SEARCH: AutoSuggestion
      */
     var autoSuggestResult = new Bloodhound({
