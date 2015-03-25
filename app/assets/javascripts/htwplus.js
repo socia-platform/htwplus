@@ -202,10 +202,10 @@ $(document).ready(function () {
 	$('.hp-comment-form').each(function(){
 		var context = $(this);
 		$(".commentSubmit", this).click(function(){
-			if(context.serializeArray()[0].value == ""){
+			if(context.serializeArray()[0].value === ""){
 				$(context).find('textarea').animate({opacity:0.3},100,"linear",function(){
-					  $(this).animate({opacity:1},100);
-					  $(this).focus();
+					$(this).animate({opacity:1},100);
+					$(this).focus();
 				});
 			} else {
 				$.ajax({
