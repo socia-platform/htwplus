@@ -97,6 +97,30 @@ $("li > a").click(function(e) {
 	}
 });
 
+/*
+ *  prevent easy copying of account deletion confirmation text
+ */
+$(document).on("copy", function(e) {
+    if ($("#hp-deleteModal").is(":visible")) { // if the deletion confirmation is actually visible
+        var selection = window.getSelection();
+        if (selection.toString().contains("ösche ich meinen Account von dieser wundervolle")) { // check if the user copied the 'forbidden' string (or at least the middle part of it)
+            var newdiv = document.createElement('div');
+
+            //hide the newly created container
+            newdiv.style.position = 'absolute';
+            newdiv.style.left = '-9999px';
+
+            //insert the container, fill it with the extended text, and define the new selection
+            document.body.appendChild(newdiv);
+            newdiv.innerHTML = "It's not that easy!";
+            selection.selectAllChildren(newdiv);
+
+            window.setTimeout(function () {
+                document.body.removeChild(newdiv);
+            }, 100);
+        }
+    }
+});
 
 $(document).ready(function () {
 
