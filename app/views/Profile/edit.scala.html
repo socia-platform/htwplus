@@ -9,50 +9,50 @@
 <h2>Profil bearbeiten</h2>
 <br>
 
-<div class="modal fade" id="cropper-example-2-modal">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-body">
-				<div id="cropper-example-2">
-					<img src="@routes.ProfileController.getTempAvatar(profile.id)" width="100%" alt="Picture">
+<div id="hp-avatar-upload">
+
+	<div class="modal fade" id="hp-avatar-modal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div id="cropper-example-2">
+						<img src="@routes.ProfileController.getTempAvatar(profile.id)" width="100%" alt="Picture" id="hp-avatar-preview">
+					</div>
 				</div>
-			</div>
-			<div class="modal-footer">
-				<form action="@routes.ProfileController.createAvatar(profile.id)" id="hp-avatar-upload-finish" method="post">
-					<input type="hidden" name="x" value="" />
-					<input type="hidden" name="y" value="" />
-					<input type="hidden" name="height" value="" />
-					<input type="hidden" name="width" value="" />
-					<button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
-					<input type="submit" class="btn btn-primary" id="hp-avatar-save-button" value="Speichern" />
-				</form>
+				<div class="modal-footer">
+					<form action="@routes.ProfileController.createAvatar(profile.id)" id="hp-avatar-upload-finish" method="post">
+						<button type="button" class="btn btn-warning" id="hp-avatar-save-button">Speichern</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
+
+	<form action="@routes.ProfileController.createTempAvatar(profile.id)" id="hp-avatar-uploadform">
+		<dl class="dl-horizontal">
+			<dt>Profilbild</dt>
+			<dd>
+				<div class="row">
+					<div class="col-lg-2">
+						<img alt="avatar" src="@routes.ProfileController.getThumb(profile.id)" class="hp-avatar-medium" />
+					</div>
+					<div class="col-lg-10">
+						<div class="hp-avatar-input-wrapper btn btn-warning">
+							Bild ändern
+							<input type="file" name="avatarimage" class="hp-avatar-fileinput" />
+						</div>
+						<div class="loading"></div>
+						<div class="hp-avatar-flash">
+							Max. 3 MB
+						</div>
+					</div>
+				</div>
+			</dd>
+		</dl>
+	</form>
+
 </div>
-	
-<form action="@routes.ProfileController.createTempAvatar(profile.id)" id="hp-avatar-upload" >
-	<dl class="dl-horizontal">
-		<dt>Profilbild</dt>
-		<dd>
-			<div class="row">
-				<div class="col-lg-2">
-					<img alt="avatar" src="@routes.ProfileController.getThumb(profile.id)" class="hp-avatar-medium" />
-				</div>
-				<div class="col-lg-10">
-					<div class="hp-avatar-input-wrapper btn btn-warning">
-						Bild hochladen
-						<input type="file" name="avatarimage" class="hp-avatar-fileinput" />
-					</div>
-					<div class="loading"></div>
-					<div class="hp-avatar-flash">
-						Max. 3 MB
-					</div>
-				</div>
-			</div>
-		</dd>
-	</dl>
-</form>
 	
 @form(routes.ProfileController.update(profile.id), 'class -> "ajaxForm") {
 	<dl class="dl-horizontal">
@@ -119,8 +119,6 @@
 	</dl>
 	<div class="pull-right">
 		<input type="hidden" id="avatar" name="avatar" value="">
-
-		<button class="btn btn-primary" type="button" data-target="#cropper-example-2-modal" data-toggle="modal">Launch the demo</button>
 		<input type="submit" class="btn btn-warning" value="Speichern">
 		<a type="button" class="btn btn-default" href="@routes.ProfileController.me()">Abbrechen</a>
 	</div>

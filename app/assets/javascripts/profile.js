@@ -5,9 +5,16 @@ $(document).ready(function () {
 
     function AvatarUpload(element) {
         this.$element = $(element);
+        this.$uploadForm = this.$element.find('#hp-avatar-uploadform');
+        this.$finishForm = this.$element.find('#hp-avatar-upload-finish');
         this.$uploadButton = this.$element.find('input');
         this.$errorMessage = this.$element.find('.hp-avatar-flash');
         this.$loading = this.$element.find('.loading');
+        this.$modal = this.$element.find('.modal');
+        this.$previewImg = this.$element.find('#hp-avatar-preview');
+        this.$saveButton = this.$element.find('#hp-avatar-save-button');
+        this.$profileAvatar = this.$element.find('.hp-avatar-medium');
+        this.cropBoxData = {};
         this.init();
     }
 
@@ -18,12 +25,29 @@ $(document).ready(function () {
             this.$uploadButton.change(function (e) {
                 _this.uploadFile();
             });
+            this.$modal.on('shown.bs.modal', function () {
+                _this.$previewImg.cropper({
+                    zoomable: false,
+                    aspectRatio: 1/1,
+                    background: false,
+                    guides: false,
+                    built: function () {
+                        _this.$previewImg.cropper('setCropBoxData', _this.cropBoxData);
+                    }
+                });
+            });
+            this.$modal.on('hide.bs.modal', function () {
+                _this.$previewImg.cropper('destroy');
+            });
+            this.$saveButton.click(function () {
+                _this.cropSuccess();
+            });
         },
 
         uploadFile: function () {
             //this.$loading.show();
-            var data = new FormData(this.$element[0]);
-            var url = this.$element.attr('action');
+            var data = new FormData(this.$uploadForm[0]);
+            var url = this.$uploadForm.attr('action');
             var _this = this;
             $.ajax(url, {
                 type: 'POST',
@@ -47,78 +71,43 @@ $(document).ready(function () {
         },
         
         uploadSuccess: function (data) {
-            this.$loading.show();
-            this.$loading.css('display', 'inline-block');
-            var imgSelector = $('#cropper-example-2 > img');
-            var img =  imgSelector.attr("src");
+            var _this = this;
+            var img =  this.$previewImg.attr("src");
             var d = new Date();
-            imgSelector.attr("src", img+"?"+d.getTime());
-            imgSelector.load(function (e) {
-                $('#cropper-example-2-modal').modal();
+            this.$previewImg.attr("src", img+"?"+d.getTime());
+            this.$previewImg.load(function () {
+                _this.$modal.modal();
             });
-            this.$loading.hide();
+        },
+        
+        cropSuccess: function () {
+            var _this = this;
+            var data = this.$previewImg.cropper('getData');
+            var payload = {
+                x: Math.round(data.x),
+                y: Math.round(data.y),
+                width: Math.round(data.width),
+                height: Math.round(data.height)
+            };
+            console.log(data);
+            var url = this.$finishForm.attr('action');
+            $.ajax(url, {
+                type: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify(payload),
+                dataType: 'json',
+                processData: false,
+                success: function () {
+                    _this.$modal.modal('hide');
+                    var img =  _this.$profileAvatar.attr("src");
+                    var d = new Date();
+                    _this.$profileAvatar.attr("src", img+"?"+d.getTime());
+                }
+            });
         }
         
-
     };
 
     new AvatarUpload("#hp-avatar-upload");
-
-
-    //var avatarDropzone = new Dropzone("#hp-avatar-upload", {
-    //    paramName: "avatarimage",
-    //    maxFiles: 1,
-    //    maxFilesize: 20,
-    //    createImageThumbnails: false,
-    //    acceptedFiles: ".jpg"
-    //
-    //});
-    //avatarDropzone.on("success", function(file, response) {
-    //    var imgSelector = $('#cropper-example-2 > img');
-    //    var img =  imgSelector.attr("src");
-    //    var d = new Date();
-    //    imgSelector.attr("src", img+"?"+d.getTime());
-    //    avatarDropzone.removeFile(file);
-    //    $('#cropper-example-2-modal').modal();
-    //});
-    //avatarDropzone.on("error", function(file) {
-    //    //alert("hallo");
-    //});
-
-    var $image = $('#cropper-example-2 > img'),
-        canvasData,
-        cropBoxData;
-
-    $('#cropper-example-2-modal').on('shown.bs.modal', function () {
-        $image.cropper({
-            zoomable: false,
-            aspectRatio: 1/1,
-            built: function () {
-                $image.cropper('setCanvasData', canvasData);
-                $image.cropper('setCropBoxData', cropBoxData);
-            },
-            crop: function (data) {
-                $('#hp-avatar-upload-finish > input[name=x]').val(Math.round(data.x));
-                $('#hp-avatar-upload-finish > input[name=y]').val(Math.round(data.y));
-                $('#hp-avatar-upload-finish > input[name=height]').val(Math.round(data.height));
-                $('#hp-avatar-upload-finish > input[name=width]').val(Math.round(data.width));
-            }
-        });
-    }).on('hidden.bs.modal', function () {
-        canvasData = $image.cropper('getCanvasData');
-        cropBoxData = $image.cropper('getCropBoxData');
-        $image.cropper('destroy');
-    });
-
-    $('#hp-avatar-save-button').click(function () {
-        $('#cropper-example-2-modal').modal('hide');
-        canvasData = $image.cropper('getCanvasData');
-        cropBoxData = $image.cropper('getCropBoxData');
-        $image.cropper('destroy');
-        //$.post( "ajax/test.html", function( data ) {
-        //    $( ".result" ).html( data );
-        //});
-
-    });
 
 });
