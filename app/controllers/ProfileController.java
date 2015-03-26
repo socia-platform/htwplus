@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.List;
 import models.*;
 import models.enums.EmailNotifications;
 import play.Play;
@@ -266,6 +267,22 @@ public class ProfileController extends BaseController {
 
     @Transactional
     public static Result deleteProfile(Long id) {
-        return badRequest("not yet implemented");
+        Account tbd = Account.findById(id);
+        Account dummy = Account.findByEmail("anonym@htwplus.de"); //TODO: change placeholder
+        if(tbd == null || dummy == null)  {
+            return badRequest();
+        }
+
+        List<Post> owned = Post.listAllPostsOwnedBy(id);
+        for(Post post : owned) {
+            post.owner = dummy;
+        }
+
+        List<Post> pinned = Post.listAllPostsPostedOnAccount(id);
+        for(Post post : pinned) {
+            post.account = dummy;
+        }
+
+        return redirect(controllers.routes.Application.index());
     }
 }
