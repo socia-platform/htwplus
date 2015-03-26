@@ -150,6 +150,9 @@ public class Global extends GlobalSettings {
 			final String adminGroupTitle = app.configuration().getString("htwplus.admin.group");
 			final String adminMail = app.configuration().getString("htwplus.admin.mail");
 			final String adminPassword = app.configuration().getString("htwplus.admin.pw");
+
+            final String dummyMail = "anonym@htwplus.de"; //app.configuration().getString("htwplus.dummy.mail");
+            final String dummyPassword = "enormouslylongpasswordthatnooneneverneeds"; //app.configuration().getString("htwplus.dummy.mail");
 			
 			// Do some inital db stuff
 			JPA.withTransaction(new play.libs.F.Callback0() {
@@ -166,6 +169,19 @@ public class Global extends GlobalSettings {
                         admin.avatar = "a1";
                         admin.password = Component.md5(adminPassword);
                         admin.create();
+                    }
+
+                    // create Dummy anonymous account, if it doesn't exist //
+                    Account dummy = Account.findByEmail(dummyMail);
+                    if (dummy == null) {
+                        dummy = new Account();
+                        dummy.email = dummyMail;
+                        dummy.firstname = "Anonym";
+                        dummy.lastname = "@HTWplus";
+                        dummy.role = AccountRole.DUMMY;
+                        dummy.avatar = "aDefault";
+                        dummy.password = Component.md5(dummyPassword);
+                        dummy.create();
                     }
 
                     // create Admin group if none exists
