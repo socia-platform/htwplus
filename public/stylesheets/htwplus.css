@@ -1186,8 +1186,31 @@ table .hp-avatar {
     margin-top: 10px;
 }
 
-/*========= Other stuff ==========*/
+/*========= Account Deletion ==========*/
 
 #hp-delete-account {
     margin-left: 180px;
+}
+
+#hp-deleteModal .modal-header {
+    background-color: #d43f3a;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding-right: 18px;
+    color: white;
+}
+
+#hp-deleteModal .close {
+    margin-top: 0px;
+    font-size: 24px;
+    opacity: 0.3;
+}
+
+#hp-deleteModal .close:hover , #hp-deleteModal .close:focus {
+    opacity: 0.6;
+}
+
+#hp-deleteModalLabel {
+    text-align: center;
+    font-size: 20px;
 }
