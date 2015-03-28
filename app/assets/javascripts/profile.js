@@ -87,7 +87,7 @@ $(document).ready(function () {
                 x: Math.round(data.x),
                 y: Math.round(data.y),
                 width: Math.round(data.width),
-                height: Math.round(data.height)
+                height: Math.round(data.width)
             };
             console.log(data);
             var url = this.$finishForm.attr('action');

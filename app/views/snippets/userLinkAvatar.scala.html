@@ -2,5 +2,5 @@
 @import helper._
 
 <a class="pull-left" href="@if(Secured.isFriend(user)) { @routes.ProfileController.view(user.id)/stream } else { @routes.ProfileController.view(user.id) }">
-	<img alt="avatar" src="@user.getAvatarUrl()" class="hp-avatar" />
+	<img alt="avatar" src="@routes.ProfileController.getAvatar(user.id)" class="hp-avatar-small" />
 </a>

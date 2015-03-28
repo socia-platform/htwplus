@@ -18,25 +18,17 @@ import org.imgscalr.Scalr;
 public class AvatarService {
 
     final static Logger.ALogger logger = Logger.of(AvatarService.class);
+
+    private AvatarService(){}
     
-    static public int MIN_HEIGHT = 600;
-    static public int MIN_WIDTH = 600;
-    
-    static public int AVATAR_WIDTH = 600;
-    static public int AVATAR_HEIGHT = 600;
-    static public int THUMB_WIDTH = 140;
-    static public int THUMB_HEIGHT = 140;
-    
-    private AvatarService(){};
-    
-    static public boolean validateSize(File file){
+    static public boolean validateSize(File file, int min_length, int min_height){
         BufferedImage image;
         try {
             image = ImageIO.read(file);
-            if(image.getWidth() < MIN_WIDTH) {
+            if(image.getWidth() < min_length) {
                 return false;
             }
-            if(image.getHeight() < MIN_HEIGHT) {
+            if(image.getHeight() < min_height) {
                 return false;
             }
         } catch (IOException e) {
@@ -56,14 +48,6 @@ public class AvatarService {
             logger.error(e.getMessage(), e);
             throw new FileOperationException("Cropping failed");
         }
-    }
-    
-    static public void resizeToAvatar(File file) throws FileOperationException {
-        AvatarService.resize(file, AVATAR_WIDTH, AVATAR_HEIGHT);
-    }
-
-    static public void resizeToThumbnail(File file) throws FileOperationException {
-        AvatarService.resize(file, THUMB_WIDTH, THUMB_HEIGHT);
     }
 
     static public void resize(File file, int width, int height) throws FileOperationException {

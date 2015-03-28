@@ -29,6 +29,9 @@ error.maxLength=Maximum length is {0}
 error.email=Bitte eine gültige Adresse eingeben
 error.pattern=Es gibt mindestens ein ungültiges Zeichen.
 error.sessionExpired=Deine Sitzung ist abgelaufen.
+error.fileToBig=Die Datei ist zu groß
+error.contentTypeNotSupported=Das Dateiformat wird nicht unterstützt
+error.resolutionLow=Die Auflösung ist zu gering
 
 # --- authenticate
 authenticate.matriculationNumberMissing=Also deine Matrikelnummer brauchen wir schon!

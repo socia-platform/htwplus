@@ -1,8 +1,6 @@
 package models;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +11,7 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import com.typesafe.config.ConfigFactory;
 import models.base.BaseModel;
 import models.base.FileOperationException;
 import models.base.IJsonNodeSerializable;
@@ -25,6 +24,7 @@ import models.base.ValidationException;
 import models.services.ElasticsearchService;
 import play.Logger;
 import play.data.validation.Constraints;
+import play.i18n.Messages;
 import play.mvc.Http.MultipartFormData;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
@@ -184,60 +184,114 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		return url;
 	}
 
+	static public String AVATAR_REALM = "avatar";
+	static public int AVATAR_MIN_SIZE = 600;
+	static public int AVATAR_LARGE_SIZE = 600;
+	static public int AVATAR_MEDIUM_SIZE = 140;
+	static public int AVATAR_SMALL_SIZE = 70;
+	static public String AVATAR_CUSTOM = "custom";
+	static public enum AVATAR_SIZE {
+		SMALL, MEDIUM, LARGE
+	}
+
+	/**
+	 * Set the temporary avatar image for the user
+	 *
+	 * @param filePart The uploaded file part
+	 * @throws ValidationException
+	 */
 	public void setTempAvatar(MultipartFormData.FilePart filePart) throws ValidationException {
-		FileService fileService = new FileService("tempavatar");
-		fileService.setFilePart(filePart);
-		if(!fileService.validateSize(FileService.MBAsByte(20))) {
-			throw new ValidationException("File to big.");
+		FileService fileService = new FileService(Account.AVATAR_REALM, filePart);
+
+		int maxSize = ConfigFactory.load().getInt("avatar.maxSize");
+		if(!fileService.validateSize(FileService.MBAsByte(maxSize))) {
+			throw new ValidationException(Messages.get("error.fileToBig"));
 		}
-		String[] allowedContentTypes = { FileService.MIME_JPEG };
+		String[] allowedContentTypes = { FileService.MIME_JPEG, FileService.MIME_PNG };
 		if(!fileService.validateContentType(allowedContentTypes)) {
-			throw new ValidationException("Content Type is not supported.");
+			throw new ValidationException(Messages.get("error.contentTypeNotSupported"));
 		}
-		if(!AvatarService.validateSize(fileService.getFile())){
-			throw new ValidationException("Image Resolution is to little.");
+		if(!AvatarService.validateSize(fileService.getFile(), Account.AVATAR_MIN_SIZE, Account.AVATAR_MIN_SIZE)){
+			throw new ValidationException(Messages.get("error.resolutionLow"));
 		}
 
 		fileService.saveFile(this.getTempAvatarName(), true);
 	}
-	
+
+	/**
+	 * Returns the temporary avatar image
+	 *
+	 * @return The temp avatar
+	 */
 	public File getTempAvatar() {
-		FileService fileService = new FileService("tempavatar");
-		return fileService.openFile(this.getTempAvatarName());
-	}
-	
-	public void saveAvatar(AvatarForm avatarForm){
-		FileService fileService = new FileService("tempavatar");
-		File avatarFile = fileService.copyFile(this.getTempAvatarName(), this.getAvatarName());
+		FileService fileService;
 		try {
-			AvatarService.crop(avatarFile, avatarForm.x, avatarForm.y, avatarForm.width, avatarForm.height);
-			File thumbFile = fileService.copyFile(this.getAvatarName(), this.getThumbName());
-			AvatarService.resizeToAvatar(avatarFile);
-			AvatarService.resizeToThumbnail(thumbFile);
+			fileService = new FileService(Account.AVATAR_REALM, this.getTempAvatarName());
+			return fileService.getFile();
+		} catch (FileOperationException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Saves the avatar
+	 *
+	 * @param avatarForm
+	 */
+	public void saveAvatar(AvatarForm avatarForm){
+		try {
+			FileService fsTempAvatar = new FileService(Account.AVATAR_REALM, this.getTempAvatarName());
+			FileService fsAvatarLarge = fsTempAvatar.copy(this.getAvatarName(AVATAR_SIZE.LARGE));
+			AvatarService.crop(fsAvatarLarge.getFile(), avatarForm.x, avatarForm.y, avatarForm.width, avatarForm.height);
+			FileService fsAvatarMedium = fsAvatarLarge.copy(this.getAvatarName(AVATAR_SIZE.MEDIUM));
+			FileService fsAvatarSmall = fsAvatarLarge.copy(this.getAvatarName(AVATAR_SIZE.SMALL));
+			AvatarService.resize(fsAvatarLarge.getFile(), AVATAR_LARGE_SIZE, AVATAR_LARGE_SIZE);
+			AvatarService.resize(fsAvatarMedium.getFile(), AVATAR_MEDIUM_SIZE, AVATAR_MEDIUM_SIZE);
+			AvatarService.resize(fsAvatarSmall.getFile(), AVATAR_SMALL_SIZE, AVATAR_SMALL_SIZE);
 		} catch (FileOperationException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
 
-	public File getAvatar(boolean thumb) {
-		FileService fileService = new FileService("tempavatar");
-		if(!thumb) {
-			return fileService.openFile(this.getAvatarName());
-		} else {
-			return fileService.openFile(this.getThumbName());
+	/**
+	 * Get the avatar in different sizes
+	 *
+	 * @param size
+	 * @returns
+	 */
+	public File getAvatar(AVATAR_SIZE size) {
+		FileService fileService;
+		try {
+			fileService = new FileService(Account.AVATAR_REALM, this.getAvatarName(size));
+			return fileService.getFile();
+		} catch (FileOperationException e) {
+			return null;
 		}
 	}
-	
-	private String getAvatarName(){
-		String fileName = this.id.toString() + "_avatar.jpg";
-		return fileName;
+
+	/**
+	 * Get the file name for an avatar in different sizes
+	 *
+	 * @param size
+	 * @return
+	 */
+	private String getAvatarName(AVATAR_SIZE size) {
+		switch (size) {
+			case SMALL:
+				return this.id.toString() + "_small.jpg";
+			case MEDIUM:
+				return this.id.toString() + "_medium.jpg";
+			case LARGE:
+				return this.id.toString() + "_large.jpg";
+		}
+		return this.id.toString() + "_large.jpg";
 	}
 
-	private String getThumbName(){
-		String fileName = this.id.toString() + "_thumb.jpg";
-		return fileName;
-	}
-	
+	/**
+	 * Get the temp avatar name
+	 *
+	 * @return
+	 */
 	private String getTempAvatarName(){
 		String fileName = this.id.toString() + ".jpg";
 		return fileName;
@@ -316,8 +370,13 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
 		@Constraints.Required
 		public Integer height;
-		
-		// ToDo Validate Square Geo
+
+		public String validate() {
+			if(!this.width.equals(this.height)) {
+				return "The chosen extract is not rectangular";
+			}
+			return null;
+		}
 
 	}
 

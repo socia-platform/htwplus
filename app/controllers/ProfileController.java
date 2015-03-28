@@ -275,6 +275,12 @@ public class ProfileController extends BaseController {
 		}
 	}
 
+	/**
+	 * Handles the upload of the temporary avatar image
+	 *
+	 * @param id
+	 * @return
+	 */
 	public static Result createTempAvatar(Long id) {
 
 		ObjectNode result = Json.newObject();
@@ -300,11 +306,16 @@ public class ProfileController extends BaseController {
 			return badRequest(result);
 		}
 		
-		result.put("exampleField1", "foobar");
-		result.put("exampleField2", "Hello world!");
+		result.put("success", controllers.routes.ProfileController.getTempAvatar(id).toString());
 		return ok(result);
 	}
-	
+
+	/**
+	 * Get the temporary avatar image
+	 *
+	 * @param id
+	 * @return
+	 */
 	public static Result getTempAvatar(Long id) {
 
 		ObjectNode result = Json.newObject();
@@ -316,9 +327,19 @@ public class ProfileController extends BaseController {
 		}
 
 		File tempAvatar = account.getTempAvatar();
-		return ok(tempAvatar);
+		if(tempAvatar != null){
+			return ok(tempAvatar);
+		} else {
+			return notFound();
+		}
 	}
 
+	/**
+	 * Create the real avatar with the given dimensions
+	 *
+	 * @param id
+	 * @return
+	 */
 	public static Result createAvatar(long id) {
 		ObjectNode result = Json.newObject();
 		
@@ -340,17 +361,36 @@ public class ProfileController extends BaseController {
 		return ok(result);
 	}
 
-	public static Result getAvatar(long id) {
+	/**
+	 * Get the avatar of a user.
+	 *
+	 * @param id User ID
+	 * @param size Size - Possible values: "small", "medium", "large"
+	 * @return
+	 */
+	public static Result getAvatar(long id, String size){
 		Account account = Account.findById(id);
-		File avatar = account.getAvatar(false);
+		File avatar;
+		switch (size) {
+			case "small":
+				avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
+				break;
+			case "medium":
+				avatar = account.getAvatar(Account.AVATAR_SIZE.MEDIUM);
+				break;
+			case "large":
+				avatar = account.getAvatar(Account.AVATAR_SIZE.LARGE);
+				break;
+			default:
+				avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
+		}
 		response().setHeader("Content-disposition","inline");
-		return ok(avatar);
+		if(avatar != null){
+			return ok(avatar);
+		} else {
+			return notFound();
+		}
 	}
 
-	public static Result getThumb(long id) {
-		Account account = Account.findById(id);
-		File avatar = account.getAvatar(true);
-		response().setHeader("Content-disposition","inline");
-		return ok(avatar);
-	}
+
 }

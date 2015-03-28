@@ -1011,9 +1011,19 @@ table .hp-avatar {
     margin-top: -4px;
 }
 
+.hp-avatar-small {
+    width: 30px;
+    border-radius: 4px;
+}
+
 .hp-avatar-large {
     width: 250px;
     border-radius: 6px;
+}
+
+.hp-avatar-navi {
+    width: 32px;
+    border-radius: 4px;
 }
 
 .hp-avatar-medium {

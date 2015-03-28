@@ -2,7 +2,7 @@
 @views.html.snippets.deleteCommentModal(comment.id)
 <div class="media">
 	<a class="pull-left" href="@routes.ProfileController.view(comment.owner.id)">
-		<img alt="avatar" src="@comment.owner.getAvatarUrl()" class="hp-avatar" />
+		<img alt="avatar" src="@routes.ProfileController.getAvatar(comment.owner.id)" class="hp-avatar-small" />
 	</a>
 	<div class="media-body">
 		<h5 class="media-heading">
