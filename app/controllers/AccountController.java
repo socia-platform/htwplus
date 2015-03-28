@@ -124,6 +124,39 @@ public class AccountController extends BaseController {
 		}
 	}
 
+    /**
+     * Checks if the specified password is correct for the current user
+     * @param password
+     * @return true, if the password is correct
+     */
+    public static boolean checkPassword(String password) {
+        Account current = Component.currentAccount();
+
+        if(password == null || password.length() == 0) {
+            flash("error", Messages.get("Kein Passwort angegeben!"));
+            return false;
+        }
+
+        if(current.loginname == null || current.loginname.length() == 0) { // not an LDAP Account
+            Account auth = Account.authenticate(current.email, password);
+            if(auth == null || auth.id != current.id) {
+                flash("error", Messages.get("profile.delete.wrongpassword"));
+                return false;
+            } else {
+                return true;
+            }
+        } else { // LDAP Account
+            LdapService ldap = LdapService.getInstance();
+            try {
+                ldap.connect(current.loginname, password); // try logging in with the specified password
+                return true; // login successful
+            } catch (LdapService.LdapConnectorException e) {
+                flash("error", e.getMessage());
+                return false;
+            }
+        }
+    }
+
 	/**
 	 * Logout and clean the session.
 	 */

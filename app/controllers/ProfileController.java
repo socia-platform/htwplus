@@ -6,6 +6,7 @@ import models.enums.EmailNotifications;
 import play.Play;
 import play.data.Form;
 import play.db.jpa.Transactional;
+import play.i18n.Messages;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Profile.edit;
@@ -20,6 +21,7 @@ public class ProfileController extends BaseController {
 
 	static Form<Account> accountForm = Form.form(Account.class);
 	static Form<Post> postForm = Form.form(Post.class);
+    static Form<Login> loginForm = Form.form(Login.class);
 	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
 
 	public static Result me() {
@@ -175,7 +177,7 @@ public class ProfileController extends BaseController {
 		}
 
         Navigation.set(Level.PROFILE, "Editieren");
-		return ok(edit.render(account, accountForm.fill(account)));
+		return ok(edit.render(account, accountForm.fill(account), loginForm));
 	}
 
 	public static Result update(Long id) {
@@ -206,12 +208,12 @@ public class ProfileController extends BaseController {
 		Account exisitingAccount = Account.findByEmail(filledForm.field("email").value());
 		if (exisitingAccount != null && !exisitingAccount.equals(account)) {
 			filledForm.reject("email", "Diese Mail wird bereits verwendet!");
-			return badRequest(edit.render(account, filledForm));
+			return badRequest(edit.render(account, filledForm, loginForm));
 		}
 		
 		// Perform JPA Validation
 		if (filledForm.hasErrors()) {
-			return badRequest(edit.render(account, filledForm));
+			return badRequest(edit.render(account, filledForm, loginForm));
 		} else {
 
 			// Fill an and update the model manually 
@@ -266,23 +268,31 @@ public class ProfileController extends BaseController {
 	}
 
     @Transactional
-    public static Result deleteProfile(Long id) {
-        Account tbd = Account.findById(id);
+    public static Result deleteProfile() {
+        Account current = Component.currentAccount();
         Account dummy = Account.findByEmail("anonym@htwplus.de"); //TODO: change placeholder
-        if(tbd == null || dummy == null)  {
-            return badRequest();
+
+        // Check Password //
+        Form<Login> filledForm = loginForm.bindFromRequest();
+        String entered = filledForm.field("password").value();
+        if(entered == null || entered.length() == 0) {
+            flash("error", Messages.get("profile.delete.nopassword"));
+            return redirect(controllers.routes.ProfileController.update(current.id));
+        } else if(!AccountController.checkPassword(entered)) {
+            return redirect(controllers.routes.ProfileController.update(current.id));
         }
 
-        List<Post> owned = Post.listAllPostsOwnedBy(id);
+        List<Post> owned = Post.listAllPostsOwnedBy(current.id);
         for(Post post : owned) {
             post.owner = dummy;
         }
 
-        List<Post> pinned = Post.listAllPostsPostedOnAccount(id);
+        List<Post> pinned = Post.listAllPostsPostedOnAccount(current.id);
         for(Post post : pinned) {
             post.account = dummy;
         }
 
+        flash("success", Messages.get("profile.delete.success"));
         return redirect(controllers.routes.Application.index());
     }
 }

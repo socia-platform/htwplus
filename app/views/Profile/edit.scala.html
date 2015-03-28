@@ -1,4 +1,4 @@
-@(profile: Account, profileForm: Form[Account])
+@(profile: Account, profileForm: Form[Account], loginForm: Form[Login])
 @import helper._
 @import models._
 @import models.enums._
@@ -6,7 +6,7 @@
 @main("Editieren") {
 
 @views.html.Profile.snippets.navTabs(profile)
-@views.html.Profile.snippets.deleteModal(profile)
+@views.html.Profile.snippets.deleteModal(profile, loginForm)
 <h2>Profil bearbeiten</h2>
 <br>
 

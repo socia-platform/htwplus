@@ -1,4 +1,4 @@
-@(profile: Account)
+@(profile: Account, loginForm: Form[Login])
 
 <div aria-hidden="true" aria-labelledby="hp-deleteModalLabel" id="hp-deleteModal" class="modal fade">
     <div class="modal-dialog">
@@ -9,20 +9,19 @@
                     <b> WARNUNG </b>
                 </h4>
             </div>
-            <div class="modal-body">
-                <b style="font-size: 1.3em">Du bist im Begriff, deinen Account komplett zu löschen!</b><br>
-                Das bedeutet, dass du dich nie wieder in deinen Account einloggen werden kannst! Deine Posts und Kommentare werden in anonymisierter Form bestehen bleiben.<br>
-                <br>
-                <p>Wenn du dir wirklich sicher bist, gib<br>
-                <code>"Hiermit lösche ich meinen Account von dieser wundervollen Website"</code><br>
-                in das folgende Feld ein:</p>
-                <input type="text" class="form-control" id="hp-confirmDeleteText" placeholder=":(">
-                <!--/user/6/delete-->
-            </div>
-            <div class="modal-footer">
-                <button id="hp-confirmAccountDelete" class="btn btn-danger" data-hp-deletelink="@routes.ProfileController.deleteProfile(profile.id)">LÖSCHEN</button>
-                <button data-dismiss="modal" class="btn btn-success">Nicht löschen</button>
-            </div>
+            @helper.form(action = routes.ProfileController.deleteProfile(), 'id -> "hp-deleteConfirmForm", 'class -> "hp-nolabel") {
+                <div class="modal-body">
+                    <b style="font-size: 1.3em">Du bist im Begriff, deinen Account unwiderruflich zu löschen!</b><br>
+                    Das bedeutet, dass du dich nie wieder in deinen Account einloggen werden kannst! Deine Posts und Kommentare werden in anonymisierter Form bestehen bleiben.<br>
+                    <br>
+                    <p>Wenn du dir wirklich sicher bist, gib dein Passwort in das folgende Feld ein:</p>
+                    @helper.inputPassword(loginForm("password"), '_id -> "hp-deleteConfirmPassword", 'class -> "form-control", 'placeholder -> "Passwort")
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" id="hp-deleteConfirmSubmit" class="btn btn-danger" value="LÖSCHEN">
+                    <button data-dismiss="modal" class="btn btn-success">Nicht löschen</button>
+                </div>
+            }
         </div>
     </div>
 </div>

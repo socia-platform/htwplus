@@ -121,6 +121,10 @@ h1 {
     margin-top: 15px;
 }
 
+.hp-nolabel label {
+    display: none;
+}
+
 /*============================== Landingpage ==============================*/
 body#hp-landingpage {
 	margin-top: 0 !important;
@@ -1213,4 +1217,7 @@ table .hp-avatar {
 #hp-deleteModalLabel {
     text-align: center;
     font-size: 20px;
+}
+#hp-deleteConfirmPassword {
+    margin-bottom: 0px;
 }
