@@ -151,9 +151,9 @@ public class Global extends GlobalSettings {
 			final String adminMail = app.configuration().getString("htwplus.admin.mail");
 			final String adminPassword = app.configuration().getString("htwplus.admin.pw");
 
-            final String dummyMail = "anonym@htwplus.de"; //app.configuration().getString("htwplus.dummy.mail");
-            final String dummyPassword = "enormouslylongpasswordthatnooneneverneeds"; //app.configuration().getString("htwplus.dummy.mail");
-			
+            final String dummyMail = app.configuration().getString("htwplus.dummy.mail");
+            final String dummyPassword = app.configuration().getString("htwplus.dummy.pw");
+            
 			// Do some inital db stuff
 			JPA.withTransaction(new play.libs.F.Callback0() {
 				@Override

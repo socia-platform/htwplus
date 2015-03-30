@@ -1,6 +1,8 @@
 package controllers;
 
 import java.util.List;
+
+import com.typesafe.config.ConfigFactory;
 import models.*;
 import models.enums.EmailNotifications;
 import models.enums.LinkType;
@@ -273,7 +275,7 @@ public class ProfileController extends BaseController {
     @Transactional
     public static Result deleteProfile() {
         Account current = JPA.em().merge(Component.currentAccount());
-        Account dummy = Account.findByEmail("anonym@htwplus.de"); //TODO: change placeholder
+        Account dummy = Account.findByEmail(ConfigFactory.load().getString("htwplus.dummy.mail"));
 
         // Check Password //
         Form<Login> filledForm = loginForm.bindFromRequest();
@@ -285,7 +287,7 @@ public class ProfileController extends BaseController {
             return redirect(controllers.routes.ProfileController.update(current.id));
         }
 
-        Logger.info("Deleting Account[#"+current.id+"]... persistent? "+JPA.em().contains(current));
+        Logger.info("Deleting Account[#"+current.id+"]...");
         // Anonymize Posts //
         List<Post> owned = Post.listAllPostsOwnedBy(current.id);
         for(Post post : owned) {
