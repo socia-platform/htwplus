@@ -9,11 +9,13 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import com.typesafe.config.ConfigFactory;
 import models.base.BaseModel;
 import models.base.IJsonNodeSerializable;
 import models.enums.AccountRole;
 import models.enums.EmailNotifications;
 
+import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.Logger;
 import play.data.validation.Constraints.Email;
@@ -102,7 +104,58 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	@Override
 	public void delete() {
+        Account dummy = Account.findByEmail(ConfigFactory.load().getString("htwplus.dummy.mail"));
+
+        // Anonymize Posts //
+        List<Post> owned = Post.listAllPostsOwnedBy(this.id);
+        for(Post post : owned) {
+            post.owner = dummy;
+            post.create(); // elastic search indexing
+            post.update();
+        }
+        List<Post> pinned = Post.listAllPostsPostedOnAccount(this.id);
+        for(Post post : pinned) {
+            post.account = dummy;
+            post.create(); // elastic search indexing
+            post.update();
+        }
+
+        // Anonymize created groups //
+        List<Group> groups = Group.listAllGroupsOwnedBy(this.id);
+        for(Group group : groups) {
+            if(GroupAccount.findAccountsByGroup(group, LinkType.establish).size() == 1) { // if the owner is the only member of the group
+                Logger.info("Group '" + group.title + "' is now empty, so it will be deleted!");
+                group.delete();
+            } else {
+                group.owner = dummy;
+                group.update();
+            }
+        }
+
+        // Delete Friendships //
+        List<Friendship> friendships = Friendship.listAllFriendships(this.id);
+        for(Friendship friendship : friendships) {
+            friendship.delete();
+        }
+
+        // Anonymize media //
+        List<Media> media = Media.listAllOwnedBy(this.id);
+        for(Media med : media) {
+            med.owner = dummy;
+            med.update();
+        }
+
+        // Delete incoming notifications //
         Notification.deleteNotificationsForAccount(this.id);
+
+        // (internally) anonymize outgoing notifications //
+        // The renderedContent still contains the name!  //
+        // TODO: notification anonymization              //
+        List<Notification> notifications = Notification.findBySenderId(this.id);
+        for(Notification not : notifications) {
+            not.sender = dummy;
+            not.update();
+        }
 
         ElasticsearchService.deleteAccount(this);
 
