@@ -15,10 +15,12 @@ import models.enums.AccountRole;
 import models.enums.EmailNotifications;
 
 import models.services.ElasticsearchService;
+import play.Logger;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import controllers.Component;
+import play.db.jpa.Transactional;
 import play.libs.Json;
 
 @Entity
@@ -43,17 +45,17 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	
 	public String avatar;
 
-	@OneToMany(mappedBy = "account")
+	@OneToMany(mappedBy = "account", orphanRemoval = true)
 	public Set<Friendship> friends;
 	
-	@OneToMany(mappedBy="account")
+	@OneToMany(mappedBy="account", orphanRemoval = true)
 	public Set<GroupAccount> groupMemberships;
 
 	public Date lastLogin;
 
 	public String studentId;
 
-	@OneToOne
+	@OneToOne(orphanRemoval = true)
 	public Studycourse studycourse;
 	public String degree;
 	public Integer semester;
@@ -100,8 +102,12 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	@Override
 	public void delete() {
-		// TODO Auto-generated method stub
-	}
+        Notification.deleteNotificationsForAccount(this.id);
+
+        ElasticsearchService.deleteAccount(this);
+
+        JPA.em().remove(this);
+    }
 		
 	/**
      * Retrieve a User from email.

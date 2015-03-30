@@ -104,6 +104,21 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
     }
 
     /**
+     * Returns a list of notifications <b>sent</b> by a specific account ID.
+     *
+     * @param senderId User account ID
+     * @return List of notifications
+     * @throws Throwable
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Notification> findBySenderId(final Long senderId)  {
+        return (List<Notification>) JPA.em()
+                .createQuery("FROM Notification n WHERE n.sender.id = :senderId")
+                .setParameter("senderId", senderId)
+                .getResultList();
+    }
+
+    /**
      * Returns a list of notifications by a specific user account ID for a specific page.
      *
      * @param accountId User account ID
@@ -151,6 +166,17 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
     public static void deleteReferencesForAccountId(final BaseModel reference, final long accountId) {
         JPA.em().createQuery("DELETE FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :accountId")
                 .setParameter("referenceId", reference.id)
+                .setParameter("accountId", accountId)
+                .executeUpdate();
+    }
+
+    /**
+     * Deletes all notifications for a specific account ID
+     *
+     * @param accountId User account ID
+     */
+    public static void deleteNotificationsForAccount(final long accountId) {
+        JPA.em().createQuery("DELETE FROM Notification n WHERE n.recipient.id = :accountId")
                 .setParameter("accountId", accountId)
                 .executeUpdate();
     }

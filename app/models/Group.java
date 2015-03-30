@@ -145,6 +145,11 @@ public class Group extends BaseNotifiable implements INotifiable {
         return JPA.em().createQuery("FROM Group").getResultList();
 	}
 
+    @SuppressWarnings("unchecked")
+    public static List<Group> listAllGroupsOwnedBy(Long id) {
+        return JPA.em().createQuery("FROM Group g WHERE g.owner.id = "+id).getResultList();
+    }
+
     /**
      * Returns true, if an account is member of a group.
      *
