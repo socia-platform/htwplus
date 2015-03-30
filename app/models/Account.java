@@ -106,6 +106,11 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public void delete() {
         Account dummy = Account.findByEmail(ConfigFactory.load().getString("htwplus.dummy.mail"));
 
+        if(dummy == null) {
+            Logger.error("Couldn't delete account because there is no Dummy Account! (mail="+ConfigFactory.load().getString("htwplus.dummy.mail")+")");
+            throw new RuntimeException("Couldn't delete account because there is no Dummy Account!");
+        }
+
         // Anonymize Posts //
         List<Post> owned = Post.listAllPostsOwnedBy(this.id);
         for(Post post : owned) {
