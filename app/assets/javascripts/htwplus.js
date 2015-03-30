@@ -222,20 +222,27 @@ $(document).ready(function () {
     autolinkUrls();
 
     /*
-     * Confirm account deletion
+     * Add Countdown to Account deletion button
      */
-    $("#hp-confirmAccountDelete").click(function() {
-        var enteredText = $("#hp-confirmDeleteText").val();
+    $("#hp-deleteModal").on("show.bs.modal", function() {
+        $("#hp-deleteConfirmSubmit").attr("disabled", "disabled");
 
-        if(enteredText.toLowerCase() !== "hiermit lösche ich meinen account von dieser wundervollen website") {
-            console.log(enteredText);
-            $("#hp-confirmDeleteText").animate({opacity:0.3},100,"linear",function(){
-                $(this).animate({opacity:1},200);
-                $(this).focus();
-            });
-        } else {
-            window.location.href = $(this).attr("data-hp-deletelink");
+        if($.disableDeleteFunctionTimeout) {
+            clearTimeout($.disableDeleteFunctionTimeout);
         }
+
+        var disableTimeLeft = 10;
+        var disableCountdown = function() {
+            if(disableTimeLeft > 0) {
+                $("#hp-deleteConfirmSubmit").val("Warte "+disableTimeLeft+"s...");
+                disableTimeLeft--;
+                $.disableDeleteFunctionTimeout = setTimeout(disableCountdown, 1000);
+            } else {
+                $("#hp-deleteConfirmSubmit").removeAttr("disabled");
+                $("#hp-deleteConfirmSubmit").val("LÖSCHEN");
+            }
+        }
+        disableCountdown();
     });
 
     /*
