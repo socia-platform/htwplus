@@ -1011,6 +1011,53 @@ table .hp-avatar {
     margin-top: -4px;
 }
 
+div[class*="hp-avatar-default-"] {
+	color: white;
+	text-align: center;
+	vertical-align: middle;
+	display: table-cell;
+}
+
+div.hp-avatar-default-0 {
+	background-color: rgb(118, 185, 0);
+}
+
+div.hp-avatar-default-1 {
+	background-color: rgb(255, 95, 0);
+}
+
+div.hp-avatar-default-2 {
+	background-color: rgb(98, 159, 161);
+}
+
+div.hp-avatar-default-3 {
+	background-color: rgb(90, 88, 88);
+}
+
+div.hp-avatar-default-4 {
+	background-color: rgb(230, 178, 130);
+}
+
+div.hp-avatar-default-5 {
+	background-color: rgb(43, 192, 175);
+}
+
+div.hp-avatar-default-6 {
+	background-color: rgb(152, 84, 192);
+}
+
+div.hp-avatar-default-7 {
+	background-color: rgb(192, 84, 162);
+}
+
+div.hp-avatar-default-8 {
+	background-color: rgb(219, 93, 93);
+}
+
+div.hp-avatar-default-9 {
+	background-color: rgb(95, 121, 63);
+}
+
 .hp-avatar-small {
     width: 30px;
     border-radius: 4px;
