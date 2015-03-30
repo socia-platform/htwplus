@@ -1192,10 +1192,6 @@ table .hp-avatar {
 
 /*========= Account Deletion ==========*/
 
-#hp-delete-account {
-    margin-left: 180px;
-}
-
 #hp-deleteModal .modal-header {
     background-color: #d43f3a;
     border-top-left-radius: 5px;
