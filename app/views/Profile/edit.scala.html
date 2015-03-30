@@ -23,6 +23,7 @@
 					<form action="@routes.ProfileController.createAvatar(profile.id)" id="hp-avatar-upload-finish" method="post">
 						<button type="button" class="btn btn-warning" id="hp-avatar-save-button">Speichern</button>
 						<button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+						<div class="loading"></div>
 					</form>
 				</div>
 			</div>
@@ -34,13 +35,18 @@
 			<dt>Profilbild</dt>
 			<dd>
 				<div class="row">
-					<div class="col-lg-2">
-						<img alt="avatar" src="@routes.ProfileController.getAvatar(profile.id, "medium")" class="hp-avatar-medium" />
-					</div>
-					<div class="col-lg-10">
+					@if(profile.hasAvatar){
+						<div class="col-lg-2">
+							<img alt="avatar" src="@routes.ProfileController.getAvatar(profile.id, "medium")" class="hp-avatar-medium" />
+						</div>
+						<div class="col-lg-10">
+					} else {
+						<div class="col-lg-12">
+					}
+
 						<div class="hp-avatar-input-wrapper btn btn-warning">
-							Bild ändern
-							<input type="file" name="avatarimage" class="hp-avatar-fileinput" />
+						@if(profile.hasAvatar){ Bild ändern } else { Bild hinzufügen }
+							<input type="file" name="avatarimage" class="hp-avatar-fileinput" id="yeah" />
 						</div>
 						<div class="loading"></div>
 						<div class="hp-avatar-flash">
@@ -51,7 +57,6 @@
 			</dd>
 		</dl>
 	</form>
-
 </div>
 	
 @form(routes.ProfileController.update(profile.id), 'class -> "ajaxForm") {

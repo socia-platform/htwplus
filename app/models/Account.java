@@ -248,6 +248,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 			AvatarService.resize(fsAvatarLarge.getFile(), AVATAR_LARGE_SIZE, AVATAR_LARGE_SIZE);
 			AvatarService.resize(fsAvatarMedium.getFile(), AVATAR_MEDIUM_SIZE, AVATAR_MEDIUM_SIZE);
 			AvatarService.resize(fsAvatarSmall.getFile(), AVATAR_SMALL_SIZE, AVATAR_SMALL_SIZE);
+			this.avatar = AVATAR_CUSTOM;
 		} catch (FileOperationException e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -295,6 +296,30 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	private String getTempAvatarName(){
 		String fileName = this.id.toString() + ".jpg";
 		return fileName;
+	}
+
+	/**
+	 * Determines if the user has a custom avatar
+	 *
+	 * @return
+	 */
+	public boolean hasAvatar(){
+		if(this.avatar.equals(AVATAR_CUSTOM)){
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns the initials of the user as an alternative to the avatar
+	 *
+	 * @return
+	 */
+	public String getInitials(){
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.firstname.charAt(0));
+		sb.append(this.lastname.charAt(0));
+		return sb.toString();
 	}
 	
 	public static boolean isOwner(Long accountId, Account currentUser) {

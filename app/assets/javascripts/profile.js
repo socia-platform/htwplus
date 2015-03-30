@@ -6,6 +6,7 @@ $(document).ready(function () {
     function AvatarUpload(element) {
         this.$element = $(element);
         this.$uploadForm = this.$element.find('#hp-avatar-uploadform');
+        this.$uploadInput = this.$element.find('.hp-avatar-fileinput')[0];
         this.$finishForm = this.$element.find('#hp-avatar-upload-finish');
         this.$uploadButton = this.$element.find('input');
         this.$errorMessage = this.$element.find('.hp-avatar-flash');
@@ -21,6 +22,7 @@ $(document).ready(function () {
     AvatarUpload.prototype = {
 
         init: function () {
+
             var _this = this;
             this.$uploadButton.change(function (e) {
                 _this.uploadFile();
@@ -46,6 +48,10 @@ $(document).ready(function () {
 
         uploadFile: function () {
             //this.$loading.show();
+            this.resetError();
+            if(!this.validateFile()){
+                return;
+            }
             var data = new FormData(this.$uploadForm[0]);
             var url = this.$uploadForm.attr('action');
             var _this = this;
@@ -64,6 +70,23 @@ $(document).ready(function () {
             });
         },
 
+        validateFile: function () {
+            var allowedTypes = ['image/jpeg', 'image/png'];
+            var file = this.$uploadInput.files[0];
+            var type = file.type;
+            var size = file.size;
+            size = size / 1024 / 1024;
+            if(allowedTypes.indexOf(type) == -1){
+                this.showError("Das Dateiformat wird nicht unterstützt.");
+                return false;
+            }
+            if(size > 3){
+                this.showError("Das Bild ist leider zu groß.");
+                return false;
+            }
+            return true;
+        },
+
         uploadError: function (XMLHttpRequest, textStatus, errorThrown) {
             var error = XMLHttpRequest.responseJSON.error;
             this.$errorMessage.html(error);
@@ -78,6 +101,16 @@ $(document).ready(function () {
             this.$previewImg.load(function () {
                 _this.$modal.modal();
             });
+        },
+
+        showError: function (message) {
+            this.$errorMessage.html(message);
+            this.$errorMessage.addClass("hp-avatar-error");
+        },
+
+        resetError: function () {
+            this.$errorMessage.html("Max. 3 MB");
+            this.$errorMessage.removeClass("hp-avatar-error");
         },
         
         cropSuccess: function () {
@@ -98,10 +131,8 @@ $(document).ready(function () {
                 dataType: 'json',
                 processData: false,
                 success: function () {
-                    _this.$modal.modal('hide');
-                    var img =  _this.$profileAvatar.attr("src");
-                    var d = new Date();
-                    _this.$profileAvatar.attr("src", img+"?"+d.getTime());
+                    _this.$modal.hide();
+                    location.reload();
                 }
             });
         }

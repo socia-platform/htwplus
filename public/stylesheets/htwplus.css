@@ -28,6 +28,10 @@ a.disabled {
     text-decoration: line-through;
 }
 
+a.undecorated:hover {
+    text-decoration: none;
+}
+
 hr {
 	border-bottom: 1px solid #ffffff
 }
@@ -1060,21 +1064,26 @@ div.hp-avatar-default-9 {
 
 .hp-avatar-small {
     width: 30px;
+    height:  30px;
     border-radius: 4px;
 }
 
 .hp-avatar-large {
     width: 250px;
+    height: 250px;
     border-radius: 6px;
 }
 
 .hp-avatar-navi {
     width: 32px;
+    height: 32px;
+    display: inline-block;
     border-radius: 4px;
 }
 
 .hp-avatar-medium {
     width: 72px;
+    height: 72px;
     border-radius: 5px;
     display: inline-block;
 }

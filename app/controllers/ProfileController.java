@@ -370,23 +370,27 @@ public class ProfileController extends BaseController {
 	 */
 	public static Result getAvatar(long id, String size){
 		Account account = Account.findById(id);
-		File avatar;
-		switch (size) {
-			case "small":
-				avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
-				break;
-			case "medium":
-				avatar = account.getAvatar(Account.AVATAR_SIZE.MEDIUM);
-				break;
-			case "large":
-				avatar = account.getAvatar(Account.AVATAR_SIZE.LARGE);
-				break;
-			default:
-				avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
-		}
-		response().setHeader("Content-disposition","inline");
-		if(avatar != null){
-			return ok(avatar);
+		if(account != null){
+			File avatar;
+			switch (size) {
+				case "small":
+					avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
+					break;
+				case "medium":
+					avatar = account.getAvatar(Account.AVATAR_SIZE.MEDIUM);
+					break;
+				case "large":
+					avatar = account.getAvatar(Account.AVATAR_SIZE.LARGE);
+					break;
+				default:
+					avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
+			}
+			response().setHeader("Content-disposition","inline");
+			if(avatar != null){
+				return ok(avatar);
+			} else {
+				return notFound();
+			}
 		} else {
 			return notFound();
 		}

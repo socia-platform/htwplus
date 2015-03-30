@@ -60,7 +60,11 @@
 		<ul class="nav navbar-nav navbar-right">
 			<li class="dropdown">
 				<a href="#" class="hp-nav-user dropdown-toggle" data-toggle="dropdown">
-					<img alt="avatar" src="@routes.ProfileController.getAvatar(user.id, "medium")" class="hp-avatar-navi" />
+					@if(user.hasAvatar){
+						<img alt="avatar" src="@routes.ProfileController.getAvatar(user.id)" class="hp-avatar-navi" />
+					} else {
+						<div class="hp-avatar-navi hp-avatar-default-@user.avatar">@user.getInitials</div>
+					}
 					<span class="visible-lg-inline-block">@user.name </span>
 					<b class="caret"></b>
 				</a>
