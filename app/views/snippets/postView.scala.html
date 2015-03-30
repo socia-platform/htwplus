@@ -23,11 +23,11 @@
                     }
                     @if(Secured.isAllowedToEditPost(post, currentUser)){
                         @if(Secured.isPostStillEditable(post, currentUser)) {
-                            <a id="hp-editPost_@post.id" class="hp-post-edit" style="text-decoration: none;" rel="tooltip" data-original-title="Post bearbeiten">
+                            <a id="hp-editPost_@post.id hp-nohref" class="hp-post-edit" rel="tooltip" data-original-title="Post bearbeiten">
                                 <span class="glyphicon glyphicon-pencil"></span>
                             </a>
                         } else {
-                            <a class="hp-post-edit disabled" style="text-decoration: none;" rel="tooltip" data-original-title="Posts lassen sich nur @ConfigFactory.load().getInt("htwplus.post.editTimeLimit") Minuten nach Erstellung bearbeiten.">
+                            <a class="hp-post-edit hp-nohref disabled" rel="tooltip" data-original-title="Posts lassen sich nur @ConfigFactory.load().getInt("htwplus.post.editTimeLimit") Minuten nach Erstellung bearbeiten.">
                                 <span class="glyphicon glyphicon-pencil"></span>
                             </a>
                         }
