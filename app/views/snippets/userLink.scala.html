@@ -2,14 +2,27 @@
 @import helper._
 @import models.enums.AccountRole;
 
-<a href="@if(Secured.isFriend(user)) { @routes.ProfileController.stream(user.id) } else { @routes.ProfileController.view(user.id) }" data-placement="@place" data-original-title="@user.name"
-        @if(user.role == AccountRole.STUDENT) {
-        data-content="Rolle: Student @if(user.studycourse != null){<br />Studiengang: @user.studycourse.title<br />}@if(user.semester != null){@user.semester. Semester }@if(user.degree != null){@user.degree}"
-        } else { @if(user.role == AccountRole.TUTOR) {
-        data-content="Rolle: Dozent @if(user.studycourse != null){<br />Studiengang: @user.studycourse.title}"
+<a @if(user.role != AccountRole.DUMMY) {
+        href="@if(Secured.isFriend(user)) {  @* Play doesn't support 'else if' -.- *@
+            @routes.ProfileController.stream(user.id)
         } else {
-        data-content="<i>Komisch, diese Person ist unbekannt!</i>"
+            @routes.ProfileController.view(user.id)
+        }"
+    }
+
+    data-content="@if(user.role == AccountRole.STUDENT) {
+        Rolle: Student @if(user.studycourse != null){ <br />Studiengang: @user.studycourse.title<br />}@if(user.semester != null){@user.semester. Semester }@if(user.degree != null){@user.degree}
+    } else {
+        @if(user.role == AccountRole.TUTOR) {
+            Rolle: Dozent @if(user.studycourse != null){<br />Studiengang: @user.studycourse.title}
+        } else { @if(user.role == AccountRole.DUMMY) { @* Play doesn't support 'else if' -.- *@
+            <i>Dieser Account repräsentiert User, die ihr Profil gelöscht haben.</i>
+        } else {
+            <i>Komisch, diese Person ist unbekannt!</i>
         }}
-        data-delay="500" data-trigger="hover" data-html="true" rel="popover">
-        @user.name
+    }"
+
+    data-placement="@place" data-original-title="@user.name"
+    data-delay="500" data-trigger="hover" data-html="true" rel="popover" class="hp-nohref">
+    @user.name
 </a>
