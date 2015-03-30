@@ -290,7 +290,9 @@ public class ProfileController extends BaseController {
         Logger.info("Deleting Account[#"+current.id+"]...");
         current.delete();
 
+        // override logout message
+        Result logoutResult = AccountController.logout();
         flash("success", Messages.get("profile.delete.success"));
-        return AccountController.logout();
+        return logoutResult;
     }
 }
