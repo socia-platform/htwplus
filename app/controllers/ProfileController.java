@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.typesafe.config.ConfigFactory;
 import models.*;
+import models.enums.AccountRole;
 import models.enums.EmailNotifications;
 import models.enums.LinkType;
 import play.Logger;
@@ -44,7 +45,7 @@ public class ProfileController extends BaseController {
 	public static Result view(final Long id) {
 		Account account = Account.findById(id);
 
-		if (account == null) {
+		if (account == null || account.role == AccountRole.DUMMY) {
 			flash("info", "Diese Person gibt es nicht.");
 			return redirect(controllers.routes.Application.index());
 		} else {
@@ -64,7 +65,7 @@ public class ProfileController extends BaseController {
 		Account account = Account.findById(accountId);
 		Account currentUser = Component.currentAccount();
 		
-		if (account == null) {
+		if (account == null || account.role == AccountRole.DUMMY) {
 			flash("info", "Diese Person gibt es nicht.");
 			return redirect(controllers.routes.Application.index());
 		}

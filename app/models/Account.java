@@ -289,7 +289,10 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
     public static long indexAllAccounts() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Account account: all()) ElasticsearchService.indexAccount(account);
+        for (Account account: all()) {
+            if(account.role != AccountRole.DUMMY)
+                ElasticsearchService.indexAccount(account);
+        }
         return (System.currentTimeMillis() - start) / 100;
 
     }
