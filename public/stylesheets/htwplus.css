@@ -1220,6 +1220,10 @@ table .hp-avatar {
     font-size: 20px;
 }
 
+.hp-warningModal .hp-bigcaption {
+    font-size: 16px;
+}
+
 #hp-deleteConfirmPassword {
     margin-bottom: 0px;
 }

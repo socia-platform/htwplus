@@ -1,0 +1,27 @@
+@(account: Account)
+
+<div aria-hidden="true" aria-labelledby="hp-confirmDeleteModalLabel@account.id" id="hp-confirmDeleteModal@account.id" class="modal fade hp-warningModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 id="hp-confirmDeleteModalLabel" class="modal-title hp-truncate">
+                    <b> WARNUNG </b>
+                </h4>
+            </div>
+            @helper.form(action = routes.AdminController.deleteAccount(account.id), 'id -> "hp-confirmDeleteForm", 'class -> "hp-nolabel") {
+                <div class="modal-body">
+                    <b class="hp-bigcaption">Du bist im Begriff, diesen Account unwiderruflich zu löschen!</b><br>
+                    Die Posts, Kommentare, Gruppen und Medien des Users werden in anonymisierter Form bestehen bleiben. Alle anderen Daten werden gelöscht!<br>
+                    <br>
+                    <p>Wenn du dir wirklich sicher bist, gib <b>Account wirklich löschen</b> in das folgende Feld ein:</p>
+                    <input type="text" name="confirmText" id="hp-confirmDeleteText" class="form-control" placeholder="Bestätigung" autocomplete="off">
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" id="hp-confirmDeleteSubmit" class="btn btn-danger" value="LÖSCHEN">
+                    <button data-dismiss="modal" class="btn btn-success">Nicht löschen</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
