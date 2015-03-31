@@ -1197,7 +1197,7 @@ table .hp-avatar {
 
 /*========= Account Deletion ==========*/
 
-#hp-deleteModal .modal-header {
+.hp-warningModal .modal-header {
     background-color: #d43f3a;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -1205,20 +1205,21 @@ table .hp-avatar {
     color: white;
 }
 
-#hp-deleteModal .close {
+.hp-warningModal .close {
     margin-top: 0px;
     font-size: 24px;
     opacity: 0.3;
 }
 
-#hp-deleteModal .close:hover , #hp-deleteModal .close:focus {
+.hp-warningModal .close:hover , .hp-warningModal .close:focus {
     opacity: 0.6;
 }
 
-#hp-deleteModalLabel {
+.hp-warningModal .modal-title {
     text-align: center;
     font-size: 20px;
 }
+
 #hp-deleteConfirmPassword {
     margin-bottom: 0px;
 }
