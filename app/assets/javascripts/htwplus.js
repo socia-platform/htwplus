@@ -335,7 +335,7 @@ $(document).ready(function () {
                 ].join('\n'),
                 suggestion: Handlebars.compile("" +
                     "{{#if avatar}} " +
-                    "<img class='autosuggest-user-avatar' src='/assets/images/avatars/{{avatar}}.png' alt='picture'>{{{hLabel}}}" +
+					"<div class='hp-avatar-small hp-avatar-default-0'>XX</div>{{{hLabel}}}" +
                     "{{/if}}" +
                     "{{#if groupIcon}}" +
                     "<span class='glyphicon glyphicon-{{groupIcon}} autosuggest-group-icon'></span>{{{hLabel}}}" +

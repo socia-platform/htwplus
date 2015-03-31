@@ -28,6 +28,10 @@ a.disabled {
     text-decoration: line-through;
 }
 
+a.undecorated:hover {
+    text-decoration: none;
+}
+
 hr {
 	border-bottom: 1px solid #ffffff
 }
@@ -1269,6 +1273,133 @@ table .hp-avatar {
 	margin-bottom: -4px;
     margin-top: -4px;
 }
+
+div[class*="hp-avatar-default-"] {
+	color: white;
+	text-align: center;
+	vertical-align: middle;
+	display: table-cell;
+}
+
+div.hp-avatar-default-0 {
+	background-color: rgb(118, 185, 0);
+}
+
+div.hp-avatar-default-1 {
+	background-color: rgb(255, 95, 0);
+}
+
+div.hp-avatar-default-2 {
+	background-color: rgb(98, 159, 161);
+}
+
+div.hp-avatar-default-3 {
+	background-color: rgb(90, 88, 88);
+}
+
+div.hp-avatar-default-4 {
+	background-color: rgb(230, 178, 130);
+}
+
+div.hp-avatar-default-5 {
+	background-color: rgb(43, 192, 175);
+}
+
+div.hp-avatar-default-6 {
+	background-color: rgb(152, 84, 192);
+}
+
+div.hp-avatar-default-7 {
+	background-color: rgb(192, 84, 162);
+}
+
+div.hp-avatar-default-8 {
+	background-color: rgb(219, 93, 93);
+}
+
+div.hp-avatar-default-9 {
+	background-color: rgb(95, 121, 63);
+}
+
+.hp-avatar-small {
+    width: 30px;
+    height:  30px;
+    border-radius: 4px;
+}
+
+.hp-avatar-large {
+    width: 250px;
+    height: 250px;
+    border-radius: 6px;
+}
+
+.hp-avatar-navi {
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    border-radius: 4px;
+}
+
+.hp-avatar-medium {
+    width: 72px;
+    height: 72px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.hp-avatar-input-wrapper {
+    display: inline-block;
+    height: 32px;
+
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    /*Using a background color, but you can use a background image to represent a button*/
+}
+
+.hp-avatar-fileinput {
+    cursor: pointer;
+    height: 100%;
+    position:absolute;
+    top: 0;
+    right: 0;
+    z-index: 99;
+    /*This makes the button huge. If you want a bigger button, increase the font size*/
+    font-size:50px;
+    /*Opacity settings for all browsers*/
+    opacity: 0;
+    -moz-opacity: 0;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0)
+}
+
+.hp-avatar-flash {
+    margin-top: 10px;
+    margin-left: 5px;
+}
+
+.hp-avatar-error {
+    color: darkred;
+}
+
+.hp-avatar-loading {
+    background-image: url(../images/loading.gif);
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 8px;
+    background-size: 100%;
+    display: none;
+}
+
+
+
+/*#hp-avatar-upload {*/
+    /*min-height: 200px;*/
+    /*width: 200px;*/
+    /*background-color: #808080;*/
+/*}*/
+
+
 
 /*============================== Token ==============================*/
 
