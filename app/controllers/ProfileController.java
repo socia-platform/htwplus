@@ -274,8 +274,13 @@ public class ProfileController extends BaseController {
 	}
 
     @Transactional
-    public static Result deleteProfile() {
-        Account current = JPA.em().merge(Component.currentAccount());
+    public static Result deleteProfile(Long accountId) {
+        Account current = Account.findById(accountId);
+
+        if(!Secured.deleteAccount(current)) {
+            flash("error", Messages.get("profile.delete.nopermission"));
+            return redirect(controllers.routes.Application.index());
+        }
 
         // Check Password //
         Form<Login> filledForm = loginForm.bindFromRequest();
@@ -283,7 +288,7 @@ public class ProfileController extends BaseController {
         if(entered == null || entered.length() == 0) {
             flash("error", Messages.get("profile.delete.nopassword"));
             return redirect(controllers.routes.ProfileController.update(current.id));
-        } else if(!AccountController.checkPassword(entered)) {
+        } else if(!AccountController.checkPassword(accountId, entered)) {
             return redirect(controllers.routes.ProfileController.update(current.id));
         }
 

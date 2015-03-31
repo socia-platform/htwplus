@@ -54,7 +54,7 @@ GET		/user/:id/editPassword				controllers.ProfileController.editPassword(id:Lon
 POST	/user/:id/updatePassword			controllers.ProfileController.updatePassword(id:Long)
 POST	/user/:id/edit						controllers.ProfileController.update(id:Long)
 GET		/user/:id/stream					controllers.ProfileController.stream(id:Long,page: Integer ?= 1)
-POST 	/user/delete					    controllers.ProfileController.deleteProfile()
+POST 	/user/:id/delete					controllers.ProfileController.deleteProfile(id:Long)
 
 
 #Friends
