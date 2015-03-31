@@ -238,7 +238,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	 *
 	 * @param avatarForm
 	 */
-	public void saveAvatar(AvatarForm avatarForm){
+	public void saveAvatar(AvatarForm avatarForm) throws FileOperationException {
 		try {
 			FileService fsTempAvatar = new FileService(Account.AVATAR_REALM, this.getTempAvatarName());
 			FileService fsAvatarLarge = fsTempAvatar.copy(this.getAvatarName(AVATAR_SIZE.LARGE));
@@ -251,6 +251,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 			this.avatar = AVATAR_CUSTOM;
 		} catch (FileOperationException e) {
 			logger.error(e.getMessage(), e);
+			throw new FileOperationException("Error while saving avatar.");
 		}
 	}
 

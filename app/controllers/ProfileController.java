@@ -1,6 +1,7 @@
 package controllers;
 
 import models.*;
+import models.base.FileOperationException;
 import models.base.ValidationException;
 import models.enums.EmailNotifications;
 import models.services.AvatarService;
@@ -283,6 +284,12 @@ public class ProfileController extends BaseController {
 	 */
 	public static Result createTempAvatar(Long id) {
 
+		Account account = Account.findById(id);
+
+		if(account == null){
+			return notFound();
+		}
+
 		ObjectNode result = Json.newObject();
 		MultipartFormData body = request().body().asMultipartFormData();
 		
@@ -298,9 +305,8 @@ public class ProfileController extends BaseController {
 			return badRequest(result);
 		}
 
-		Account currentUser = Component.currentAccount();
 		try {
-			currentUser.setTempAvatar(avatar);
+			account.setTempAvatar(avatar);
 		} catch (ValidationException e) {
 			result.put("error", e.getMessage());
 			return badRequest(result);
@@ -320,7 +326,11 @@ public class ProfileController extends BaseController {
 
 		ObjectNode result = Json.newObject();
 		Account account = Account.findById(id);
-		
+
+		if(account == null){
+			return notFound();
+		}
+
 		if (!Secured.editAccount(account)) {
 			result.put("error", "Not allowed.");
 			return forbidden(result);
@@ -344,6 +354,11 @@ public class ProfileController extends BaseController {
 		ObjectNode result = Json.newObject();
 		
 		Account account = Account.findById(id);
+
+		if(account == null){
+			return notFound();
+		}
+
 		if (!Secured.editAccount(account)) {
 			result.put("error", "Not allowed.");
 			return forbidden(result);
@@ -356,9 +371,14 @@ public class ProfileController extends BaseController {
 			return badRequest(result);
 		}
 
-		account.saveAvatar(form.get());
-		result.put("success", "saved");
-		return ok(result);
+		try {
+			account.saveAvatar(form.get());
+			result.put("success", "saved");
+			return ok(result);
+		} catch (FileOperationException e) {
+			result.put("error", "Unexpected Error while saving avatar.");
+			return internalServerError(result);
+		}
 	}
 
 	/**

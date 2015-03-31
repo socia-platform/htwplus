@@ -1122,6 +1122,16 @@ div.hp-avatar-default-9 {
     color: darkred;
 }
 
+.hp-avatar-loading {
+    background-image: url(../images/loading.gif);
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 8px;
+    background-size: 100%;
+    display: none;
+}
+
 
 
 /*#hp-avatar-upload {*/

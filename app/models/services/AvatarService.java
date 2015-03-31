@@ -57,7 +57,7 @@ public class AvatarService {
             image = Scalr.resize(image, 
                     Scalr.Method.ULTRA_QUALITY, 
                     Scalr.Mode.FIT_EXACT, 
-                    width, 
+                    width,
                     height);
             ImageIO.write(image, "jpg", file);
             image.flush();
