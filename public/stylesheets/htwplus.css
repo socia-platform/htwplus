@@ -1517,10 +1517,18 @@ div.hp-avatar-default-9 {
 
 /*========= AutoSuggestion ==========*/
 
-.autosuggest-user-avatar {
-    width: 25px;
-    height: 25px;
-    margin-right: 10px;
+.autosuggest-avatar {
+      float: left;
+      line-height: 30px;
+  }
+.autosuggest-custom-avatar {
+    margin-right: 5px;
+}
+
+.autosuggest-username {
+    margin-left: 5px;
+    line-height: 30px;
+    display: inline;
 }
 
 .autosuggest-group-icon {
@@ -1551,6 +1559,7 @@ div.hp-avatar-default-9 {
 .tt-suggestion {
     padding: 5px;
     cursor: pointer;
+    clear: both;
 }
 .tt-suggestion.tt-cursor {
     background-color: #0097cf;

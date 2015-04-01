@@ -119,6 +119,7 @@ public class ElasticsearchService {
                 .setSource(jsonBuilder()
                                 .startObject()
                                 .field("name", account.name)
+                                .field("initial", account.getInitials())
                                 .field("avatar", account.avatar)
                                 .field("public", true)
                                 .field("friends", Friendship.findFriendsId(account))
