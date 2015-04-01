@@ -103,7 +103,7 @@
 		@if(!approvedCourses.isEmpty){
 			@views.html.Group.snippets.listCourses(approvedCourses, user)
 		} else {
-		<p><i>Du bist noch keinem Kurs beigetreten. Jetzt einen Kurs <b><a class="hp-focus-search">suchen</a></b>@if(user.role == AccountRole.TUTOR) { oder einfach einen <b><a href="@routes.GroupController.create()">gründen</a></b>}.</i></p>
+		<p><i>Du bist noch keinem Kurs beigetreten. Jetzt einen Kurs <b><a href="@routes.Application.search()">suchen</a></b>@if(user.role == AccountRole.TUTOR) { oder einfach einen <b><a href="@routes.GroupController.create()">gründen</a></b>}.</i></p>
 		}
 
         <hr />
@@ -118,7 +118,7 @@
 		@if(!approvedGroups.isEmpty){
 			@views.html.Group.snippets.listGroups(approvedGroups, user)
 		} else {
-		<p><i>Du bist noch keiner Gruppe beigetreten. Jetzt eine Gruppe <b><a class="hp-focus-search">suchen</a></b> oder einfach eine <b><a href="@routes.GroupController.create()">gründen</a></b>.</i></p>
+		<p><i>Du bist noch keiner Gruppe beigetreten. Jetzt eine Gruppe <b><a href="@routes.Application.search()">suchen</a></b> oder einfach eine <b><a href="@routes.GroupController.create()">gründen</a></b>.</i></p>
 		}
 	}
 }
