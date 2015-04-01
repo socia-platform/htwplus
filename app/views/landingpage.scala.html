@@ -3,13 +3,17 @@
 
 <head>
     <title>HTWplus</title>
-    <link rel="stylesheet" href='@routes.Assets.at("bootstrap/css/bootstrap.min.css")'>
-    <link rel="stylesheet" media="all" href='@routes.Assets.at("stylesheets/htwplus.css")'>
-    <link rel="stylesheet" media="all" href='@routes.Assets.at("stylesheets/bootstrap-prettyfile.css")'>
-    <link id="dynamic-favicon" rel="shortcut icon" type="image/png" href='@routes.Assets.at("images/favicon.png")'>
-    <link href='http://fonts.googleapis.com/css?family=Swanky+and+Moo+Moo' rel='stylesheet' type='text/css'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link id="dynamic-favicon" rel="shortcut icon" type="image/png" href='@routes.Assets.at("images/favicon.png")'>
+    <link href='http://fonts.googleapis.com/css?family=Swanky+and+Moo+Moo' rel='stylesheet' type='text/css'>
+
+    <!-- injector:css -->
+    <link rel="stylesheet" href="/public/bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/public/stylesheets/bootstrap-prettyfile.css">
+    <link rel="stylesheet" href="/public/stylesheets/jquery.fileupload-ui.css">
+    <link rel="stylesheet" href="/public/stylesheets/main.css">
+    <!-- endinjector -->
 </head>
 
 <body id="hp-landingpage">
@@ -796,18 +800,19 @@
     </footer>
 
     <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
-    <script type="text/javascript" src='@routes.Assets.at("bower_components/jquery/dist/jquery.min.js")'></script>
-    <script type="text/javascript" src='@routes.Assets.at("bootstrap/js/bootstrap.min.js")'></script>
-    <script type="text/javascript" src='@routes.Assets.at("bower_components/jQuery-linkify/dist/jquery.linkify.min.js")'></script>
-    <script type="text/javascript" src='@routes.Assets.at("bower_components/jquery-scrollspy/jquery-scrollspy.js")'></script>
-    <script type="text/javascript" src='@routes.Assets.at("bower_components/gsap/src/minified/TweenMax.min.js")'></script>
-    <script type="text/javascript" src='@routes.Assets.at("bower_components/ScrollMagic/js/jquery.scrollmagic.min.js")'></script>
 
-    <script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>
-    <script type="text/javascript" src='@routes.Assets.at("javascripts/landingpage.js")'></script>
-    
-    
-
+    <!-- injector:js -->
+    <script src="/public/bower_components/jquery/dist/jquery.js"></script>
+    <script src="/public/bower_components/jQuery-linkify/dist/jquery.linkify.js"></script>
+    <script src="/public/bower_components/jquery-scrollspy/jquery-scrollspy.js"></script>
+    <script src="/public/bower_components/handlebars/handlebars.js"></script>
+    <script src="/public/bower_components/typehead.js/dist/typeahead.bundle.js"></script>
+    <script src="/public/bower_components/gsap/src/uncompressed/TweenMax.js"></script>
+    <script src="/public/bower_components/ScrollMagic/js/jquery.scrollmagic.js"></script>
+    <script src="/public/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="/public/javascripts/bootstrap-prettyfile.js"></script>
+    <script src="/public/javascripts/landingpage.js"></script>
+    <!-- endinjector -->
 
 </body>
 

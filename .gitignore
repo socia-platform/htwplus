@@ -1,13 +1,15 @@
 # Extracted from https://github.com/ulrich/macaron-factory/blob/master/.gitignore
+
 # Ignore all dotfiles...
 .*
 # except for .gitignore
 !.gitignore
 
-# Ignore Play! working directory #
+
 db
 eclipse
 log
+*.log
 logs
 modules
 precompiled
@@ -31,3 +33,4 @@ conf/META-INF/persistence.xml
 searchstuff
 htwplus
 node_modules
+public/fonts
