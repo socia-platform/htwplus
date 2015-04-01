@@ -31,6 +31,7 @@ import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import controllers.Component;
 import play.libs.Json;
+import scala.Char;
 
 @Entity
 public class Account extends BaseModel implements IJsonNodeSerializable {
@@ -318,8 +319,8 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	 */
 	public String getInitials(){
 		StringBuilder sb = new StringBuilder();
-		sb.append(this.firstname.charAt(0));
-		sb.append(this.lastname.charAt(0));
+		sb.append(Character.toUpperCase(this.firstname.charAt(0)));
+		sb.append(Character.toUpperCase(this.lastname.charAt(0)));
 		return sb.toString();
 	}
 	

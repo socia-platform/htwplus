@@ -15,6 +15,7 @@ $(document).ready(function () {
         this.$saveButton = this.$element.find('#hp-avatar-save-button');
         this.$profileAvatar = this.$element.find('.hp-avatar-medium');
         this.cropBoxData = {};
+        this.$uploadWrapper = this.$element.find('.hp-avatar-input-wrapper');
         this.init();
     }
 
@@ -43,6 +44,7 @@ $(document).ready(function () {
             this.$saveButton.click(function () {
                 _this.cropSuccess();
             });
+            this.$uploadWrapper.tooltip();
         },
 
         uploadFile: function () {
@@ -110,7 +112,7 @@ $(document).ready(function () {
         },
 
         resetError: function () {
-            this.$errorMessage.html("Max. 3 MB");
+            this.$errorMessage.html("");
             this.$errorMessage.removeClass("hp-avatar-error");
         },
         
