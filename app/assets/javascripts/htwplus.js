@@ -100,6 +100,19 @@ $(".hp-optionsTable>tr>td>input").on("click", function(e) {
 });
 
 /*
+* prevent submitting empty posts
+*/
+$(".hp-post-form").on("submit", function(e) {
+    if ($(this).find("textarea").val().trim().length <= 0) {
+        e.preventDefault();
+        $(this).find("textarea").animate({opacity: 0.1}, 100, "linear", function () { // blink and focus textarea
+            $(this).animate({opacity: 1}, 100);
+            $(this).focus();
+        }).focus();
+    }
+}
+
+/*
  * EDIT COMMENTS
  */
 $('body').on('click', 'a.hp-post-edit', function(e) {
@@ -202,11 +215,11 @@ $(document).ready(function () {
 	$('.hp-comment-form').each(function(){
 		var context = $(this);
 		$(".commentSubmit", this).click(function(){
-			if(context.serializeArray()[0].value === ""){
+			if(context.serializeArray()[0].value.trim() == ""){
 				$(context).find('textarea').animate({opacity:0.3},100,"linear",function(){
-					$(this).animate({opacity:1},100);
-					$(this).focus();
-				});
+                    $(this).animate({opacity:1},100);
+                    $(this).focus();
+				}).focus();
 			} else {
 				$.ajax({
 					url: context.attr('action'),
