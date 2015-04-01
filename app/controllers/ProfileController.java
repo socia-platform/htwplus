@@ -227,8 +227,6 @@ public class ProfileController extends BaseController {
 
 			// Fill an and update the model manually 
 			// because the its just a partial form
-			account.avatar = filledForm.field("avatar").value();
-			
 			if (!filledForm.field("email").value().isEmpty()) {
 				account.email = filledForm.field("email").value();
 			} else {
