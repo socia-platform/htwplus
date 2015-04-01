@@ -12,7 +12,7 @@
             @helper.form(action = routes.AdminController.deleteAccount(account.id), 'id -> "hp-confirmDeleteForm", 'class -> "hp-nolabel") {
                 <div class="modal-body">
                     <b class="hp-bigcaption">Du bist im Begriff, diesen Account unwiderruflich zu löschen!</b><br>
-                    Die Posts, Kommentare, Gruppen und Medien des Users werden in anonymisierter Form bestehen bleiben. Alle anderen Daten werden gelöscht!<br>
+                    Die Posts, Kommentare, Gruppen und Medien des Users werden in anonymisierter Form bestehen bleiben. Alle anderen Daten werden gelöscht! Wenn sich der User das nächste mal einloggt, wird ein neuer Account für ihn erstellt.<br>
                     <br>
                     <p>Wenn du dir wirklich sicher bist, gib <b>Account wirklich löschen</b> in das folgende Feld ein:</p>
                     <input type="text" name="confirmText" id="hp-confirmDeleteText" class="form-control" placeholder="Bestätigung" autocomplete="off">
