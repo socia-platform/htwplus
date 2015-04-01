@@ -119,6 +119,7 @@ public class ElasticsearchService {
                 .setSource(jsonBuilder()
                                 .startObject()
                                 .field("name", account.name)
+                                .field("initial", account.getInitials())
                                 .field("avatar", account.avatar)
                                 .field("public", true)
                                 .field("friends", Friendship.findFriendsId(account))
@@ -159,7 +160,7 @@ public class ElasticsearchService {
 
         // Build searchRequest which will be executed after fields to highlight are added.
         SearchRequestBuilder searchRequest = ElasticsearchService.getInstance().getClient().prepareSearch(ES_INDEX)
-                .setFetchSource(new String[]{"title", "grouptype", "name", "avatar", "content"}, new String[]{})
+                .setFetchSource(new String[]{"title", "grouptype", "name", "initial", "avatar", "content"}, new String[]{})
                 .setQuery(filteredQuery);
 
         // Add highlighting on all fields to search on
