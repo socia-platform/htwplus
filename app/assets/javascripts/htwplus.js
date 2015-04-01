@@ -110,7 +110,7 @@ $(".hp-post-form").on("submit", function(e) {
             $(this).focus();
         }).focus();
     }
-}
+});
 
 /*
  * EDIT COMMENTS
