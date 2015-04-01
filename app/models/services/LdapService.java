@@ -162,7 +162,7 @@ public class LdapService {
             Logger.info("Read Account from LDAP: " + this.firstName + " " + this.lastName);
         } catch (LdapException | CursorException e) {
             e.printStackTrace();
-            throw new LdapConnectorException(Messages.get("ldap.generalError"));
+            throw new LdapConnectorException(Messages.get("ldap.wrongCredentials"));
         }
 
         // user data successfully set, try to find the role of the user
@@ -181,7 +181,7 @@ public class LdapService {
             }
         } catch (LdapException | CursorException e) {
             e.printStackTrace();
-            throw new LdapConnectorException(Messages.get("ldap.generalError"));
+            throw new LdapConnectorException(Messages.get("ldap.wrongCredentials"));
         }
     }
 
