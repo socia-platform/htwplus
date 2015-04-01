@@ -1019,7 +1019,7 @@ div[class*="hp-avatar-default-"] {
 	color: white;
 	text-align: center;
 	vertical-align: middle;
-	display: table-cell;
+    line-height: 30px;
 }
 
 div.hp-avatar-default-0 {

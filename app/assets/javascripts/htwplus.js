@@ -271,8 +271,10 @@ $(document).ready(function () {
                     "{{#if custom_avatar}} " +
                     "<img class='autosuggest-custom-avatar hp-avatar-small' src='/user/{{id}}/avatar' alt='avatar'>{{{hLabel}}}" +
                     "{{else}}" +
+                    "{{#if avatar}}" +
                     "<div class='autosuggest-avatar hp-avatar-small hp-avatar-default-{{avatar}}'>{{initial}}</div>" +
                     "<div class='autosuggest-username'>{{{hLabel}}}</div>" +
+                    "{{/if}}" +
                     "{{/if}}" +
                     "{{#if groupIcon}}" +
                     "<span class='glyphicon glyphicon-{{groupIcon}} autosuggest-group-icon'></span>{{{hLabel}}}" +
