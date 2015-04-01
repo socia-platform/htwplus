@@ -280,7 +280,7 @@ $(document).ready(function () {
             }
 
         }).on('typeahead:selected', function($e, searchResult){
-            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream'
+            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
         });
 });
 
