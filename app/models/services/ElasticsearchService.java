@@ -133,6 +133,7 @@ public class ElasticsearchService {
 
     /**
      * Build search query based on all provided fields
+     * @param caller - Define normal search or autocomplete
      * @param query - Terms to search for (e.g. 'informatik')
      * @param filter - Filter for searchfacets (e.g. user, group, comment)
      * @param page - Which results should be shown (e.g. 1: 1-10 ; 2: 11-20 etc.)
@@ -154,13 +155,14 @@ public class ElasticsearchService {
         // Build completeQuery with search- and scoringQuery
         QueryBuilder completeQuery = QueryBuilders.boolQuery().must(searchQuery).should(scoringQuery);
 
+        // Build viewableFilter to show authorized posts only
         FilterBuilder viewableFilter = FilterBuilders.boolFilter().should(FilterBuilders.termFilter("viewable", currentAccountId),FilterBuilders.termFilter("public", true));
 
+        // Build filteredQuery to apply viewableFilter to completeQuery
         QueryBuilder filteredQuery = QueryBuilders.filteredQuery(completeQuery, viewableFilter);
 
         // Build searchRequest which will be executed after fields to highlight are added.
         SearchRequestBuilder searchRequest = ElasticsearchService.getInstance().getClient().prepareSearch(ES_INDEX)
-                .setFetchSource(new String[]{"title", "grouptype", "name", "initial", "avatar", "content"}, new String[]{})
                 .setQuery(filteredQuery);
 
         // Add highlighting on all fields to search on
@@ -169,8 +171,6 @@ public class ElasticsearchService {
         }
 
         // Define html tags for highlighting
-        if (caller.equals("searchSuggestions"))
-            searchRequest = searchRequest.setHighlighterPreTags("<strong>").setHighlighterPostTags("</strong>");
         if (caller.equals("search"))
             searchRequest = searchRequest.setHighlighterPreTags("[startStrong]").setHighlighterPostTags("[endStrong]");
 
@@ -180,6 +180,7 @@ public class ElasticsearchService {
         // Add term aggregation for facet count
         searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("types").field("_type"));
 
+        // Apply PostFilter if request mode is not 'all'
         if (!filter.equals("all")) {
             FilterBuilder filterQuery = FilterBuilders.typeFilter(filter);
             searchRequest.setPostFilter(filterQuery);

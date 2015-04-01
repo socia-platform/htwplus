@@ -279,8 +279,8 @@ $(document).ready(function () {
                     "{{/if}}")
             }
 
-        }).on('typeahead:selected', function($e, datum){
-            window.location.href = window.location.origin + "/"+datum.type+"/" + datum.id + '/stream';
+        }).on('typeahead:selected', function($e, searchResult){
+            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream'
         });
 });
 

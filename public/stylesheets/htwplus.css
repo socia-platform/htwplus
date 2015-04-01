@@ -1306,6 +1306,11 @@ div.hp-avatar-default-9 {
     background-color: #0097cf;
     color: #fff;
 }
+.tt-suggestions strong, em {
+    font-weight: bold;
+    font-style: normal;
+}
+
 .searchresult-container .hp-avatar {
     width: 25px;
     height: 25px;
