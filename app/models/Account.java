@@ -57,7 +57,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	public String studentId;
 
-	@OneToOne(orphanRemoval = true)
+	@OneToOne
 	public Studycourse studycourse;
 	public String degree;
 	public Integer semester;
@@ -153,13 +153,10 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
         // Delete incoming notifications //
         Notification.deleteNotificationsForAccount(this.id);
 
-        // (internally) anonymize outgoing notifications //
-        // The renderedContent still contains the name!  //
-        // TODO: notification anonymization              //
+        // Delete outgoing notifications //
         List<Notification> notifications = Notification.findBySenderId(this.id);
         for(Notification not : notifications) {
-            not.sender = dummy;
-            not.update();
+            not.delete();
         }
 
         ElasticsearchService.deleteAccount(this);
