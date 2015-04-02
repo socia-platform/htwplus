@@ -186,7 +186,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	}
 
 	static public String AVATAR_REALM = "avatar";
-	static public int AVATAR_MIN_SIZE = 600;
+	static public int AVATAR_MIN_SIZE = 250;
 	static public int AVATAR_LARGE_SIZE = 600;
 	static public int AVATAR_MEDIUM_SIZE = 140;
 	static public int AVATAR_SMALL_SIZE = 70;

@@ -1,6 +1,7 @@
 package models.services;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ImagingOpException;
@@ -42,7 +43,7 @@ public class AvatarService {
         try {
             image = ImageIO.read(file);
             image = Scalr.crop(image, x, y, width, height);
-            ImageIO.write(image, "jpg", file);
+            saveToJPG(image, file);
             image.flush();
         } catch (IOException | IllegalArgumentException e){
             logger.error(e.getMessage(), e);
@@ -59,12 +60,19 @@ public class AvatarService {
                     Scalr.Mode.FIT_EXACT, 
                     width,
                     height);
-            ImageIO.write(image, "jpg", file);
+            saveToJPG(image, file);
             image.flush();
         } catch (IOException | IllegalArgumentException e) {
             logger.error(e.getMessage(), e);
             throw new FileOperationException("Resizing failed");
         }
+    }
+
+    static private void saveToJPG(BufferedImage image, File file) throws IOException {
+        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        newImage.createGraphics().drawImage(image, 0, 0, Color.WHITE, null);
+        ImageIO.write(newImage, "jpg", file);
+        newImage.flush();
     }
     
 }
