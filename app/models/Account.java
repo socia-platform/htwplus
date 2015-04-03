@@ -377,6 +377,20 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
         return JPA.em().createQuery("SELECT a.id, a.name FROM Account a").getResultList();
     }
 
+    /**
+     * Index the current account
+     */
+    public void indexAccount() {
+        try {
+            ElasticsearchService.indexAccount(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Index all accounts
+     */
     public static long indexAllAccounts() throws IOException {
         final long start = System.currentTimeMillis();
         for (Account account: all()) ElasticsearchService.indexAccount(account);
@@ -406,5 +420,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		}
 
 	}
+
+
 
 }

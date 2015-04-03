@@ -371,6 +371,7 @@ public class ProfileController extends BaseController {
 
 		try {
 			account.saveAvatar(form.get());
+            account.indexAccount();
 			result.put("success", "saved");
 			return ok(result);
 		} catch (FileOperationException e) {
