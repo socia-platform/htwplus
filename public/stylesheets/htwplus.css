@@ -1062,6 +1062,10 @@ div.hp-avatar-default-9 {
 	background-color: rgb(95, 121, 63);
 }
 
+table td .hp-avatar-small {
+	margin: -4px;
+}
+
 .hp-avatar-small {
     width: 30px;
     height:  30px;
