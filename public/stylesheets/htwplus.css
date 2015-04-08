@@ -665,6 +665,10 @@ input.hp-notification-hour {
     box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.125);
 }
 
+.hp-nav-tabs li > a > span:not(.glyphicon) {
+    font-size: 10px;
+}
+
 /*============================== Logo ==============================*/
 
 .hp-logo {
