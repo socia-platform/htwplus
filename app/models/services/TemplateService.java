@@ -1,6 +1,7 @@
 package models.services;
 
-import org.hibernate.sql.Template;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import play.Logger;
 import play.i18n.Messages;
 
@@ -9,7 +10,6 @@ import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Helper service to render templates. This service also provides helper methods to use in templates.
@@ -92,17 +92,19 @@ public class TemplateService {
     }
 
     /**
-     * Get a difference between two dates.
-     * See: http://stackoverflow.com/a/10650881
+     * Get a (correct) difference between two dates using Joda-Time API.
+     * See: http://stackoverflow.com/a/1555307
+     * See: http://www.joda.org/joda-time/
      *
      * @param date1 the oldest date
      * @param date2 the newest date
-     * @param timeUnit the unit in which you want the diff
-     * @return The difference value, in the provided unit
+     * @return The difference in days
      */
-    public static long getDateDifference(Date date1, Date date2, TimeUnit timeUnit) {
-        long differenceInMilliseconds = date2.getTime() - date1.getTime();
-        return timeUnit.convert(differenceInMilliseconds,TimeUnit.MILLISECONDS);
+    public static int getDateDifference(Date date1, Date date2) {
+        DateTime dateTime1 = new DateTime(date1).withTimeAtStartOfDay();
+        DateTime dateTime2 = new DateTime(date2).withTimeAtStartOfDay();
+
+        return Days.daysBetween(dateTime1, dateTime2).getDays();
     }
 
     /**
@@ -112,7 +114,7 @@ public class TemplateService {
      * @return Colloquially date
      */
     public static String getDateColloquially(Date date) {
-        long dateDifference = TemplateService.getDateDifference(date, new Date(), TimeUnit.DAYS);
+        long dateDifference = TemplateService.getDateDifference(date, new Date());
         SimpleDateFormat dateFormatTime = new SimpleDateFormat("HH:mm");
 
         if (dateDifference > 7) {
