@@ -2,7 +2,7 @@
 function resizeRings() {
 	$('.hp-notepad-content').each(function() {
 		var offset = ($(this).height() + parseInt($(this).css('padding-top'))) % 12.0;
-		if (offset != 0)
+		if (offset !== 0)
 			$(this).css('padding-bottom', (12.0 - offset) + "px");
 		else
 			$(this).css('padding-bottom', '0');
@@ -19,26 +19,26 @@ function toggleMediaSelection(parent) {
 
 function autolinkUrls() {
     $('.hp-truncate').each(function(){
-    	$(this).linkify({
-		  tagName: 'a',
-		  target: '_blank',
-		  newLine: '\n',
-		  linkClass: 'hp-postLink',
-		  linkAttributes: null
+		$(this).linkify({
+			tagName: 'a', 
+			target: '_blank', 
+			newLine: '\n', 
+			linkClass: 'hp-postLink', 
+			linkAttributes: null
 		});
 	});
 	$('.hp-postLink').each(function(){
         if (!$(this).find("span").length)
-    	    $(this).append(" <span class='glyphicon glyphicon-share-alt'></span>");
-	})
+			$(this).append(" <span class='glyphicon glyphicon-share-alt'></span>");
+	});
 }
 
 function truncateBreadcrumb() {
 	var lastBreadcrumb = $("#hp-navbar-breadcrumb .breadcrumb > li:last-child");
 	var index = 3;	// first breadcrumb item which is hidden
 	// hide breadcrumb items while last item isn't visible
-	while (lastBreadcrumb.length &&
-	       lastBreadcrumb.position().left + lastBreadcrumb.width() > $("#hp-navbar-breadcrumb .breadcrumb").width()) {
+	while (lastBreadcrumb.length && 
+		lastBreadcrumb.position().left + lastBreadcrumb.width() > $("#hp-navbar-breadcrumb .breadcrumb").width()) {
 		$("#hp-navbar-breadcrumb #hp-navbar-breadcrumb-truncate").removeClass("hidden");
 		$("#hp-navbar-breadcrumb .breadcrumb > li:nth-child("+index+")").addClass("hidden");
 		index++;
@@ -48,6 +48,19 @@ function truncateBreadcrumb() {
 function showAllBreadcrumbItems() {
 	$("#hp-navbar-breadcrumb .breadcrumb > li").removeClass("hidden");
 	$("#hp-navbar-breadcrumb #hp-navbar-breadcrumb-truncate").addClass("hidden");
+}
+
+/** replaces the content of the given element with a loading indicator, and returns the old content (as html) **/
+function replaceContentWithLoadingIndicator(element) {
+    var old_content = element.html();
+    element.html("<div class=\"loading\"></div>");
+    element.find(".loading").show();
+    return old_content;
+}
+
+/** show an error before/above the given element **/
+function showErrorBeforeElement(element, error_message) {
+    element.before('<div class="alert alert-danger"><a data-dismiss="alert" class="close" href="#">×</a>'+error_message+'</div>');
 }
 
 /*
@@ -86,6 +99,71 @@ $(".hp-optionsTable>tr>td>input").on("click", function(e) {
     e.stopPropagation();
 });
 
+/*
+* prevent submitting empty posts
+*/
+$(".hp-post-form").on("submit", function(e) {
+    if ($(this).find("textarea").val().trim().length <= 0) {
+        e.preventDefault();
+        $(this).find("textarea").animate({opacity: 0.1}, 100, "linear", function () { // blink and focus textarea
+            $(this).animate({opacity: 1}, 100);
+            $(this).focus();
+        }).focus();
+    }
+});
+
+/*
+ * EDIT COMMENTS
+ */
+$('body').on('click', 'a.hp-post-edit', function(e) {
+    if($(e.currentTarget).hasClass("disabled"))
+        return false;
+    else {
+        var post_id = e.currentTarget.id.split("_")[1];
+        var post_container = $("#"+post_id);
+
+        var old_content = replaceContentWithLoadingIndicator(post_container);
+        var removed_classes = post_container.attr("class");
+        post_container.attr("class", ""); // remove the classes (preventing linkify and whitespace stuff to apply)
+
+        post_container.load("/post/"+post_id+"/getEditForm", function(response, status, xhr) {
+            if (status == "error") {
+                console.log("Error when trying to edit post: ["+status+"]");
+                showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                $(".hp-reload").click(function() {
+                    window.location.reload();
+                });
+                post_container.html(old_content); // put back removed content
+            } else {
+                post_container.find(".commentSubmit").click(function () {
+                    var form = post_container.find("form");
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: "POST",
+                        data: form.serialize(),
+                        success: function (data) {
+                            post_container.html(data);
+                            post_container.attr("class", removed_classes);
+                        },
+                        error: function(xhr, status, errorThrown) {
+                            console.log("Error when submitting edited post: ["+status+"] " + errorThrown);
+                            showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                            $(".hp-reload").click(function() {
+                                window.location.reload();
+                            });
+                            post_container.html(old_content); // put back removed content
+                        }
+                    });
+
+                    replaceContentWithLoadingIndicator(post_container);
+                    return false;
+                });
+            }
+        });
+        return false;
+    }
+});
+
 
 /*
  *  prevent click action for disabled list items
@@ -121,14 +199,14 @@ $(document).ready(function () {
 	 * AJAX loading indicator
 	 */
 	$.ajaxSetup({
-	    beforeSend:function(){
-	        $(".loading").show();
-	        $(".loading").css('display', 'inline-block');
-	    },
-	    complete:function(){
-	        $(".loading").hide();
+		beforeSend:function(){
+			$(".loading").show();
+			$(".loading").css('display', 'inline-block');
+		}, 
+		complete:function(){
+			$(".loading").hide();
 			autolinkUrls();
-	    }
+		}
 	});
 
 	/*
@@ -137,11 +215,11 @@ $(document).ready(function () {
 	$('.hp-comment-form').each(function(){
 		var context = $(this);
 		$(".commentSubmit", this).click(function(){
-			if(context.serializeArray()[0].value == ""){
-				$(context).find('textarea').animate({opacity:0},200,"linear",function(){
-					  $(this).animate({opacity:1},200);
-					  $(this).focus();
-				});
+			if(context.serializeArray()[0].value.trim() === ""){
+				$(context).find('textarea').animate({opacity:0.3},100,"linear",function(){
+                    $(this).animate({opacity:1},100);
+                    $(this).focus();
+				}).focus();
 			} else {
 				$.ajax({
 					url: context.attr('action'),
@@ -150,7 +228,12 @@ $(document).ready(function () {
 					success: function(data){
 						context.before(data);
 						context[0].reset();
-					}
+					}, error: function() {
+                        $(context).find('textarea').animate({opacity:0.3},100,"linear",function(){
+                            $(this).animate({opacity:1},100);
+                            $(this).focus();
+                        });
+                    }
 				});
 			}
 			return false;
@@ -190,7 +273,7 @@ $(document).ready(function () {
 				$(context).addClass('open');
 				$(context).removeClass('unloaded');
 			}
-			window.setTimeout("resizeRings()", 400);
+			window.setTimeout(resizeRings(), 400);
 			return false;
 		});
 	});
@@ -217,21 +300,25 @@ $(document).ready(function () {
                     var hLabel = '';
                     var groupType = '';
                     var groupIcon = '';
+                    var custom_avatar = false;
                     if(item._type === 'user') {
                         label = item._source.name;
                         hLabel = item.highlight.name;
+                        if(item._source.avatar === 'custom') {custom_avatar = true;}
                     }
                     if(item._type === 'group') {
                         label = item._source.title;
                         hLabel = item.highlight.title;
                         groupType = item._source.grouptype;
-                        if(groupType === 'open') groupIcon = 'globe'
-                        if(groupType === 'close') groupIcon = 'lock'
-                        if(groupType === 'course') groupIcon = 'briefcase'
+                        if(groupType === 'open') groupIcon = 'globe';
+                        if(groupType === 'close') groupIcon = 'lock';
+                        if(groupType === 'course') groupIcon = 'briefcase';
                     }
                     result.push({
                         label: label,
                         hLabel: hLabel,
+                        initial: item._source.initial,
+                        custom_avatar: custom_avatar,
                         id: item._id,
                         type: item._type,
                         avatar: item._source.avatar,
@@ -264,8 +351,13 @@ $(document).ready(function () {
                     '</div>'
                 ].join('\n'),
                 suggestion: Handlebars.compile("" +
-                    "{{#if avatar}} " +
-                    "<img class='autosuggest-user-avatar' src='/assets/images/avatars/{{avatar}}.png' alt='picture'>{{{hLabel}}}" +
+                    "{{#if custom_avatar}} " +
+                    "<img class='autosuggest-custom-avatar hp-avatar-small' src='/user/{{id}}/avatar' alt='avatar'>{{{hLabel}}}" +
+                    "{{else}}" +
+                    "{{#if avatar}}" +
+                    "<div class='autosuggest-avatar hp-avatar-small hp-avatar-default-{{avatar}}'>{{initial}}</div>" +
+                    "<div class='autosuggest-username'>{{{hLabel}}}</div>" +
+                    "{{/if}}" +
                     "{{/if}}" +
                     "{{#if groupIcon}}" +
                     "<span class='glyphicon glyphicon-{{groupIcon}} autosuggest-group-icon'></span>{{{hLabel}}}" +
@@ -273,7 +365,7 @@ $(document).ready(function () {
             }
 
         }).on('typeahead:selected', function($e, searchResult){
-            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream'
+            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
         });
 });
 
@@ -282,8 +374,16 @@ $(window).resize(function() {
 	truncateBreadcrumb();
 });
 
-$('[rel="tooltip"]').tooltip();
-$('[rel="popover"]').popover();
+$(window).load(function() {
+});
+
+$('body').tooltip({
+    selector: '[rel=tooltip]'
+});
+$('body').popover({
+    trigger: 'hover',
+    selector: '[rel="popover"]'
+});
 
 $('.hp-focus-search').click(function() {
     $('.hp-easy-search').focus();

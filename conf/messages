@@ -29,6 +29,9 @@ error.maxLength=Maximum length is {0}
 error.email=Bitte eine gültige Adresse eingeben
 error.pattern=Es gibt mindestens ein ungültiges Zeichen.
 error.sessionExpired=Deine Sitzung ist abgelaufen.
+error.fileToBig=Die Datei ist zu groß
+error.contentTypeNotSupported=Das Dateiformat wird nicht unterstützt
+error.resolutionLow=Die Auflösung ist zu gering
 
 # --- authenticate
 authenticate.matriculationNumberMissing=Also deine Matrikelnummer brauchen wir schon!
@@ -58,7 +61,13 @@ landingpage.features.notifications.description=Ob neue Posts, Kommentare, Freund
 # --- LDAP connector
 ldap.noConnection=Keine Verbindung zum LDAP-Server möglich. Bitte versuche es später noch einmal.
 ldap.wrongCredentials=Ungültiges Passwort und/oder Matrikelnummer.
-ldap.generalError=Es gab ein Problem bei der Verbindung zum LDAP-Server. Bitte versuche es später noch einmal.
+
+# --- Chat
+chat.chat=Chat
+chat.friends_online=Freunde (Online):
+chat.friends_offline=Leider sind keine deiner Freunde zurzeit online.
+chat.type_message=Gebe eine Nachricht ein...
+chat.type_message_offline=Leider ist dein Freund jetzt offline...
 
 # --- notifications
 notification.title=Übersicht
@@ -93,6 +102,11 @@ post.comment_profile=Neues zum Post <span class="hp-bold">{0}</span> auf deinem 
 post.comment_group=Neues zum Post <span class="hp-bold">{0}</span> in der Gruppe <span class="hp-bold">{1}</span>
 post.comment_profile_own=Neues zu deinem Post <span class="hp-bold">{0}</span> auf dem Newstream von <span class="hp-bold">{1}</span>
 post.broadcast_post=Neue Broadcast Nachricht von <span class="hp-bold">{0}</span> auf deinem Newsstream
+post.date_colloquially_today=Heute um {0} Uhr
+post.date_colloquially_yesterday=Gestern um {0} Uhr
+post.date_colloquially_day_before_yesterday=Vorgestern um {0} Uhr
+post.date_colloquially_days=Vor {0} Tagen um {1} Uhr
+post.date_colloquially_date=Am {0} um {1} Uhr
 friendship.new_request=Neue Freundschaftsanfrage von <span class="hp-bold">{0}</span>
 friendship.request_decline=<span class="hp-bold">{0}</span> hat deine Freundschaftsanfrage abgelehnt
 friendship.request_successful=<span class="hp-bold">{0}</span> hat deine Freundschaftsanfrage angenommen
@@ -120,5 +134,4 @@ admin.broadcast_notification.intro=Wähle einen oder mehrere Empfänger dieser N
 admin.broadcast_notification.error.no_message=Bitte gebe zumindest eine Broadcast Nachricht ein
 admin.indexing=Indexieren
 
-# --- search
 search.headline=Suchergebnisse für <b>{0}</b>

@@ -1,8 +1,11 @@
+/**
+ * This class acts as framework for all WebSocket (WS) related methods.
+ *
+ * @constructor
+ */
 function WS() {
     this.debug = false;
-    this.targetUrl = window.location.protocol === 'https:'
-        ? 'wss://' + window.location.host + '/websocket'
-        : 'ws://' + window.location.host + '/websocket';
+    this.targetUrl = window.location.protocol === 'https:' ? 'wss://' + window.location.host + '/websocket' : 'ws://' + window.location.host + '/websocket';
     this.socket = window.MozWebSocket ? new window.MozWebSocket(this.targetUrl) : new window.WebSocket(this.targetUrl);
 
     var ws = this;
@@ -20,8 +23,17 @@ function WS() {
                 console.log(data);
             }
 
-            if (data.code == "OK" && data.method == "ReceiveNotification" && data.notification) {
-                ws.updateNotification(data.notification, data.unreadCount);
+            // if we got data, decide, which update we have to do
+            if (data.code == "OK") {
+                if (data.method == "ReceiveNotification" && data.notification) {
+                    ws.updateNotification(data.notification, data.unreadCount);
+                } else if (data.method == "FriendList") {
+                    chat.updateFriendList(data.friends, "FriendOnline");
+                } else if (data.method == "FriendOnline" || data.method == "FriendOffline") {
+                    chat.updateFriendList(data.sender, data.method);
+                } else if (data.method == "ReceiveChat") {
+                    chat.receiveChat(data.sender, data.text);
+                }
             }
         } catch (exception) {
             if (ws.debug) {
@@ -29,6 +41,14 @@ function WS() {
                 console.log('Data from server: ' + e.data);
             }
         }
+    };
+
+    /**
+     * WebSocket on open listener. Is triggered, when the connection is established.
+     */
+    this.socket.onopen = function() {
+        // when WebSocket is open, read currently online friend list
+        ws.send({'method': 'GetFriendList'});
     };
 
     /**
@@ -48,8 +68,8 @@ function WS() {
      * @param data The message to send
      */
     this.send = function(data) {
+        var sendingJson = JSON.stringify(data);
         if (ws.debug) {
-            var sendingJson = JSON.stringify(data);
             console.log('WS Send: ' + sendingJson);
         }
 
@@ -158,7 +178,7 @@ function WS() {
         link.rel = 'shortcut icon';
         link.href = count < 1 ? '/assets/images/favicon.png' : '/assets/images/favicon_unread.png';
 
-        this.originalTitle = this.originalTitle == undefined ? document.title : this.originalTitle;
+        this.originalTitle = this.originalTitle === undefined ? document.title : this.originalTitle;
         title.innerHTML = count < 1 ? this.originalTitle : '(' + count.toString() + ') ' + this.originalTitle;
 
         if (oldLink) {
@@ -186,7 +206,13 @@ function WS() {
 }
 
 var webSocket;
+var chat;
 $(document).ready(function () {
+    chat = new Chat();
     webSocket = new WS();
     webSocket.updateNewNotificationCounter();
+});
+
+$(window).on('beforeunload', function() {
+    webSocket.socket.close();
 });

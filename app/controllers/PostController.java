@@ -161,6 +161,40 @@ public class PostController extends BaseController {
 		}
 	}
 
+    public static Result getEditForm(Long postId) {
+        Post post = Post.findById(postId);
+        Account account = Component.currentAccount();
+
+        if(!Secured.isPostStillEditable(post, account)) {
+            return badRequest();
+        }
+
+        return ok(views.html.snippets.editPost.render(post.id, postForm.fill(post)));
+    }
+
+    @Transactional
+    public static Result updatePost(Long postId) {
+        Post post = Post.findById(postId);
+        Account account = Component.currentAccount();
+
+        if(!Secured.isPostStillEditableWithTolerance(post, account)) {
+            return badRequest();
+        } else {
+            Form<Post> filledForm = postForm.bindFromRequest();
+
+            if(filledForm.hasErrors()) {
+                return badRequest();
+            } else {
+                Post newPost = filledForm.get();
+                post.content = newPost.content;
+                post.create(); // updates elasticsearch stuff
+                post.update();
+
+                return ok(post.content);
+            }
+        }
+    }
+
 	@Transactional
 	public static List<Post> getComments(Long id, int limit) {
 		//int max = Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));

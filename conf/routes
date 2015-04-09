@@ -43,17 +43,23 @@ GET		/post/olderComments				    controllers.PostController.getOlderComments(id:L
 GET		/post/:id							controllers.PostController.view(id:Long)
 POST	/post/:id/addComment				controllers.PostController.addComment(id:Long)
 POST	/:target/:id/addPost				controllers.PostController.addPost(id:Long, target:String)
+GET     /post/:id/getEditForm               controllers.PostController.getEditForm(id:Long)
+POST    /post/:id/updatePost                controllers.PostController.updatePost(id:Long)
 GET		/post/:postId/deletePost			controllers.PostController.deletePost(postId:Long)
 
 
 #User
-GET		/profile							controllers.ProfileController.me()
-GET		/user/:id							controllers.ProfileController.view(id:Long)
-GET		/user/:id/edit						controllers.ProfileController.edit(id:Long)
-GET		/user/:id/editPassword				controllers.ProfileController.editPassword(id:Long)
-POST	/user/:id/updatePassword			controllers.ProfileController.updatePassword(id:Long)
-POST	/user/:id/edit						controllers.ProfileController.update(id:Long)
-GET		/user/:id/stream					controllers.ProfileController.stream(id:Long,page: Integer ?= 1)
+GET         /profile                                   controllers.ProfileController.me()
+GET         /user/:id                                  controllers.ProfileController.view(id:Long)
+GET         /user/:id/edit                             controllers.ProfileController.edit(id:Long)
+GET         /user/:id/editPassword                     controllers.ProfileController.editPassword(id:Long)
+POST        /user/:id/updatePassword                   controllers.ProfileController.updatePassword(id:Long)
+POST        /user/:id/tempavatar                       controllers.ProfileController.createTempAvatar(id:Long)
+GET         /user/:id/tempavatar                       controllers.ProfileController.getTempAvatar(id:Long)
+POST        /user/:id/createavatar                     controllers.ProfileController.createAvatar(id:Long)
+GET         /user/:id/avatar                           controllers.ProfileController.getAvatar(id:Long, size:String ?= "small")
+POST        /user/:id/edit                             controllers.ProfileController.update(id:Long)
+GET         /user/:id/stream                           controllers.ProfileController.stream(id:Long,page: Integer ?= 1)
 
 
 #Friends
