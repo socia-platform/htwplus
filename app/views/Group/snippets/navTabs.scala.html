@@ -2,30 +2,70 @@
 @import helper._
 
 <ul class="nav nav-tabs hp-nav-tabs pull-right">
-    <li><a href="#infoModal" role="button" class="btn btn-default active" data-toggle="modal" rel="tooltip" data-original-title="Info" data-container="body"><span class="glyphicon glyphicon-info-sign"></span></a></li>
+    <li>
+        <a href="#infoModal" role="button" class="btn btn-default active" data-toggle="modal" rel="tooltip" data-original-title="Informationen über die Gruppe" data-container="body">
+            <span class="glyphicon glyphicon-info-sign"></span>
+            <span class="hidden-xs"> Info</span>
+        </a>
+    </li>
     @defining(if(Navigation.getTitle().equals("Newsstream")){"active"} else {"deactive"}) { status =>
-    <li class="@status"><a href="@routes.GroupController.stream(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Newsstream" data-container="body"><span class="glyphicon glyphicon-comment"></span></a></li>
+        <li class="@status">
+            <a href="@routes.GroupController.stream(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Newsstream der Gruppe" data-container="body">
+                <span class="glyphicon glyphicon-comment"></span>
+                <span class="hidden-xs"> Newsstream</span>
+            </a>
+        </li>
     }
     @defining(if(Navigation.getTitle().equals("Media")){"active"} else {"deactive"}) { status =>
-    <li class="@status"><a href="@routes.GroupController.media(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Medien" data-container="body"><span class="glyphicon glyphicon-file"></span></a></li>
+        <li class="@status">
+            <a href="@routes.GroupController.media(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Medien der Gruppe" data-container="body">
+                <span class="glyphicon glyphicon-file"></span>
+                <span class="hidden-xs"> Medien</span>
+            </a>
+        </li>
     }
     @defining(if(Navigation.getTitle().equals("Freunde einladen")){"active"} else {"deactive"}) { status =>
-    @if(Secured.editGroup(group)) {
-    <li class="@status"><a href="@routes.GroupController.invite(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Freunde einladen" data-container="body"><span class="glyphicon glyphicon-collapse-down"></span></a></li>
-    }
+        @if(Secured.editGroup(group)) {
+            <li class="@status">
+                <a href="@routes.GroupController.invite(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Lade Freunde in die Gruppe ein" data-container="body">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span class="hidden-xs"> Einladung</span>
+                </a>
+            </li>
+        }
     }
     @defining(if(Navigation.getTitle().equals("Bearbeiten")){"active"} else {"deactive"}) { status =>
-    @if(Secured.editGroup(group)) {
-    <li class="@status"><a href="@routes.GroupController.edit(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Bearbeiten" data-container="body"><span class="glyphicon glyphicon-pencil"></span></a></li>
-    }
+        @if(Secured.editGroup(group)) {
+            <li class="@status">
+                <a href="@routes.GroupController.edit(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Bearbeite die Gruppe" data-container="body">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    <span class="hidden-xs"> Bearbeiten</span>
+                </a>
+            </li>
+        }
     }
 	@if(Secured.deleteGroup(group)) {
-		<li><a href="#confirmDeleteGroup" role="button" class="btn btn-default active" rel="tooltip" data-toggle="modal" data-original-title="Löschen" data-container="body"><span class="glyphicon glyphicon-trash"></span></a></li>
+		<li>
+            <a href="#confirmDeleteGroup" role="button" class="btn btn-default active" rel="tooltip" data-toggle="modal" data-original-title="Lösche die Gruppe" data-container="body">
+                <span class="glyphicon glyphicon-trash"></span>
+                <span class="hidden-xs"> Löschen</span>
+            </a>
+        </li>
 	}
 	@if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
-		<li><a href="@routes.GroupController.join(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Beitreten" data-container="body"><span class="glyphicon glyphicon-ok"></span></a></li>
+		<li>
+            <a href="@routes.GroupController.join(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Tritt der Gruppe bei" data-container="body">
+                <span class="glyphicon glyphicon-ok"></span>
+                <span class="hidden-xs"> Beitreten</span>
+            </a>
+        </li>
 	}
 	@if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
-		<li><a href="#confirmLeaveGroup" role="button" class="btn btn-default active" rel="tooltip" data-toggle="modal" data-original-title="Gruppe verlassen" data-container="body"><span class="glyphicon glyphicon-remove"></span></a></li>
+		<li>
+            <a href="#confirmLeaveGroup" role="button" class="btn btn-default active" rel="tooltip" data-toggle="modal" data-original-title="Verlasse die Gruppe" data-container="body">
+                <span class="glyphicon glyphicon-remove"></span>
+                <span class="hidden-xs"> Verlassen</span>
+            </a>
+        </li>
 	}
 </ul>

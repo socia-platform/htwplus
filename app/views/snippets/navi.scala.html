@@ -18,16 +18,20 @@
 			<!-- Friends -->
 			@defining(if(Navigation.getLevel() == Navigation.Level.FRIENDS){"active"} else {"deactive"}) { status =>
 				<li class="@status">
-					<a class="visible-xs-block" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)"><span class="glyphicon glyphicon-user"></span></a>
-					<a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)">@Navigation.getLevelTitle(Navigation.Level.FRIENDS)</a>
+					<a href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)">
+                        <span class="glyphicon glyphicon-user"></span>
+                        <span class="hidden-xs"> @Navigation.getLevelTitle(Navigation.Level.FRIENDS)</span>
+                    </a>
 				</li>
 			}
 
 			<!-- Groups -->
 			@defining(if(Navigation.getLevel() == Navigation.Level.GROUPS){"active"} else {"deactive"}) { status =>
 				<li class="@status">
-					<a class="visible-xs-block" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)"><span class="glyphicon glyphicon-list"></span></a>
-					<a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)">@Navigation.getLevelTitle(Navigation.Level.GROUPS)</a>
+					<a href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)">
+                        <span class="glyphicon glyphicon-list"></span>
+                        <span class="hidden-xs"> @Navigation.getLevelTitle(Navigation.Level.GROUPS)</span>
+                    </a>
 				</li>
 			}
 
