@@ -640,7 +640,13 @@ input.hp-notification-hour {
 }
 
 .hp-nav-tabs > li {
-	width: 50px;
+	width: 100px;
+}
+
+@media (max-width: 767px) {
+    .hp-nav-tabs > li {
+        width: 50px;
+    }
 }
 
 .hp-nav-tabs > li > a {
@@ -661,6 +667,10 @@ input.hp-notification-hour {
 .hp-nav-tabs li.active > a {
     border-bottom-color: transparent !important;
     box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.125);
+}
+
+.hp-nav-tabs li > a > span:not(.glyphicon) {
+    font-size: 10px;
 }
 
 /*============================== Logo ==============================*/
