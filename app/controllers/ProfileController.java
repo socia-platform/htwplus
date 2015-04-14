@@ -40,6 +40,10 @@ public class ProfileController extends BaseController {
 			flash("info", "Diese Person gibt es nicht.");
 			return redirect(controllers.routes.Application.index());
 		} else {
+			String avatar = Form.form().bindFromRequest().get("avatar");
+			if(avatar != null && avatar.equals("success")){
+				flash("success", "Dein Profilbild wurde erfolgreich gespeichert.");
+			}
 			return ok(index.render(account, postForm));
 			// return ok(index.render(account));
 		}

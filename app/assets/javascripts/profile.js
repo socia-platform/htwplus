@@ -148,9 +148,7 @@ $(document).ready(function () {
                 processData: false,
                 success: function () {
                     _this.$modal.modal('hide');
-                    _this.updateAvatars();
-                    _this.showSuccess("Dein Profilbild wurde erfolgreich geändert.");
-                    //location.href = location.href + "?avatar=success";
+                    location.href = '/profile?avatar=success';
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     _this.$modal.modal('hide');
