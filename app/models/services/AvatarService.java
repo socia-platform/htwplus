@@ -22,7 +22,7 @@ public class AvatarService {
 
     private AvatarService(){}
     
-    static public boolean validateSize(File file, int min_length, int min_height){
+    static public boolean validateMinSize(File file, int min_length, int min_height){
         BufferedImage image;
         try {
             image = ImageIO.read(file);
@@ -30,6 +30,22 @@ public class AvatarService {
                 return false;
             }
             if(image.getHeight() < min_height) {
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    static public boolean validateMaxSize(File file, int max_length, int max_height){
+        BufferedImage image;
+        try {
+            image = ImageIO.read(file);
+            if(image.getWidth() > max_length) {
+                return false;
+            }
+            if(image.getHeight() > max_height) {
                 return false;
             }
         } catch (IOException e) {

@@ -856,6 +856,10 @@ form dd.info {
 	display: none;
 }
 
+#email-notifications {
+    padding-left: 20px;
+}
+
 
 /*============================== Pagination ==============================*/
 
@@ -1023,11 +1027,11 @@ div[class*="hp-avatar-default-"] {
 }
 
 div.hp-avatar-default-0 {
-	background-color: rgb(118, 185, 0);
+	background-color: rgb(153, 205, 100);
 }
 
 div.hp-avatar-default-1 {
-	background-color: rgb(255, 95, 0);
+	background-color: rgb(255, 193, 40);
 }
 
 div.hp-avatar-default-2 {
@@ -1126,6 +1130,10 @@ table td .hp-avatar-small {
     color: darkred;
 }
 
+.hp-avatar-success {
+    color: #205c0c;
+}
+
 .hp-avatar-loading {
     background-image: url(../images/loading.gif);
     width: 16px;
@@ -1136,14 +1144,18 @@ table td .hp-avatar-small {
     display: none;
 }
 
+.cropper-line {
+    background-color: #76b900 !important;
+}
 
+.cropper-view-box {
+    outline: 1px solid #76b900 !important;
+    outline-color: #76b900 !important;
+}
 
-/*#hp-avatar-upload {*/
-    /*min-height: 200px;*/
-    /*width: 200px;*/
-    /*background-color: #808080;*/
-/*}*/
-
+.cropper-point {
+    background-color: #76b900 !important;
+}
 
 
 /*============================== Token ==============================*/

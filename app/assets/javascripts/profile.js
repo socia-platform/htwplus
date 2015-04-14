@@ -14,6 +14,7 @@ $(document).ready(function () {
         this.$previewImg = this.$element.find('#hp-avatar-preview');
         this.$saveButton = this.$element.find('#hp-avatar-save-button');
         this.$profileAvatar = this.$element.find('.hp-avatar-medium');
+        this.$navAvatar = $('.hp-avatar-navi');
         this.cropBoxData = {};
         this.$uploadWrapper = this.$element.find('.hp-avatar-input-wrapper');
         this.init();
@@ -39,6 +40,7 @@ $(document).ready(function () {
                 });
             });
             this.$modal.on('hide.bs.modal', function () {
+                _this.$uploadButton.val("");
                 _this.$previewImg.cropper('destroy');
             });
             this.$saveButton.click(function () {
@@ -49,6 +51,7 @@ $(document).ready(function () {
 
         uploadFile: function () {
             this.resetError();
+            this.resetSuccess();
             if(!this.validateFile()){
                 return;
             }
@@ -102,7 +105,7 @@ $(document).ready(function () {
             this.$previewImg.attr("src", img+"?"+d.getTime());
             this.$previewImg.load(function () {
                 _this.hideLoading();
-                _this.$modal.modal();
+                _this.$modal.modal('show');
             });
         },
 
@@ -114,6 +117,16 @@ $(document).ready(function () {
         resetError: function () {
             this.$errorMessage.html("");
             this.$errorMessage.removeClass("hp-avatar-error");
+        },
+
+        showSuccess: function (message) {
+            this.$errorMessage.html(message);
+            this.$errorMessage.addClass("hp-avatar-success");
+        },
+
+        resetSuccess: function () {
+            this.$errorMessage.html("");
+            this.$errorMessage.removeClass("hp-avatar-success");
         },
         
         cropSuccess: function () {
@@ -134,14 +147,24 @@ $(document).ready(function () {
                 dataType: 'json',
                 processData: false,
                 success: function () {
-                    _this.$modal.hide();
-                    location.reload();
+                    _this.$modal.modal('hide');
+                    _this.updateAvatars();
+                    _this.showSuccess("Dein Profilbild wurde erfolgreich geändert.");
+                    //location.href = location.href + "?avatar=success";
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    _this.$modal.hide();
+                    _this.$modal.modal('hide');
                     _this.uploadError(XMLHttpRequest, textStatus, errorThrown);
                 }
             });
+        },
+
+        updateAvatars: function () {
+            var img =  this.$profileAvatar.attr("src");
+            var d = new Date();
+            this.$profileAvatar.attr("src", img+"&"+d.getTime());
+            img = this.$navAvatar.attr("src");
+            this.$navAvatar.attr("src", img+"?"+d.getTime());
         },
 
         showLoading: function () {

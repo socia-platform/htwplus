@@ -179,14 +179,10 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 			return currentAcc;
 		}
 	}
-	
-	public String getAvatarUrl() {
-		String url = controllers.routes.Assets.at("images/avatars/" + this.avatar + ".png").toString();
-		return url;
-	}
 
 	static public String AVATAR_REALM = "avatar";
 	static public int AVATAR_MIN_SIZE = 250;
+	static public int AVATAR_MAX_SIZE = 4000;
 	static public int AVATAR_LARGE_SIZE = 600;
 	static public int AVATAR_MEDIUM_SIZE = 140;
 	static public int AVATAR_SMALL_SIZE = 70;
@@ -212,8 +208,11 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		if(!fileService.validateContentType(allowedContentTypes)) {
 			throw new ValidationException(Messages.get("error.contentTypeNotSupported"));
 		}
-		if(!AvatarService.validateSize(fileService.getFile(), Account.AVATAR_MIN_SIZE, Account.AVATAR_MIN_SIZE)){
+		if(!AvatarService.validateMinSize(fileService.getFile(), Account.AVATAR_MIN_SIZE, Account.AVATAR_MIN_SIZE)){
 			throw new ValidationException(Messages.get("error.resolutionLow"));
+		}
+		if(!AvatarService.validateMaxSize(fileService.getFile(), Account.AVATAR_MAX_SIZE, Account.AVATAR_MAX_SIZE)){
+			throw new ValidationException(Messages.get("error.resolutionHigh"));
 		}
 
 		fileService.saveFile(this.getTempAvatarName(), true);
