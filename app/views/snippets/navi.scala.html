@@ -18,16 +18,20 @@
 			<!-- Friends -->
 			@defining(if(Navigation.getLevel() == Navigation.Level.FRIENDS){"active"} else {"deactive"}) { status =>
 				<li class="@status">
-					<a class="visible-xs-block" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)"><span class="glyphicon glyphicon-user"></span></a>
-					<a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)">@Navigation.getLevelTitle(Navigation.Level.FRIENDS)</a>
+					<a href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)">
+                        <span class="glyphicon glyphicon-user"></span>
+                        <span class="hidden-xs"> @Navigation.getLevelTitle(Navigation.Level.FRIENDS)</span>
+                    </a>
 				</li>
 			}
 
 			<!-- Groups -->
 			@defining(if(Navigation.getLevel() == Navigation.Level.GROUPS){"active"} else {"deactive"}) { status =>
 				<li class="@status">
-					<a class="visible-xs-block" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)"><span class="glyphicon glyphicon-list"></span></a>
-					<a class="hidden-xs" href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)">@Navigation.getLevelTitle(Navigation.Level.GROUPS)</a>
+					<a href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)">
+                        <span class="glyphicon glyphicon-list"></span>
+                        <span class="hidden-xs"> @Navigation.getLevelTitle(Navigation.Level.GROUPS)</span>
+                    </a>
 				</li>
 			}
 
@@ -60,7 +64,11 @@
 		<ul class="nav navbar-nav navbar-right">
 			<li class="dropdown">
 				<a href="#" class="hp-nav-user dropdown-toggle" data-toggle="dropdown">
-					<img class="hp-avatar" alt="avatar" src="@Component.currentAccount().getAvatarUrl()" />
+					@if(user.hasAvatar){
+						<img alt="avatar" src="@routes.ProfileController.getAvatar(user.id)" class="hp-avatar-navi" />
+					} else {
+						<div class="hp-avatar-navi hp-avatar-default-@user.avatar">@user.getInitials</div>
+					}
 					<span class="visible-lg-inline-block">@user.name </span>
 					<b class="caret"></b>
 				</a>

@@ -85,7 +85,7 @@ public class AccountController extends BaseController {
             account.loginname = matriculationNumber;
             account.password = "LDAP - not needed";
             Random generator = new Random();
-            account.avatar = "a" + generator.nextInt(10);
+            account.avatar = String.valueOf(generator.nextInt(9));
             account.role = role;
             account.create();
 		} else {

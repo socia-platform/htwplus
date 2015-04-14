@@ -24,7 +24,7 @@ if ($('.prettyFile').length) {
             e.preventDefault();
             // Make as the real input was clicked
             fileInput.click();
-        })
+        });
     });
 }
 

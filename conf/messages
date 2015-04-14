@@ -29,6 +29,10 @@ error.maxLength=Maximum length is {0}
 error.email=Bitte eine gültige Adresse eingeben
 error.pattern=Es gibt mindestens ein ungültiges Zeichen.
 error.sessionExpired=Deine Sitzung ist abgelaufen.
+error.fileToBig=Die Datei ist zu groß
+error.contentTypeNotSupported=Das Dateiformat wird nicht unterstützt
+error.resolutionLow=Die Auflösung ist zu gering
+error.resolutionHigh=Die Auflösung ist zu hoch
 
 # --- authenticate
 authenticate.matriculationNumberMissing=Also deine Matrikelnummer brauchen wir schon!
@@ -58,7 +62,6 @@ landingpage.features.notifications.description=Ob neue Posts, Kommentare, Freund
 # --- LDAP connector
 ldap.noConnection=Keine Verbindung zum LDAP-Server möglich. Bitte versuche es später noch einmal.
 ldap.wrongCredentials=Ungültiges Passwort und/oder Matrikelnummer.
-ldap.generalError=Es gab ein Problem bei der Verbindung zum LDAP-Server. Bitte versuche es später noch einmal.
 
 # --- notifications
 notification.title=Übersicht

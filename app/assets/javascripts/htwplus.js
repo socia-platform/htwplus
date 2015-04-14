@@ -2,7 +2,7 @@
 function resizeRings() {
 	$('.hp-notepad-content').each(function() {
 		var offset = ($(this).height() + parseInt($(this).css('padding-top'))) % 12.0;
-		if (offset != 0)
+		if (offset !== 0)
 			$(this).css('padding-bottom', (12.0 - offset) + "px");
 		else
 			$(this).css('padding-bottom', '0');
@@ -19,26 +19,26 @@ function toggleMediaSelection(parent) {
 
 function autolinkUrls() {
     $('.hp-truncate').each(function(){
-    	$(this).linkify({
-		  tagName: 'a',
-		  target: '_blank',
-		  newLine: '\n',
-		  linkClass: 'hp-postLink',
-		  linkAttributes: null
+		$(this).linkify({
+			tagName: 'a', 
+			target: '_blank', 
+			newLine: '\n', 
+			linkClass: 'hp-postLink', 
+			linkAttributes: null
 		});
 	});
 	$('.hp-postLink').each(function(){
         if (!$(this).find("span").length)
-    	    $(this).append(" <span class='glyphicon glyphicon-share-alt'></span>");
-	})
+			$(this).append(" <span class='glyphicon glyphicon-share-alt'></span>");
+	});
 }
 
 function truncateBreadcrumb() {
 	var lastBreadcrumb = $("#hp-navbar-breadcrumb .breadcrumb > li:last-child");
 	var index = 3;	// first breadcrumb item which is hidden
 	// hide breadcrumb items while last item isn't visible
-	while (lastBreadcrumb.length &&
-	       lastBreadcrumb.position().left + lastBreadcrumb.width() > $("#hp-navbar-breadcrumb .breadcrumb").width()) {
+	while (lastBreadcrumb.length && 
+		lastBreadcrumb.position().left + lastBreadcrumb.width() > $("#hp-navbar-breadcrumb .breadcrumb").width()) {
 		$("#hp-navbar-breadcrumb #hp-navbar-breadcrumb-truncate").removeClass("hidden");
 		$("#hp-navbar-breadcrumb .breadcrumb > li:nth-child("+index+")").addClass("hidden");
 		index++;
@@ -151,6 +151,19 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
     }
 });
 
+/*
+ * prevent submitting empty posts
+ */
+$(".hp-post-form").on("submit", function(e) {
+    if($(this).find("textarea").val().trim().length <= 0) {
+        e.preventDefault();
+        $(this).find("textarea").animate({opacity:0.1},100,"linear",function() { // blink and focus textarea
+            $(this).animate({opacity:1},100);
+            $(this).focus();
+        }).focus();
+    }
+});
+
 
 /*
  *  prevent click action for disabled list items
@@ -186,14 +199,14 @@ $(document).ready(function () {
 	 * AJAX loading indicator
 	 */
 	$.ajaxSetup({
-	    beforeSend:function(){
-	        $(".loading").show();
-	        $(".loading").css('display', 'inline-block');
-	    },
-	    complete:function(){
-	        $(".loading").hide();
+		beforeSend:function(){
+			$(".loading").show();
+			$(".loading").css('display', 'inline-block');
+		}, 
+		complete:function(){
+			$(".loading").hide();
 			autolinkUrls();
-	    }
+		}
 	});
 
 	/*
@@ -202,11 +215,11 @@ $(document).ready(function () {
 	$('.hp-comment-form').each(function(){
 		var context = $(this);
 		$(".commentSubmit", this).click(function(){
-			if(context.serializeArray()[0].value == ""){
-				$(context).find('textarea').animate({opacity:0},200,"linear",function(){
-					  $(this).animate({opacity:1},200);
+			if(context.serializeArray()[0].value.trim() === ""){
+				$(context).find('textarea').animate({opacity:0.3},100,"linear",function(){
+					  $(this).animate({opacity:1},100);
 					  $(this).focus();
-				});
+				}).focus();
 			} else {
 				$.ajax({
 					url: context.attr('action'),
@@ -215,7 +228,12 @@ $(document).ready(function () {
 					success: function(data){
 						context.before(data);
 						context[0].reset();
-					}
+					}, error: function() {
+                        $(context).find('textarea').animate({opacity:0.3},100,"linear",function(){
+                            $(this).animate({opacity:1},100);
+                            $(this).focus();
+                        });
+                    }
 				});
 			}
 			return false;
@@ -255,7 +273,7 @@ $(document).ready(function () {
 				$(context).addClass('open');
 				$(context).removeClass('unloaded');
 			}
-			window.setTimeout("resizeRings()", 400);
+			window.setTimeout(resizeRings(), 400);
 			return false;
 		});
 	});
@@ -282,21 +300,25 @@ $(document).ready(function () {
                     var hLabel = '';
                     var groupType = '';
                     var groupIcon = '';
+                    var custom_avatar = false;
                     if(item._type === 'user') {
                         label = item._source.name;
                         hLabel = item.highlight.name;
+                        if(item._source.avatar === 'custom') {custom_avatar = true;}
                     }
                     if(item._type === 'group') {
                         label = item._source.title;
                         hLabel = item.highlight.title;
                         groupType = item._source.grouptype;
-                        if(groupType === 'open') groupIcon = 'globe'
-                        if(groupType === 'close') groupIcon = 'lock'
-                        if(groupType === 'course') groupIcon = 'briefcase'
+                        if(groupType === 'open') groupIcon = 'globe';
+                        if(groupType === 'close') groupIcon = 'lock';
+                        if(groupType === 'course') groupIcon = 'briefcase';
                     }
                     result.push({
                         label: label,
                         hLabel: hLabel,
+                        initial: item._source.initial,
+                        custom_avatar: custom_avatar,
                         id: item._id,
                         type: item._type,
                         avatar: item._source.avatar,
@@ -329,8 +351,13 @@ $(document).ready(function () {
                     '</div>'
                 ].join('\n'),
                 suggestion: Handlebars.compile("" +
-                    "{{#if avatar}} " +
-                    "<img class='autosuggest-user-avatar' src='/assets/images/avatars/{{avatar}}.png' alt='picture'>{{{hLabel}}}" +
+                    "{{#if custom_avatar}} " +
+                    "<img class='autosuggest-custom-avatar hp-avatar-small' src='/user/{{id}}/avatar' alt='avatar'>{{{hLabel}}}" +
+                    "{{else}}" +
+                    "{{#if avatar}}" +
+                    "<div class='autosuggest-avatar hp-avatar-small hp-avatar-default-{{avatar}}'>{{initial}}</div>" +
+                    "<div class='autosuggest-username'>{{{hLabel}}}</div>" +
+                    "{{/if}}" +
                     "{{/if}}" +
                     "{{#if groupIcon}}" +
                     "<span class='glyphicon glyphicon-{{groupIcon}} autosuggest-group-icon'></span>{{{hLabel}}}" +
@@ -338,7 +365,7 @@ $(document).ready(function () {
             }
 
         }).on('typeahead:selected', function($e, searchResult){
-            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream'
+            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
         });
 });
 

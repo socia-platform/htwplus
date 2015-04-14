@@ -9,6 +9,7 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 * JDK 7 or higher
 * Activator (https://www.playframework.com/download)
 * Git
+* Node.js
 * PostgreSQL
 * Elasticsearch
 
@@ -20,6 +21,11 @@ HTWplus is a straightforward and lightweight social network. It offers essential
  * Provide database settings
  * Provide media.path and media.tempPath
 * Copy conf/META-INF/persistence.sample.xml to persistence.xml
+* Open the repository directory in shell
+* Install Node.js packages with `npm install`
+* Install frontend dependencies with Bower
+ * `cd public`
+ * `..\node_modules\.bin\bower install`
 
 ### Run
 
@@ -31,4 +37,4 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 ### Initialize Elasticsearch
 
 * Browse to http://localhost:9000/admin/indexing
-* Excecute all options, but DELETE Index
+* Execute all options, but DELETE Index

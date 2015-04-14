@@ -2,9 +2,19 @@
 
 <ul class="nav nav-tabs hp-nav-tabs pull-right">
 	@defining(if(Navigation.getTitle().equals("Übersicht")){"active"} else {"deactive"}) { status =>
-		<li class="@status"><a href="@routes.GroupController.index()" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Gruppen & Kurse" data-container="body"><span class="glyphicon glyphicon-list"></span></a></li>
+		<li class="@status">
+            <a href="@routes.GroupController.index()" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Übersicht deiner Gruppen & Kurse" data-container="body">
+                <span class="glyphicon glyphicon-list"></span>
+                <span class="hidden-xs"> Übersicht</span>
+            </a>
+        </li>
 	}
 	@defining(if(Navigation.getTitle().equals("Erstellen")){"active"} else {"deactive"}) { status =>
-		<li class="@status"><a href="@routes.GroupController.add()" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Neue Gruppe erstellen" data-container="body"><span class="glyphicon glyphicon-plus"></span></a></li>
+		<li class="@status">
+            <a href="@routes.GroupController.add()" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Erstelle eine neue Gruppe" data-container="body">
+                <span class="glyphicon glyphicon-plus"></span>
+                <span class="hidden-xs"> Neu</span>
+            </a>
+        </li>
 	}
 </ul>
