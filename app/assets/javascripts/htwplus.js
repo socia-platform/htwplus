@@ -86,6 +86,19 @@ $(".hp-optionsTable>tr>td>input").on("click", function(e) {
     e.stopPropagation();
 });
 
+/*
+ * prevent submitting empty posts
+ */
+$(".hp-post-form").on("submit", function(e) {
+    if($(this).find("textarea").val().trim().length <= 0) {
+        e.preventDefault();
+        $(this).find("textarea").animate({opacity:0.1},100,"linear",function() { // blink and focus textarea
+            $(this).animate({opacity:1},100);
+            $(this).focus();
+        }).focus();
+    }
+});
+
 
 /*
  *  prevent click action for disabled list items
@@ -137,11 +150,11 @@ $(document).ready(function () {
 	$('.hp-comment-form').each(function(){
 		var context = $(this);
 		$(".commentSubmit", this).click(function(){
-			if(context.serializeArray()[0].value === ""){
-				$(context).find('textarea').animate({opacity:0},200,"linear",function(){
-					$(this).animate({opacity:1},200);
-					$(this).focus();
-				});
+			if(context.serializeArray()[0].value.trim() === ""){
+				$(context).find('textarea').animate({opacity:0.3},100,"linear",function(){
+					  $(this).animate({opacity:1},100);
+					  $(this).focus();
+				}).focus();
 			} else {
 				$.ajax({
 					url: context.attr('action'),
@@ -150,7 +163,12 @@ $(document).ready(function () {
 					success: function(data){
 						context.before(data);
 						context[0].reset();
-					}
+					}, error: function() {
+                        $(context).find('textarea').animate({opacity:0.3},100,"linear",function(){
+                            $(this).animate({opacity:1},100);
+                            $(this).focus();
+                        });
+                    }
 				});
 			}
 			return false;
