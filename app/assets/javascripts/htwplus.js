@@ -212,33 +212,33 @@ $(document).ready(function () {
 	/*
 	 * ADD COMMENTS
 	 */
-	$('.hp-comment-form').each(function(){
-		var context = $(this);
-		$(".commentSubmit", this).click(function(){
-			if(context.serializeArray()[0].value.trim() === ""){
-				$(context).find('textarea').animate({opacity:0.3},100,"linear",function(){
-					  $(this).animate({opacity:1},100);
-					  $(this).focus();
-				}).focus();
-			} else {
-				$.ajax({
-					url: context.attr('action'),
-					type: "POST",
-					data: context.serialize(),
-					success: function(data){
-						context.before(data);
-						context[0].reset();
-					}, error: function() {
-                        $(context).find('textarea').animate({opacity:0.3},100,"linear",function(){
-                            $(this).animate({opacity:1},100);
+    $('.hp-comment-form').each(function () {
+        var context = $(this);
+        $(".commentSubmit", this).click(function () {
+            if (context.serializeArray()[0].value.trim() === "") {
+                $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
+                    $(this).animate({opacity: 1}, 100);
+                    $(this).focus();
+                }).focus();
+            } else {
+                $.ajax({
+                    url: context.attr('action'),
+                    type: "POST",
+                    data: context.serialize(),
+                    success: function (data) {
+                        context.before(data);
+                        context[0].reset();
+                    }, error: function () {
+                        $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
+                            $(this).animate({opacity: 1}, 100);
                             $(this).focus();
                         });
                     }
-				});
-			}
-			return false;
-		});
-	});
+                });
+            }
+            return false;
+        });
+    });
 
 	/*
 	 * SHOW OLDER COMMENTS
