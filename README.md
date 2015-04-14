@@ -37,4 +37,4 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 ### Initialize Elasticsearch
 
 * Browse to http://localhost:9000/admin/indexing
-* Excecute all options, but DELETE Index
+* Execute all options, but DELETE Index

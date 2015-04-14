@@ -1,9 +1,13 @@
 package controllers;
 
 import models.*;
+import models.base.FileOperationException;
+import models.base.ValidationException;
 import models.enums.EmailNotifications;
+import models.services.AvatarService;
 import play.Play;
 import play.data.Form;
+import play.mvc.Http.MultipartFormData;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -12,6 +16,14 @@ import views.html.Profile.editPassword;
 import views.html.Profile.index;
 import views.html.Profile.stream;
 import controllers.Navigation.Level;
+import play.Logger;
+import play.libs.Json;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang.StringUtils;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Transactional
 @Security.Authenticated(Secured.class)
@@ -28,6 +40,10 @@ public class ProfileController extends BaseController {
 			flash("info", "Diese Person gibt es nicht.");
 			return redirect(controllers.routes.Application.index());
 		} else {
+			String avatar = Form.form().bindFromRequest().get("avatar");
+			if(avatar != null && avatar.equals("success")){
+				flash("success", "Dein Profilbild wurde erfolgreich gespeichert.");
+			}
 			return ok(index.render(account, postForm));
 			// return ok(index.render(account));
 		}
@@ -215,8 +231,6 @@ public class ProfileController extends BaseController {
 
 			// Fill an and update the model manually 
 			// because the its just a partial form
-			account.avatar = filledForm.field("avatar").value();
-			
 			if (!filledForm.field("email").value().isEmpty()) {
 				account.email = filledForm.field("email").value();
 			} else {
@@ -263,4 +277,147 @@ public class ProfileController extends BaseController {
 			return redirect(controllers.routes.ProfileController.me());
 		}
 	}
+
+	/**
+	 * Handles the upload of the temporary avatar image
+	 *
+	 * @param id
+	 * @return
+	 */
+	public static Result createTempAvatar(Long id) {
+
+		Account account = Account.findById(id);
+
+		if(account == null){
+			return notFound();
+		}
+
+		ObjectNode result = Json.newObject();
+		MultipartFormData body = request().body().asMultipartFormData();
+		
+		if(body == null) {
+			result.put("error", "No file attached");
+			return badRequest(result);
+		}
+		
+		MultipartFormData.FilePart avatar = body.getFile("avatarimage");
+
+		if(avatar == null) {
+			result.put("error", "No file with key 'avatarimage'");
+			return badRequest(result);
+		}
+
+		try {
+			account.setTempAvatar(avatar);
+		} catch (ValidationException e) {
+			result.put("error", e.getMessage());
+			return badRequest(result);
+		}
+		
+		result.put("success", controllers.routes.ProfileController.getTempAvatar(id).toString());
+		return ok(result);
+	}
+
+	/**
+	 * Get the temporary avatar image
+	 *
+	 * @param id
+	 * @return
+	 */
+	public static Result getTempAvatar(Long id) {
+
+		ObjectNode result = Json.newObject();
+		Account account = Account.findById(id);
+
+		if(account == null){
+			return notFound();
+		}
+
+		if (!Secured.editAccount(account)) {
+			result.put("error", "Not allowed.");
+			return forbidden(result);
+		}
+
+		File tempAvatar = account.getTempAvatar();
+		if(tempAvatar != null){
+			return ok(tempAvatar);
+		} else {
+			return notFound();
+		}
+	}
+
+	/**
+	 * Create the real avatar with the given dimensions
+	 *
+	 * @param id
+	 * @return
+	 */
+	public static Result createAvatar(long id) {
+		ObjectNode result = Json.newObject();
+		
+		Account account = Account.findById(id);
+
+		if(account == null){
+			return notFound();
+		}
+
+		if (!Secured.editAccount(account)) {
+			result.put("error", "Not allowed.");
+			return forbidden(result);
+		}
+		
+		Form<Account.AvatarForm> form = Form.form(Account.AvatarForm.class).bindFromRequest();
+
+		if(form.hasErrors()){
+			result.put("error", form.errorsAsJson());
+			return badRequest(result);
+		}
+
+		try {
+			account.saveAvatar(form.get());
+            account.indexAccount();
+			result.put("success", "saved");
+			return ok(result);
+		} catch (FileOperationException e) {
+			result.put("error", "Unexpected Error while saving avatar.");
+			return internalServerError(result);
+		}
+	}
+
+	/**
+	 * Get the avatar of a user.
+	 *
+	 * @param id User ID
+	 * @param size Size - Possible values: "small", "medium", "large"
+	 * @return
+	 */
+	public static Result getAvatar(long id, String size){
+		Account account = Account.findById(id);
+		if(account != null){
+			File avatar;
+			switch (size) {
+				case "small":
+					avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
+					break;
+				case "medium":
+					avatar = account.getAvatar(Account.AVATAR_SIZE.MEDIUM);
+					break;
+				case "large":
+					avatar = account.getAvatar(Account.AVATAR_SIZE.LARGE);
+					break;
+				default:
+					avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
+			}
+			response().setHeader("Content-disposition","inline");
+			if(avatar != null){
+				return ok(avatar);
+			} else {
+				return notFound();
+			}
+		} else {
+			return notFound();
+		}
+	}
+
+
 }

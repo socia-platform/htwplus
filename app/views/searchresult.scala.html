@@ -30,10 +30,21 @@
                 case account: Account => {
                     @if(searchMode.equals("user") || searchMode.equals("all")) {
                         <div class="well searchresult-container">
-                            <div class="account-result">
+                            <div class="account-result media">
                                 @views.html.snippets.userLinkAvatar(account)
-                                @views.html.snippets.userLink(account)
-                                @if(Friendship.alreadyFriendly(currentUser, account)) { <span class="glyphicon glyphicon-ok"></span> }
+                                <div class="media-body">
+                                    <div class="media-heading">
+                                        @views.html.snippets.userLink(account)
+                                    </div>
+                                    <small>
+                                        @if(Friendship.alreadyFriendly(currentUser, account)) {
+                                            <span class="glyphicon glyphicon-ok"></span>
+                                            <span> Ihr seid bereits befreundet.</span>
+                                        } else {
+                                            <span>Mit dieser Person bist du noch nicht befreundet.</span>
+                                        }
+                                    </small>
+                                </div>
                             </div>
                         </div>
                     }
@@ -56,7 +67,7 @@
                 case post: Post => {
                     @if(searchMode.equals("post") || searchMode.equals("all")) {
                         <div class="well searchresult-container">
-                            <div class="post-result">
+                            <div class="post-result media">
                                 @views.html.snippets.userLinkAvatar(post.owner)
                                 <div class="media-body">
                                     <div class="media-heading">

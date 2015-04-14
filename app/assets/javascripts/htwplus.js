@@ -217,9 +217,11 @@ $(document).ready(function () {
                     var hLabel = '';
                     var groupType = '';
                     var groupIcon = '';
+                    var custom_avatar = false;
                     if(item._type === 'user') {
                         label = item._source.name;
                         hLabel = item.highlight.name;
+                        if(item._source.avatar === 'custom') {custom_avatar = true;}
                     }
                     if(item._type === 'group') {
                         label = item._source.title;
@@ -232,6 +234,8 @@ $(document).ready(function () {
                     result.push({
                         label: label,
                         hLabel: hLabel,
+                        initial: item._source.initial,
+                        custom_avatar: custom_avatar,
                         id: item._id,
                         type: item._type,
                         avatar: item._source.avatar,
@@ -264,16 +268,21 @@ $(document).ready(function () {
                     '</div>'
                 ].join('\n'),
                 suggestion: Handlebars.compile("" +
-                    "{{#if avatar}} " +
-                    "<img class='autosuggest-user-avatar' src='/assets/images/avatars/{{avatar}}.png' alt='picture'>{{{hLabel}}}" +
+                    "{{#if custom_avatar}} " +
+                    "<img class='autosuggest-custom-avatar hp-avatar-small' src='/user/{{id}}/avatar' alt='avatar'>{{{hLabel}}}" +
+                    "{{else}}" +
+                    "{{#if avatar}}" +
+                    "<div class='autosuggest-avatar hp-avatar-small hp-avatar-default-{{avatar}}'>{{initial}}</div>" +
+                    "<div class='autosuggest-username'>{{{hLabel}}}</div>" +
+                    "{{/if}}" +
                     "{{/if}}" +
                     "{{#if groupIcon}}" +
                     "<span class='glyphicon glyphicon-{{groupIcon}} autosuggest-group-icon'></span>{{{hLabel}}}" +
                     "{{/if}}")
             }
 
-        }).on('typeahead:selected', function($e, datum){
-            window.location.href = window.location.origin + "/"+datum.type+"/" + datum.id + '/stream';
+        }).on('typeahead:selected', function($e, searchResult){
+            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
         });
 });
 
