@@ -1,6 +1,7 @@
 @(post: Post, postForm: Form[Post], currentView: String, commentLimit: Integer)
 @import helper._
 @import play._
+@import com.typesafe.config.ConfigFactory
 
 @defining(Component.currentAccount()) { currentUser =>
 	<br />
@@ -16,10 +17,21 @@
 					@if(post.belongsToAccount && currentUser != post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(post.account)} 
 					@if(post.belongsToAccount && currentUser == post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(currentUser)}
                     @if(Secured.isAllowedToDeletePost(post, currentUser)){
-                			<a href="#confirmModalDeletePost@post.id" data-toggle="modal" rel="tooltip" data-original-title="Post löschen">
-                				<span class="glyphicon glyphicon-trash"></span>
-                			</a>
-                	}
+                        <a href="#confirmModalDeletePost@post.id" style="text-decoration: none;" data-toggle="modal" rel="tooltip" data-original-title="Post löschen">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    }
+                    @if(Secured.isAllowedToEditPost(post, currentUser)){
+                        @if(Secured.isPostStillEditable(post, currentUser)) {
+                            <a id="hp-editPost_@post.id hp-nohref" class="hp-post-edit" rel="tooltip" data-original-title="Post bearbeiten">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                        } else {
+                            <a class="hp-post-edit hp-nohref disabled" rel="tooltip" data-original-title="Posts lassen sich nur @ConfigFactory.load().getInt("htwplus.post.editTimeLimit") Minuten nach Erstellung bearbeiten.">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                        }
+                    }
 				</h4>
 				<small>@post.createdAt.format("dd.MM.yyyy HH:mm")</small>
 			</div>

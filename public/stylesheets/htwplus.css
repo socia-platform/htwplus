@@ -117,6 +117,11 @@ h1 {
 	cursor: no-drop;
 }
 
+a.hp-nohref {
+    cursor: pointer;
+    text-decoration: none;
+}
+
 .hp-focus-search {
 	cursor: pointer;	
 }
@@ -961,9 +966,21 @@ div.hp-pagination {
 	color: #999999;
 }
 
-.media-heading a[data-toggle = 'modal'] {
-	position: absolute;
-	margin-left: 5px; 
+.media-heading .glyphicon {
+    line-height: inherit;
+}
+
+.media-heading a.disabled .glyphicon {
+    color: #bbbbbb;
+}
+
+.media-heading a {
+    cursor: pointer;
+}
+
+.media-heading a.disabled {
+    pointer-events: auto;
+    cursor: default;
 }
 
 .hp-postLink {

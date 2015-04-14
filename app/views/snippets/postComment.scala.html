@@ -1,4 +1,6 @@
 @(comment: Post)
+@import com.typesafe.config.ConfigFactory
+
 @views.html.snippets.deleteCommentModal(comment.id)
 <div class="media">
 	<a class="pull-left" href="@routes.ProfileController.view(comment.owner.id)">
@@ -13,10 +15,21 @@
 			@views.html.snippets.userLink(comment.owner)
 			<small>(@comment.createdAt.format("dd.MM.yyyy HH:mm"))</small>
 			@if(Secured.isAllowedToDeletePost(comment, Component.currentAccount())){
-               	<a href="#confirmModalDeleteComment@comment.id" data-toggle="modal" rel="tooltip" data-original-title="Post löschen">
+               	<a href="#confirmModalDeleteComment@comment.id" style="text-decoration: none;" data-toggle="modal" rel="tooltip" data-original-title="Kommentar löschen">
                		<span class="glyphicon glyphicon-trash"></span>
                	</a>
 			}
+            @if(Secured.isAllowedToEditPost(comment, Component.currentAccount())) {
+                @if(Secured.isPostStillEditable(comment, Component.currentAccount())) {
+                    <a id="hp-editPost_@comment.id" class="hp-post-edit hp-nohref" rel="tooltip" data-original-title="Kommentar bearbeiten">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                } else {
+                    <a class="hp-post-edit disabled hp-nohref" rel="tooltip" data-original-title="Kommentare lassen sich nur @ConfigFactory.load().getInt("htwplus.post.editTimeLimit") Minuten nach Erstellung bearbeiten.">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                }
+            }
 		</h5>
 		<div class="hp-truncate hp-white-space" id="@comment.id">@comment.content</div>
 	</div>
