@@ -3,9 +3,7 @@
 @import play._
 
 @main("Newsstream") {
-    
-	<h1>Mein Newsstream</h1><br />
-	
+    <br />
 	@views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
 		
 	@if(posts != null) {
