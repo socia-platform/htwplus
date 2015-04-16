@@ -146,8 +146,15 @@ public class ElasticsearchService {
      */
     public static SearchResponse doSearch(String caller, String query, String filter, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
 
-        // Build searchQuery by provided fields (mustFields) to search on
-        QueryBuilder searchQuery = QueryBuilders.multiMatchQuery(query, mustFields.toArray(new String[mustFields.size()]));
+        QueryBuilder searchQuery;
+
+        if(query.isEmpty() || query == null) {
+            // Build searchQuery to search for everything
+            searchQuery = QueryBuilders.matchAllQuery();
+        } else {
+            // Build searchQuery by provided fields (mustFields) to search on
+            searchQuery = QueryBuilders.multiMatchQuery(query, mustFields.toArray(new String[mustFields.size()]));
+        }
 
         // Build scoringQuery by provided fields (shouldFields) to increase the scoring of a better matching hit
         QueryBuilder scoringQuery = QueryBuilders.multiMatchQuery(currentAccountId, scoringFields.toArray(new String[scoringFields.size()]));
@@ -185,6 +192,8 @@ public class ElasticsearchService {
             FilterBuilder filterQuery = FilterBuilders.typeFilter(filter);
             searchRequest.setPostFilter(filterQuery);
         }
+
+        Logger.info(searchRequest.toString());
 
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
