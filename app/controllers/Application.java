@@ -80,10 +80,6 @@ public class Application extends BaseController {
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();
 
-        if (keyword == null || keyword.isEmpty()) {
-            flash("info","Nach was suchst du?");
-            return ok(search.render());
-        }
         if (mode == null) mode = "all";
 
         Pattern pt = Pattern.compile("[^ a-zA-Z0-9\u00C0-\u00FF]");
@@ -93,11 +89,6 @@ public class Application extends BaseController {
             String s = match.group();
             keyword=keyword.replaceAll("\\"+s, "");
             flash("info","Dein Suchwort enthielt ungültige Zeichen, die für die Suche entfernt wurden!");
-        }
-
-        if(keyword.isEmpty()){
-            flash("info","Dein Suchwort bestand nur aus ungültigen Zeichen!");
-            return ok(search.render());
         }
 
         Logger.info(currentAccount.id + " is searching for: "+keyword+" on mode: "+mode);
@@ -127,7 +118,9 @@ public class Application extends BaseController {
                     break;
                 case "post":
                     Post post = Post.findById(Long.parseLong(searchHit.getId()));
-                    String searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
+                    String searchContent = post.content;
+                    if(!searchHit.getHighlightFields().isEmpty())
+                        searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
                     post.searchContent = StringEscapeUtils.escapeHtml4(searchContent)
                             .replace("[startStrong]","<strong>")
                             .replace("[endStrong]","</strong>");
