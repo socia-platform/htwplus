@@ -80,6 +80,11 @@ public class Application extends BaseController {
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();
 
+        if (keyword == null) {
+            flash("info","Nach was suchst du?");
+            return ok(search.render());
+        }
+
         if (mode == null) mode = "all";
 
         Pattern pt = Pattern.compile("[^ a-zA-Z0-9\u00C0-\u00FF]");
