@@ -72,6 +72,10 @@ public class Application extends BaseController {
         SearchResponse response = ElasticsearchService.doSearch("searchSuggestions", query, "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
         return ok(response.toString());
     }
+
+    public static Result searchHome() {
+        return ok(search.render());
+    }
 	
 	@Security.Authenticated(Secured.class)
 	public static Result search(int page) throws ExecutionException, InterruptedException {
@@ -79,6 +83,11 @@ public class Application extends BaseController {
         Account currentAccount = Component.currentAccount();
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();
+
+        if (keyword == null) {
+            flash("info","Nach was suchst du?");
+            return redirect(routes.Application.searchHome());
+        }
 
         if (mode == null) mode = "all";
 
