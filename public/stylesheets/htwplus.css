@@ -28,10 +28,6 @@ a.disabled {
     text-decoration: line-through;
 }
 
-a.undecorated:hover {
-    text-decoration: none;
-}
-
 hr {
 	border-bottom: 1px solid #ffffff
 }
