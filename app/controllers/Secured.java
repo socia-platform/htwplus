@@ -3,12 +3,14 @@ package controllers;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.typesafe.config.ConfigFactory;
 import models.*;
 import models.enums.AccountRole;
 import play.Logger;
 import play.Play;
 import play.i18n.Messages;
+import play.libs.Json;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -59,7 +61,17 @@ public class Secured extends Security.Authenticator {
 	@Override
     public Result onUnauthorized(Context ctx) {
 		Logger.info("Unauthorized - Redirect to Login");
-		return ok(landingpage.render());
+		/**
+		 * Return a JSON-Response, when AJAX-Request
+		 */
+		String[] requestedWith = ctx.request().headers().get("X-Requested-With");
+		if(requestedWith != null && requestedWith.length > 0 && requestedWith[0].equals("XMLHttpRequest")){
+			ObjectNode result = Json.newObject();
+			result.put("error", "Not Authorized");
+			return forbidden(result);
+		} else {
+			return ok(landingpage.render());
+		}
     }
 
 	/**
