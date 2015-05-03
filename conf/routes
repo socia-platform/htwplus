@@ -94,6 +94,7 @@ GET         /assets/*file                              controllers.Assets.at(pat
 GET		/admin								controllers.AdminController.index()
 GET		/admin/user/create					controllers.AdminController.createAccountForm()
 POST	/admin/user/create					controllers.AdminController.createAccount()
+POST    /admin/user/:id/delete				controllers.AdminController.deleteAccount(id: Long)
 GET		/admin/user/list					controllers.AdminController.listAccounts()
 GET		/admin/media/						controllers.AdminController.viewMediaTemp()
 GET		/admin/media/clean					controllers.AdminController.cleanMediaTemp()
