@@ -324,7 +324,7 @@ $(document).ready(function () {
                 $("#hp-deleteConfirmSubmit").removeAttr("disabled");
                 $("#hp-deleteConfirmSubmit").val("LÖSCHEN");
             }
-        }
+        };
         disableCountdown();
     });
 
