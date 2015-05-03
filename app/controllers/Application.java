@@ -18,6 +18,7 @@ import play.mvc.Security;
 import views.html.*;
 import controllers.Navigation.Level;
 import org.elasticsearch.action.search.SearchResponse;
+import models.services.AvatarService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,6 +72,10 @@ public class Application extends BaseController {
         SearchResponse response = ElasticsearchService.doSearch("searchSuggestions", query, "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
         return ok(response.toString());
     }
+
+    public static Result searchHome() {
+        return ok(search.render());
+    }
 	
 	@Security.Authenticated(Secured.class)
 	public static Result search(int page) throws ExecutionException, InterruptedException {
@@ -79,10 +84,11 @@ public class Application extends BaseController {
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();
 
-        if (keyword == null || keyword.isEmpty()) {
+        if (keyword == null) {
             flash("info","Nach was suchst du?");
-            return ok(search.render());
+            return redirect(routes.Application.searchHome());
         }
+
         if (mode == null) mode = "all";
 
         Pattern pt = Pattern.compile("[^ a-zA-Z0-9\u00C0-\u00FF]");
@@ -92,11 +98,6 @@ public class Application extends BaseController {
             String s = match.group();
             keyword=keyword.replaceAll("\\"+s, "");
             flash("info","Dein Suchwort enthielt ungültige Zeichen, die für die Suche entfernt wurden!");
-        }
-
-        if(keyword.isEmpty()){
-            flash("info","Dein Suchwort bestand nur aus ungültigen Zeichen!");
-            return ok(search.render());
         }
 
         Logger.info(currentAccount.id + " is searching for: "+keyword+" on mode: "+mode);
@@ -126,7 +127,9 @@ public class Application extends BaseController {
                     break;
                 case "post":
                     Post post = Post.findById(Long.parseLong(searchHit.getId()));
-                    String searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
+                    String searchContent = post.content;
+                    if(!searchHit.getHighlightFields().isEmpty())
+                        searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
                     post.searchContent = StringEscapeUtils.escapeHtml4(searchContent)
                             .replace("[startStrong]","<strong>")
                             .replace("[endStrong]","</strong>");

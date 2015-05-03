@@ -1,13 +1,18 @@
 package models.services;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import play.Logger;
+import play.i18n.Messages;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
- * Helper service to render templates.
+ * Helper service to render templates. This service also provides helper methods to use in templates.
  */
 public class TemplateService {
     /**
@@ -84,5 +89,45 @@ public class TemplateService {
 
         // previous exception is logged, return empty String
         return "";
+    }
+
+    /**
+     * Get a (correct) difference between two dates using Joda-Time API.
+     * See: http://stackoverflow.com/a/1555307
+     * See: http://www.joda.org/joda-time/
+     *
+     * @param date1 the oldest date
+     * @param date2 the newest date
+     * @return The difference in days
+     */
+    public static int getDateDifference(Date date1, Date date2) {
+        DateTime dateTime1 = new DateTime(date1).withTimeAtStartOfDay();
+        DateTime dateTime2 = new DateTime(date2).withTimeAtStartOfDay();
+
+        return Days.daysBetween(dateTime1, dateTime2).getDays();
+    }
+
+    /**
+     * Returns a colloquially date from a date instance.
+     *
+     * @param date Date instance
+     * @return Colloquially date
+     */
+    public static String getDateColloquially(Date date) {
+        long dateDifference = TemplateService.getDateDifference(date, new Date());
+        SimpleDateFormat dateFormatTime = new SimpleDateFormat("HH:mm");
+
+        if (dateDifference > 7) {
+            SimpleDateFormat dateFormatDate = new SimpleDateFormat("dd.MM.yyyy");
+            return Messages.get("post.date_colloquially_date", dateFormatDate.format(date), dateFormatTime.format(date));
+        } else if (dateDifference > 2) {
+            return Messages.get("post.date_colloquially_days", dateDifference, dateFormatTime.format(date));
+        } else if (dateDifference > 1) {
+            return Messages.get("post.date_colloquially_day_before_yesterday", dateFormatTime.format(date));
+        } else if (dateDifference > 0) {
+            return Messages.get("post.date_colloquially_yesterday", dateFormatTime.format(date));
+        } else {
+            return Messages.get("post.date_colloquially_today", dateFormatTime.format(date));
+        }
     }
 }

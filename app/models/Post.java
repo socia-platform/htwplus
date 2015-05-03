@@ -71,6 +71,13 @@ public class Post extends BaseNotifiable implements INotifiable {
         }
     }
 
+    public String validate() {
+        if(this.content.trim().length() <= 0) {
+            return "Empty post!";
+        }
+        return null;
+    }
+
 	@Override
 	public void update() {
 		updatedAt();

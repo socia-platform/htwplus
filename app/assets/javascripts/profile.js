@@ -1,0 +1,179 @@
+$(document).ready(function () {
+    'use strict';
+    var console = window.console || { log: function () {} };
+
+    function AvatarUpload(element) {
+        this.$element = $(element);
+        this.$uploadForm = this.$element.find('#hp-avatar-uploadform');
+        this.$uploadInput = this.$element.find('.hp-avatar-fileinput')[0];
+        this.$finishForm = this.$element.find('#hp-avatar-upload-finish');
+        this.$uploadButton = this.$element.find('input');
+        this.$errorMessage = this.$element.find('.hp-avatar-flash');
+        this.$loading = this.$element.find('.hp-avatar-loading');
+        this.$modal = this.$element.find('.modal');
+        this.$previewImg = this.$element.find('#hp-avatar-preview');
+        this.$saveButton = this.$element.find('#hp-avatar-save-button');
+        this.$profileAvatar = this.$element.find('.hp-avatar-medium');
+        this.$navAvatar = $('.hp-avatar-navi');
+        this.cropBoxData = {};
+        this.$uploadWrapper = this.$element.find('.hp-avatar-input-wrapper');
+        this.init();
+    }
+
+    AvatarUpload.prototype = {
+
+        init: function () {
+
+            var _this = this;
+            this.$uploadButton.change(function (e) {
+                _this.uploadFile();
+            });
+            this.$modal.on('shown.bs.modal', function () {
+                _this.$previewImg.cropper({
+                    zoomable: false,
+                    aspectRatio: 1/1,
+                    background: false,
+                    guides: false,
+                    built: function () {
+                        _this.$previewImg.cropper('setCropBoxData', _this.cropBoxData);
+                    }
+                });
+            });
+            this.$modal.on('hide.bs.modal', function () {
+                _this.$uploadButton.val("");
+                _this.$previewImg.cropper('destroy');
+            });
+            this.$saveButton.click(function () {
+                _this.cropSuccess();
+            });
+            this.$uploadWrapper.tooltip();
+        },
+
+        uploadFile: function () {
+            this.resetError();
+            this.resetSuccess();
+            if(!this.validateFile()){
+                return;
+            }
+            this.showLoading();
+            var data = new FormData(this.$uploadForm[0]);
+            var url = this.$uploadForm.attr('action');
+            var _this = this;
+            $.ajax(url, {
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    _this.uploadError(XMLHttpRequest, textStatus, errorThrown);
+                },
+                success: function (data) {
+                    _this.uploadSuccess(data);
+                }
+            });
+        },
+
+        validateFile: function () {
+            var allowedTypes = ['image/jpeg', 'image/png'];
+            var file = this.$uploadInput.files[0];
+            var type = file.type;
+            var size = file.size;
+            size = size / 1024 / 1024;
+            if(allowedTypes.indexOf(type) == -1){
+                this.showError("Das Dateiformat wird nicht unterstützt.");
+                return false;
+            }
+            if(size > 3){
+                this.showError("Das Bild ist leider zu groß.");
+                return false;
+            }
+            return true;
+        },
+
+        uploadError: function (XMLHttpRequest, textStatus, errorThrown) {
+            var error = XMLHttpRequest.responseJSON.error;
+            this.$errorMessage.html(error);
+            this.$errorMessage.addClass("hp-avatar-error");
+            this.hideLoading();
+        },
+        
+        uploadSuccess: function (data) {
+            var _this = this;
+            var img =  this.$previewImg.attr("src");
+            var d = new Date();
+            this.$previewImg.attr("src", img+"?"+d.getTime());
+            this.$previewImg.load(function () {
+                _this.hideLoading();
+                _this.$modal.modal('show');
+            });
+        },
+
+        showError: function (message) {
+            this.$errorMessage.html(message);
+            this.$errorMessage.addClass("hp-avatar-error");
+        },
+
+        resetError: function () {
+            this.$errorMessage.html("");
+            this.$errorMessage.removeClass("hp-avatar-error");
+        },
+
+        showSuccess: function (message) {
+            this.$errorMessage.html(message);
+            this.$errorMessage.addClass("hp-avatar-success");
+        },
+
+        resetSuccess: function () {
+            this.$errorMessage.html("");
+            this.$errorMessage.removeClass("hp-avatar-success");
+        },
+        
+        cropSuccess: function () {
+            var _this = this;
+            var data = this.$previewImg.cropper('getData');
+            var payload = {
+                x: Math.round(data.x),
+                y: Math.round(data.y),
+                width: Math.round(data.width),
+                height: Math.round(data.width)
+            };
+            console.log(data);
+            var url = this.$finishForm.attr('action');
+            $.ajax(url, {
+                type: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify(payload),
+                dataType: 'json',
+                processData: false,
+                success: function () {
+                    _this.$modal.modal('hide');
+                    location.href = '/profile?avatar=success';
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    _this.$modal.modal('hide');
+                    _this.uploadError(XMLHttpRequest, textStatus, errorThrown);
+                }
+            });
+        },
+
+        updateAvatars: function () {
+            var img =  this.$profileAvatar.attr("src");
+            var d = new Date();
+            this.$profileAvatar.attr("src", img+"&"+d.getTime());
+            img = this.$navAvatar.attr("src");
+            this.$navAvatar.attr("src", img+"?"+d.getTime());
+        },
+
+        showLoading: function () {
+            this.$loading.css("display", "inline-block");
+        },
+
+        hideLoading: function () {
+            this.$loading.css("display", "none");
+        }
+    };
+
+    new AvatarUpload("#hp-avatar-upload");
+
+});

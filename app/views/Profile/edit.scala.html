@@ -10,8 +10,61 @@
 <h2>Profil bearbeiten</h2>
 <br>
 
+<div id="hp-avatar-upload">
+
+	<div class="modal fade" id="hp-avatar-modal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div id="cropper-example-2">
+						<img src="@routes.ProfileController.getTempAvatar(profile.id)" width="100%" alt="Picture" id="hp-avatar-preview">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<form action="@routes.ProfileController.createAvatar(profile.id)" id="hp-avatar-upload-finish" method="post">
+						<button type="button" class="btn btn-warning" id="hp-avatar-save-button">Speichern</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+						<div class="loading"></div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<form action="@routes.ProfileController.createTempAvatar(profile.id)" id="hp-avatar-uploadform">
+		<dl class="dl-horizontal">
+			<dt>Profilbild</dt>
+			<dd>
+				<div class="row">
+					@if(profile.hasAvatar){
+						<div class="col-lg-2">
+							<img alt="avatar" src="@routes.ProfileController.getAvatar(profile.id, "medium")" class="hp-avatar-medium" />
+						</div>
+						<div class="col-lg-10">
+					} else {
+						<div class="col-lg-12">
+					}
+
+						<div class="hp-avatar-input-wrapper btn btn-warning"
+						data-toggle="tooltip" data-placement="top"
+						title="Formate: JPG oder PNG, Max. 3 MB, Min. 250x250px">
+						@if(profile.hasAvatar){ Bild ändern } else { Bild hinzufügen }
+							<input type="file" name="avatarimage" class="hp-avatar-fileinput" id="yeah"  />
+						</div>
+						<span class="hp-avatar-loading"></span>
+						<div class="hp-avatar-flash">
+
+						</div>
+					</div>
+				</div>
+			</dd>
+		</dl>
+	</form>
+</div>
+	
 @form(routes.ProfileController.update(profile.id), 'class -> "ajaxForm") {
 	<dl class="dl-horizontal">
+
 		@inputText(
 			profileForm("email"),
 			'class -> "form-control",
@@ -22,12 +75,12 @@
 		<dd>
 			<select class="form-control" name="studycourse">
 				@if(profile.studycourse == null) {
-				<option value="0" selected="selected">Keine Angabe</option>
+					<option value="0" selected="selected">Keine Angabe</option>
 				} else {
-				<option value="0">Keine Angabe</option>
+					<option value="0">Keine Angabe</option>
 				}
 				@for(studycourse <- Studycourse.getAll()){
-				<option value="@studycourse.id" @if(profile.studycourse !=null && profile.studycourse.equals(studycourse)){selected="selected"}>@studycourse.title</option>
+					<option value="@studycourse.id" @if(profile.studycourse !=null && profile.studycourse.equals(studycourse)){selected="selected"}>@studycourse.title</option>
 				}
 			</select>
 		</dd>
@@ -36,9 +89,9 @@
 			<dd>
 				<select class="form-control" name="semester">
 					@if(profile.semester == null) {
-					<option value="0" selected="selected">Keine Angabe</option>
+						<option value="0" selected="selected">Keine Angabe</option>
 					} else {
-					<option value="0">Keine Angabe</option>
+						<option value="0">Keine Angabe</option>
 					}
 					<option value="1" @if(profile.semester !=null && profile.semester == 1){selected="selected"}>1. Semester</option>
 					<option value="2" @if(profile.semester !=null && profile.semester == 2){selected="selected"}>2. Semester</option>
@@ -52,9 +105,9 @@
 				</br>
 				<select class="form-control" name="degree">
 					@if(profile.degree == null) {
-					<option value="null" selected="selected">Keine Angabe</option>
+						<option value="null" selected="selected">Keine Angabe</option>
 					} else {
-					<option value="null">Keine Angabe</option>
+						<option value="null">Keine Angabe</option>
 					}
 					<option value="Bachelor" @if(profile.degree !=null && profile.degree.equals("Bachelor")){selected="selected"}>Bachelor</option>
 					<option value="Master" @if(profile.degree !=null && profile.degree.equals("Master")){selected="selected"}>Master</option>
@@ -62,21 +115,15 @@
 				</select>
 			</dd>
 		}
-        <dt>@Messages("notification.email_notifications")</dt>
-        <dd id="email-notifications" class="radio">
-            <input type="radio"  name="emailNotifications" value="@models.enums.EmailNotifications.NONE"@if(profile.emailNotifications == null || profile.emailNotifications == models.enums.EmailNotifications.NONE) { checked="checked"}> @Messages("notification.email_notifications.none")<br>
-            <input type="radio" name="emailNotifications" value="@models.enums.EmailNotifications.COLLECTED_DAILY"@if(profile.emailNotifications !=null && profile.emailNotifications == models.enums.EmailNotifications.COLLECTED_DAILY){ checked="checked"}> @Messages("notification.email_notifications.collected_daily")
-            <input type="number" class="form-control input-sm hp-notification-hour" min="0" max="23" name="dailyEmailNotificationHour" value="@if(profile.dailyEmailNotificationHour !=null){@profile.dailyEmailNotificationHour}else{18}"> @Messages("notification.email_notifications.oclock")<br>
-            <input type="radio" name="emailNotifications" value="@models.enums.EmailNotifications.HOURLY"@if(profile.emailNotifications !=null && profile.emailNotifications == models.enums.EmailNotifications.HOURLY){ checked="checked"}> @Messages("notification.email_notifications.hourly")<br>
-            <input type="radio" name="emailNotifications" value="@models.enums.EmailNotifications.IMMEDIATELY_ALL"@if(profile.emailNotifications !=null && profile.emailNotifications == models.enums.EmailNotifications.IMMEDIATELY_ALL){ checked="checked"}> @Messages("notification.email_notifications.immediately_all")
-        </dd>
-		<dt>Avatar</dt>
-		<dd id="hp-avatars">
-			<img id="aDefault" class="img-thumbnail" src="@routes.Assets.at("images/avatars/aDefault.png")" alt="avatar" onclick="updateAvatar(this)" />
-			@for( i <- 0 to 29) {
-         		<img id="a@i" class="img-thumbnail" src="@routes.Assets.at("images/avatars/a"+i+".png")" alt="avatar" onclick="updateAvatar(this)" />
-      		}
+		<dt>@Messages("notification.email_notifications")</dt>
+		<dd id="email-notifications" class="radio">
+			<input type="radio"  name="emailNotifications" value="@models.enums.EmailNotifications.NONE"@if(profile.emailNotifications == null || profile.emailNotifications == models.enums.EmailNotifications.NONE) { checked="checked"}> @Messages("notification.email_notifications.none")<br>
+			<input type="radio" name="emailNotifications" value="@models.enums.EmailNotifications.COLLECTED_DAILY"@if(profile.emailNotifications !=null && profile.emailNotifications == models.enums.EmailNotifications.COLLECTED_DAILY){ checked="checked"}> @Messages("notification.email_notifications.collected_daily")
+			<input type="number" class="form-control input-sm hp-notification-hour" min="0" max="23" name="dailyEmailNotificationHour" value="@if(profile.dailyEmailNotificationHour !=null){@profile.dailyEmailNotificationHour}else{18}"> @Messages("notification.email_notifications.oclock")<br>
+			<input type="radio" name="emailNotifications" value="@models.enums.EmailNotifications.HOURLY"@if(profile.emailNotifications !=null && profile.emailNotifications == models.enums.EmailNotifications.HOURLY){ checked="checked"}> @Messages("notification.email_notifications.hourly")<br>
+			<input type="radio" name="emailNotifications" value="@models.enums.EmailNotifications.IMMEDIATELY_ALL"@if(profile.emailNotifications !=null && profile.emailNotifications == models.enums.EmailNotifications.IMMEDIATELY_ALL){ checked="checked"}> @Messages("notification.email_notifications.immediately_all")
 		</dd>
+
 	</dl>
     <div class="pull-left">
         <a id="hp-delete-account" href="#hp-deleteModal" data-toggle="modal"><button class="btn btn-danger">ACCOUNT LÖSCHEN</button></a>
@@ -87,24 +134,5 @@
 		<a type="button" class="btn btn-default" href="@routes.ProfileController.me()">Abbrechen</a>
 	</div>
 	<div class="clearfix"></div>
-	<script type="text/javascript">
-		var aID = "@profile.avatar";
-	
-		function updateAvatar(parent) {
-			var childs = document.getElementById("hp-avatars").getElementsByClassName("img-thumbnail");
-			for (i = 0; i < childs.length; i++) {
-				childs[i].className = "img-thumbnail";
-			}
-			parent.className = "img-thumbnail active";
-			document.getElementById("avatar").value = parent.id;
-		}
-		
-		function setAvatar(id) {
-			document.getElementById(id).className = "img-thumbnail active";
-			document.getElementById("avatar").value = id;
-		}
-		
-		setAvatar(aID);
-	</script>
 }
 }

@@ -29,7 +29,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     @Required
 	@Column(unique = true)
-    @Pattern(value="^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}~-]+$")
+    @Pattern(value="^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}/\\\\\\[\\]~-]+$")
 	public String title;
 
 	public String description;
