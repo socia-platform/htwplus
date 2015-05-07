@@ -807,7 +807,14 @@ div.hp-notepad-bottom {
 	padding-bottom: 22px;
     background: url(../images/backgrounds.png) repeat-x 0 bottom;
 }
-
+div.hp-notepad-content.Newsstream {
+    border-radius: 0px;
+    border: none;
+    box-shadow: none;
+    moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    background: none;
+}
 div.hp-notepad-content {
 	min-height: 500px;
 	padding: 5px 30px 0;

@@ -53,8 +53,7 @@
                         <span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
                         <div class="hp-easy-feedback">Feedback</div>
                     </a>
-                    @views.html.snippets.notepad{ @content }
-
+                    @views.html.snippets.notepad(title) { @content }
 				</div> <!-- /col-xs-9 -->
 			</div> <!-- /row -->
 		</div> <!-- /container -->
@@ -80,6 +79,8 @@
 			@views.html.snippets.impressumModal()
 			@views.html.snippets.datenschutzModal()
 		</footer>
+
+
 
 		<script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
         <script type="text/javascript" src='@routes.Assets.at("bower_components/jquery/dist/jquery.min.js")'></script>
