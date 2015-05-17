@@ -53,7 +53,7 @@ public class Application extends BaseController {
 	public static Result index() {
 		Navigation.set(Level.STREAM);
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount), LIMIT, PAGE));
+		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
 	}
 	
 	public static Result help() {
@@ -62,10 +62,10 @@ public class Application extends BaseController {
 	}
 	
 	@Security.Authenticated(Secured.class)
-	public static Result stream(int page) {
+	public static Result stream(String filter, int page) {
 		Navigation.set(Level.STREAM);
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, page),postForm,Post.countStream(currentAccount), LIMIT, page));
+		return ok(stream.render(currentAccount,Post.getFilteredStream(currentAccount, LIMIT, page, filter),postForm,Post.countStream(currentAccount, filter), LIMIT, page, filter));
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {

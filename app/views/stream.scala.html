@@ -1,11 +1,12 @@
-@(currentUser: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer)
-
+@(currentUser: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String)
+@import helper._
 @import play._
 
 @main("Newsstream") {
     
 	<h1>Mein Newsstream</h1><br />
-	
+
+
 	@views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
 		
 	@if(posts != null) {
@@ -14,5 +15,5 @@
 		}
 	}
 	
-	@views.html.pagination(count, limit, currentPage, routes.Application.stream(1).toString, "?")
+	@views.html.pagination(count, limit, currentPage, routes.Application.stream(filter, 1).toString, "&")
 }

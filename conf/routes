@@ -4,7 +4,7 @@
 
 # Home page
 GET         /                                          controllers.Application.index()
-GET         /stream                                    controllers.Application.stream(page: Integer ?= 1)
+GET         /stream                                    controllers.Application.stream(filter:String, page: Integer ?= 1)
 GET         /search                                    controllers.Application.search(page: Integer ?= 1)
 GET         /searchHome                                controllers.Application.searchHome()
 GET         /suggestions                               controllers.Application.searchSuggestions(query: String)
