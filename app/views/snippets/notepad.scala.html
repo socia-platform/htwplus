@@ -1,6 +1,6 @@
 @(currentPage: String)(content: Html)
 
-@if(Navigation.getLevel().equals(Navigation.Level.STREAM)) {
+@if(Navigation.getLevel() != null && Navigation.getLevel().equals(Navigation.Level.STREAM)) {
     <ul id="hp-nav-filter" class="nav ">
         <span class='glyphicon glyphicon-filter'></span>
         @defining(if(Navigation.getTitle().equals("Alles")){"active"} else {"deactive"}) { status =>
