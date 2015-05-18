@@ -206,6 +206,9 @@ public class Post extends BaseNotifiable implements INotifiable {
                 streamClausesList.add(streamClausesMap.get("contactToAccountPosts"));
                 streamClausesList.add(streamClausesMap.get("accountPosts"));
                 break;
+            case "favorite":
+                streamClausesList.add(streamClausesMap.get("accountPosts"));
+                break;
 
             default:
                 streamClausesList.add(streamClausesMap.get("accountPosts"));

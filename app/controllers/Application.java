@@ -62,7 +62,22 @@ public class Application extends BaseController {
 	
 	@Security.Authenticated(Secured.class)
 	public static Result stream(String filter, int page) {
-		Navigation.set(Level.STREAM);
+        switch (filter) {
+            case "account":
+                Navigation.set(Level.STREAM, "Eigene Posts");
+                break;
+            case "group":
+                Navigation.set(Level.STREAM, "Gruppen");
+                break;
+            case "contact":
+                Navigation.set(Level.STREAM, "Kontakte");
+                break;
+            case "favorite":
+                Navigation.set(Level.STREAM, "Favoriten");
+                break;
+            default:
+                Navigation.set(Level.STREAM, "Alles");
+        }
 		Account currentAccount = Component.currentAccount();
 		return ok(stream.render(currentAccount,Post.getFilteredStream(currentAccount, LIMIT, page, filter),postForm,Post.countStream(currentAccount, filter), LIMIT, page, filter));
 	}
@@ -73,12 +88,13 @@ public class Application extends BaseController {
     }
 
     public static Result searchHome() {
+        Navigation.set(Level.SEARCH);
         return ok(search.render());
     }
 	
 	@Security.Authenticated(Secured.class)
 	public static Result search(int page) throws ExecutionException, InterruptedException {
-        Navigation.set("Suche");
+        Navigation.set(Level.SEARCH);
         Account currentAccount = Component.currentAccount();
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();

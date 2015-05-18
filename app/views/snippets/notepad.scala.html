@@ -1,32 +1,31 @@
 @(currentPage: String)(content: Html)
 
-
-@if(currentPage.equals("Newsstream")) {
+@if(Navigation.getLevel().equals(Navigation.Level.STREAM)) {
     <ul id="hp-nav-filter" class="nav ">
         <span class='glyphicon glyphicon-filter'></span>
         @defining(if(Navigation.getTitle().equals("Alles")){"active"} else {"deactive"}) { status =>
         <li class="@status">
-            <a href="@routes.Application.index()">Alles</a>
+            <a href='@routes.Application.index()' data-container="body" rel="tooltip" data-original-title="Alles, was wichtig für dich ist.">Alles</a>
         </li>
         }
         @defining(if(Navigation.getTitle().equals("Eigene Posts")){"active"} else {"deactive"}) { status =>
         <li class="@status">
-            <a href="@routes.Application.stream()">Eigene Posts</a>
+            <a href='@routes.Application.stream("account")' data-container="body" rel="tooltip" data-original-title="Post, die du verfasst hast.">Eigene Posts</a>
         </li>
         }
         @defining(if(Navigation.getTitle().equals("Gruppen")){"active"} else {"deactive"}) { status =>
         <li class="@status">
-            <a href="#">Gruppen</a>
+            <a href='@routes.Application.stream("group")' data-container="body" rel="tooltip" data-original-title="Post aus deinen Gruppen und Kursen">Gruppen</a>
         </li>
         }
-        @defining(if(Navigation.getTitle().equals("Kurse")){"active"} else {"deactive"}) { status =>
+        @defining(if(Navigation.getTitle().equals("Kontakte")){"active"} else {"deactive"}) { status =>
         <li class="@status">
-            <a href="#">Kurse</a>
+            <a href='@routes.Application.stream("contact")' data-container="body" rel="tooltip" data-original-title="Posts von deinen Kontakten.">Kontakte</a>
         </li>
         }
         @defining(if(Navigation.getTitle().equals("Favoriten")){"active"} else {"deactive"}) { status =>
         <li class="@status">
-            <a href="#">Favoriten</a>
+            <a href='@routes.Application.stream("favorite")' data-container="body" rel="tooltip" data-original-title="Posts, die du auf deinem Stream verfassst hast.">Favoriten</a>
         </li>
         }
         <span class='glyphicon glyphicon-filter'></span>
