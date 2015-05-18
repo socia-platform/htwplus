@@ -1,8 +1,7 @@
 package models;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import javax.persistence.*;
 
@@ -141,98 +140,116 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 
     @SuppressWarnings("unchecked")
-	public static List<Post> findStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final boolean isVisitor, final int limit, final int offset) {
-        	Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, isVisitor, " ORDER BY p.updatedAt DESC");
+	public static List<Post> findStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final String filter, final int limit, final int offset) {
+        	Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, filter, " ORDER BY p.updatedAt DESC");
 
             // set limit and offset
             query = limit(query, limit, offset);
             return query.getResultList();
 	}
 
-	public static int countStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final boolean isVisitor) {
-		final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, isVisitor,"");
+	public static int countStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final String filter) {
+		final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, filter, "");
         return ((Number) query.getSingleResult()).intValue();
 	}
 	
 	/**
-	 * @param account - Account (current user, profile or a friend)
-	 * @param groupList - a list containing all groups we want to search in
-	 * @param friendList - a list containing all friends we want to search in
+	 * @param account - Account (usually: current user or a contact)
+	 * @param groupList - a list containing all groups we want to search in (usually all groups from account)
+	 * @param accountList - a list containing all accounts we want to search in (usually contact from account)
 	 * @return List of Posts
 	 */
-	public static Query streamForAccount(String selectClause, Account account, List<Group> groupList, List<Account> friendList, boolean isVisitor, String orderByClause){
+	public static Query streamForAccount(String selectClause, Account account, List<Group> groupList, List<Account> accountList, String filter, String orderByClause){
 
-		// since JPA is unable to handle empty lists (eg. groupList, friendList) we need to assemble our query.
-		String myPostsClause;
-		String groupListClause = "";
-		String friendListClause = "";
-		String visitorClause = "";
-        String broadcastJoin = "";
-        String broadcastClause = "";
+        HashMap<String, String> streamClausesMap = new HashMap<>();
+        List<String> streamClausesList = new ArrayList<>();
 
-		/**
-		 *  finds all stream-post for account.
-		 *  e.g account = myself
-		 *  1. if i'm mentioned in post.account, somebody posted me. (yep, we want this => 'p.account = :account')
-		 *  2. if i'm post.owner, i posted somewhere (yep, we want this too => 'p.owner = :account')
-		 *  BUT, if i'm the owner and post.parent is set, it's only a comment. so => 'p.parent = NULL'
-		 */
-		myPostsClause = " p.account = :account OR (p.owner = :account AND p.parent = NULL) ";
+        // find stream posts from @account
+        String accountPosts = " (p.owner = (:account) AND p.account = (:account)) ";
+        streamClausesMap.put("accountPosts", accountPosts);
 
-		// add additional clauses if not null or empty
+        // find group posts from @account
+        String accountGroupPosts = " (p.owner = (:account) AND p.group IN (:groupList)) ";
+        streamClausesMap.put("accountGroupPosts", accountGroupPosts);
 
-		if (friendList != null && !friendList.isEmpty()) {
-			/**
-			 *  finds all own stream-posts of my friends.
-			 *  e.g account = a friend of mine
-			 *  1. if my friend is mentioned in p.account, somebody posted him => 'p.account IN :friendList'
-			 *  BUT, we only want his/her own posts. so he has to be the owner as well => 'p.account = p.owner'
-			 */
-			friendListClause = " OR p.account IN :friendList AND p.account = p.owner";
-		}
+        // find posts from each group in @groupList
+        String allGroupPosts = " (p.group IN (:groupList)) ";
+        streamClausesMap.put("allGroupPosts", allGroupPosts);
 
-		if (groupList != null && !groupList.isEmpty()) {
-			// finds all stream-post of groups
-			groupListClause = " OR p.group IN :groupList ";
-		}
+        // find posts from @account where @account posted on @accountList
+        String accountContactPosts = " (p.owner = (:account) AND p.account IN (:accountList)) ";
+        streamClausesMap.put("accountContactPosts", accountContactPosts);
 
-		if (isVisitor) {
-			/**
-			 * since 'myPostsClause' includes posts where the given account posted to someone ('OR (p.owner = :account AND p.parent = NULL)').
-			 * we have to modify it for the friends-stream (cut it out).
-			 */
-			myPostsClause = " p.account = :account ";
+        // find posts from @accountList where @accountList posted on @account's feed
+        String contactToAccountPosts = " (p.owner IN (:accountList) AND p.account = (:account)) ";
+        streamClausesMap.put("contactToAccountPosts", contactToAccountPosts);
 
-			/**
-			 * groupListClause includes all posts where my friend is member/owner of.
-			 * but we only need those posts where he/she is owner of.
-			 */
-			if (groupList != null && !groupList.isEmpty()) {
-				visitorClause = " AND p.owner = :account ";
-			}
-		} else {
-            // its the origin user, show also broadcast messages
-            broadcastJoin = " LEFT JOIN p.broadcastPostRecipients bc_recipients";
-            broadcastClause = " OR bc_recipients = :account ";
+        // find posts from @accountList which are posted on his/her own feed
+        String contactPosts = " (p.owner IN (:accountList) AND p.account = p.owner) ";
+        streamClausesMap.put("contactPosts", contactPosts);
+
+
+        switch (filter) {
+            case "group":
+                streamClausesList.add(streamClausesMap.get("allGroupPosts"));
+                break;
+            case "account":
+                streamClausesList.add(streamClausesMap.get("accountPosts"));
+                streamClausesList.add(streamClausesMap.get("accountGroupPosts"));
+                break;
+            case "contact":
+                streamClausesList.add(streamClausesMap.get("contactToAccountPosts"));
+                streamClausesList.add(streamClausesMap.get("contactPosts"));
+                break;
+            case "visitor":
+                streamClausesList.add(streamClausesMap.get("accountGroupPosts"));
+                streamClausesList.add(streamClausesMap.get("contactToAccountPosts"));
+                streamClausesList.add(streamClausesMap.get("accountPosts"));
+                break;
+            case "favorite":
+                streamClausesList.add(streamClausesMap.get("accountPosts"));
+                break;
+
+            default:
+                streamClausesList.add(streamClausesMap.get("accountPosts"));
+                streamClausesList.add(streamClausesMap.get("accountGroupPosts"));
+                streamClausesList.add(streamClausesMap.get("allGroupPosts"));
+                streamClausesList.add(streamClausesMap.get("accountContactPosts"));
+                streamClausesList.add(streamClausesMap.get("contactToAccountPosts"));
+                streamClausesList.add(streamClausesMap.get("contactPosts"));
+                break;
+        }
+        // its possible that @streamClausesList contains null values. remove them.
+        streamClausesList.removeAll(Collections.singleton(null));
+
+        // assemble query.
+        String completeQuery = selectClause + " FROM Post p WHERE " + assembleClauses(streamClausesList) + orderByClause;
+		Query query = JPA.em().createQuery(completeQuery);
+
+        // check @completeQuery for parameter which are needed.
+        // () are necessary to distinguish between :account and :accountList
+        if (completeQuery.contains("(:account)"))
+            query.setParameter("account", account);
+
+        if (completeQuery.contains("(:groupList)"))
+            query.setParameter("groupList", groupList);
+
+        if (completeQuery.contains("(:accountList)"))
+            query.setParameter("accountList", accountList);
+
+        return query;
+	}
+
+    private static String assembleClauses(List<String> streamClausesList) {
+        String assembledClauses = "";
+        Iterator iterator = streamClausesList.iterator();
+        while(iterator.hasNext()){
+            assembledClauses += iterator.next().toString();
+            if(iterator.hasNext()) assembledClauses += " OR ";
         }
 
-		// create Query.
-        String completeQuery = selectClause + " FROM Post p" + broadcastJoin + " WHERE " + myPostsClause
-                + groupListClause + friendListClause + visitorClause + broadcastClause + orderByClause;
-		Query query = JPA.em().createQuery(completeQuery);
-		query.setParameter("account", account);
-
-
-		// add parameter as needed
-		if (groupList != null && !groupList.isEmpty()) {
-			query.setParameter("groupList", groupList);
-		}
-		if (friendList != null && !friendList.isEmpty()) {
-			query.setParameter("friendList", friendList);
-		}
-
-		return query;
-	}
+        return assembledClauses;
+    }
 	
 	public static int countCommentsForPost(final Long id) {
 		return ((Number)JPA.em().createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
@@ -260,44 +277,44 @@ public class Post extends BaseNotifiable implements INotifiable {
 		List<Group> groupList = GroupAccount.findEstablished(account);
 		
 		int offset = (page * limit) - limit;
-		return findStreamForAccount(account, groupList, friendList, false, limit, offset);
+		return findStreamForAccount(account, groupList, friendList, "all", limit, offset);
 	}
+
+    /**
+     * @param account Account (current user)
+     * @return List of Posts
+     */
+    public static List<Post> getFilteredStream(Account account, int limit, int page, String filter) {
+        int offset = (page * limit) - limit;
+        return findStreamForAccount(account, GroupAccount.findEstablished(account), Friendship.findFriends(account), filter, limit, offset);
+    }
 	
 	
 	/**
 	 * @param account Account (current user)
 	 * @return Number of Posts
 	 */
-	public static int countStream(Account account){
-		// find friends and groups of given account
-		List<Account> friendList = Friendship.findFriends(account);
-		List<Group> groupList = GroupAccount.findEstablished(account);
-			
-		return countStreamForAccount(account, groupList, friendList, false);
-	}
-	
+	public static int countStream(Account account, String filter) {
+        return countStreamForAccount(account, GroupAccount.findEstablished(account), Friendship.findFriends(account), filter);
+    }
+
 	/**
-	 * @param friend - Account (a friends account)
+	 * @param contact - Account
 	 * @return List of Posts
 	 */
-	public static List<Post> getFriendStream(Account friend, int limit, int page) {
-		// find open groups for given account
-		List<Group> groupList = GroupAccount.findPublicEstablished(friend);
-			
+	public static List<Post> getFriendStream(Account contact, int limit, int page) {
 		int offset = (page * limit) - limit;
-		return findStreamForAccount(friend, groupList, null, true, limit, offset);
+		return findStreamForAccount(contact, GroupAccount.findPublicEstablished(contact), Friendship.findFriends(contact), "visitor", limit, offset);
 	}
-	
+
 	/**
-	 * @param friend - Account (a friends account)
+	 * @param contact - Account (a friends account)
 	 * @return Number of Posts
 	 */
-	public static int countFriendStream(Account friend){
-		// find groups of given account
-		List<Group> groupList = GroupAccount.findPublicEstablished(friend);
-		
-		return countStreamForAccount(friend, groupList, null, true);
+	public static int countFriendStream(Account contact){
+		return countStreamForAccount(contact, GroupAccount.findPublicEstablished(contact), Friendship.findFriends(contact), "visitor");
 	}
+
 
     @Override
     public Account getSender() {

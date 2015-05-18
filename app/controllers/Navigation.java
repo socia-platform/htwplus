@@ -11,7 +11,7 @@ import play.mvc.*;
 
 public class Navigation {
 
-	public static enum Level {PROFILE,STREAM,FRIENDS,GROUPS,COURSES,HELP,USER,ADMIN,NOTIFICATIONS}
+	public static enum Level {PROFILE,STREAM,FRIENDS,GROUPS,COURSES,HELP,USER,ADMIN,SEARCH,NOTIFICATIONS}
 	
 	private static Map<Level,Call> callMapping = new HashMap<Navigation.Level, Call>();
 	static
@@ -35,6 +35,7 @@ public class Navigation {
 		titleMapping.put(Level.HELP, "Hilfe");
 		titleMapping.put(Level.USER, "Person");
 		titleMapping.put(Level.ADMIN, "Control Center");
+        titleMapping.put(Level.SEARCH, "Suche");
         titleMapping.put(Level.NOTIFICATIONS, Messages.get("notification.news"));
 	}
 	
