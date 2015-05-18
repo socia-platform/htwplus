@@ -5,7 +5,7 @@
 @main("Newsstream") {
     <br />
 	@views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
-    <br />
+
 	@if(posts != null) {
 		@for(post <- posts) {
 			@views.html.snippets.postView(post, postForm, models.Post.STREAM, Play.application().configuration().getInt("htwplus.comments.init"))
