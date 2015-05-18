@@ -21,6 +21,7 @@ public class PostController extends BaseController {
 	
 	static Form<Post> postForm = Form.form(Post.class);
 	static final int PAGE = 1;
+    static final String STREAM_FILTER = "all";
 	
 	public static Result view (Long id) {
 		Post post = Post.findById(id);
@@ -112,11 +113,11 @@ public class PostController extends BaseController {
 					post.owner = account;
 					post.create();
 				}
-				return redirect(controllers.routes.Application.stream(PAGE));
+				return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
 			}
             
 			flash("info", Messages.get("post.post_on_stream_only"));
-			return redirect(controllers.routes.Application.stream(PAGE));
+			return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
 		}
         
 		return redirect(controllers.routes.Application.index());
