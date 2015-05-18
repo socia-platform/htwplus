@@ -534,4 +534,8 @@ public class Secured extends Security.Authenticator {
 		return notification.recipient.equals(Component.currentAccount());
 	}
 
+    public static boolean isNotNull(Object object) {
+        return object != null;
+    }
+
 }
