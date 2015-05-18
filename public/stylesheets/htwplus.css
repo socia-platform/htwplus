@@ -10,6 +10,8 @@ html {
 body {
 	margin-top: 91px;
 	overflow-x: hidden;
+    background: url('../images/crossword.png');
+    background-repeat:repeat;
 }
 
 div.alert {
@@ -123,7 +125,7 @@ a.hp-nohref {
 }
 
 .hp-container {
-    margin-top: 15px;
+    margin-top: 45px;
 }
 
 /*============================== Landingpage ==============================*/
@@ -637,7 +639,7 @@ input.hp-notification-hour {
 /*============================== Nav-Tabs ==============================*/
 
 .hp-nav-tabs {
-	margin-top: -40px;
+	margin-top: -28px;
 }
 
 .hp-nav-tabs > li {
@@ -805,10 +807,14 @@ div.hp-notepad-bottom {
 div.hp-notepad-content {
 	min-height: 500px;
 	padding: 5px 30px 0;
-	background-color: white;
 	box-sizing: content-box;
+    background-color: white;
 	-moz-box-sizing: content-box;
 	-webkit-box-sizing: content-box;
+    border-radius: 4px;
+    -moz-box-shadow: 0 0 3px #888;
+    -webkit-box-shadow: 0 0 3px #888;
+    box-shadow: 0 0 3px #888;
 }
 
 div.hp-notepad-content > *:last-child {
@@ -820,6 +826,23 @@ div.hp-notepad-content > *:last-child {
         padding-right: 5px;
         padding-left: 5px;
     }
+}
+
+ul#hp-nav-filter {
+    text-align: center;
+    margin-bottom: 3px;
+}
+
+ul#hp-nav-filter > li {
+    display: inline-block;
+}
+
+ul#hp-nav-filter > li > a:hover, ul.hp-nav-filter > li > a:focus {
+    background-color: transparent;
+}
+
+ul#hp-nav-filter > li.active > a {
+    border-bottom:2px #000 solid;
 }
 
 div#hp-footer {
@@ -907,7 +930,7 @@ div.hp-pagination {
 
 #hp-new-comment-content,
 #hp-new-post-content {
-	height: 31px;
+	height: 60px;
     transition: height 0.5s ease 0.2s;
 	-webkit-transition: height 0.5s ease 0.2s;
 	-moz-transition: height 0.5s ease 0.2s;
@@ -952,7 +975,6 @@ div.hp-pagination {
 
 .well {
 	padding: 15px;
-	margin-bottom: 0;
 }
 .well.broadcast {
     border: 1px solid #76b900;
