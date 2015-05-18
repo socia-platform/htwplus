@@ -168,26 +168,29 @@ public class Post extends BaseNotifiable implements INotifiable {
         String accountPosts = " (p.owner = (:account) AND p.account = (:account)) ";
         streamClausesMap.put("accountPosts", accountPosts);
 
-        // find group posts from @account
-        String accountGroupPosts = " (p.owner = (:account) AND p.group IN (:groupList)) ";
-        streamClausesMap.put("accountGroupPosts", accountGroupPosts);
+        if(groupList != null && groupList.size() != 0) {
+            // find group posts from @account
+            String accountGroupPosts = " (p.owner = (:account) AND p.group IN (:groupList)) ";
+            streamClausesMap.put("accountGroupPosts", accountGroupPosts);
 
-        // find posts from each group in @groupList
-        String allGroupPosts = " (p.group IN (:groupList)) ";
-        streamClausesMap.put("allGroupPosts", allGroupPosts);
+            // find posts from each group in @groupList
+            String allGroupPosts = " (p.group IN (:groupList)) ";
+            streamClausesMap.put("allGroupPosts", allGroupPosts);
+        }
 
-        // find posts from @account where @account posted on @accountList
-        String accountContactPosts = " (p.owner = (:account) AND p.account IN (:accountList)) ";
-        streamClausesMap.put("accountContactPosts", accountContactPosts);
+        if(accountList != null && accountList.size() != 0) {
+            // find posts from @account where @account posted on @accountList
+            String accountContactPosts = " (p.owner = (:account) AND p.account IN (:accountList)) ";
+            streamClausesMap.put("accountContactPosts", accountContactPosts);
 
-        // find posts from @accountList where @accountList posted on @account's feed
-        String contactToAccountPosts = " (p.owner IN (:accountList) AND p.account = (:account)) ";
-        streamClausesMap.put("contactToAccountPosts", contactToAccountPosts);
+            // find posts from @accountList where @accountList posted on @account's feed
+            String contactToAccountPosts = " (p.owner IN (:accountList) AND p.account = (:account)) ";
+            streamClausesMap.put("contactToAccountPosts", contactToAccountPosts);
 
-        // find posts from @accountList which are posted on his/her own feed
-        String contactPosts = " (p.owner IN (:accountList) AND p.account = p.owner) ";
-        streamClausesMap.put("contactPosts", contactPosts);
-
+            // find posts from @accountList which are posted on his/her own feed
+            String contactPosts = " (p.owner IN (:accountList) AND p.account = p.owner) ";
+            streamClausesMap.put("contactPosts", contactPosts);
+        }
 
         switch (filter) {
             case "group":
