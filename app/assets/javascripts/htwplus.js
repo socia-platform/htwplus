@@ -9,10 +9,10 @@ function toggleMediaSelection(parent) {
 function autolinkUrls() {
     $('.hp-truncate').each(function(){
 		$(this).linkify({
-			tagName: 'a', 
-			target: '_blank', 
-			newLine: '\n', 
-			linkClass: 'hp-postLink', 
+			tagName: 'a',
+			target: '_blank',
+			newLine: '\n',
+			linkClass: 'hp-postLink',
 			linkAttributes: null
 		});
 	});
@@ -26,7 +26,7 @@ function truncateBreadcrumb() {
 	var lastBreadcrumb = $("#hp-navbar-breadcrumb .breadcrumb > li:last-child");
 	var index = 3;	// first breadcrumb item which is hidden
 	// hide breadcrumb items while last item isn't visible
-	while (lastBreadcrumb.length && 
+	while (lastBreadcrumb.length &&
 		lastBreadcrumb.position().left + lastBreadcrumb.width() > $("#hp-navbar-breadcrumb .breadcrumb").width()) {
 		$("#hp-navbar-breadcrumb #hp-navbar-breadcrumb-truncate").removeClass("hidden");
 		$("#hp-navbar-breadcrumb .breadcrumb > li:nth-child("+index+")").addClass("hidden");
@@ -55,6 +55,14 @@ function showErrorBeforeElement(element, error_message) {
 /*
  *  Options Menu
  */
+$('.hp-optionsMenu>div').on('shown.bs.dropdown', function() {
+    $(this).find('.dropdown-toggle>span').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+    var menu = $(this).find('ul.dropdown-menu');
+    var row = $(this).parents('tr');
+    // hacky: 45 belongs to div.hp-notepad-content.addmargin    
+    var top = 45 + row.offset().top + row.height() - $('.hp-notepad-content').offset().top;
+    menu.css('top', top + 'px');
+});
 
 $('.hp-optionsMenu>div').on('hidden.bs.dropdown', function() {
     $(this).find('.dropdown-toggle>span').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
@@ -174,7 +182,7 @@ $(document).ready(function () {
 		} else {
 			$("#token-input").fadeOut();
 		}
-		
+
 	});
 
 	/*
@@ -184,7 +192,7 @@ $(document).ready(function () {
 		beforeSend:function(){
 			$(".loading").show();
 			$(".loading").css('display', 'inline-block');
-		}, 
+		},
 		complete:function(){
 			$(".loading").hide();
 			autolinkUrls();
