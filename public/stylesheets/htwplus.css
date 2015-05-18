@@ -807,14 +807,7 @@ div.hp-notepad-bottom {
 	padding-bottom: 22px;
     background: url(../images/backgrounds.png) repeat-x 0 bottom;
 }
-div.hp-notepad-content.Newsstream {
-    border-radius: 0px;
-    border: none;
-    box-shadow: none;
-    moz-box-shadow: none;
-    -webkit-box-shadow: none;
-    background: none;
-}
+
 div.hp-notepad-content {
 	min-height: 500px;
 	padding: 5px 30px 0;
@@ -837,6 +830,23 @@ div.hp-notepad-content > *:last-child {
         padding-right: 5px;
         padding-left: 5px;
     }
+}
+
+ul#hp-nav-filter {
+    text-align: center;
+    margin-bottom: 3px;
+}
+
+ul#hp-nav-filter > li {
+    display: inline-block;
+}
+
+ul#hp-nav-filter > li > a:hover, ul.hp-nav-filter > li > a:focus {
+    background-color: transparent;
+}
+
+ul#hp-nav-filter > li.active > a {
+    border-bottom:2px #000 solid;
 }
 
 div#hp-footer {
@@ -969,7 +979,6 @@ div.hp-pagination {
 
 .well {
 	padding: 15px;
-	margin-bottom: 0;
 }
 .well.broadcast {
     border: 1px solid #76b900;

@@ -51,7 +51,7 @@ public class Application extends BaseController {
 
 	@Security.Authenticated(Secured.class)
 	public static Result index() {
-		Navigation.set(Level.STREAM);
+		Navigation.set(Level.STREAM, "Alles");
 		Account currentAccount = Component.currentAccount();
 		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount), LIMIT, PAGE));
 	}

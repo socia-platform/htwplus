@@ -1,5 +1,38 @@
 @(currentPage: String)(content: Html)
 
+
+@if(currentPage.equals("Newsstream")) {
+    <ul id="hp-nav-filter" class="nav ">
+        <span class='glyphicon glyphicon-filter'></span>
+        @defining(if(Navigation.getTitle().equals("Alles")){"active"} else {"deactive"}) { status =>
+        <li class="@status">
+            <a href="@routes.Application.index()">Alles</a>
+        </li>
+        }
+        @defining(if(Navigation.getTitle().equals("Eigene Posts")){"active"} else {"deactive"}) { status =>
+        <li class="@status">
+            <a href="@routes.Application.stream()">Eigene Posts</a>
+        </li>
+        }
+        @defining(if(Navigation.getTitle().equals("Gruppen")){"active"} else {"deactive"}) { status =>
+        <li class="@status">
+            <a href="#">Gruppen</a>
+        </li>
+        }
+        @defining(if(Navigation.getTitle().equals("Kurse")){"active"} else {"deactive"}) { status =>
+        <li class="@status">
+            <a href="#">Kurse</a>
+        </li>
+        }
+        @defining(if(Navigation.getTitle().equals("Favoriten")){"active"} else {"deactive"}) { status =>
+        <li class="@status">
+            <a href="#">Favoriten</a>
+        </li>
+        }
+        <span class='glyphicon glyphicon-filter'></span>
+    </ul>
+}
+
 <div class="hp-notepad-content @currentPage">
     @content
 </div> <!-- /content -->
