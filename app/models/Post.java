@@ -225,8 +225,10 @@ public class Post extends BaseNotifiable implements INotifiable {
         // its possible that @streamClausesList contains null values. remove them.
         streamClausesList.removeAll(Collections.singleton(null));
 
+
         // assemble query.
-        String completeQuery = selectClause + " FROM Post p WHERE " + assembleClauses(streamClausesList) + orderByClause;
+        // insert dummy where clause (1=2) for the unlikely event of empty @streamClausesList (e.g. new user with no groups or contact)
+        String completeQuery = selectClause + " FROM Post p WHERE 1=2 " + assembleClauses(streamClausesList) + orderByClause;
 		Query query = JPA.em().createQuery(completeQuery);
 
         // check @completeQuery for parameter which are needed.
@@ -247,8 +249,7 @@ public class Post extends BaseNotifiable implements INotifiable {
         String assembledClauses = "";
         Iterator iterator = streamClausesList.iterator();
         while(iterator.hasNext()){
-            assembledClauses += iterator.next().toString();
-            if(iterator.hasNext()) assembledClauses += " OR ";
+            assembledClauses += " OR " + iterator.next().toString();
         }
 
         return assembledClauses;
