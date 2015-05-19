@@ -1,32 +1,9 @@
 @if(Navigation.getLevel() != null && Navigation.getLevel().equals(Navigation.Level.STREAM)) {
-    <ul id="hp-nav-filter" class="nav ">
-        @defining(if(Navigation.getTitle().equals("Alles")){"active"} else {"deactive"}) { status =>
-        <li class="@status">
-            <a href='@routes.Application.index()' data-container="body">Alles</a>
-        </li>
-        }
-        @defining(if(Navigation.getTitle().equals("Eigene Posts")){"active"} else {"deactive"}) { status =>
-        <li class="@status">
-            <a href='@routes.Application.stream("account")' data-container="body">Eigene Posts</a>
-        </li>
-        }
-        @defining(if(Navigation.getTitle().equals("Gruppen")){"active"} else {"deactive"}) { status =>
-        <li class="@status">
-            <a href='@routes.Application.stream("group")' data-container="body">Gruppen</a>
-        </li>
-        }
-        @defining(if(Navigation.getTitle().equals("Kontakte")){"active"} else {"deactive"}) { status =>
-        <li class="@status">
-            <a href='@routes.Application.stream("contact")' data-container="body">Kontakte</a>
-        </li>
-        }
-    </ul>
-
-    <div class="hp-nav-filter2 container">
+    <div id="hp-nav-filter" class="container">
         <div class="row">
             <div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
                 <!-- Single button -->
-                <div class="btn-group" style="float: right">
+                <div class="btn-group btn-group-sm" style="float: right">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                         <span class="glyphicon glyphicon-filter"></span> Filter: @Navigation.getTitle() <span class="caret"></span>
                     </button>
