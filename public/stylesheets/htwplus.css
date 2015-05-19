@@ -776,10 +776,21 @@ ul#hp-nav-filter > li {
 
 ul#hp-nav-filter > li > a:hover, ul.hp-nav-filter > li > a:focus {
     background-color: transparent;
+    color: #ff5f00;
 }
 
 ul#hp-nav-filter > li.active > a {
-    border-bottom:2px #000 solid;
+    border-bottom: 2px #ff5f00 solid;
+    color: #ff5f00;
+}
+
+div.hp-nav-filter2 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.btn-group.btn-group-xs.active > a {
+    background-color: #ff5f00;
 }
 
 div#hp-footer {
