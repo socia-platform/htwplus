@@ -765,27 +765,9 @@ div.hp-notepad-content > *:last-child {
     }
 }
 
-ul#hp-nav-filter {
-    text-align: center;
-    margin: 3px;
-}
-
-ul#hp-nav-filter > li {
-    display: inline-block;
-}
-
-ul#hp-nav-filter > li > a:hover, ul.hp-nav-filter > li > a:focus {
-    background-color: transparent;
-    color: #ff5f00;
-}
-
-ul#hp-nav-filter > li.active > a {
-    border-bottom: 2px #ff5f00 solid;
-    color: #ff5f00;
-}
-
-div.hp-nav-filter2 {
-    margin-bottom: 10px;
+div#hp-nav-filter {
+    margin-top: 10px;
+    margin-bottom: 7px;
 }
 
 div#hp-footer {
