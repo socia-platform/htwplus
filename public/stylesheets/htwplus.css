@@ -785,12 +785,7 @@ ul#hp-nav-filter > li.active > a {
 }
 
 div.hp-nav-filter2 {
-    margin-top: 10px;
     margin-bottom: 10px;
-}
-
-div.btn-group.btn-group-xs.active > a {
-    background-color: #ff5f00;
 }
 
 div#hp-footer {
