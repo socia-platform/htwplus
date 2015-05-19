@@ -1,31 +1,53 @@
 @if(Navigation.getLevel() != null && Navigation.getLevel().equals(Navigation.Level.STREAM)) {
     <ul id="hp-nav-filter" class="nav ">
-        <span class='glyphicon glyphicon-filter'></span>
         @defining(if(Navigation.getTitle().equals("Alles")){"active"} else {"deactive"}) { status =>
         <li class="@status">
-            <a href='@routes.Application.index()' data-container="body" rel="tooltip" data-original-title="Alles, was wichtig für dich ist.">Alles</a>
+            <a href='@routes.Application.index()' data-container="body">Alles</a>
         </li>
         }
         @defining(if(Navigation.getTitle().equals("Eigene Posts")){"active"} else {"deactive"}) { status =>
         <li class="@status">
-            <a href='@routes.Application.stream("account")' data-container="body" rel="tooltip" data-original-title="Post, die du verfasst hast.">Eigene Posts</a>
+            <a href='@routes.Application.stream("account")' data-container="body">Eigene Posts</a>
         </li>
         }
         @defining(if(Navigation.getTitle().equals("Gruppen")){"active"} else {"deactive"}) { status =>
         <li class="@status">
-            <a href='@routes.Application.stream("group")' data-container="body" rel="tooltip" data-original-title="Post aus deinen Gruppen und Kursen">Gruppen</a>
+            <a href='@routes.Application.stream("group")' data-container="body">Gruppen</a>
         </li>
         }
         @defining(if(Navigation.getTitle().equals("Kontakte")){"active"} else {"deactive"}) { status =>
         <li class="@status">
-            <a href='@routes.Application.stream("contact")' data-container="body" rel="tooltip" data-original-title="Posts von deinen Kontakten.">Kontakte</a>
+            <a href='@routes.Application.stream("contact")' data-container="body">Kontakte</a>
         </li>
         }
-        @defining(if(Navigation.getTitle().equals("Favoriten")){"active"} else {"deactive"}) { status =>
-        <li class="@status">
-            <a href='@routes.Application.stream("favorite")' data-container="body" rel="tooltip" data-original-title="Posts, die du auf deinem Stream verfassst hast.">Favoriten</a>
-        </li>
-        }
-        <span class='glyphicon glyphicon-filter'></span>
     </ul>
+
+    <div class="hp-nav-filter2 container">
+        <div class="row">
+            <div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
+                <div class="btn-group btn-group-justified" role="group" aria-label="...">
+                    @defining(if(Navigation.getTitle().equals("Alles")){"active"} else {"deactive"}) { status =>
+                    <div class="btn-group btn-group-xs @status" role="group">
+                    <a href='@routes.Application.index()' type="button" class="btn btn-default">Alles</a>
+                    </div>
+                    }
+                    @defining(if(Navigation.getTitle().equals("Eigene Posts")){"active"} else {"deactive"}) { status =>
+                    <div class="btn-group btn-group-xs @status" role="group">
+                    <a href='@routes.Application.stream("account")' type="button" class="btn btn-default">Eigene Posts</a>
+                    </div>
+                    }
+                    @defining(if(Navigation.getTitle().equals("Gruppen")){"active"} else {"deactive"}) { status =>
+                    <div class="btn-group btn-group-xs @status" role="group">
+                    <a href='@routes.Application.stream("group")' type="button" class="btn btn-default">Gruppen</a>
+                    </div>
+                    }
+                    @defining(if(Navigation.getTitle().equals("Kontakte")){"active"} else {"deactive"}) { status =>
+                    <div class="btn-group btn-group-xs @status" role="group">
+                        <a href='@routes.Application.stream("contact")' type="button" class="btn btn-default">Kontakte</a>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 }
