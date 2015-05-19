@@ -5,6 +5,7 @@ import java.util.List;
 import controllers.Navigation.Level;
 import models.*;
 import models.services.NotificationService;
+import play.Logger;
 import play.Play;
 import play.api.mvc.Call;
 import play.data.Form;
@@ -82,7 +83,7 @@ public class PostController extends BaseController {
 		
 		if (target.equals(Post.PROFILE)) {
 			Account profile = Account.findById(anyId);
-			if (Secured.isFriend(profile) || profile.equals(account) || Secured.isAdmin()) {
+			if (Secured.isNotNull(profile) && (Secured.isFriend(profile) || profile.equals(account) || Secured.isAdmin())) {
 				if (filledForm.hasErrors()) {
 					flash("error", Messages.get("post.try_with_content"));
 				} else {
@@ -104,7 +105,7 @@ public class PostController extends BaseController {
 		
 		if (target.equals(Post.STREAM)) {
 			Account profile = Account.findById(anyId);
-			if(profile.equals(account)){
+			if(Secured.isNotNull(profile) && profile.equals(account)){
 				if (filledForm.hasErrors()) {
 					flash("error", Messages.get("post.try_with_content"));
 				} else {

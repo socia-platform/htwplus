@@ -1,14 +1,3 @@
-
-function resizeRings() {
-	$('.hp-notepad-content').each(function() {
-		var offset = ($(this).height() + parseInt($(this).css('padding-top'))) % 12.0;
-		if (offset !== 0)
-			$(this).css('padding-bottom', (12.0 - offset) + "px");
-		else
-			$(this).css('padding-bottom', '0');
-	});
-}
-
 function toggleMediaSelection(parent) {
 	var childs = document.getElementById("mediaList").getElementsByTagName("input");
 	for (i = 0; i < childs.length; i++) {
@@ -20,10 +9,10 @@ function toggleMediaSelection(parent) {
 function autolinkUrls() {
     $('.hp-truncate').each(function(){
 		$(this).linkify({
-			tagName: 'a', 
-			target: '_blank', 
-			newLine: '\n', 
-			linkClass: 'hp-postLink', 
+			tagName: 'a',
+			target: '_blank',
+			newLine: '\n',
+			linkClass: 'hp-postLink',
 			linkAttributes: null
 		});
 	});
@@ -37,7 +26,7 @@ function truncateBreadcrumb() {
 	var lastBreadcrumb = $("#hp-navbar-breadcrumb .breadcrumb > li:last-child");
 	var index = 3;	// first breadcrumb item which is hidden
 	// hide breadcrumb items while last item isn't visible
-	while (lastBreadcrumb.length && 
+	while (lastBreadcrumb.length &&
 		lastBreadcrumb.position().left + lastBreadcrumb.width() > $("#hp-navbar-breadcrumb .breadcrumb").width()) {
 		$("#hp-navbar-breadcrumb #hp-navbar-breadcrumb-truncate").removeClass("hidden");
 		$("#hp-navbar-breadcrumb .breadcrumb > li:nth-child("+index+")").addClass("hidden");
@@ -70,7 +59,8 @@ $('.hp-optionsMenu>div').on('shown.bs.dropdown', function() {
     $(this).find('.dropdown-toggle>span').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
     var menu = $(this).find('ul.dropdown-menu');
     var row = $(this).parents('tr');
-    var top = row.offset().top + row.height() - $('.hp-notepad-right').offset().top;
+    // hacky: 45 belongs to div.hp-notepad-content.addmargin    
+    var top = 45 + row.offset().top + row.height() - $('.hp-notepad-content').offset().top;
     menu.css('top', top + 'px');
 });
 
@@ -192,7 +182,7 @@ $(document).ready(function () {
 		} else {
 			$("#token-input").fadeOut();
 		}
-		
+
 	});
 
 	/*
@@ -202,7 +192,7 @@ $(document).ready(function () {
 		beforeSend:function(){
 			$(".loading").show();
 			$(".loading").css('display', 'inline-block');
-		}, 
+		},
 		complete:function(){
 			$(".loading").hide();
 			autolinkUrls();
@@ -370,7 +360,6 @@ $(document).ready(function () {
 });
 
 $(window).resize(function() {
-	resizeRings();
 	truncateBreadcrumb();
 });
 
@@ -386,5 +375,4 @@ $('.hp-focus-search').click(function() {
     $('.hp-easy-search').focus();
 });
 
-resizeRings();
 truncateBreadcrumb();

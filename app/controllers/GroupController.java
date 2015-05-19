@@ -51,7 +51,7 @@ public class GroupController extends BaseController {
 
         return ok(view.render(group));
     }
-		
+
 	@Transactional(readOnly=true)
 	public static Result stream(Long id, int page) {
 		Group group = Group.findById(id);
