@@ -3,6 +3,7 @@
 @import play._
 @import com.typesafe.config.ConfigFactory
 
+<div class="hp-post-container">
 @defining(Component.currentAccount()) { currentUser =>
 	<br />
 	@views.html.snippets.deletePostModal(post.id)
@@ -68,4 +69,5 @@
 		<div class="clear"></div>
 	</div>
 }
+</div>
 

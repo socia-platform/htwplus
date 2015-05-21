@@ -209,6 +209,19 @@ $(document).ready(function () {
 		}
 	});
 
+    /*
+     * Auto-pagination with jQuery plugin
+     */
+    $("a.nextPage").removeClass("hidden");
+    $('.hp-notepad-content').AutoPagination({
+        nextPageSelector: 'a.nextPage',
+        panelSelector: 'div.hp-post-container',
+        loaderDivClass: 'ajax-loader',
+        loaderDivStyle: 'text-align:center;margin-top:20px;font-weight:bold;',
+        loaderImage: 'assets/images/loading.gif',
+        loaderText: 'Lade Posts...'
+    });
+
 	/*
 	 * ADD COMMENTS
 	 */
@@ -363,10 +376,10 @@ $(document).ready(function () {
                     "<span class='glyphicon glyphicon-{{groupIcon}} autosuggest-group-icon'></span>{{{hLabel}}}" +
                     "{{/if}}")
             }
-
-        }).on('typeahead:selected', function($e, searchResult){
-            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
-        });
+        }
+    ).on('typeahead:selected', function($e, searchResult){
+        window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
+    });
 });
 
 $(window).resize(function() {
