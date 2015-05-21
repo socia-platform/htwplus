@@ -9,6 +9,8 @@
  * Dual licensed under the MIT and GPL
  *   http://www.opensource.org/licenses/mit-license.php
  *   http://www.gnu.org/licenses/gpl.html
+ *
+ *   MODIFIED VERSION - uses nextPageSelector.hide() instead of 'visiblity:hidden'
  */
 (function( $ ) {
     $.fn.AutoPagination = function( options ) {
@@ -18,7 +20,7 @@
 
         // Hide the 'nextPageSelector' anchor since it the point of this
         // plugin is that one shouldn't need to click 'Next Page'
-        $( opts.nextPageSelector ).css( { visibility:'hidden' } );
+        $( opts.nextPageSelector ).hide();
 
         // scroll event fires repeatedly as the window is scrolled
         $( window ).scroll(function() {
