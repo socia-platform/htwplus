@@ -115,8 +115,6 @@ public class Application extends BaseController {
             flash("info","Dein Suchwort enthielt ungültige Zeichen, die für die Suche entfernt wurden!");
         }
 
-        Logger.info(currentAccount.id + " is searching for: "+keyword+" on mode: "+mode);
-
         List<Object> resultList = new ArrayList<>();
 
         SearchResponse response;
@@ -172,8 +170,6 @@ public class Application extends BaseController {
                     break;
             }
         }
-
-        Logger.info("found: "+userCount+" users, "+groupCount+" groups and "+postCount+" posts.");
 
         return ok(views.html.searchresult.render(keyword, mode, page, LIMIT, resultList, response.getTookInMillis(), userCount+groupCount+postCount, userCount, groupCount, postCount));
 	}

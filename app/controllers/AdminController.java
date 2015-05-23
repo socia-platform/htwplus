@@ -93,10 +93,8 @@ public class AdminController extends BaseController {
             ElasticsearchService.deleteIndex();
             flash("info","index gelöscht");
         } catch(IndexMissingException ime) {
-            Logger.info("index "+ime.getMessage());
             flash("error","index "+ime.getMessage());
         } catch(NoNodeAvailableException nna) {
-            Logger.error(nna.getMessage());
             flash("error",nna.getMessage());
         }
 
@@ -109,10 +107,8 @@ public class AdminController extends BaseController {
             ElasticsearchService.createMapping();
             flash("success","Mapping und Anazyler erfolgreich erstellt!");
         } catch(NoNodeAvailableException nnae) {
-            Logger.error(nnae.getMessage());
             flash("error",nnae.getMessage());
         } catch(IndexAlreadyExistsException iaee) {
-            Logger.info("index "+iaee.getMessage());
             flash("error","index "+iaee.getMessage());
         }
         return ok(indexing.render());
@@ -121,7 +117,6 @@ public class AdminController extends BaseController {
     public static Result indexAccounts() throws IOException {
         long time = Account.indexAllAccounts();
         String out = "Alle Accounts indexiert ("+Long.toString(time)+"ms)";
-        Logger.info(out);
         flash("info",out);
         return ok(indexing.render());
     }
@@ -129,7 +124,6 @@ public class AdminController extends BaseController {
     public static Result indexGroups() throws IOException {
         long time = Group.indexAllGroups();
         String out = "Alle Gruppen indexiert ("+Long.toString(time)+"ms)";
-        Logger.info(out);
         flash("info",out);
         return ok(indexing.render());
     }
@@ -137,7 +131,6 @@ public class AdminController extends BaseController {
     public static Result indexPosts() throws IOException {
         long time = Post.indexAllPosts();
         String out = "Alle Posts indexiert ("+Long.toString(time)+"ms)";
-        Logger.info(out);
         flash("info",out);
         return ok(indexing.render());
     }
