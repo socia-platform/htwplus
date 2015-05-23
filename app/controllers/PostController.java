@@ -5,6 +5,7 @@ import java.util.List;
 import controllers.Navigation.Level;
 import models.*;
 import models.services.NotificationService;
+import play.Logger;
 import play.Play;
 import play.api.mvc.Call;
 import play.data.Form;
@@ -21,6 +22,7 @@ public class PostController extends BaseController {
 	
 	static Form<Post> postForm = Form.form(Post.class);
 	static final int PAGE = 1;
+    static final String STREAM_FILTER = "all";
 	
 	public static Result view (Long id) {
 		Post post = Post.findById(id);
@@ -81,7 +83,7 @@ public class PostController extends BaseController {
 		
 		if (target.equals(Post.PROFILE)) {
 			Account profile = Account.findById(anyId);
-			if (Secured.isFriend(profile) || profile.equals(account) || Secured.isAdmin()) {
+			if (Secured.isNotNull(profile) && (Secured.isFriend(profile) || profile.equals(account) || Secured.isAdmin())) {
 				if (filledForm.hasErrors()) {
 					flash("error", Messages.get("post.try_with_content"));
 				} else {
@@ -103,7 +105,7 @@ public class PostController extends BaseController {
 		
 		if (target.equals(Post.STREAM)) {
 			Account profile = Account.findById(anyId);
-			if(profile.equals(account)){
+			if(Secured.isNotNull(profile) && profile.equals(account)){
 				if (filledForm.hasErrors()) {
 					flash("error", Messages.get("post.try_with_content"));
 				} else {
@@ -112,11 +114,11 @@ public class PostController extends BaseController {
 					post.owner = account;
 					post.create();
 				}
-				return redirect(controllers.routes.Application.stream(PAGE));
+				return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
 			}
             
 			flash("info", Messages.get("post.post_on_stream_only"));
-			return redirect(controllers.routes.Application.stream(PAGE));
+			return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
 		}
         
 		return redirect(controllers.routes.Application.index());

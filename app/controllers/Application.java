@@ -18,7 +18,6 @@ import play.mvc.Security;
 import views.html.*;
 import controllers.Navigation.Level;
 import org.elasticsearch.action.search.SearchResponse;
-import models.services.AvatarService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,9 +50,9 @@ public class Application extends BaseController {
 
 	@Security.Authenticated(Secured.class)
 	public static Result index() {
-		Navigation.set(Level.STREAM);
+		Navigation.set(Level.STREAM, "Alles");
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount), LIMIT, PAGE));
+		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
 	}
 	
 	public static Result help() {
@@ -62,10 +61,25 @@ public class Application extends BaseController {
 	}
 	
 	@Security.Authenticated(Secured.class)
-	public static Result stream(int page) {
-		Navigation.set(Level.STREAM);
+	public static Result stream(String filter, int page) {
+        switch (filter) {
+            case "account":
+                Navigation.set(Level.STREAM, "Eigene Posts");
+                break;
+            case "group":
+                Navigation.set(Level.STREAM, "Gruppen");
+                break;
+            case "contact":
+                Navigation.set(Level.STREAM, "Kontakte");
+                break;
+            case "favorite":
+                Navigation.set(Level.STREAM, "Favoriten");
+                break;
+            default:
+                Navigation.set(Level.STREAM, "Alles");
+        }
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, page),postForm,Post.countStream(currentAccount), LIMIT, page));
+		return ok(stream.render(currentAccount,Post.getFilteredStream(currentAccount, LIMIT, page, filter),postForm,Post.countStream(currentAccount, filter), LIMIT, page, filter));
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
@@ -74,12 +88,13 @@ public class Application extends BaseController {
     }
 
     public static Result searchHome() {
+        Navigation.set(Level.SEARCH);
         return ok(search.render());
     }
 	
 	@Security.Authenticated(Secured.class)
 	public static Result search(int page) throws ExecutionException, InterruptedException {
-        Navigation.set("Suche");
+        Navigation.set(Level.SEARCH);
         Account currentAccount = Component.currentAccount();
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();

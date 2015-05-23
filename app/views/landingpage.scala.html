@@ -7,7 +7,7 @@
     <link rel="stylesheet" media="all" href='@routes.Assets.at("stylesheets/htwplus.css")'>
     <link rel="stylesheet" media="all" href='@routes.Assets.at("stylesheets/bootstrap-prettyfile.css")'>
     <link id="dynamic-favicon" rel="shortcut icon" type="image/png" href='@routes.Assets.at("images/favicon.png")'>
-    <link href='http://fonts.googleapis.com/css?family=Swanky+and+Moo+Moo' rel='stylesheet' type='text/css'>
+    <link rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css?family=Swanky+and+Moo+Moo'  >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
@@ -93,7 +93,7 @@
                 <!-- feature demos -->
                 <div class="hidden-xs hidden-sm col-md-6">
                     <div id="hp-feature-demo">
-                    @views.html.snippets.notepad{
+                    @views.html.snippets.notepad("Landing"){
                         <!-- Login -->
                         <div id="hp-feature-demo-login">
                             <h2>Max Mustermann</h2>

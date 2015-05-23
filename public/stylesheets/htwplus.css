@@ -10,11 +10,14 @@ html {
 body {
 	margin-top: 91px;
 	overflow-x: hidden;
+    background: url('../images/crossword.png');
+    background-repeat:repeat;
 }
 
 div.alert {
 	margin-left: -10px;
     margin-right: -10px;
+    margin-top: 10px;
 }
 
 a {
@@ -120,10 +123,6 @@ a.hp-nohref {
 
 .hp-focus-search {
 	cursor: pointer;	
-}
-
-.hp-container {
-    margin-top: 15px;
 }
 
 /*============================== Landingpage ==============================*/
@@ -345,13 +344,14 @@ div[id*='hp-feature-text-'] table {
 	#hp-landingpage div#hp-feature-demo .hp-notepad-content {
 		position: relative;
 	    min-height: inherit;
+        margin-top: 40px;
 	}
 
     #hp-landingpage div#hp-features div[id*='hp-feature-demo-'] {
         display: none;
         opacity: 0;
         position: absolute;
-        top: 5px;
+        top: 0px;
         left: 30px;
         right: 15px;
         z-index: 1000;
@@ -637,7 +637,7 @@ input.hp-notification-hour {
 /*============================== Nav-Tabs ==============================*/
 
 .hp-nav-tabs {
-	margin-top: -40px;
+	margin-top: -28px;
 }
 
 .hp-nav-tabs > li {
@@ -736,79 +736,22 @@ input.hp-notification-hour {
 
 /*============================== Notepad ==============================*/
 
-div.hp-notepad-right {
-	position: relative;
-    background: url(../images/vertical.png) repeat-y right 0;
-    margin: 20px -10px 0;
-}
-
-@media (max-width: 767px) {
-    div.hp-notepad-right  {
-        margin-right: -25px;
-        margin-left: -49px;
-    }
-}
-
-div.hp-notepad-topRight {
-	width: 48px;
-	height: 15px;
-	position: absolute;
-	top: 0;
-	right: 0;
-    background: url(../images/backgrounds.png) no-repeat -50px -15px;
-}
-
-div.hp-notepad-bottomRight {
-	width: 48px;
-	height: 22px;
-	position: absolute;
-	bottom: 0;
-	right: 0;
-    background: url(../images/backgrounds.png) no-repeat -50px -30px;
-}
-
-div.hp-notepad-left {
-	margin-right: 24px;
-    background: url(../images/vertical.png) repeat-y 0 15px;
-}
-
-div.hp-notepad-topLeft {
-	width: 50px;
-	height: 15px;
-	vertical-align: top;
-	position: absolute;
-	top: 0;
-	left: 0;
-    background: url(../images/backgrounds.png) no-repeat 0 -15px;
-}
-
-div.hp-notepad-bottomLeft {
-	width: 50px;
-	height: 22px;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-    background: url(../images/backgrounds.png) no-repeat 0 -30px;
-}
-
-div.hp-notepad-top {
-	margin-left: 50px;
-	padding-top: 15px;
-    background: url(../images/backgrounds.png) repeat-x 0 top;
-}
-
-div.hp-notepad-bottom {
-	padding-bottom: 22px;
-    background: url(../images/backgrounds.png) repeat-x 0 bottom;
-}
-
 div.hp-notepad-content {
 	min-height: 500px;
-	padding: 5px 30px 0;
-	background-color: white;
+	padding: 5px 30px 15px;
+    margin-bottom: 15px;
 	box-sizing: content-box;
+    background-color: white;
 	-moz-box-sizing: content-box;
 	-webkit-box-sizing: content-box;
+    border-radius: 4px;
+    -moz-box-shadow: 0 0 3px #888;
+    -webkit-box-shadow: 0 0 3px #888;
+    box-shadow: 0 0 3px #888;
+
+}
+div.hp-notepad-content.addmargin {
+    margin-top: 45px;
 }
 
 div.hp-notepad-content > *:last-child {
@@ -822,6 +765,23 @@ div.hp-notepad-content > *:last-child {
     }
 }
 
+ul#hp-nav-filter {
+    text-align: center;
+    margin: 3px;
+}
+
+ul#hp-nav-filter > li {
+    display: inline-block;
+}
+
+ul#hp-nav-filter > li > a:hover, ul.hp-nav-filter > li > a:focus {
+    background-color: transparent;
+}
+
+ul#hp-nav-filter > li.active > a {
+    border-bottom:2px #000 solid;
+}
+
 div#hp-footer {
 	margin: 5px 44px 0 69px;
 }
@@ -831,10 +791,10 @@ div#hp-footer-links {
 }
 
 div#hp-footer-logo {
-	height: 46px;
-	width: 200px;
-    background: url(../images/backgrounds.png) no-repeat right -52px;
+    background: url(../images/logos/HTW_Logo_quer_Grau.jpg) no-repeat;
     float: right;
+    width: 200px;
+    height: 47px;
 }
 
 
@@ -907,7 +867,7 @@ div.hp-pagination {
 
 #hp-new-comment-content,
 #hp-new-post-content {
-	height: 31px;
+	height: 60px;
     transition: height 0.5s ease 0.2s;
 	-webkit-transition: height 0.5s ease 0.2s;
 	-moz-transition: height 0.5s ease 0.2s;
@@ -952,7 +912,7 @@ div.hp-pagination {
 
 .well {
 	padding: 15px;
-	margin-bottom: 0;
+    margin: 20px 0px;
 }
 .well.broadcast {
     border: 1px solid #76b900;
