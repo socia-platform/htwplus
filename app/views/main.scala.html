@@ -15,10 +15,11 @@
 	</head>
 	
 	<body>
-        @views.html.snippets.navi()
-        @views.html.snippets.breadcrumb()
-        @views.html.snippets.feedFilter()
-
+        @if(user != null){
+            @views.html.snippets.navi()
+            @views.html.snippets.breadcrumb()
+            @views.html.snippets.feedFilter()
+        }
 		<div class="hp-container container">
 
 			@if(!flash.isEmpty()) {
