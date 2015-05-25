@@ -72,6 +72,16 @@ public class Secured extends Security.Authenticator {
 		return current.role == AccountRole.ADMIN;
 	}
 
+    /**
+     * Returns true, if the currently logged in user is the @param user.
+     *
+     * @return True, if currentUser.id is @param id
+     */
+    public static boolean isMe(Long id) {
+        Account current = Component.currentAccount();
+        return current.equals(Account.findById(id));
+    }
+
 	/**
 	 * Returns true, if an account is member of a group.
 	 *

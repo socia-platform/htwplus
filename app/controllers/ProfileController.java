@@ -11,10 +11,7 @@ import play.mvc.Http.MultipartFormData;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.Profile.edit;
-import views.html.Profile.editPassword;
-import views.html.Profile.index;
-import views.html.Profile.stream;
+import views.html.Profile.*;
 import controllers.Navigation.Level;
 import play.Logger;
 import play.libs.Json;
@@ -277,6 +274,22 @@ public class ProfileController extends BaseController {
 			return redirect(controllers.routes.ProfileController.me());
 		}
 	}
+
+    public static Result groups(Long id) {
+        Account account = Account.findById(id);
+
+        if(Secured.isFriend(account)) {
+            Navigation.set(Level.FRIENDS, "Gruppen & Kurse", account.name, controllers.routes.ProfileController.view(account.id));
+        } else {
+            if(Secured.isMe(id)) {
+                Navigation.set(Level.PROFILE, "Gruppen & Kurse");
+            } else {
+                Navigation.set(Level.USER, "Gruppen & Kurse", account.name, controllers.routes.ProfileController.view(account.id));
+            }
+        }
+
+        return ok(groups.render(account, GroupAccount.findGroupsEstablished(account),GroupAccount.findCoursesEstablished(account)));
+    }
 
 	/**
 	 * Handles the upload of the temporary avatar image
