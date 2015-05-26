@@ -140,16 +140,16 @@ public class Post extends BaseNotifiable implements INotifiable {
 	}
 
     @SuppressWarnings("unchecked")
-	public static List<Post> findStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final String filter, final int limit, final int offset) {
-        	Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, filter, " ORDER BY p.updatedAt DESC");
+	public static List<Post> findStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final List<Post> bookmarkList, final String filter, final int limit, final int offset) {
+        	Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, bookmarkList, filter, " ORDER BY p.updatedAt DESC");
 
             // set limit and offset
             query = limit(query, limit, offset);
             return query.getResultList();
 	}
 
-	public static int countStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final String filter) {
-		final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, filter, "");
+	public static int countStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final List<Post> bookmarkList, final String filter) {
+		final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, bookmarkList, filter, "");
         return ((Number) query.getSingleResult()).intValue();
 	}
 	
@@ -159,7 +159,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	 * @param accountList - a list containing all accounts we want to search in (usually contact from account)
 	 * @return List of Posts
 	 */
-	public static Query streamForAccount(String selectClause, Account account, List<Group> groupList, List<Account> accountList, String filter, String orderByClause){
+	public static Query streamForAccount(String selectClause, Account account, List<Group> groupList, List<Account> accountList, List<Post> bookmarkList, String filter, String orderByClause){
 
         HashMap<String, String> streamClausesMap = new HashMap<>();
         List<String> streamClausesList = new ArrayList<>();
@@ -167,6 +167,8 @@ public class Post extends BaseNotifiable implements INotifiable {
         // find stream posts from @account
         String accountPosts = " (p.owner = (:account) AND p.account = (:account)) ";
         streamClausesMap.put("accountPosts", accountPosts);
+
+
 
         if(groupList != null && groupList.size() != 0) {
             // find group posts from @account
@@ -192,6 +194,13 @@ public class Post extends BaseNotifiable implements INotifiable {
             streamClausesMap.put("contactPosts", contactPosts);
         }
 
+        if(bookmarkList != null && bookmarkList.size() != 0) {
+            // find bookmarked posts from @account
+            String bookmarkPosts = " (p IN (:bookmarkList)) ";
+            streamClausesMap.put("bookmarkPosts", bookmarkPosts);
+
+        }
+
         switch (filter) {
             case "group":
                 streamClausesList.add(streamClausesMap.get("allGroupPosts"));
@@ -210,8 +219,8 @@ public class Post extends BaseNotifiable implements INotifiable {
                 streamClausesList.add(streamClausesMap.get("contactToAccountPosts"));
                 streamClausesList.add(streamClausesMap.get("accountPosts"));
                 break;
-            case "favorite":
-                streamClausesList.add(streamClausesMap.get("accountPosts"));
+            case "bookmark":
+                streamClausesList.add(streamClausesMap.get("bookmarkPosts"));
                 break;
 
             default:
@@ -242,6 +251,9 @@ public class Post extends BaseNotifiable implements INotifiable {
 
         if (completeQuery.contains("(:accountList)"))
             query.setParameter("accountList", accountList);
+
+        if (completeQuery.contains("(:bookmarkList)"))
+            query.setParameter("bookmarkList", bookmarkList);
 
         return query;
 	}
@@ -280,9 +292,10 @@ public class Post extends BaseNotifiable implements INotifiable {
 		// find friends and groups of given account
 		List<Account> friendList = Friendship.findFriends(account);
 		List<Group> groupList = GroupAccount.findEstablished(account);
+        List<Post> bookmarkList = PostBookmark.findByAccount(account);
 		
 		int offset = (page * limit) - limit;
-		return findStreamForAccount(account, groupList, friendList, "all", limit, offset);
+		return findStreamForAccount(account, groupList, friendList, bookmarkList, "all", limit, offset);
 	}
 
     /**
@@ -291,7 +304,7 @@ public class Post extends BaseNotifiable implements INotifiable {
      */
     public static List<Post> getFilteredStream(Account account, int limit, int page, String filter) {
         int offset = (page * limit) - limit;
-        return findStreamForAccount(account, GroupAccount.findEstablished(account), Friendship.findFriends(account), filter, limit, offset);
+        return findStreamForAccount(account, GroupAccount.findEstablished(account), Friendship.findFriends(account), PostBookmark.findByAccount(account), filter, limit, offset);
     }
 	
 	
@@ -300,7 +313,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	 * @return Number of Posts
 	 */
 	public static int countStream(Account account, String filter) {
-        return countStreamForAccount(account, GroupAccount.findEstablished(account), Friendship.findFriends(account), filter);
+        return countStreamForAccount(account, GroupAccount.findEstablished(account), Friendship.findFriends(account), PostBookmark.findByAccount(account), filter);
     }
 
 	/**
@@ -309,7 +322,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	 */
 	public static List<Post> getFriendStream(Account contact, int limit, int page) {
 		int offset = (page * limit) - limit;
-		return findStreamForAccount(contact, GroupAccount.findPublicEstablished(contact), Friendship.findFriends(contact), "visitor", limit, offset);
+		return findStreamForAccount(contact, GroupAccount.findPublicEstablished(contact), Friendship.findFriends(contact), PostBookmark.findByAccount(contact), "visitor", limit, offset);
 	}
 
 	/**
@@ -317,7 +330,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 	 * @return Number of Posts
 	 */
 	public static int countFriendStream(Account contact){
-		return countStreamForAccount(contact, GroupAccount.findPublicEstablished(contact), Friendship.findFriends(contact), "visitor");
+		return countStreamForAccount(contact, GroupAccount.findPublicEstablished(contact), Friendship.findFriends(contact), PostBookmark.findByAccount(contact),  "visitor");
 	}
 
 
