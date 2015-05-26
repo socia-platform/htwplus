@@ -72,7 +72,7 @@ public class Application extends BaseController {
             case "contact":
                 Navigation.set(Level.STREAM, "Kontakte");
                 break;
-            case "favorite":
+            case "bookmark":
                 Navigation.set(Level.STREAM, "Favoriten");
                 break;
             default:

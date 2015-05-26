@@ -419,7 +419,4 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		}
 
 	}
-
-
-
 }

@@ -375,4 +375,29 @@ $('.hp-focus-search').click(function() {
     $('.hp-easy-search').focus();
 });
 
+/*
+ * SET OR REMOVE BOOKMARKS
+ */
+$('.hp-post-bookmark-icon').click(function(){
+    var id = $(this).attr('href').split('-')[1];
+    var context = this;
+    var icon = this.children[0];
+    $.ajax({
+        url: "/post/"+id + "/bookmark",
+        type: "GET",
+        success: function(data){
+            if(data === "setBookmark") {
+                $(icon).addClass('glyphicon-star');
+                $(icon).removeClass('glyphicon-star-empty');
+                $(context).attr("data-original-title", "Post vergessen").tooltip('fixTitle').tooltip('show');
+            }
+            if(data === "removeBookmark") {
+                $(icon).addClass('glyphicon-star-empty');
+                $(icon).removeClass('glyphicon-star');
+                $(context).attr("data-original-title", "Post merken").tooltip('fixTitle').tooltip('show');
+            }
+        }
+    });
+});
+
 truncateBreadcrumb();

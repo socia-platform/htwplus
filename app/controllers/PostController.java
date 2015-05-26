@@ -5,14 +5,11 @@ import java.util.List;
 import controllers.Navigation.Level;
 import models.*;
 import models.services.NotificationService;
-import play.Logger;
 import play.Play;
 import play.api.mvc.Call;
 import play.data.Form;
-import play.db.jpa.JPA;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
-import play.libs.F;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Post.view;
@@ -253,9 +250,6 @@ public class PostController extends BaseController {
 					routesTo = controllers.routes.Application.index();
 				}
 			}
-			
-			
-			
 			post.delete();
 			flash("success", "Gelöscht!");
 			
@@ -269,4 +263,22 @@ public class PostController extends BaseController {
 
 		return redirect(routesTo);
 	}
+
+    public static Result bookmarkPost(Long postId) {
+        Account account = Component.currentAccount();
+        Post post = Post.findById(postId);
+        String returnStatement = "";
+
+        if(Secured.viewPost(post)) {
+            PostBookmark possibleBookmark = PostBookmark.findByAccountAndPost(account, post);
+            if(possibleBookmark == null) {
+                new PostBookmark(account, post).create();
+                returnStatement = "setBookmark";
+            } else {
+                possibleBookmark.delete();
+                returnStatement = "removeBookmark";
+            }
+        }
+        return ok(returnStatement);
+    }
 }
