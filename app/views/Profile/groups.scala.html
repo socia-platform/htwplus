@@ -1,0 +1,55 @@
+@(account: Account, approvedGroups: List[Group], approvedCourses: List[Group])
+@import helper._
+@import models.enums._
+
+@main("Gruppen & Kurse von @account.name") {
+
+	<!-- Start infoModal -->
+	@for(group <- approvedGroups ++ approvedCourses) {
+	<div class="modal fade" id="infoModal@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		@views.html.Group.snippets.infoModal(group)
+	</div>
+	}
+	<!-- Ende infoModal -->
+	
+	
+	<!-- Start confirmDeleteGroupModal -->
+	@for(group <- approvedGroups ++ approvedCourses) {
+	<div class="modal fade" id="confirmDeleteGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		@views.html.Group.snippets.deleteGroupModal(group)
+	</div>
+	}
+	<!-- End confirmDeleteGroupModal -->
+	
+	<!-- Start confirmLeaveGroupModal -->
+	@for(group <- approvedGroups ++ approvedCourses) {
+	<div class="modal fade" id="confirmLeaveGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+		@views.html.Group.snippets.leaveGroupModal(group)
+	</div>
+	}
+	<!-- End confirmDeleteGroupModal -->
+
+
+    @views.html.Profile.snippets.navTabs(account)
+
+    <h2>@account.name's Gruppen & Kurse</h2>
+    <br />
+
+    @defining(Component.currentAccount()) { currentUser =>
+        @if(!approvedCourses.isEmpty){
+            @views.html.Group.snippets.listCourses(approvedCourses, currentUser)
+        } else {
+        <p><i>@account.name ist noch keinem Kurs beigetreten.</i></p>
+        }
+
+        <br />
+        <hr />
+        <br />
+
+        @if(!approvedGroups.isEmpty){
+            @views.html.Group.snippets.listGroups(approvedGroups, currentUser)
+        } else {
+        <p><i>@account.name ist noch keiner Gruppe beigetreten.</i></p>
+        }
+    }
+}

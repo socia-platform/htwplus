@@ -21,6 +21,14 @@
             </li>
 		}
 	}
+    @defining(if(Navigation.getTitle().equals("Gruppen & Kurse")) {"active"} else {"deactive"}) { status =>
+        <li class="@status">
+            <a href="@routes.ProfileController.groups(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Gruppen- und Kursübersicht" data-container="body">
+                <span class="glyphicon glyphicon-th-list"></span>
+                <span class="hidden-xs"> Gruppen</span>
+            </a>
+        </li>
+    }
 	@defining(if(Navigation.getTitle().equals("Profil") || Navigation.getTitle().equals("Ich")){"active"} else {"deactive"}) { status =>
 		@if(Component.currentAccount() == user){
 			<li class="@status">

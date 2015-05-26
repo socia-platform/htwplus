@@ -61,6 +61,7 @@ POST        /user/:id/createavatar                     controllers.ProfileContro
 GET         /user/:id/avatar                           controllers.ProfileController.getAvatar(id:Long, size:String ?= "small")
 POST        /user/:id/edit                             controllers.ProfileController.update(id:Long)
 GET         /user/:id/stream                           controllers.ProfileController.stream(id:Long,page: Integer ?= 1)
+GET         /user/:id/groups                           controllers.ProfileController.groups(id:Long)
 
 
 #Friends

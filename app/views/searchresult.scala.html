@@ -3,12 +3,11 @@
 @import play._
 @import models.enums._
 @import java.math.BigInteger; var paginationSearchHits=0;
-@main("Searchresult"){
+@main(keyword){
 @defining(Component.currentAccount()) { currentUser =>
 
-
-
     <h2>@searchHits @Html(Messages("search.headline", truncate(keyword,30)))</h2>
+    @ctx.args.put("searchKeyword", keyword)
     <br />
 
     @if(searchHits != 0) {
@@ -92,5 +91,4 @@
     @views.html.pagination(paginationSearchHits, searchLimit, currentPage, "/search?keyword="+keyword+"&mode="+searchMode+"", "&")
     }
 }
-
 }

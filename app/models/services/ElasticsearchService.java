@@ -1,11 +1,8 @@
 package models.services;
 
 import com.typesafe.config.ConfigFactory;
-import controllers.Component;
 import models.*;
-import models.enums.GroupType;
 import models.enums.LinkType;
-import org.apache.lucene.queries.TermFilter;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -16,10 +13,8 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import play.Logger;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -95,8 +90,6 @@ public class ElasticsearchService {
                         .endObject())
                 .execute()
                 .actionGet();
-
-        Logger.info(post.id + " indexiert? "+indexResponse.isCreated());
     }
 
     public static void indexGroup(Group group) throws IOException {
@@ -111,7 +104,6 @@ public class ElasticsearchService {
                         .endObject())
                 .execute()
                 .actionGet();
-        Logger.info(group.title + " indexiert? " + indexResponse.isCreated());
     }
 
     public static void indexAccount(Account account) throws IOException {
@@ -127,8 +119,6 @@ public class ElasticsearchService {
                 )
                 .execute()
                 .actionGet();
-
-        Logger.info(account.name + " indexiert? "+response.isCreated());
     }
 
     /**
@@ -192,8 +182,6 @@ public class ElasticsearchService {
             FilterBuilder filterQuery = FilterBuilders.typeFilter(filter);
             searchRequest.setPostFilter(filterQuery);
         }
-
-        Logger.info(searchRequest.toString());
 
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
