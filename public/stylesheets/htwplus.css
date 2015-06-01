@@ -938,6 +938,13 @@ div.hp-pagination {
     top: 0;
 }
 
+.hp-post-bookmark-icon {
+    float: right;
+    font-size: 16px;
+    position: relative;
+    top: -25px;
+}
+
 /*============================== Avatare ==============================*/
 
 #hp-avatars img {

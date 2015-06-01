@@ -312,6 +312,20 @@ public class Secured extends Security.Authenticator {
     }
 
     /**
+     * Returns true, if given account has bookmarked a specific post.
+     *
+     * @param account Account
+     * @param post Post
+     * @return true, if given account has bookmarked the given post
+     */
+    public static boolean isPostBookmarkedByAccount(Account account, Post post) {
+        if (post == null) {
+            return false;
+        }
+        return PostBookmark.isPostBookmarkedByAccount(account, post);
+    }
+
+    /**
      * Returns true if the post is still editable by the given account.
      * This includes the {@code isAllowedToEditPost} check
      *
