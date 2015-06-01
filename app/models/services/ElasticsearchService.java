@@ -13,6 +13,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import play.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -80,7 +81,7 @@ public class ElasticsearchService {
     }
 
     public static void indexPost(Post post) throws IOException {
-        IndexResponse indexResponse = getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_POST, post.id.toString())
+        getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("content", post.content)
@@ -93,7 +94,7 @@ public class ElasticsearchService {
     }
 
     public static void indexGroup(Group group) throws IOException {
-        IndexResponse indexResponse = getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
+        getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("title", group.title)
@@ -107,10 +108,14 @@ public class ElasticsearchService {
     }
 
     public static void indexAccount(Account account) throws IOException {
-        IndexResponse response = getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_USER, account.id.toString())
+        getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .setSource(jsonBuilder()
                                 .startObject()
                                 .field("name", account.name)
+                                .field("studycourse", account.studycourse != null ? account.studycourse.title : "")
+                                .field("degree", account.degree != null ? account.degree : "")
+                                .field("semester", account.semester != null ? account.semester : "")
+                                .field("role", account.role != null ? account.role.getDisplayName() : "")
                                 .field("initial", account.getInitials())
                                 .field("avatar", account.avatar)
                                 .field("public", true)
