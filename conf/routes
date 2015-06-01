@@ -47,7 +47,7 @@ POST        /:target/:id/addPost                       controllers.PostControlle
 GET         /post/:id/getEditForm                      controllers.PostController.getEditForm(id:Long)
 POST        /post/:id/updatePost                       controllers.PostController.updatePost(id:Long)
 GET         /post/:postId/deletePost                   controllers.PostController.deletePost(postId:Long)
-GET         /post/:id/bookmark                         controllers.PostController.bookmarkPost(id:Long)
+PUT         /post/:id/bookmark                         controllers.PostController.bookmarkPost(id:Long)
 
 
 #User

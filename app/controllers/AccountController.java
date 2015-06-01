@@ -34,14 +34,17 @@ public class AccountController extends BaseController {
 	public static Result authenticate() {
 		DynamicForm form = form().bindFromRequest();
 		String username = form.field("email").value();
-	
+
+        // save originURL before clearing the session (it gets cleared in defaultAuthenticate() and LdapAuthenticate())
+        String redirect = session().get("originURL");
+
 		if (username.contains("@")) {
-			return defaultAuthenticate();
+			return defaultAuthenticate(redirect);
 		} else if (username.length() == 0) {
 			flash("error", "Also deine Matrikelnummer brauchen wir schon!");
 			return badRequest(landingpage.render());
 		} else {
-			return LdapAuthenticate();
+			return LdapAuthenticate(redirect);
 		}
 	}
 
@@ -50,7 +53,7 @@ public class AccountController extends BaseController {
      *
      * @return Result
      */
-	private static Result LdapAuthenticate() {
+	private static Result LdapAuthenticate(final String redirect) {
 		Form<Login> form = form(Login.class).bindFromRequest();
 		String matriculationNumber = form.field("email").value();
 		String password = form.field("password").value();
@@ -102,10 +105,10 @@ public class AccountController extends BaseController {
 			session("rememberMe", "1");
 		}
 
-		return redirect(controllers.routes.Application.index());
+		return redirect(redirect);
 	}
 
-	private static Result defaultAuthenticate() {
+	private static Result defaultAuthenticate(final String redirect) {
 		Form<Login> loginForm = form(Login.class).bindFromRequest();
 		if (loginForm.hasErrors()) {
 			flash("error", loginForm.globalError().message());
@@ -119,8 +122,8 @@ public class AccountController extends BaseController {
 			if (loginForm.get().rememberMe != null) {
 				session("rememberMe", "1");
 			}
-			
-			return redirect(controllers.routes.Application.index());
+
+			return redirect(redirect);
 		}
 	}
 

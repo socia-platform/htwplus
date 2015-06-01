@@ -384,7 +384,7 @@ $('.hp-post-bookmark-icon').click(function(){
     var icon = this.children[0];
     $.ajax({
         url: "/post/"+id + "/bookmark",
-        type: "GET",
+        type: "PUT",
         success: function(data){
             if(data === "setBookmark") {
                 $(icon).addClass('glyphicon-star');
