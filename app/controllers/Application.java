@@ -21,6 +21,7 @@ import org.elasticsearch.action.search.SearchResponse;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -83,7 +84,7 @@ public class Application extends BaseController {
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        SearchResponse response = ElasticsearchService.doSearch("searchSuggestions", query, "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
+        SearchResponse response = ElasticsearchService.doSearch("searchSuggestions", query, "all", new HashMap<String, String[]>(), 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
         return ok(response.toString());
     }
 
@@ -98,6 +99,17 @@ public class Application extends BaseController {
         Account currentAccount = Component.currentAccount();
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();
+        String studycourseParam = Form.form().bindFromRequest().field("studycourse").value();
+        String degreeParam = Form.form().bindFromRequest().field("degree").value();
+        String semesterParam = Form.form().bindFromRequest().field("semester").value();
+        String roleParam = Form.form().bindFromRequest().field("role").value();
+
+        HashMap<String, String[]> userFacets = new HashMap<>();
+        userFacets.put("studycourse", buildUserFacetList(studycourseParam));
+        userFacets.put("degree", buildUserFacetList(degreeParam));
+        userFacets.put("semester", buildUserFacetList(semesterParam));
+        userFacets.put("role", buildUserFacetList(roleParam));
+
 
         if (keyword == null) {
             flash("info","Nach was suchst du?");
@@ -123,7 +135,7 @@ public class Application extends BaseController {
         long postCount = 0;
 
         try {
-            response = ElasticsearchService.doSearch("search", keyword.toLowerCase(), mode, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
+            response = ElasticsearchService.doSearch("search", keyword.toLowerCase(), mode, userFacets, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
         } catch (NoNodeAvailableException nna) {
             flash("error", "Leider steht die Suche zur Zeit nicht zur Verfügung!");
             return ok(search.render());
@@ -171,7 +183,40 @@ public class Application extends BaseController {
             }
         }
 
-        return ok(views.html.searchresult.render(keyword, mode, page, LIMIT, resultList, response.getTookInMillis(), userCount+groupCount+postCount, userCount, groupCount, postCount));
+        HashMap studycoursesMap = new HashMap<String, Long>();
+        HashMap degreeMap = new HashMap<String, Long>();
+        HashMap semesterMap = new HashMap<String, Long>();
+        HashMap roleMap = new HashMap<String, Long>();
+
+        if (mode.equals("user")) {
+            Terms termAggregation = response.getAggregations().get("studycourse");
+            buckets = termAggregation.getBuckets();
+            for (Terms.Bucket bucket : buckets) {
+                studycoursesMap.put(bucket.getKey(), bucket.getDocCount());
+            }
+            termAggregation = response.getAggregations().get("degree");
+            buckets = termAggregation.getBuckets();
+            for (Terms.Bucket bucket : buckets) {
+                degreeMap.put(bucket.getKey(), bucket.getDocCount());
+            }
+            termAggregation = response.getAggregations().get("semester");
+            buckets = termAggregation.getBuckets();
+            for (Terms.Bucket bucket : buckets) {
+                semesterMap.put(bucket.getKey(), bucket.getDocCount());
+            }
+            termAggregation = response.getAggregations().get("role");
+            buckets = termAggregation.getBuckets();
+            for (Terms.Bucket bucket : buckets) {
+                roleMap.put(bucket.getKey(), bucket.getDocCount());
+            }
+        }
+
+        String uri = ctx().request().uri();
+                if(uri.contains("&page=")){
+                    uri = uri.substring(0, uri.lastIndexOf("&"));
+                }
+        return ok(views.html.searchresult.render(uri, studycourseParam, degreeParam, semesterParam, roleParam, keyword, mode, page, LIMIT, resultList, response.getHits().getTotalHits(),
+                response.getTookInMillis(), userCount+groupCount+postCount, userCount, groupCount, postCount, studycoursesMap, degreeMap, semesterMap, roleMap));
 	}
 
 	public static Result error() {
@@ -214,5 +259,12 @@ public class Application extends BaseController {
 		Logger.info(path+" nicht gefunden");
 		return redirect(controllers.routes.Application.index());
 	}
+
+    private static String[] buildUserFacetList(String parameter) {
+        if (parameter != null) {
+            return  parameter.split(",");
+        }
+        return new String[0];
+    }
 
 }

@@ -1,26 +1,47 @@
-@(keyword: String, searchMode: String, currentPage: Int, searchLimit: Int, searchResults: List[Object], searchDuration: Long, searchHits: Long, searchUserHits: Long, searchGroupHits: Long, searchPostHits: Long)
+@(cleanedUri: String, studycourse: String, degree: String, semester: String, role: String, keyword: String, searchMode: String, currentPage: Int, searchLimit: Int, searchResults: List[Object], resultsHits: Long, searchDuration: Long, searchHits: Long, searchUserHits: Long, searchGroupHits: Long, searchPostHits: Long, studycoursesMap: Map[String, Long], degreeMap: Map[String, Long], semesterMap: Map[String, Long], roleMap: Map[String, Long])
 @import helper._
 @import play._
 @import models.enums._
-@import java.math.BigInteger; var paginationSearchHits=0;
 @main(keyword){
 @defining(Component.currentAccount()) { currentUser =>
 
-    <h2>@searchHits @Html(Messages("search.headline", truncate(keyword,30)))</h2>
+    <h2>@resultsHits @Html(Messages("search.headline", truncate(keyword,30)))</h2>
     @ctx.args.put("searchKeyword", keyword)
     <br />
 
     @if(searchHits != 0) {
 
-        @if(searchMode.equals("all")){ @{paginationSearchHits = searchHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
-        <a class="@if(searchHits == 0) {disabled}" href='/search?keyword=@keyword&mode=all'>Alles (@searchHits)</a><span> | </span>
-        @if(searchMode.equals("user")){ @{paginationSearchHits = searchUserHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
-        <a class="@if(searchUserHits == 0) {disabled}" href='/search?keyword=@keyword&mode=user'>Personen (@searchUserHits)</a><span> | </span>
-        @if(searchMode.equals("group")){ @{paginationSearchHits = searchGroupHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
-        <a class="@if(searchGroupHits == 0) {disabled}" href='/search?keyword=@keyword&mode=group'>Gruppen und Kurse (@searchGroupHits)</a><span> | </span>
-        @if(searchMode.equals("post")){ @{paginationSearchHits = searchPostHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
+        @if(searchMode.equals("all")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+        <a class="@if(searchHits == 0) {disabled}" href='/search?keyword=@keyword&mode=all'>Alles (@searchHits)</a><br />
+        @if(searchMode.equals("user")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+        <a class="@if(searchUserHits == 0) {disabled}" href='/search?keyword=@keyword&mode=user'>Personen (@searchUserHits)</a><br />
+        @if(searchMode.equals("user")){
+        <br />
+            @for((key, value) <- studycoursesMap) {
+                @if(!key.equals("")) {
+                    <a href='/search?keyword=@keyword&mode=@searchMode@if(degree != null){&degree=@degree}@if(semester != null){&semester=@semester}@if(role != null){&role=@role}&studycourse=@key'>@key (@value)</a> <br />
+                }
+            }
+            <br />
+            @for((key, value) <- degreeMap) {
+                @if(!key.equals("")) {
+                    <a href='/search?keyword=@keyword&mode=@searchMode@if(studycourse != null){&studycourse=@studycourse}@if(semester != null){&semester=@semester}@if(role != null){&role=@role}&degree=@key'>@key (@value)</a> <br />
+                }
+            }
+            <br />
+            @for((key, value) <- semesterMap) {
+                <a href='/search?keyword=@keyword&mode=@searchMode@if(degree != null){&degree=@degree}@if(studycourse != null){&studycourse=@studycourse}@if(role != null){&role=@role}&semester=@key'>@key (@value)</a> <br />
+            }
+            <br />
+            @for((key, value) <- roleMap) {
+                <a href='/search?keyword=@keyword&mode=@searchMode@if(degree != null){&degree=@degree}@if(semester != null){&semester=@semester}@if(studycourse != null){&studycourse=@studycourse}&role=@key'>@key (@value)</a> <br />
+            }
+        }
+        @if(searchMode.equals("group")){ <span class="glyphicon glyphicon-chevron-right"></span> }
+        <a class="@if(searchGroupHits == 0) {disabled}" href='/search?keyword=@keyword&mode=group'>Gruppen und Kurse (@searchGroupHits)</a><br />
+        @if(searchMode.equals("post")){  <span class="glyphicon glyphicon-chevron-right"></span> }
         <a class="@if(searchPostHits == 0) {disabled}" href='/search?keyword=@keyword&mode=post'>Post und Kommentare (@searchPostHits)</a>
-        <br/>
+        <br />
         <br />
 
         @for(result <- searchResults) {
@@ -88,7 +109,7 @@
                 case _ => { @result }
             }
         }
-    @views.html.pagination(paginationSearchHits, searchLimit, currentPage, "/search?keyword="+keyword+"&mode="+searchMode+"", "&")
+    @views.html.pagination(resultsHits.toInt, searchLimit, currentPage, cleanedUri, "&")
     }
 }
 }
