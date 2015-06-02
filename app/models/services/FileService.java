@@ -7,7 +7,7 @@ import play.api.PlayException;
 import org.apache.commons.lang.Validate;
 import eu.medsea.mimeutil.MimeUtil;
 import eu.medsea.mimeutil.MimeType;
-import play.api.libs.Files;
+import java.nio.file.Files;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.api.libs.MimeTypes;
 
@@ -213,7 +213,7 @@ public class FileService {
     public FileService copy(String destFileName){
         String destPath = this.buildPath(destFileName);
         File destFile = new File(destPath);
-        Files.copyFile(this.file, destFile, true);
+        //Files.copy(this.file, destFile);
 
         if(destFile.exists()){
             return new FileService(this.realm, destFile);
