@@ -102,15 +102,18 @@ public class AdminController extends BaseController {
     }
 
     public static Result indexSettings() throws IOException {
-        try {
-            ElasticsearchService.createAnalyzer();
-            ElasticsearchService.createMapping();
-            flash("success","Mapping und Anazyler erfolgreich erstellt!");
-        } catch(NoNodeAvailableException nnae) {
-            flash("error",nnae.getMessage());
-        } catch(IndexAlreadyExistsException iaee) {
-            flash("error","index "+iaee.getMessage());
+        if (ElasticsearchService.isClientAvailable()) {
+            if (!ElasticsearchService.isIndexExists()) {
+                ElasticsearchService.createAnalyzer();
+                ElasticsearchService.createMapping();
+                flash("success","Mapping und Anazyler erfolgreich erstellt!");
+            } else {
+                flash("error","Index bereits vorhanden.");
+            }
+        } else {
+            flash("error", "Elasticsearch nicht erreichbar!");
         }
+
         return ok(indexing.render());
     }
 
