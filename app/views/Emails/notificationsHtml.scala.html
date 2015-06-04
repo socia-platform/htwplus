@@ -18,42 +18,45 @@
         <table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td> <!-- OUTER CONTAINER -->
             <table align="center" border="0" cellpadding="0" cellspacing="0" style="max-width:600px; border-collapse: collapse; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5); border: 1px solid rgb(204, 204, 204);;"> <!-- INNER CONTAINER -->
                 <tr><td bgcolor="#76b900" align="center" colspan="2" style="font-size: 50px; font-weight: bold; color: white; line-height: 146px;">
-                    <a href="@controllers.routes.Application.index()" style="color:white;text-decoration: none"><img alt="HTWplus" src="https://plus.f4.htw-berlin.de/assets/images/logos/logo-white.svg" width="227" height="146" style="display:block"></a>
+                    <a href="@controllers.routes.Application.index().absoluteURL(request())" style="color:white;text-decoration: none"><img alt="HTWplus" src="https://plus.f4.htw-berlin.de/assets/images/logos/logo-white.svg" width="227" height="146" style="display:block"></a>
                 </td></tr>
 
-                <tr align="center" style="text-align: center"><td colspan="2" style="padding:5px"><h1>
+                <tr align="center" style="text-align: center"><td colspan="2" style="padding:5px 10px"><h2>
                     @if(notifications.size > 1) {
                         @Html(Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size))
                     } else {
                         @Html(Messages("notification.email_notifications.single.intro_text", recipient.name))
                     }
-                </h1></td></tr>
+                </h2></td></tr>
 
                 @if(notifications != null) {
                     <tr><td colspan="2">
                         @for(notification <- notifications) {
-                            <div style="border: 1px solid black; margin: 0px 10px; box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3); padding: 0px 16px;">
-                                <h2> @Html(notification.rendered) </h2>
-                            </div>
-                            <p style="margin: 3px 16px 5px;"><i>
-                                @Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm")))
-                            </i></p>
+                            <a style="text-decoration: none; color:inherit" href="@controllers.routes.NotificationController.forward(notification.id).absoluteURL(request())">
+                                <div style="border: 1px solid #888; margin: 5px 10px; padding: 10px 16px; border-radius: 3px">
+                                    <p style="margin: 0px 0px">
+                                        <b>@Html(notification.rendered)</b>
+                                    </p>
+                                    <p style="margin: 2px 0px 0px 0px">
+                                        <i>@Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm")))</i>
+                                    </p>
+                                </div>
+                            </a>
                         }
                         <br>
                     </td></tr>
                 }
 
                 <tr height="60px"><td width="50%" align="center" bgcolor="#0076B9" style="color:white">
-                    <div style="font-size: 20px"><a href=
-                        @if(notifications.size > 1) {
-                            "@controllers.routes.NotificationController.showAll(1)"
-                        } else {
-                            "@controllers.routes.NotificationController.forward(notifications(0).id)"
-                        } style="text-decoration: none; color:white"><b>@Html(Messages("notification.email_notifications.visit"))</b></a></div>
+                    <a href="@if(notifications.size > 1) {@controllers.routes.NotificationController.showAll(1).absoluteURL(request())} else { @controllers.routes.NotificationController.forward(notifications(0).id).absoluteURL(request())}" style="text-decoration: none; color:white">
+                        <div style="font-size: 20px;height:60px;line-height: 60px"><b>@Html(Messages("notification.email_notifications.visit"))</b></div>
+                    </a>
                 </td><td width="50%" align="center"  bgcolor="#B94300" style="color:white">
-                    <div style="font-size: 20px"><a href="@controllers.routes.ProfileController.edit(recipient.id)" style="text-decoration: none; color:white"><b>@Html(Messages("notification.email_notifications.edit_settings"))</b></a></div>
+                    <a href="@controllers.routes.ProfileController.edit(recipient.id).absoluteURL(request())" style="text-decoration: none; color:white">
+                        <div style="font-size: 20px;height:60px;line-height: 60px"><b>@Html(Messages("notification.email_notifications.edit_settings"))</b></div>
+                    </a>
                 </td></tr>
             </table></td></tr>
-        </table>
+        </table><br>
     </body>
 </html>
