@@ -835,6 +835,13 @@ div.hp-pagination {
 	color: white;	
 }
 
+.nextPage {
+    border-radius: 4px;
+}
+.ajax-loader img {
+    width: 32px;
+    height: 32px;
+}
 
 /*============================== Post & Comment View ==============================*/
 
