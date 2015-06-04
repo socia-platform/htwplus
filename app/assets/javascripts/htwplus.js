@@ -210,9 +210,8 @@ $(document).ready(function () {
 	});
 
     /*
-     * Auto-pagination with jQuery plugin
+     * Auto-pagination with jQuery plugin (modified version of jquery.auto.pagination.js)
      */
-    $("a.nextPage").removeClass("hidden");
     $('.hp-notepad-content').AutoPagination({
         nextPageSelector: 'a.nextPage',
         panelSelector: 'div.hp-post-container',

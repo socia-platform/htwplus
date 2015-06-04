@@ -1,5 +1,5 @@
 /**
- * jQuery Auto Pagination v1.0
+ * jQuery Auto Pagination v1.0 - modified
  * Copyright 2013 Choy Peng Kong
  * An unobstrusive auto pagination plugin for JQuery
  *
@@ -10,7 +10,7 @@
  *   http://www.opensource.org/licenses/mit-license.php
  *   http://www.gnu.org/licenses/gpl.html
  *
- *   MODIFIED VERSION - uses nextPageSelector.hide() instead of 'visiblity:hidden'
+ * MODIFIED VERSION - uses nextPageSelector.hide() instead of 'visiblity:hidden' -> element doesn't use space on the page
  */
 (function( $ ) {
     $.fn.AutoPagination = function( options ) {
@@ -24,12 +24,14 @@
 
         // scroll event fires repeatedly as the window is scrolled
         $( window ).scroll(function() {
+            $( opts.nextPageSelector ).show(); // nextPage has to be visible, else the position will be 0
 
+            console.log(($( window ).scrollTop() + $( window ).height())+" > "+( $( opts.nextPageSelector).offset().top - opts.nextPageBufferPx )+" ? "+$( opts.nextPageSelector ).attr( 'href' ));
             // if 'nextPageSelector' anchor href isn't empty and...
             if ( $( opts.nextPageSelector ).attr( 'href' ) &&
                     // ...window scroll is less then 'nextPageBufferPx' pixels away from it
                 $( window ).scrollTop() + $( window ).height() >
-                $( opts.nextPageSelector ).offset().top - opts.nextPageBufferPx ) {
+                $( opts.nextPageSelector).last().offset().top - opts.nextPageBufferPx ) {
 
                 // remember the 'nextPageSelector' anchor href as 'nextPage'
                 var nextPage = $( opts.nextPageSelector ).attr( 'href' );
@@ -52,7 +54,7 @@
                     });
 
                     // remove loader div from DOM
-                    $( '.'+opts.loaderDivClass ).hide();
+                    $( '.'+opts.loaderDivClass ).remove();
 
                     // reset the 'nextPageSelector' anchor href
                     $( opts.nextPageSelector ).attr( 'href', $( data ).find( opts.nextPageSelector ).attr( 'href' ) );
@@ -60,7 +62,7 @@
                 }); // closing of ajax 'GET'
 
             } // closing of if 'nextPageSelector' anchor...
-
+            $( opts.nextPageSelector ).hide(); // hide the nextPage element again
         }); // closing of scroll event
     };
 
