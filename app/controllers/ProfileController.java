@@ -1,14 +1,22 @@
 package controllers;
 
+import java.util.List;
+
+import com.typesafe.config.ConfigFactory;
 import models.*;
+import models.enums.AccountRole;
 import models.base.FileOperationException;
 import models.base.ValidationException;
 import models.enums.EmailNotifications;
+import models.enums.LinkType;
+import play.Logger;
 import models.services.AvatarService;
 import play.Play;
 import play.data.Form;
+import play.db.jpa.JPA;
 import play.mvc.Http.MultipartFormData;
 import play.db.jpa.Transactional;
+import play.i18n.Messages;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Profile.*;
@@ -28,6 +36,7 @@ public class ProfileController extends BaseController {
 
 	static Form<Account> accountForm = Form.form(Account.class);
 	static Form<Post> postForm = Form.form(Post.class);
+    static Form<Login> loginForm = Form.form(Login.class);
 	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
 
 	public static Result me() {
@@ -49,7 +58,7 @@ public class ProfileController extends BaseController {
 	public static Result view(final Long id) {
 		Account account = Account.findById(id);
 
-		if (account == null) {
+		if (account == null || account.role == AccountRole.DUMMY) {
 			flash("info", "Diese Person gibt es nicht.");
 			return redirect(controllers.routes.Application.index());
 		} else {
@@ -69,7 +78,7 @@ public class ProfileController extends BaseController {
 		Account account = Account.findById(accountId);
 		Account currentUser = Component.currentAccount();
 		
-		if (account == null) {
+		if (account == null || account.role == AccountRole.DUMMY) {
 			flash("info", "Diese Person gibt es nicht.");
 			return redirect(controllers.routes.Application.index());
 		}
@@ -187,7 +196,7 @@ public class ProfileController extends BaseController {
 		}
 
         Navigation.set(Level.PROFILE, "Editieren");
-		return ok(edit.render(account, accountForm.fill(account)));
+		return ok(edit.render(account, accountForm.fill(account), loginForm));
 	}
 
 	public static Result update(Long id) {
@@ -218,12 +227,12 @@ public class ProfileController extends BaseController {
 		Account exisitingAccount = Account.findByEmail(filledForm.field("email").value());
 		if (exisitingAccount != null && !exisitingAccount.equals(account)) {
 			filledForm.reject("email", "Diese Mail wird bereits verwendet!");
-			return badRequest(edit.render(account, filledForm));
+			return badRequest(edit.render(account, filledForm, loginForm));
 		}
 		
 		// Perform JPA Validation
 		if (filledForm.hasErrors()) {
-			return badRequest(edit.render(account, filledForm));
+			return badRequest(edit.render(account, filledForm, loginForm));
 		} else {
 
 			// Fill an and update the model manually 
@@ -289,6 +298,35 @@ public class ProfileController extends BaseController {
         }
 
         return ok(groups.render(account, GroupAccount.findGroupsEstablished(account),GroupAccount.findCoursesEstablished(account)));
+    }
+
+    @Transactional
+    public static Result deleteProfile(Long accountId) {
+        Account current = Account.findById(accountId);
+
+        if(!Secured.deleteAccount(current)) {
+            flash("error", Messages.get("profile.delete.nopermission"));
+            return redirect(controllers.routes.Application.index());
+        }
+
+        // Check Password //
+        Form<Login> filledForm = loginForm.bindFromRequest();
+        String entered = filledForm.field("password").value();
+        if(entered == null || entered.length() == 0) {
+            flash("error", Messages.get("profile.delete.nopassword"));
+            return redirect(controllers.routes.ProfileController.update(current.id));
+        } else if(!AccountController.checkPassword(accountId, entered)) {
+            return redirect(controllers.routes.ProfileController.update(current.id));
+        }
+
+        // ACTUAL DELETION //
+        Logger.info("Deleting Account[#"+current.id+"]...");
+        current.delete();
+
+        // override logout message
+        Result logoutResult = AccountController.logout();
+        flash("success", Messages.get("profile.delete.success"));
+        return logoutResult;
     }
 
 	/**
