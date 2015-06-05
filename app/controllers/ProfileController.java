@@ -52,7 +52,7 @@ public class ProfileController extends BaseController {
 	public static Result view(final Long id) {
 		Account account = Account.findById(id);
 
-		if (request().accepts(CustomContentType.JSON_COLLECTION.getIdentifier())) {
+		if (request().getHeader("Accept").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
 			Collection collection;
 			if (account == null) {
 				collection = Collection.create(
