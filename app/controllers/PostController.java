@@ -1,15 +1,24 @@
 package controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import controllers.Navigation.Level;
 import models.*;
+import models.enums.CustomContentType;
 import models.services.NotificationService;
+import net.hamnaberg.funclite.Predicate;
+import net.hamnaberg.json.Collection;
+import net.hamnaberg.json.Item;
+import net.hamnaberg.json.data.JsonObjectFromData;
+import net.hamnaberg.json.parser.CollectionParser;
 import play.Play;
+import play.api.libs.json.Json;
 import play.api.mvc.Call;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
+import play.mvc.BodyParser;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Post.view;
@@ -55,6 +64,7 @@ public class PostController extends BaseController {
 	 * @return Result
 	 */
     @Transactional
+	@BodyParser.Of(BodyParser.TolerantJson.class)
 	public static Result addPost(Long anyId, String target) {
 		Account account = Component.currentAccount();
 		Form<Post> filledForm = postForm.bindFromRequest();
@@ -102,22 +112,36 @@ public class PostController extends BaseController {
 		
 		if (target.equals(Post.STREAM)) {
 			Account profile = Account.findById(anyId);
-			if(Secured.isNotNull(profile) && profile.equals(account)){
-				if (filledForm.hasErrors()) {
-					flash("error", Messages.get("post.try_with_content"));
+			if(Secured.isNotNull(profile) && profile.equals(account)) {
+				if (request().getHeader("Content-Type").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
+					CollectionParser parser = new CollectionParser();
+					try {
+						Collection collection = parser.parse(request().body().asJson().toString());
+						final Post post = new Post();
+						post.account = profile;
+						post.owner = account;
+						String content = collection.asJson().get("items").get(0).get("data").get(0).get("content").toString();
+						System.out.println(content);
+						post.content = content;
+						post.create();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				} else {
-					final Post post = filledForm.get();
-					post.account = profile;
-					post.owner = account;
-					post.create();
+					if (filledForm.hasErrors()) {
+						flash("error", Messages.get("post.try_with_content"));
+					} else {
+						final Post post = filledForm.get();
+						post.account = profile;
+						post.owner = account;
+						post.create();
+					}
+					return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
 				}
+				flash("info", Messages.get("post.post_on_stream_only"));
 				return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
 			}
-            
-			flash("info", Messages.get("post.post_on_stream_only"));
-			return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
 		}
-        
 		return redirect(controllers.routes.Application.index());
 	}
 	
