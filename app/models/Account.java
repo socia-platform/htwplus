@@ -1,6 +1,10 @@
 package models;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +26,8 @@ import models.services.FileService;
 import models.base.ValidationException;
 
 import models.services.ElasticsearchService;
+import net.hamnaberg.json.Item;
+import net.hamnaberg.json.Property;
 import play.Logger;
 import play.data.validation.Constraints;
 import play.i18n.Messages;
@@ -37,6 +43,9 @@ import scala.Char;
 public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	private final static Logger.ALogger logger = Logger.of(Account.class);
+
+	private final static String[] visibleFields = {"firstname", "lastname", "email", "avatar", "semester",
+			"studycourse", "role", "degree"};
 
 	public String loginname;
 
@@ -99,11 +108,11 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public void create() {
 		this.name = firstname+" "+lastname;
 		JPA.em().persist(this);
-        try {
+        /*try {
             ElasticsearchService.indexAccount(this);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
 	@Override
@@ -418,5 +427,20 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 			return null;
 		}
 
+	}
+
+	public List<Property> getProperies() {
+		List<Property> propList = new ArrayList<Property>();
+		Field[] fields = this.getClass().getDeclaredFields();
+		for (String s : visibleFields) {
+			try {
+				propList.add(Property.value(s, this.getClass().getField(s).get(this)));
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
+			}
+		}
+		return propList;
 	}
 }
