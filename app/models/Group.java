@@ -84,11 +84,11 @@ public class Group extends BaseNotifiable implements INotifiable {
 	@Override
 	public void create() {
         JPA.em().persist(this);
-        try {
+       /* try {
             ElasticsearchService.indexGroup(this);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
 	@Override

@@ -49,11 +49,11 @@ public class GroupAccount extends BaseModel {
 
         // each group document contains information about their member
         // if a user create or join to this.group -> (re)index this.group document
-        try {
+        /*try {
             ElasticsearchService.indexGroup(this.group);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
 	@Override
