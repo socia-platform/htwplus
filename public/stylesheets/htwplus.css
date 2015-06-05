@@ -125,6 +125,10 @@ a.hp-nohref {
 	cursor: pointer;	
 }
 
+.hp-nolabel label {
+    display: none;
+}
+
 /*============================== Landingpage ==============================*/
 body#hp-landingpage {
 	margin-top: 0 !important;
@@ -835,6 +839,13 @@ div.hp-pagination {
 	color: white;	
 }
 
+.nextPage {
+    border-radius: 4px;
+}
+.ajax-loader img {
+    width: 32px;
+    height: 32px;
+}
 
 /*============================== Post & Comment View ==============================*/
 
@@ -1294,4 +1305,37 @@ div.hp-avatar-default-9 {
 
 .searchresult-container {
     margin-top: 10px;
+}
+
+/*========= Account Deletion ==========*/
+
+.hp-warningModal .modal-header {
+    background-color: #d43f3a;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding-right: 18px;
+    color: white;
+}
+
+.hp-warningModal .close {
+    margin-top: 0px;
+    font-size: 24px;
+    opacity: 0.3;
+}
+
+.hp-warningModal .close:hover , .hp-warningModal .close:focus {
+    opacity: 0.6;
+}
+
+.hp-warningModal .modal-title {
+    text-align: center;
+    font-size: 20px;
+}
+
+.hp-warningModal .hp-bigcaption {
+    font-size: 16px;
+}
+
+#hp-deleteConfirmPassword {
+    margin-bottom: 0px;
 }

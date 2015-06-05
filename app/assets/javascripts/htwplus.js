@@ -165,6 +165,30 @@ $("li > a").click(function(e) {
 	}
 });
 
+/*
+ *  prevent easy copying of account deletion confirmation text
+ */
+$(document).on("copy", function(e) {
+    if ($("#hp-deleteModal").is(":visible")) { // if the deletion confirmation is actually visible
+        var selection = window.getSelection();
+        if (selection.toString().contains("ösche ich meinen Account von dieser wundervolle")) { // check if the user copied the 'forbidden' string (or at least the middle part of it)
+            var newdiv = document.createElement('div');
+
+            //hide the newly created container
+            newdiv.style.position = 'absolute';
+            newdiv.style.left = '-9999px';
+
+            //insert the container, fill it with the extended text, and define the new selection
+            document.body.appendChild(newdiv);
+            newdiv.innerHTML = "It's not that easy!";
+            selection.selectAllChildren(newdiv);
+
+            window.setTimeout(function () {
+                document.body.removeChild(newdiv);
+            }, 100);
+        }
+    }
+});
 
 $(document).ready(function () {
 
@@ -198,6 +222,18 @@ $(document).ready(function () {
 			autolinkUrls();
 		}
 	});
+
+    /*
+     * Auto-pagination with jQuery plugin (modified version of jquery.auto.pagination.js)
+     */
+    $('.hp-notepad-content').AutoPagination({
+        nextPageSelector: 'a.nextPage',
+        panelSelector: 'div.hp-post-container',
+        loaderDivClass: 'ajax-loader',
+        loaderDivStyle: 'text-align:center;margin-top:20px;font-weight:bold;',
+        loaderImage: 'assets/images/loading.gif',
+        loaderText: 'Lade Posts...'
+    });
 
 	/*
 	 * ADD COMMENTS
@@ -269,6 +305,30 @@ $(document).ready(function () {
 	});
 
     autolinkUrls();
+
+    /*
+     * Add Countdown to Account deletion button
+     */
+    $("#hp-deleteModal").on("show.bs.modal", function() {
+        $("#hp-deleteConfirmSubmit").attr("disabled", "disabled");
+
+        if($.disableDeleteFunctionTimeout) {
+            clearTimeout($.disableDeleteFunctionTimeout);
+        }
+
+        var disableTimeLeft = 10;
+        var disableCountdown = function() {
+            if(disableTimeLeft > 0) {
+                $("#hp-deleteConfirmSubmit").val("Warte "+disableTimeLeft+"s...");
+                disableTimeLeft--;
+                $.disableDeleteFunctionTimeout = setTimeout(disableCountdown, 1000);
+            } else {
+                $("#hp-deleteConfirmSubmit").removeAttr("disabled");
+                $("#hp-deleteConfirmSubmit").val("LÖSCHEN");
+            }
+        };
+        disableCountdown();
+    });
 
     /*
      * SEARCH: AutoSuggestion
@@ -353,10 +413,10 @@ $(document).ready(function () {
                     "<span class='glyphicon glyphicon-{{groupIcon}} autosuggest-group-icon'></span>{{{hLabel}}}" +
                     "{{/if}}")
             }
-
-        }).on('typeahead:selected', function($e, searchResult){
-            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
-        });
+        }
+    ).on('typeahead:selected', function($e, searchResult){
+        window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
+    });
 });
 
 $(window).resize(function() {
