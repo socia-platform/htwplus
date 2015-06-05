@@ -19,7 +19,8 @@ libraryDependencies ++= Seq(
   "org.elasticsearch" % "elasticsearch" % "1.4.1",
   "eu.medsea.mimeutil" % "mime-util" % "2.1.3",
   "org.imgscalr" % "imgscalr-lib" % "4.2",
-  "joda-time" % "joda-time" % "2.7"
+  "joda-time" % "joda-time" % "2.7",
+  "net.hamnaberg.rest" % "json-collection" % "3.1.0"
 )
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
