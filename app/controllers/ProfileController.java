@@ -3,8 +3,10 @@ package controllers;
 import models.*;
 import models.base.FileOperationException;
 import models.base.ValidationException;
+import models.enums.CustomContentType;
 import models.enums.EmailNotifications;
 import models.services.AvatarService;
+import net.hamnaberg.json.*;
 import play.Play;
 import play.data.Form;
 import play.mvc.Http.MultipartFormData;
@@ -18,6 +20,7 @@ import play.libs.Json;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +51,35 @@ public class ProfileController extends BaseController {
 
 	public static Result view(final Long id) {
 		Account account = Account.findById(id);
+
+		if (request().accepts(CustomContentType.JSON_COLLECTION.getIdentifier())) {
+			Collection collection;
+			if (account == null) {
+				collection = Collection.create(
+						URI.create(request().host() + request().path()),
+						new ArrayList<Link>(),
+						new ArrayList<Item>(),
+						new ArrayList<Query>(),
+						Template.create(),
+						net.hamnaberg.json.Error.create("Account not found", "404", "The " +
+								"requested account does not seem to exist.")
+				);
+			} else {
+				URI uri = URI.create(request().host() + request().path());
+				ArrayList<Item> items = new ArrayList<Item>();
+				items.add(Item.create(uri, account.getProperies()));
+				collection = Collection.create(
+						uri,
+						new ArrayList<Link>(),
+						items,
+						new ArrayList<Query>(),
+						Template.create(),
+						net.hamnaberg.json.Error.create("none", "none", "none")
+				);
+			}
+			response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
+			return ok(collection.toString());
+		}
 
 		if (account == null) {
 			flash("info", "Diese Person gibt es nicht.");
