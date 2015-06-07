@@ -62,12 +62,12 @@ public class Post extends BaseNotifiable implements INotifiable {
 		
 	public void create() {
 		JPA.em().persist(this);
-        /*try {
+        try {
             if (!this.owner.role.equals(AccountRole.ADMIN))
             ElasticsearchService.indexPost(this);
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
     public String validate() {

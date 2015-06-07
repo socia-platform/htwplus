@@ -63,7 +63,7 @@ public class Global extends GlobalSettings {
         );
 
         // trying to connect to Elasticsearch
-        /*ElasticsearchService.getInstance().getClient();
+        ElasticsearchService.getInstance().getClient();
         Logger.info("trying to connect to Elasticsearch");
         if (ElasticsearchService.isClientAvailable()) {
             Logger.info("... success");
@@ -77,7 +77,7 @@ public class Global extends GlobalSettings {
             }
         } else {
             Logger.info("... failed");
-        }*/
+        }
 
 		InitialData.insert(app);
 
@@ -86,7 +86,7 @@ public class Global extends GlobalSettings {
     @Override
     public void onStop(Application app) {
         Logger.info("closing ES client...");
-        /*ElasticsearchService.getInstance().closeClient();*/
+        ElasticsearchService.getInstance().closeClient();
         Logger.info("ES client closed");
     }
 

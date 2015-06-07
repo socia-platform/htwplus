@@ -108,11 +108,11 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public void create() {
 		this.name = firstname+" "+lastname;
 		JPA.em().persist(this);
-        /*try {
+        try {
             ElasticsearchService.indexAccount(this);
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
 	@Override
