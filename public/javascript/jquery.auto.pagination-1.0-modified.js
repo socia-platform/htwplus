@@ -10,7 +10,9 @@
  *   http://www.opensource.org/licenses/mit-license.php
  *   http://www.gnu.org/licenses/gpl.html
  *
- * MODIFIED VERSION - uses nextPageSelector.hide() instead of 'visiblity:hidden' -> element doesn't use space on the page
+ * !! MODIFIED VERSION !!
+ * - uses nextPageSelector.hide() instead of 'visiblity:hidden' -> element doesn't use space on the page
+ * - loads new elements from custom page instead of loading the full page again
  */
 (function( $ ) {
     $.fn.AutoPagination = function( options ) {
@@ -26,7 +28,6 @@
         $( window ).scroll(function() {
             $( opts.nextPageSelector ).show(); // nextPage has to be visible, else the position will be 0
 
-            console.log(($( window ).scrollTop() + $( window ).height())+" > "+( $( opts.nextPageSelector).offset().top - opts.nextPageBufferPx )+" ? "+$( opts.nextPageSelector ).attr( 'href' ));
             // if 'nextPageSelector' anchor href isn't empty and...
             if ( $( opts.nextPageSelector ).attr( 'href' ) &&
                     // ...window scroll is less then 'nextPageBufferPx' pixels away from it

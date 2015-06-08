@@ -7,12 +7,6 @@
 	<h1>Mein Newsstream</h1><br />
 	
 	@views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
-		
-	@if(posts != null) {
-		@for(post <- posts) {
-			@views.html.snippets.postView(post, postForm, models.Post.STREAM, Play.application().configuration().getInt("htwplus.comments.init"))
-		}
-	}
-	
-	@views.html.pagination(count, limit, currentPage, routes.Application.stream(1).toString, "?")
+
+	@views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage)
 }

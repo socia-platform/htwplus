@@ -20,6 +20,8 @@ import play.Logger;
 import play.libs.Json;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
+import views.html.Profile.snippets.streamRaw;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +70,7 @@ public class ProfileController extends BaseController {
 	}
 
     @Transactional
-	public static Result stream(Long accountId, int page) {
+	public static Result stream(Long accountId, int page, boolean raw) {
 		Account account = Account.findById(accountId);
 		Account currentUser = Component.currentAccount();
 		
@@ -87,8 +89,13 @@ public class ProfileController extends BaseController {
 		// case for friends and own profile
 		if (Friendship.alreadyFriendly(Component.currentAccount(), account)
 				|| currentUser.equals(account) || Secured.isAdmin()) {
-			return ok(stream.render(account, Post.getFriendStream(account, LIMIT, page),
-					postForm,Post.countFriendStream(account), LIMIT, page));
+            if(raw) {
+                return ok(streamRaw.render(account, Post.getFriendStream(account, LIMIT, page),
+                        postForm, Post.countFriendStream(account), LIMIT, page));
+            } else {
+                return ok(stream.render(account, Post.getFriendStream(account, LIMIT, page),
+                        postForm, Post.countFriendStream(account), LIMIT, page));
+            }
 		}
 		// case for visitors
 		flash("info", "Du kannst nur den Stream deiner Freunde betrachten!");

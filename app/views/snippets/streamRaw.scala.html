@@ -1,0 +1,11 @@
+@(posts: List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String)
+
+@import play._
+
+@if(posts != null) {
+    @for(post <- posts) {
+        @views.html.snippets.postView(post, postForm, models.Post.STREAM, Play.application().configuration().getInt("htwplus.comments.init"))
+    }
+}
+
+@views.html.pagination(count, limit, currentPage, routes.Application.stream(filter, 1).toString, "&")

@@ -201,7 +201,7 @@ public class Friendship extends BaseNotifiable implements INotifiable {
         }
 
         if (this.type.equals(Friendship.FRIEND_REQUEST_SUCCESS)) {
-            return controllers.routes.ProfileController.stream(this.account.id, Friendship.PAGE).toString();
+            return controllers.routes.ProfileController.stream(this.account.id, Friendship.PAGE, false).toString();
         }
 
         return super.getTargetUrl();
