@@ -212,14 +212,16 @@ $(document).ready(function () {
     /*
      * Auto-pagination with jQuery plugin (modified version of jquery.auto.pagination.js)
      */
-    $('.hp-notepad-content').AutoPagination({
-        nextPageSelector: 'a.nextPage',
-        panelSelector: 'div.hp-post-container',
-        loaderDivClass: 'ajax-loader',
-        loaderDivStyle: 'text-align:center;margin-top:20px;font-weight:bold;',
-        loaderImage: 'assets/images/loading.gif',
-        loaderText: 'Lade Posts...'
-    });
+    if($('a.nextPage').length > 0) { // only apply on pages with a nextPage link
+        $('.hp-notepad-content').AutoPagination({
+            nextPageSelector: 'a.nextPage',
+            panelSelector: 'div.hp-post-container',
+            loaderDivClass: 'ajax-loader',
+            loaderDivStyle: 'text-align:center;margin-top:20px;font-weight:bold;',
+            loaderImage: 'assets/images/loading.gif',
+            loaderText: 'Lade Posts...'
+        });
+    }
 
     /*
      * Show 'Back to top'-link (src: http://jsfiddle.net/panman8201/mkzrm/10/)
