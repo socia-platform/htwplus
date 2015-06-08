@@ -20,7 +20,7 @@
 			@views.html.snippets.breadcrumb()
 		}
 		
-		<div class="hp-container container">
+		<div class="hp-container container" id="hp-top">
 
 			@if(!flash.isEmpty()) {
 				<div class="row">
@@ -61,6 +61,13 @@
 
         @views.html.snippets.impressumModal()
         @views.html.snippets.datenschutzModal()
+
+        <!-- 'Go to top' link -->
+        <span id="hp-top-link" class="hidden">
+            <a href="#hp-top" class="btn btn-success">
+                <i class="glyphicon glyphicon-chevron-up"></i> @Messages("mainpage.backtotop")
+            </a>
+        </span>
 
 		<script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
         <script type="text/javascript" src='@routes.Assets.at("bower_components/jquery/dist/jquery.min.js")'></script>

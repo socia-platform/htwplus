@@ -221,6 +221,20 @@ $(document).ready(function () {
         loaderText: 'Lade Posts...'
     });
 
+    /*
+     * Show 'Back to top'-link (src: http://jsfiddle.net/panman8201/mkzrm/10/)
+     */
+    if (($(window).height() + 200) < $(document).height() ) {
+        $('#hp-top-link').removeClass('hidden').affix({
+            // how far to scroll down before link "slides" into view
+            offset: { top:200 }
+        });
+        $('#hp-top-link a').click(function(event) {
+            $('html,body').animate({scrollTop:0});
+            return false;
+        });
+    }
+
 	/*
 	 * ADD COMMENTS
 	 */

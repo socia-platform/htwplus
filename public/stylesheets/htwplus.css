@@ -895,6 +895,20 @@ div.hp-pagination {
     height: 32px;
 }
 
+/** SCROLL TO TOP **/
+#hp-top-link.affix-top {
+    position: absolute; /* allows it to "slide" up into view */
+    bottom: -190px; /* negative of the offset - height of link element */
+    left: 10px; /* padding from the left side of the window */
+    z-index: 3; /* .form-control has z-index 2 */
+}
+#hp-top-link.affix {
+    position: fixed; /* keeps it on the bottom once in view */
+    bottom: 10px; /* height of link element */
+    left: 10px; /* padding from the left side of the window */
+    z-index: 3; /* .form-control has z-index 2 */
+}
+
 /*============================== Post & Comment View ==============================*/
 
 .hp-horizontal-form {
