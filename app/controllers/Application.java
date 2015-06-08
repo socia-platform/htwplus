@@ -65,29 +65,14 @@ public class Application extends BaseController {
 	}
 	
 	@Security.Authenticated(Secured.class)
-	public static Result stream(String filter, int page, boolean raw) {
-        switch (filter) {
-            case "account":
-                Navigation.set(Level.STREAM, "Eigene Posts");
-                break;
-            case "group":
-                Navigation.set(Level.STREAM, "Gruppen");
-                break;
-            case "contact":
-                Navigation.set(Level.STREAM, "Kontakte");
-                break;
-            case "bookmark":
-                Navigation.set(Level.STREAM, "Favoriten");
-                break;
-            default:
-                Navigation.set(Level.STREAM, "Alles");
-        }
+	public static Result stream(int page, boolean raw) {
+        Navigation.set(Level.STREAM);
 		Account currentAccount = Component.currentAccount();
 
         if(raw) {
-            return ok(streamRaw.render(Post.getStream(currentAccount, LIMIT, page), postForm, Post.countStream(currentAccount), LIMIT, page, filter));
+            return ok(streamRaw.render(Post.getStream(currentAccount, LIMIT, page), postForm, Post.countStream(currentAccount), LIMIT, page));
         } else {
-            return ok(stream.render(currentAccount, Post.getStream(currentAccount, LIMIT, page), postForm, Post.countStream(currentAccount), LIMIT, page, filter));
+            return ok(stream.render(currentAccount, Post.getStream(currentAccount, LIMIT, page), postForm, Post.countStream(currentAccount), LIMIT, page));
         }
 	}
 
