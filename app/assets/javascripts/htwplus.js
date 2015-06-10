@@ -383,7 +383,7 @@ $(document).ready(function () {
 
     autoSuggestResult.initialize();
 
-    $('.hp-easy-search').typeahead(
+    $('.hp-search-form .form-control').typeahead(
         {
             hint: true,
             highlight: false,
@@ -432,7 +432,7 @@ $('body').popover({
 });
 
 $('.hp-focus-search').click(function() {
-    $('.hp-easy-search').focus();
+    $('#hp-search').focus();
 });
 
 /*
