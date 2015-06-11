@@ -1,6 +1,14 @@
 package models.base;
 
+import net.hamnaberg.json.Property;
+import util.Expose;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -70,5 +78,21 @@ public abstract class BaseModel {
 		return obj.getClass() != BaseModel.class
                 && ((BaseModel)obj).id != null
                 && ((BaseModel)obj).id.equals(this.id);
+	}
+
+	public List<Property> getProperies() {
+		List<Property> propList = new ArrayList<Property>();
+		Field[] fields = this.getClass().getDeclaredFields();
+		for (Field f : fields) {
+			if (f.getAnnotation(Expose.class) != null) {
+				try {
+					propList.add(Property.value(f.getName(), f.get(this)));
+
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return propList;
 	}
 }
