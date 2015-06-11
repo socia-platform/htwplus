@@ -19,8 +19,10 @@ import play.data.Form;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.BodyParser;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
+import util.JsonCollectionUtil;
 import views.html.Post.view;
 
 @Security.Authenticated(Secured.class)
@@ -64,7 +66,6 @@ public class PostController extends BaseController {
 	 * @return Result
 	 */
     @Transactional
-	@BodyParser.Of(BodyParser.TolerantJson.class)
 	public static Result addPost(Long anyId, String target) {
 		Account account = Component.currentAccount();
 		Form<Post> filledForm = postForm.bindFromRequest();
@@ -113,20 +114,15 @@ public class PostController extends BaseController {
 		if (target.equals(Post.STREAM)) {
 			Account profile = Account.findById(anyId);
 			if(Secured.isNotNull(profile) && profile.equals(account)) {
-				if (request().getHeader("Content-Type").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
-					CollectionParser parser = new CollectionParser();
-					try {
-						Collection collection = parser.parse(request().body().asJson().toString());
-						final Post post = new Post();
-						post.account = profile;
-						post.owner = account;
-						String content = collection.asJson().get("items").get(0).get("data").get(0).get("content").toString();
-						System.out.println(content);
-						post.content = content;
-						post.create();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+				if (JsonCollectionUtil.hasJsonCollection(request())) {
+					Collection jcol = JsonCollectionUtil.getJsonCollection(request());
+					final Post post = new Post();
+					post.account = profile;
+					post.owner = account;
+					String content = jcol.asJson().get("items").get(0).get("data").get(0).get("content").toString();
+					System.out.println(content);
+					post.content = content;
+					post.create();
 				} else {
 					if (filledForm.hasErrors()) {
 						flash("error", Messages.get("post.try_with_content"));
@@ -138,13 +134,14 @@ public class PostController extends BaseController {
 					}
 					return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
 				}
-				flash("info", Messages.get("post.post_on_stream_only"));
-				return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
+
 			}
+			flash("info", Messages.get("post.post_on_stream_only"));
+			return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
 		}
 		return redirect(controllers.routes.Application.index());
 	}
-	
+
 	@Transactional
 	public static Result addComment(long postId) {
 		final Post parent = Post.findById(postId);
