@@ -38,26 +38,29 @@ import play.db.jpa.JPA;
 import controllers.Component;
 import play.libs.Json;
 import scala.Char;
+import util.Expose;
 
 @Entity
 public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	private final static Logger.ALogger logger = Logger.of(Account.class);
 
-	private final static String[] visibleFields = {"firstname", "lastname", "email", "avatar", "semester",
-			"studycourse", "role", "degree"};
-
 	public String loginname;
 
 	public String name;
 
 	@Required
+	@Expose
 	public String firstname;
 
+	public String funfunf;
+
 	@Required
+	@Expose
 	public String lastname;
 
 	@Email
+	@Expose
 	@Column(unique=true)
 	public String email;
 
@@ -77,6 +80,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public String studentId;
 
 	@OneToOne
+	@Expose
 	public Studycourse studycourse;
 	public String degree;
 	public Integer semester;
@@ -429,18 +433,4 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	}
 
-	public List<Property> getProperies() {
-		List<Property> propList = new ArrayList<Property>();
-		Field[] fields = this.getClass().getDeclaredFields();
-		for (String s : visibleFields) {
-			try {
-				propList.add(Property.value(s, this.getClass().getField(s).get(this)));
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (NoSuchFieldException e) {
-				e.printStackTrace();
-			}
-		}
-		return propList;
-	}
 }
