@@ -446,9 +446,9 @@ div[id*='hp-feature-text-'] table {
 }
 
 .hp-dropdown-search .hp-search-form button {
-     position: absolute;
-     top: 5px;
-     right: 11px;
+    position: relative;
+    top: 0px;
+    right: 5px;
 }
 
 .hp-dropdown-search .hp-search-form input {
@@ -949,7 +949,7 @@ div.hp-pagination {
 }
 
 @media (max-width: 350px) {
-    .hp-nav li > a {
+    .hp-navbar li > a {
         padding-left: 10px;
         padding-right: 10px;
     }
