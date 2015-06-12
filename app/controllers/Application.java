@@ -1,9 +1,7 @@
 package controllers;
 
 import com.typesafe.config.ConfigFactory;
-import models.Account;
-import models.Group;
-import models.Post;
+import models.*;
 import models.services.ElasticsearchService;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.search.SearchHit;
@@ -52,7 +50,7 @@ public class Application extends BaseController {
 	public static Result index() {
 		Navigation.set(Level.STREAM, "Alles");
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
+		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all", GroupAccount.findEstablished(currentAccount), Friendship.findFriends(currentAccount)));
 	}
 	
 	public static Result help() {
@@ -79,7 +77,7 @@ public class Application extends BaseController {
                 Navigation.set(Level.STREAM, "Alles");
         }
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getFilteredStream(currentAccount, LIMIT, page, filter),postForm,Post.countStream(currentAccount, filter), LIMIT, page, filter));
+		return ok(stream.render(currentAccount, Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter, GroupAccount.findEstablished(currentAccount), Friendship.findFriends(currentAccount)));
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {

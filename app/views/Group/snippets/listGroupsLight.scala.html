@@ -3,11 +3,19 @@
 @import helper._
 
 <table class="table table-hover">
-	<tbody class="hp-optionsTable">
+    <thead>
+        <tr>
+            <th style="width:25px"></th>
+            <th style="width:auto"></th>
+            <th style="width:25px"></th>
+        </tr>
+    </thead>
+	<tbody class="">
         @if(groups.isEmpty) {
             <tr>
                 <td></td>
                 <td>- keine Treffer -</td>
+                <td class="hp-optionsMenu"></td>
             </tr>
         }
 		@for(group <- groups) {
@@ -27,6 +35,9 @@
 					}
 				}
 			</td>
+            <td class="hp-optionsMenu">
+                @views.html.Group.snippets.optionMenu(group, user)
+            </td>
 		</tr>
 		}
 	</tbody>

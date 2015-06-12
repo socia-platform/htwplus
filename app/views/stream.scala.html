@@ -1,9 +1,7 @@
-@(currentUser: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String)
-
+@(currentUser: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String, groups: List[Group], contacts: List[Account])
 @import play._
 
 @main("Newsstream") {
-
     @views.html.snippets.feedFilter()
     <div class="row">
         <div class="col-lg-9" role="main">
@@ -23,15 +21,14 @@
         <div class="col-lg-3" role="complementary">
             <nav class="hidden-xs hidden-sm">
                 <div class="hp-sitenav">
-                    Deine Kontakte
-                    <hr>
+                    <b><span class="glyphicon glyphicon-user"></span> Kontakte</b>
+                    @views.html.Friends.snippets.listAccountsLight(contacts)
                 </div>
                 <div class="hp-sitenav">
-                    Deine Gruppen & Kurse
-                    <hr>
+                    <b><span class="glyphicon glyphicon-list"></span> Gruppen & Kurse</b>
+                    @views.html.Group.snippets.listGroupsLight(groups, currentUser)
                 </div>
             </nav>
         </div>
     </div>
-
 }
