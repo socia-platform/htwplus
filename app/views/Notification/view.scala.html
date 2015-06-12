@@ -1,38 +1,43 @@
 @(notifications: List[Notification], limit: Integer, currentPage: Integer, count: Integer, unreadNotifications: Integer)
-@import helper._
 
 @main("Notifications") {
-    <h1>@Messages("notification.news")</h1>
-    @if(notifications != null) {
-        @if(unreadNotifications > 0) {
-            <div class="notifications-mark-as-read">
-                <a href="@routes.NotificationController.readAll()">
-                    <span class="glyphicon glyphicon-ok"></span>@Messages("notification.read_everything")
-                </a>
-            </div>
-        }
-        <br />
-        @for(notification <- notifications) {
-            <div class="well notification">
-                <div class="notification-date">
-                    @if(notification.createdAt.getTime == notification.updatedAt.getTime) {
-                        @Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm")))
-                    } else {
-                        @Html(Messages("notification.date_updated", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"), notification.updatedAt.format("dd.MM.YYYY"), notification.updatedAt.format("HH:mm")))
+    <div class="row">
+        <div class="col-lg-12" role="main">
+            <div class="hp-notepad-content addmargin">
+                <h1>@Messages("notification.news")</h1>
+                @if(notifications != null) {
+                    @if(unreadNotifications > 0) {
+                        <div class="notifications-mark-as-read">
+                            <a href="@routes.NotificationController.readAll()">
+                                <span class="glyphicon glyphicon-ok"></span>@Messages("notification.read_everything")
+                            </a>
+                        </div>
                     }
-                </div>
-                @if(notification.isRead){
-                <div class="notification-read read"><span class="glyphicon glyphicon-ok-sign"></span> @Messages("notification.date_read")</div>
-                }else{
-                <div class="notification-read unread"><span class="glyphicon glyphicon-info-sign"></span> @Messages("notification.not_read")</div>
+                    <br />
+                    @for(notification <- notifications) {
+                        <div class="well notification">
+                            <div class="notification-date">
+                            @if(notification.createdAt.getTime == notification.updatedAt.getTime) {
+                                @Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm")))
+                            } else {
+                                @Html(Messages("notification.date_updated", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"), notification.updatedAt.format("dd.MM.YYYY"), notification.updatedAt.format("HH:mm")))
+                            }
+                            </div>
+                            @if(notification.isRead){
+                                <div class="notification-read read"><span class="glyphicon glyphicon-ok-sign"></span> @Messages("notification.date_read")</div>
+                            }else{
+                                <div class="notification-read unread"><span class="glyphicon glyphicon-info-sign"></span> @Messages("notification.not_read")</div>
+                            }
+                            <div class="hp-truncate hp-white-space" id="@notification.id">
+                                <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>
+                            </div>
+                        </div><br>
+                    }
+                } else {
+                    <div>@Messages("notification.nothing_new")</div>
                 }
-                <div class="hp-truncate hp-white-space" id="@notification.id">
-                    <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>
-                </div>
-            </div><br>
-        }
-    } else {
-        <div>@Messages("notification.nothing_new")</div>
-    }
-    @views.html.pagination(count, limit, currentPage, routes.NotificationController.showAll(1).toString, "?")
+                @views.html.pagination(count, limit, currentPage, routes.NotificationController.showAll(1).toString, "?")
+            </div>
+        </div>
+    </div>
 }

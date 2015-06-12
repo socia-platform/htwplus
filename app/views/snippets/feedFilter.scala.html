@@ -1,21 +1,17 @@
-@if(Navigation.getLevel() != null && Navigation.getLevel().equals(Navigation.Level.STREAM)) {
-    <div id="hp-nav-filter" class="container">
-        <div class="row">
-            <div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
-                <!-- Single button -->
-                <div class="btn-group btn-group-sm" style="float: right">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="glyphicon glyphicon-filter"></span> Filter: @Navigation.getTitle() <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href='@routes.Application.index()'>Alles</a></li>
-                        <li><a href='@routes.Application.stream("account")'>Eigene Posts</a></li>
-                        <li><a href='@routes.Application.stream("bookmark")'>Gemerkte Posts</a></li>
-                        <li><a href='@routes.Application.stream("group")'>Gruppen</a></li>
-                        <li><a href='@routes.Application.stream("contact")'>Kontakte</a></li>
-                    </ul>
-                </div>
-            </div>
+<div class="row">
+    <div class="col-md-9 hp-feed-filter">
+        <!-- Single button -->
+        <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <span class="glyphicon glyphicon-filter"></span> Filter: @Navigation.getTitle() <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href='@routes.Application.index()'>Alles</a></li>
+                <li><a href='@routes.Application.stream("account")'>Eigene Posts</a></li>
+                <li><a href='@routes.Application.stream("bookmark")'>Gemerkte Posts</a></li>
+                <li><a href='@routes.Application.stream("group")'>Gruppen</a></li>
+                <li><a href='@routes.Application.stream("contact")'>Kontakte</a></li>
+            </ul>
         </div>
     </div>
-}
+</div>

@@ -3,122 +3,128 @@
 @import models.enums._
 
 @main("Gruppen") {
-	@views.html.Group.snippets.navTabsAdd()
+    <div class="row">
+        <div class="col-lg-12" role="main">
+            <div class="hp-notepad-content addmargin">
+                @views.html.Group.snippets.navTabsAdd()
 
-	<!-- Start infoModal -->
-	@for(group <- approvedGroups ++ approvedCourses) {
-	<div class="modal fade" id="infoModal@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-		@views.html.Group.snippets.infoModal(group)
-	</div>
-	}
-	<!-- Ende infoModal -->
-	
-	
-	<!-- Start confirmDeleteGroupModal -->
-	@for(group <- approvedGroups ++ approvedCourses) {
-	<div class="modal fade" id="confirmDeleteGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-		@views.html.Group.snippets.deleteGroupModal(group)
-	</div>
-	}
-	<!-- End confirmDeleteGroupModal -->
-	
-	<!-- Start confirmLeaveGroupModal -->
-	@for(group <- approvedGroups ++ approvedCourses) {
-	<div class="modal fade" id="confirmLeaveGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-		@views.html.Group.snippets.leaveGroupModal(group)
-	</div>
-	}
-	<!-- End confirmDeleteGroupModal -->
-	
-	
-	@defining(Component.currentAccount()) { user =>
-		<h2>
-			<span rel="tooltip" data-original-title="Hier findest du den aktuellen Status deiner Gruppen-Anfragen." data-delay="500" data-container="body">
-				Offene Anfragen
-			</span>
-		</h2>
-		
-		@if(!unapprovedGroups.isEmpty){
-		<table class="table table-hover">
-			<thead>
-				<tr>
-					<th style="width:28px"></th>
-					<th style="width:30%">Name</th>
-					<th style="width:30%">Von</th>
-					<th>Status</th>
-					<th style="width:35px"></th>
-				</tr>
-			</thead>
-			<tbody class="hp-optionsTable">
-				@for(accountGroup <- unapprovedGroups) {
-				<tr>
-					@if(accountGroup.account.equals(user)) {
-						<td>
-							@if(accountGroup.group.groupType.equals(models.enums.GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
-							@if(accountGroup.group.groupType.equals(models.enums.GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
-							@if(accountGroup.group.groupType.equals(models.enums.GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
-						</td>
-						<td>
-							@if(accountGroup.group.groupType.equals(models.enums.GroupType.open)) { <a href="@routes.GroupController.stream(accountGroup.group.id)">@truncate(accountGroup.group.title,30)</a> }
-							@if(accountGroup.group.groupType.equals(models.enums.GroupType.close)) { <a class="no-drop" rel="tooltip" data-original-title="Du musst der Gruppe erst beitreten" data-container="body">@truncate(accountGroup.group.title,30)</a> }
-							@if(accountGroup.group.groupType.equals(models.enums.GroupType.course)) { <a class="no-drop" rel="tooltip" data-original-title="Du musst dem Kurs erst beitreten" data-container="body">@truncate(accountGroup.group.title,30)</a> }
-						</td>
-						<td>
-							@if(accountGroup.linkType.equals(models.enums.LinkType.invite)) {
-								<a href="@routes.ProfileController.view(accountGroup.group.owner.id)">@accountGroup.group.owner.name</a>
-							} else {
-								<a href="@routes.ProfileController.view(accountGroup.account.id)">Dir</a>
-							}
-						</td>
-						<td>@if(accountGroup.linkType.equals(models.enums.LinkType.reject)) {abgelehnt} else {in Bearbeitung}</td>
-						<td class="hp-optionsMenu">
-                            @views.html.Group.snippets.inviteOptionMenu(accountGroup, user)
-                        </td>
-					} else {
-						<td><span class="glyphicon glyphicon-lock"></span></td>
-						<td><a href="@routes.GroupController.stream(accountGroup.group.id)">@truncate(accountGroup.group.title,30)</a></td>
-						<td>@views.html.snippets.userLink(accountGroup.account)</td>
-						<td>zu bearbeiten</td>
-						<td class="hp-optionsMenu">
-                            @views.html.Group.snippets.inviteOptionMenu(accountGroup, user)
-                        </td>
-					}
-				</tr>
-				}
-			</tbody>
-		</table>
-		} else {
-		<p><i>Es gibt keine offenen Anfragen.</i></p>
-		}
-		<hr />
-		<br />
-		
-		<h2>
-			<span rel="tooltip" data-original-title="Hier findest du alle Gruppen die du gegründet hast oder denen du beigetreten bist." data-delay="500" data-container="body">
+                    <!-- Start infoModal -->
+                @for(group <- approvedGroups ++ approvedCourses) {
+                    <div class="modal fade" id="infoModal@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                    @views.html.Group.snippets.infoModal(group)
+                    </div>
+                }
+                    <!-- Ende infoModal -->
+
+
+                    <!-- Start confirmDeleteGroupModal -->
+                @for(group <- approvedGroups ++ approvedCourses) {
+                    <div class="modal fade" id="confirmDeleteGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                    @views.html.Group.snippets.deleteGroupModal(group)
+                    </div>
+                }
+                    <!-- End confirmDeleteGroupModal -->
+
+                    <!-- Start confirmLeaveGroupModal -->
+                @for(group <- approvedGroups ++ approvedCourses) {
+                    <div class="modal fade" id="confirmLeaveGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                    @views.html.Group.snippets.leaveGroupModal(group)
+                    </div>
+                }
+                    <!-- End confirmDeleteGroupModal -->
+
+
+                @defining(Component.currentAccount()) { user =>
+                    <h2>
+                        <span rel="tooltip" data-original-title="Hier findest du den aktuellen Status deiner Gruppen-Anfragen." data-delay="500" data-container="body">
+                            Offene Anfragen
+                        </span>
+                    </h2>
+
+                    @if(!unapprovedGroups.isEmpty){
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width:28px"></th>
+                                    <th style="width:30%">Name</th>
+                                    <th style="width:30%">Von</th>
+                                    <th>Status</th>
+                                    <th style="width:35px"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="hp-optionsTable">
+                            @for(accountGroup <- unapprovedGroups) {
+                                <tr>
+                                @if(accountGroup.account.equals(user)) {
+                                    <td>
+                                        @if(accountGroup.group.groupType.equals(models.enums.GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
+                                        @if(accountGroup.group.groupType.equals(models.enums.GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
+                                        @if(accountGroup.group.groupType.equals(models.enums.GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
+                                    </td>
+                                    <td>
+                                        @if(accountGroup.group.groupType.equals(models.enums.GroupType.open)) { <a href="@routes.GroupController.stream(accountGroup.group.id)">@truncate(accountGroup.group.title,30)</a> }
+                                        @if(accountGroup.group.groupType.equals(models.enums.GroupType.close)) { <a class="no-drop" rel="tooltip" data-original-title="Du musst der Gruppe erst beitreten" data-container="body">@truncate(accountGroup.group.title,30)</a> }
+                                        @if(accountGroup.group.groupType.equals(models.enums.GroupType.course)) { <a class="no-drop" rel="tooltip" data-original-title="Du musst dem Kurs erst beitreten" data-container="body">@truncate(accountGroup.group.title,30)</a> }
+                                    </td>
+                                    <td>
+                                    @if(accountGroup.linkType.equals(models.enums.LinkType.invite)) {
+                                        <a href="@routes.ProfileController.view(accountGroup.group.owner.id)">@accountGroup.group.owner.name</a>
+                                    } else {
+                                        <a href="@routes.ProfileController.view(accountGroup.account.id)">Dir</a>
+                                    }
+                                    </td>
+                                    <td>@if(accountGroup.linkType.equals(models.enums.LinkType.reject)) {abgelehnt} else {in Bearbeitung}</td>
+                                    <td class="hp-optionsMenu">
+                                    @views.html.Group.snippets.inviteOptionMenu(accountGroup, user)
+                                    </td>
+                                } else {
+                                    <td><span class="glyphicon glyphicon-lock"></span></td>
+                                    <td><a href="@routes.GroupController.stream(accountGroup.group.id)">@truncate(accountGroup.group.title,30)</a></td>
+                                    <td>@views.html.snippets.userLink(accountGroup.account)</td>
+                                    <td>zu bearbeiten</td>
+                                    <td class="hp-optionsMenu">
+                                    @views.html.Group.snippets.inviteOptionMenu(accountGroup, user)
+                                    </td>
+                                }
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    } else {
+                        <p><i>Es gibt keine offenen Anfragen.</i></p>
+                    }
+                <hr />
+                <br />
+
+                <h2>
+                    <span rel="tooltip" data-original-title="Hier findest du alle Gruppen die du gegründet hast oder denen du beigetreten bist." data-delay="500" data-container="body">
 				Meine Kurse
-			</span>
-		</h2>
-		
-		
-		@if(!approvedCourses.isEmpty){
-			@views.html.Group.snippets.listCourses(approvedCourses, user)
-		} else {
-		<p><i>Du bist noch keinem Kurs beigetreten. Jetzt einen Kurs <b><a href="@routes.Application.search()">suchen</a></b>@if(user.role == AccountRole.TUTOR) { oder einfach einen <b><a href="@routes.GroupController.create()">gründen</a></b>}.</i></p>
-		}
+                    </span>
+                </h2>
 
-        <hr />
-		<br />
-		
-		<h2>
-			<span rel="tooltip" data-original-title="Hier findest du alle Gruppen die du gegründet hast oder denen du beigetreten bist." data-delay="500" data-container="body">
+
+                    @if(!approvedCourses.isEmpty){
+                        @views.html.Group.snippets.listCourses(approvedCourses, user)
+                    } else {
+                        <p><i>Du bist noch keinem Kurs beigetreten. Jetzt einen Kurs <b><a href="@routes.Application.search()">suchen</a></b>@if(user.role == AccountRole.TUTOR) { oder einfach einen <b><a href="@routes.GroupController.create()">gründen</a></b>}.</i></p>
+                    }
+
+                <hr />
+                <br />
+
+                <h2>
+                    <span rel="tooltip" data-original-title="Hier findest du alle Gruppen die du gegründet hast oder denen du beigetreten bist." data-delay="500" data-container="body">
 				Meine Gruppen
-			</span>
-		</h2>
-				
-		@if(!approvedGroups.isEmpty){
-			@views.html.Group.snippets.listGroups(approvedGroups, user)
-		} else {
-		<p><i>Du bist noch keiner Gruppe beigetreten. Jetzt eine Gruppe <b><a href="@routes.Application.search()">suchen</a></b> oder einfach eine <b><a href="@routes.GroupController.create()">gründen</a></b>.</i></p>
-		}
-	}
+                    </span>
+                </h2>
+
+                    @if(!approvedGroups.isEmpty){
+                        @views.html.Group.snippets.listGroups(approvedGroups, user)
+                    } else {
+                        <p><i>Du bist noch keiner Gruppe beigetreten. Jetzt eine Gruppe <b><a href="@routes.Application.search()">suchen</a></b> oder einfach eine <b><a href="@routes.GroupController.create()">gründen</a></b>.</i></p>
+                    }
+                }
+            </div>
+        </div>
+    </div>
 }

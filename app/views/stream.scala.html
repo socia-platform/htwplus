@@ -4,14 +4,34 @@
 
 @main("Newsstream") {
 
-    <br />
-	@views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
+    @views.html.snippets.feedFilter()
+    <div class="row">
+        <div class="col-lg-9" role="main">
+            <div class="hp-notepad-content">
+                <br />
+                @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
 
-	@if(posts != null) {
-		@for(post <- posts) {
-			@views.html.snippets.postView(post, postForm, models.Post.STREAM, Play.application().configuration().getInt("htwplus.comments.init"))
-		}
-	}
-	
-	@views.html.pagination(count, limit, currentPage, routes.Application.stream(filter, 1).toString, "&")
+                @if(posts != null) {
+                    @for(post <- posts) {
+                        @views.html.snippets.postView(post, postForm, models.Post.STREAM, Play.application().configuration().getInt("htwplus.comments.init"))
+                    }
+                }
+
+                @views.html.pagination(count, limit, currentPage, routes.Application.stream(filter, 1).toString, "&")
+            </div>
+        </div>
+        <div class="col-lg-3" role="complementary">
+            <nav class="hidden-xs hidden-sm">
+                <div class="hp-sitenav">
+                    Deine Kontakte
+                    <hr>
+                </div>
+                <div class="hp-sitenav">
+                    Deine Gruppen & Kurse
+                    <hr>
+                </div>
+            </nav>
+        </div>
+    </div>
+
 }

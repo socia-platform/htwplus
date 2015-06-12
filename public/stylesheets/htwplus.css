@@ -15,8 +15,6 @@ body {
 }
 
 div.alert {
-	margin-left: -10px;
-    margin-right: -10px;
     margin-top: 10px;
 }
 
@@ -714,7 +712,21 @@ div.hp-notepad-content {
     box-shadow: 0 0 3px #888;
 
 }
-div.hp-notepad-content.addmargin {
+
+div.hp-sitenav {
+    padding: 10px;
+    box-sizing: content-box;
+    background-color: white;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    border-radius: 4px;
+    -moz-box-shadow: 0 0 3px #888;
+    -webkit-box-shadow: 0 0 3px #888;
+    box-shadow: 0 0 3px #888;
+    margin-bottom: 10px;
+}
+
+div.addmargin {
     margin-top: 45px;
 }
 
@@ -729,7 +741,8 @@ div.hp-notepad-content > *:last-child {
     }
 }
 
-div#hp-nav-filter {
+div.hp-feed-filter {
+    text-align: right;
     margin-top: 10px;
     margin-bottom: 7px;
 }

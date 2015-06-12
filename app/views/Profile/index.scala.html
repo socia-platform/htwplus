@@ -1,58 +1,61 @@
 @(user: Account, postForm: Form[Post])
-@import helper._
-@import models.enums._
 
 @main("Profil") {
-@defining(Component.currentAccount()) { curUser =>
+    <div class="row">
+        <div class="col-lg-12" role="main">
+            <div class="hp-notepad-content addmargin">
+                @defining(Component.currentAccount()) { curUser =>
 
-	<!-- confirmDeleteFriendModal -->
-	<div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog">@views.html.Friends.snippets.deleteFriendModal(user)</div>
-	<!-- Ende confirmDeleteFriendModal -->
-	
-	@views.html.Profile.snippets.navTabs(user)
-	
-	<div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-		@views.html.Friends.snippets.deleteFriendModal(user)
-	</div>
+                    <!-- confirmDeleteFriendModal -->
+                    <div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog">@views.html.Friends.snippets.deleteFriendModal(user)</div>
+                    <!-- Ende confirmDeleteFriendModal -->
 
-	<h2>@user.name</h2>
-	<br />
-	@if(user.hasAvatar){
-		<img alt="avatar" src="@routes.ProfileController.getAvatar(user.id, "large")" class="hp-avatar-large" />
-	}
-	<br />
-}
-<br />
-<table class="table">
-	<tr>
-		<th style="width:25%;">E-Mail</th>
-		<td style="width:75%;">@user.email</td>
-	</tr>
-	<tr>
-		<th>Studiengang</th>
-		@if(user.studycourse != null) {
-			<td>@user.studycourse.title @if(user.degree != null) { (@user.degree) }</td>
-		} else {
-			<td>Keine Angabe</td>
-		}
-	</tr>
-	
-	@if(user.role == models.enums.AccountRole.STUDENT) {
-		<tr>
-			<th>Semester</th>
-			@if(user.semester != null) {
-				<td>@{user.semester + "."} Semester</td>
-			} else {
-				<td>Keine Angabe</td>
-			}
-		</tr>
-	}
-	<tr>
-		<th>Rolle</th>
-		<td>@user.role.getDisplayName()</td>
+                @views.html.Profile.snippets.navTabs(user)
 
-	</tr>
-	
-</table>
-	
+                    <div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                    @views.html.Friends.snippets.deleteFriendModal(user)
+                    </div>
+
+                    <h2>@user.name</h2>
+                    <br />
+                @if(user.hasAvatar){
+                    <img alt="avatar" src="@routes.ProfileController.getAvatar(user.id, "large")" class="hp-avatar-large" />
+                }
+                    <br />
+                }
+                <br />
+                <table class="table">
+                    <tr>
+                        <th style="width:25%;">E-Mail</th>
+                        <td style="width:75%;">@user.email</td>
+                    </tr>
+                    <tr>
+                        <th>Studiengang</th>
+                        @if(user.studycourse != null) {
+                            <td>@user.studycourse.title @if(user.degree != null) { (@user.degree) }</td>
+                        } else {
+                            <td>Keine Angabe</td>
+                        }
+                    </tr>
+
+                    @if(user.role == models.enums.AccountRole.STUDENT) {
+                        <tr>
+                            <th>Semester</th>
+                            @if(user.semester != null) {
+                                <td>@{user.semester + "."} Semester</td>
+                            } else {
+                                <td>Keine Angabe</td>
+                            }
+                        </tr>
+                    }
+                    <tr>
+                        <th>Rolle</th>
+                        <td>@user.role.getDisplayName()</td>
+
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+    </div>
 }

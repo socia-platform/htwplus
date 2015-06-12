@@ -1,9 +1,5 @@
 @(currentPage: String)(content: Html)
+    @content
 
 
-@defining(if(currentPage != "Newsstream") {"addmargin"}) { cssclass =>
-    <div class="hp-notepad-content @cssclass">
-        @content
-    </div> <!-- /content -->
-}
 
