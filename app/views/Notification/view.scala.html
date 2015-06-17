@@ -13,7 +13,7 @@
         }
         <br />
         @for(notification <- notifications) {
-            <div class="well notification">
+            <div class="well notification hp-pagination-container">
                 <div class="notification-date">
                     @if(notification.createdAt.getTime == notification.updatedAt.getTime) {
                         @Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm")))

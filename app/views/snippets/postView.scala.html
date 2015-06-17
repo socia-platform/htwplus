@@ -3,7 +3,7 @@
 @import play._
 @import com.typesafe.config.ConfigFactory
 
-<div class="hp-post-container">
+<div class="hp-post-container hp-pagination-container">
 @defining(Component.currentAccount()) { currentUser =>
 	<br />
 	@views.html.snippets.deletePostModal(post.id)

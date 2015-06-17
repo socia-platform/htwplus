@@ -215,11 +215,11 @@ $(document).ready(function () {
     if($('a.nextPage').length > 0) { // only apply on pages with a nextPage link
         $('.hp-notepad-content').AutoPagination({
             nextPageSelector: 'a.nextPage',
-            panelSelector: 'div.hp-post-container',
+            panelSelector: '.hp-pagination-container',
             loaderDivClass: 'ajax-loader',
             loaderDivStyle: 'text-align:center;margin-top:20px;font-weight:bold;',
             loaderImage: 'assets/images/loading.gif',
-            loaderText: 'Lade Posts...'
+            loaderText: 'Lade nächste Seite...'
         });
     }
 
