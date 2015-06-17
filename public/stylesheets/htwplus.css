@@ -589,6 +589,10 @@ div.well.notification a span.glyphicon {
     color: #76b900;
 }
 
+div.well.notification {
+    margin-bottom: 10px;
+}
+
 div.hp-mailto a:hover span.glyphicon,
 div.notifications-mark-as-read a:hover span.glyphicon,
 div.well.notification a:hover span.glyphicon {

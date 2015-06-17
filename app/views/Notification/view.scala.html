@@ -29,7 +29,7 @@
                 <div class="hp-truncate hp-white-space" id="@notification.id">
                     <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>
                 </div>
-            </div><br>
+            </div>
         }
     } else {
         <div>@Messages("notification.nothing_new")</div>
