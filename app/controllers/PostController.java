@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import controllers.Navigation.Level;
@@ -114,27 +115,15 @@ public class PostController extends BaseController {
 		if (target.equals(Post.STREAM)) {
 			Account profile = Account.findById(anyId);
 			if(Secured.isNotNull(profile) && profile.equals(account)) {
-				if (JsonCollectionUtil.hasJsonCollection(request())) {
-					Collection jcol = JsonCollectionUtil.getJsonCollection(request());
-					final Post post = new Post();
+				if (filledForm.hasErrors()) {
+					flash("error", Messages.get("post.try_with_content"));
+				} else {
+					final Post post = filledForm.get();
 					post.account = profile;
 					post.owner = account;
-					String content = jcol.asJson().get("items").get(0).get("data").get(0).get("content").toString();
-					System.out.println(content);
-					post.content = content;
 					post.create();
-				} else {
-					if (filledForm.hasErrors()) {
-						flash("error", Messages.get("post.try_with_content"));
-					} else {
-						final Post post = filledForm.get();
-						post.account = profile;
-						post.owner = account;
-						post.create();
-					}
-					return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
 				}
-
+				return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
 			}
 			flash("info", Messages.get("post.post_on_stream_only"));
 			return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
