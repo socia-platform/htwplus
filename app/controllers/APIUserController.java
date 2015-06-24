@@ -24,7 +24,7 @@ public class APIUserController extends BaseController{
                         new ArrayList<Link>(),
                         new ArrayList<Item>(),
                         new ArrayList<Query>(),
-                        Template.create(),
+                        account.getTemplate(),
                         net.hamnaberg.json.Error.create("Account not found", "404", "The " +
                                 "requested account does not seem to exist.")
                 );
@@ -37,7 +37,7 @@ public class APIUserController extends BaseController{
                         new ArrayList<Link>(),
                         items,
                         new ArrayList<Query>(),
-                        Template.create(),
+                        account.getTemplate(),
                         net.hamnaberg.json.Error.create("none", "none", "none")
                 );
             }
