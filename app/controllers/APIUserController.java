@@ -23,7 +23,7 @@ public class APIUserController extends BaseController {
             if (id == 0) {  // http GET .../users
                 items = Account.all()
                         .stream()
-                        .map(a -> Item.create(URI.create(uri.toString() + "/" + a.id), a.getProperies()))
+                        .map(a -> Item.create(URI.create(uri.toString() + "/" + a.id), a.getProperties()))
                         .collect(Collectors.toList());
 
             } else {  // http GET .../users/:id
@@ -33,7 +33,7 @@ public class APIUserController extends BaseController {
                     error = net.hamnaberg.json.Error.create("Account not found", "404", "The " +
                                                             "requested account does not seem to exist.");
                 } else {
-                    items.add(Item.create(uri, account.getProperies()));
+                    items.add(Item.create(uri, account.getProperties()));
                 }
             }
 
@@ -42,7 +42,7 @@ public class APIUserController extends BaseController {
                     new ArrayList<Link>(),
                     items,
                     new ArrayList<Query>(),
-                    Template.create(Account.EXAMPLE.getProperies()),
+                    Template.create(Account.EXAMPLE.getProperties()),
                     error
             );
 

@@ -83,7 +83,7 @@ public abstract class BaseModel {
                 && ((BaseModel)obj).id.equals(this.id);
 	}
 
-	public List<Property> getProperies() {
+	public List<Property> getProperties() {
 		List<Property> propList = new ArrayList<Property>();
 		Field[] fields = this.getClass().getDeclaredFields();
 		for (Field f : fields) {
