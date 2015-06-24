@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 
 import javax.persistence.*;
+import javax.persistence.Query;
 
 import controllers.Component;
 import models.enums.AccountRole;
@@ -13,6 +14,9 @@ import models.services.ElasticsearchService;
 import models.base.BaseModel;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
+import net.hamnaberg.json.*;
+import net.hamnaberg.json.Collection;
+import net.hamnaberg.json.Error;
 import play.Logger;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
@@ -59,6 +63,69 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     @Transient
     public String searchContent;
+
+    public Post() {}
+
+    public Post(Collection col) {
+        Map<String, Property> data = col.getFirstItem().get().getDataAsMap();
+        ValueFactory fac = new ValueFactory();
+        owner = Account.findById(Long.parseLong(data.get("owner_id").getValue().get().asString()));
+        content = data.get("content").getValue().get().asString();
+        String account_id = data.get("account_id").getValue().get().asString();
+        String parent_id = data.get("parent_id").getValue().get().asString();
+        String group_id = data.get("group_id").getValue().get().asString();
+        if (account_id != "")
+            account = Account.findById(Long.parseLong(account_id));
+        else if (group_id != "")
+            group = Group.findById(Long.parseLong(group_id));
+        if (parent_id != "")
+            parent = Post.findById(Long.parseLong(parent_id));
+    }
+
+    public static Collection validatePost(Collection col) {
+        Collection validated;
+        String[] required = {"owner_id", "account_id", "parent_id", "group_id", "content"};
+        Map<String, Property> data = col.getFirstItem().get().getDataAsMap();
+        List<String> missingData = new ArrayList<String>();
+        List<String> errors = new ArrayList<String>();
+        for (String s : required) {
+            if (!data.containsKey(s)) {
+                missingData.add(s);
+            }
+        }
+        if (!missingData.isEmpty()) {
+            errors.add("Missing data: " + String.join(", ", missingData));
+        } else {
+            String account_id = data.get("account_id").getValue().get().asString();
+            String parent_id = data.get("parent_id").getValue().get().asString();
+            String group_id = data.get("group_id").getValue().get().asString();
+            if (account_id != "") {
+                if (Account.findById(Long.parseLong(account_id)) == null)
+                    errors.add("Invalid target: account with id " + account_id + " does not seem to exist.");
+            }
+            if (parent_id != "") {
+                if (Post.findById(Long.parseLong(parent_id)) == null)
+                    errors.add("Invalid target: post with id " + parent_id + " does not seem to exist.");
+            }
+            if (group_id != "") {
+                if (Group.findById(Long.parseLong(group_id)) == null) {
+                    errors.add("Invalid target: group with id " + group_id + " does not seem to exist.");
+                }
+            }
+        }
+        if (data.get("group_id").getValue().get().asString() != "" && data.get("account_id").getValue().get().asString() != "") {
+            errors.add("Invalid target: You can either post to a group or an account. Not both.");
+        }
+        if (data.get("group_id").getValue().get().asString() == "" && data.get("account_id").getValue().get().asString() == "") {
+            errors.add("Invalid target: You have to specify a target group_id or account_id.");
+        }
+        if (!errors.isEmpty()) {
+            Error error = Error.create("Invalid post data", "422", "Errors: " + String.join("\n", errors));
+            validated = Collection.create(col.getHref().get(), col.getLinks(), col.getItems(), col.getQueries(), col.getTemplate().get(), error);
+        } else
+            validated = col;
+        return validated;
+    }
 		
 	public void create() {
 		JPA.em().persist(this);
