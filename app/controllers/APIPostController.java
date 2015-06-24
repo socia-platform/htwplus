@@ -15,7 +15,7 @@ public class APIPostController extends BaseController {
         if (JsonCollectionUtil.hasJsonCollection(request()))
         {
             Collection jcol = JsonCollectionUtil.getJsonCollection(request());
-            Account account = Account.findById(jcol.asJson().get("items").get(0).get("data").get(0).get("user").asLong());
+            Account account = Account.findById(jcol.getFirstItem().get().getData().propertyByName("account_id").);
             final Post post = new Post();
             post.account = account;
             post.owner = account;
