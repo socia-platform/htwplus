@@ -1,5 +1,6 @@
 package controllers;
 
+import models.Account;
 import models.Post;
 import net.hamnaberg.json.Collection;
 import play.mvc.Result;
@@ -11,11 +12,12 @@ import util.JsonCollectionUtil;
 public class APIPostController extends BaseController {
 
     public static Result addPost() {
-        /*if (JsonCollectionUtil.hasJsonCollection(request()))
+        if (JsonCollectionUtil.hasJsonCollection(request()))
         {
             Collection jcol = JsonCollectionUtil.getJsonCollection(request());
+            Account account = Account.findById(jcol.asJson().get("items").get(0).get("data").get(0).get("user").asLong());
             final Post post = new Post();
-            post.account = profile;
+            post.account = account;
             post.owner = account;
             post.content = jcol.asJson().get("items").get(0).get("data").get(0).get("content").toString();
             post.create();
@@ -24,7 +26,6 @@ public class APIPostController extends BaseController {
         }
         else {
             return internalServerError();
-        }*/
-        return notFound("Action not implemented yet");
+        }
     }
 }
