@@ -50,7 +50,7 @@ public class APIPostController extends BaseController {
                 Post post = Post.findById(id);
                 items = new ArrayList<Item>();
                 if (post == null) {
-                    error = Error.create("Post not found", "404", "The requeseted post does not seem to exist.");
+                    error = Error.create("Post not found", "404", "The requested post does not seem to exist.");
                 } else {
                     items.add(Item.create(uri, post.getProperties()));
                 }
