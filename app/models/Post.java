@@ -22,6 +22,7 @@ import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 
 import org.hibernate.annotations.Type;
+import util.Expose;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
@@ -33,20 +34,25 @@ public class Post extends BaseNotifiable implements INotifiable {
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
     public static final String BROADCAST = "broadcast";                     // broadcast post from admin control center
 
+    @Expose
     @Required
     @Lob
     @Type(type = "org.hibernate.type.TextType")
 	public String content;
 
+    @Expose
 	@ManyToOne
 	public Post parent;
 
+    @Expose
 	@ManyToOne
 	public Group group;
 
+    @Expose
 	@ManyToOne
 	public Account account;
 
+    @Expose
 	@ManyToOne
 	public Account owner;
 
