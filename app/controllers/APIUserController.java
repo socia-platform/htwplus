@@ -3,9 +3,7 @@ package controllers;
 import models.Account;
 import models.enums.CustomContentType;
 import net.hamnaberg.json.*;
-import play.mvc.Http;
 import play.mvc.Result;
-import play.mvc.Results;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -47,8 +45,7 @@ public class APIUserController extends BaseController{
 
             return ok(collection.toString());
         } else {
-            response().setHeader("Warning", "Only accepting Accept header: " + CustomContentType.JSON_COLLECTION.getIdentifier());
-            return status(NOT_ACCEPTABLE);
+            return statusWithWarning(NOT_ACCEPTABLE, "Only accepting Accept header: " + CustomContentType.JSON_COLLECTION.getIdentifier());
         }
     }
     
