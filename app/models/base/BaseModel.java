@@ -98,9 +98,4 @@ public abstract class BaseModel {
 		}
 		return propList;
 	}
-
-    public Template getTemplate() {
-        List<Property> propList = getProperies().stream().map(p -> Property.value(p.getName(), "")).collect(Collectors.toList());
-        return Template.create(propList);
-    }
 }

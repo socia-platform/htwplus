@@ -28,6 +28,7 @@ import models.base.ValidationException;
 import models.services.ElasticsearchService;
 import net.hamnaberg.json.Item;
 import net.hamnaberg.json.Property;
+import net.hamnaberg.json.Template;
 import play.Logger;
 import play.data.validation.Constraints;
 import play.i18n.Messages;
@@ -92,6 +93,14 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
     public Integer dailyEmailNotificationHour;
 
 	public Boolean approved;
+
+    // used for collection+JSON template generation
+    public static final Account EXAMPLE = new Account();
+    static {
+        EXAMPLE.firstname = "John";
+        EXAMPLE.lastname = "Doe";
+        EXAMPLE.email = "john@doe-online.com";
+    }
 
     /**
      * Returns an account by account ID.
@@ -432,5 +441,4 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		}
 
 	}
-
 }
