@@ -15,13 +15,14 @@ public class APIPostController extends BaseController {
         if (JsonCollectionUtil.hasJsonCollection(request()))
         {
             Collection jcol = JsonCollectionUtil.getJsonCollection(request());
-            Account account = Account.findById(jcol.getFirstItem().get().getData().propertyByName("account_id").);
-            final Post post = new Post();
-            post.account = account;
-            post.owner = account;
-            post.content = jcol.asJson().get("items").get(0).get("data").get(0).get("content").toString();
-            post.create();
-            return ok();
+            jcol = Post.validatePost(jcol);
+            if (!jcol.hasError()) {
+                final Post post = new Post(jcol);
+                post.create();
+                return ok();
+            } else {
+                return badRequest(jcol.asJson());
+            }
         }
         else {
             return internalServerError();
