@@ -21,7 +21,6 @@ public class APIPostController extends BaseController {
             post.owner = account;
             post.content = jcol.asJson().get("items").get(0).get("data").get(0).get("content").toString();
             post.create();
-
             return ok();
         }
         else {
