@@ -109,6 +109,7 @@ GET         /admin/indexing/indexDelete                controllers.AdminControll
 
 # API
 GET         /api/users/:id                             controllers.APIUserController.view(id:Long)
+POST        /api/posts                                 controllers.APIPostController.addPost()
 
 # No route found? take this
 GET         /*path                                     controllers.Application.defaultRoute(path: String)
