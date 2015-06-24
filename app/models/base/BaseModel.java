@@ -1,6 +1,8 @@
 package models.base;
 
 import net.hamnaberg.json.Property;
+import net.hamnaberg.json.Template;
+import net.hamnaberg.json.Value;
 import util.Expose;
 
 import java.lang.annotation.Annotation;
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.*;
 
@@ -95,4 +98,9 @@ public abstract class BaseModel {
 		}
 		return propList;
 	}
+
+    public Template getTemplate() {
+        List<Property> propList = getProperies().stream().map(p -> Property.value(p.getName(), "")).collect(Collectors.toList());
+        return Template.create(propList);
+    }
 }
