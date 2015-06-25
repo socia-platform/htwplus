@@ -23,6 +23,7 @@ import play.db.jpa.JPA;
 
 import org.hibernate.annotations.Type;
 import util.Expose;
+import util.JsonCollectionUtil;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
@@ -34,25 +35,25 @@ public class Post extends BaseNotifiable implements INotifiable {
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
     public static final String BROADCAST = "broadcast";                     // broadcast post from admin control center
 
-    @Expose
+    @Expose(name = "content")
     @Required
     @Lob
     @Type(type = "org.hibernate.type.TextType")
 	public String content;
 
-    @Expose
+    @Expose(name = "parent_id")
 	@ManyToOne
 	public Post parent;
 
-    @Expose
+    @Expose(name = "group_id")
 	@ManyToOne
 	public Group group;
 
-    @Expose
+    @Expose(name = "account_id")
 	@ManyToOne
 	public Account account;
 
-    @Expose
+    @Expose(name = "owner_id")
 	@ManyToOne
 	public Account owner;
 
@@ -74,7 +75,6 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     public Post(Collection col) {
         Map<String, Property> data = col.getFirstItem().get().getDataAsMap();
-        ValueFactory fac = new ValueFactory();
         owner = Account.findById(Long.parseLong(data.get("owner_id").getValue().get().asString()));
         content = data.get("content").getValue().get().asString();
         String account_id = data.get("account_id").getValue().get().asString();
@@ -90,21 +90,21 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     public static Collection validatePost(Collection col) {
         Collection validated;
-        String[] required = {"owner_id", "account_id", "parent_id", "group_id", "content"};
-        Map<String, Property> data = col.getFirstItem().get().getDataAsMap();
-        List<String> missingData = new ArrayList<String>();
         List<String> errors = new ArrayList<String>();
-        for (String s : required) {
-            if (!data.containsKey(s)) {
-                missingData.add(s);
-            }
-        }
-        if (!missingData.isEmpty()) {
-            errors.add("Missing data: " + String.join(", ", missingData));
-        } else {
+
+        col = JsonCollectionUtil.checkForMissingItems(col, new Post());
+        if (!col.hasError()) {
+            Map<String, Property> data = col.getFirstItem().get().getDataAsMap();
             String account_id = data.get("account_id").getValue().get().asString();
+            String owner_id = data.get("owner_id").getValue().get().asString();
             String parent_id = data.get("parent_id").getValue().get().asString();
             String group_id = data.get("group_id").getValue().get().asString();
+            if (owner_id != "") {
+                if (Account.findById(Long.parseLong(owner_id)) == null)
+                    errors.add("Invalid owner id: account with id " + owner_id + " does not seem to exist.");
+            } else {
+                errors.add("Invalid owner id: You have to specify an owner.");
+            }
             if (account_id != "") {
                 if (Account.findById(Long.parseLong(account_id)) == null)
                     errors.add("Invalid target: account with id " + account_id + " does not seem to exist.");
@@ -118,18 +118,20 @@ public class Post extends BaseNotifiable implements INotifiable {
                     errors.add("Invalid target: group with id " + group_id + " does not seem to exist.");
                 }
             }
-        }
-        if (data.get("group_id").getValue().get().asString() != "" && data.get("account_id").getValue().get().asString() != "") {
-            errors.add("Invalid target: You can either post to a group or an account. Not both.");
-        }
-        if (data.get("group_id").getValue().get().asString() == "" && data.get("account_id").getValue().get().asString() == "") {
-            errors.add("Invalid target: You have to specify a target group_id or account_id.");
-        }
-        if (!errors.isEmpty()) {
-            Error error = Error.create("Invalid post data", "422", "Errors: " + String.join("\n", errors));
-            validated = Collection.create(col.getHref().get(), col.getLinks(), col.getItems(), col.getQueries(), col.getTemplate().get(), error);
+            if (data.get("group_id").getValue().get().asString() != "" && data.get("account_id").getValue().get().asString() != "") {
+                errors.add("Invalid target: You can either post to a group or an account. Not both.");
+            }
+            if (data.get("group_id").getValue().get().asString() == "" && data.get("account_id").getValue().get().asString() == "") {
+                errors.add("Invalid target: You have to specify a target group_id or account_id.");
+            }
+            if (!errors.isEmpty()) {
+                Error error = Error.create("Invalid post data", "422", "Errors: " + String.join(" ", errors));
+                validated = Collection.create(col.getHref().get(), col.getLinks(), col.getItems(), col.getQueries(), col.getTemplate().get(), error);
+            } else
+                validated = col;
         } else
             validated = col;
+
         return validated;
     }
 		
