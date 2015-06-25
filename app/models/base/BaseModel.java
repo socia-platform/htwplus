@@ -97,4 +97,15 @@ public abstract class BaseModel {
 		}
 		return propList;
 	}
+
+	public static List<String> getPropertyNames(BaseModel model) {
+		List<String> nameList = new ArrayList<String>();
+		Field[] fields = model.getClass().getDeclaredFields();
+		for (Field f : fields) {
+			if (f.getAnnotation(Expose.class) != null) {
+				nameList.add(f.getAnnotation(Expose.class).name());
+			}
+		}
+		return nameList;
+	}
 }
