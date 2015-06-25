@@ -89,8 +89,7 @@ public abstract class BaseModel {
 		for (Field f : fields) {
 			if (f.getAnnotation(Expose.class) != null) {
 				try {
-					propList.add(Property.value(f.getName(), f.get(this)));
-
+					propList.add(Property.value(f.getName(), f.get(this) instanceof BaseModel ? ((BaseModel) f.get(this)).id : f.get(this)));
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				}
