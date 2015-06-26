@@ -112,7 +112,9 @@ GET         /api/users                                 controllers.APIUserContro
 GET         /api/users/:id                             controllers.APIUserController.get(id:Long)
 
 # API posts
-POST        /api/posts                                 controllers.APIPostController.addPost()
+POST        /api/posts                                 controllers.APIPostController.post()
+GET         /api/posts                                 controllers.APIPostController.get(id:Long = 0)
+GET         /api/posts/:id                             controllers.APIPostController.get(id:Long)
 
 # No route found? take this
 GET         /*path                                     controllers.Application.defaultRoute(path: String)

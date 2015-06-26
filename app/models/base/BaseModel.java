@@ -83,19 +83,29 @@ public abstract class BaseModel {
                 && ((BaseModel)obj).id.equals(this.id);
 	}
 
-	public List<Property> getProperies() {
+	public List<Property> getProperties() {
 		List<Property> propList = new ArrayList<Property>();
 		Field[] fields = this.getClass().getDeclaredFields();
 		for (Field f : fields) {
 			if (f.getAnnotation(Expose.class) != null) {
 				try {
-					propList.add(Property.value(f.getName(), f.get(this)));
-
+					propList.add(Property.value(f.getName(), f.get(this) instanceof BaseModel ? ((BaseModel) f.get(this)).id : f.get(this)));
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 		return propList;
+	}
+
+	public static List<String> getPropertyNames(BaseModel model) {
+		List<String> nameList = new ArrayList<String>();
+		Field[] fields = model.getClass().getDeclaredFields();
+		for (Field f : fields) {
+			if (f.getAnnotation(Expose.class) != null) {
+				nameList.add(f.getAnnotation(Expose.class).name());
+			}
+		}
+		return nameList;
 	}
 }

@@ -51,17 +51,17 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public String name;
 
 	@Required
-	@Expose
+	@Expose(name ="firstname")
 	public String firstname;
 
 	public String funfunf;
 
 	@Required
-	@Expose
+	@Expose(name = "lastname")
 	public String lastname;
 
 	@Email
-	@Expose
+	@Expose(name = "email")
 	@Column(unique=true)
 	public String email;
 
@@ -81,7 +81,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public String studentId;
 
 	@OneToOne
-	@Expose
+	@Expose(name = "studycourse")
 	public Studycourse studycourse;
 	public String degree;
 	public Integer semester;

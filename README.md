@@ -6,7 +6,7 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 
 ### Requirements
 
-* JDK 7 or higher
+* JDK 8
 * Activator (https://www.playframework.com/download)
 * Git
 * Node.js
