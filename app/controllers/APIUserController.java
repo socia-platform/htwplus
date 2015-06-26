@@ -16,7 +16,13 @@ public class APIUserController extends BaseController {
 
     public static Result get(final Long id) {
         if (request().getHeader("Accept").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
-            URI uri = URI.create(request().host() + request().path());
+
+            // I don't like the way they did it, but that's the way this framework fixed the protocol thing
+            // https://github.com/playframework/playframework/issues/842
+            String protocol = request().secure() ? "https://" : "http://";
+            
+            URI uri = URI.create(protocol + request().host() + request().path());
+
             Error error = Error.EMPTY;
             List<Item> items = null;
 
