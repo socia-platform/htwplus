@@ -1,6 +1,6 @@
 @(group: Group, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer)
+
 @import models.enums._
-@import play._
 
 @main("Gruppenstream") {
     <div class="row">
@@ -39,16 +39,8 @@
 
                     @views.html.snippets.postForm(group.id, models.Post.GROUP, postForm)
 
-                    @if(posts != null) {
-                        @for(post <- posts) {
-                            @if(post.parent == null){
-                                @views.html.snippets.postView(post, postForm,  models.Post.GROUP, Play.application().configuration().getInt("htwplus.comments.init"))
-                            }
-                        }
-                    }
-
-                    @views.html.pagination(count, limit, currentPage, routes.GroupController.stream(group.id).toString, "?")
-
+                    @views.html.Group.snippets.streamRaw(group, posts, postForm, count, limit, currentPage)
+                    
                 </div>
             </div>
         </div>

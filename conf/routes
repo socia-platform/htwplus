@@ -4,7 +4,7 @@
 
 # Home page
 GET         /                                          controllers.Application.index()
-GET         /stream                                    controllers.Application.stream(filter: String, page: Integer ?= 1)
+GET         /stream                                    controllers.Application.stream(filter: String, page: Integer ?= 1, raw: Boolean ?= false)
 GET         /search                                    controllers.Application.search(page: Integer ?= 1)
 GET         /searchHome                                controllers.Application.searchHome()
 GET         /suggestions                               controllers.Application.searchSuggestions(query: String)
@@ -23,7 +23,7 @@ GET         /groups                                    controllers.GroupControll
 POST        /group/create                              controllers.GroupController.add()
 GET         /group/create                              controllers.GroupController.create()
 GET         /group/:id                                 controllers.GroupController.view(id:Long)
-GET         /group/:id/stream                          controllers.GroupController.stream(id:Long, page: Integer ?= 1)
+GET         /group/:id/stream                          controllers.GroupController.stream(id:Long, page: Int ?= 1, raw: Boolean ?= false)
 GET         /group/:id/media                           controllers.GroupController.media(id:Long)
 GET         /group/:id/edit                            controllers.GroupController.edit(id:Long)
 POST        /group/:id/update                          controllers.GroupController.update(id:Long)
@@ -61,7 +61,7 @@ GET         /user/:id/tempavatar                       controllers.ProfileContro
 POST        /user/:id/createavatar                     controllers.ProfileController.createAvatar(id:Long)
 GET         /user/:id/avatar                           controllers.ProfileController.getAvatar(id:Long, size:String ?= "small")
 POST        /user/:id/edit                             controllers.ProfileController.update(id:Long)
-GET         /user/:id/stream                           controllers.ProfileController.stream(id:Long,page: Integer ?= 1)
+GET         /user/:id/stream                           controllers.ProfileController.stream(id:Long,page: Integer ?= 1, raw: Boolean ?= false)
 GET         /user/:id/groups                           controllers.ProfileController.groups(id:Long)
 POST 	/user/:id/delete					           controllers.ProfileController.deleteProfile(id:Long)
 

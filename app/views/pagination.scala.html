@@ -1,4 +1,4 @@
-@(count: Integer, limit: Integer, currentPage: Integer, route: String, et: String)
+@(count: Integer, limit: Integer, currentPage: Integer, route: String, et: String, addRawLink: Boolean = false)
 @import controllers.Navigation
 
 <div class="hp-pagination">
@@ -7,7 +7,7 @@
 	@defining(Navigation.calcPagination(count, limit, currentPage)) { nav =>
 
         @for(p <- nav.get("pages").asInstanceOf[List[Integer]]) {
-            @if(currentPage+1 == p) {<li><a class="nextPage" href="@{route + et+"page=" + p}">Next Page</a></li>}
+            @if(currentPage+1 == p) {<li><a class="nextPage" href="@{route + et+"page=" + p}" @if(addRawLink) {data-raw-page-link="@{route + et + "page=" + p + "&raw=true"}"}>Next Page</a></li>}
         }
 
         <noscript>

@@ -15,7 +15,7 @@
                     }
                     <br />
                     @for(notification <- notifications) {
-                        <div class="well notification">
+                        <div class="well notification hp-pagination-container">
                             <div class="notification-date">
                             @if(notification.createdAt.getTime == notification.updatedAt.getTime) {
                                 @Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm")))
@@ -31,12 +31,12 @@
                             <div class="hp-truncate hp-white-space" id="@notification.id">
                                 <a href="@routes.NotificationController.forward(notification.id)">@Html(notification.rendered)</a>
                             </div>
-                        </div><br>
+                        </div>
                     }
                 } else {
                     <div>@Messages("notification.nothing_new")</div>
-                }
-                @views.html.pagination(count, limit, currentPage, routes.NotificationController.showAll(1).toString, "?")
+}
+    @views.html.pagination(count, limit, currentPage, routes.NotificationController.showAll(1).toString, "?")
             </div>
         </div>
     </div>

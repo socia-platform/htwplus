@@ -191,12 +191,16 @@ public class Global extends GlobalSettings {
                     if (dummy == null) {
                         dummy = new Account();
                         dummy.email = dummyMail;
-                        dummy.firstname = "Anonym";
-                        dummy.lastname = "@HTWplus";
+                        dummy.firstname = "Gelöschter";
+                        dummy.lastname = "Account";
                         dummy.role = AccountRole.DUMMY;
                         dummy.avatar = "aDefault";
                         dummy.password = Component.md5(dummyPassword);
                         dummy.create();
+                    } else if(dummy.firstname.equals("Anonym")) {
+                        dummy.firstname = "Gelöschter";
+                        dummy.lastname = "Account";
+                        dummy.update();
                     }
 
                     // create Admin group if none exists

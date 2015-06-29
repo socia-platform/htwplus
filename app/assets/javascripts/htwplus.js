@@ -226,14 +226,30 @@ $(document).ready(function () {
     /*
      * Auto-pagination with jQuery plugin (modified version of jquery.auto.pagination.js)
      */
-    $('.hp-notepad-content').AutoPagination({
-        nextPageSelector: 'a.nextPage',
-        panelSelector: 'div.hp-post-container',
-        loaderDivClass: 'ajax-loader',
-        loaderDivStyle: 'text-align:center;margin-top:20px;font-weight:bold;',
-        loaderImage: 'assets/images/loading.gif',
-        loaderText: 'Lade Posts...'
-    });
+    if($('a.nextPage').length > 0) { // only apply on pages with a nextPage link
+        $('.hp-notepad-content').AutoPagination({
+            nextPageSelector: 'a.nextPage',
+            panelSelector: '.hp-pagination-container',
+            loaderDivClass: 'ajax-loader',
+            loaderDivStyle: 'text-align:center;margin-top:20px;font-weight:bold;',
+            loaderImage: 'assets/images/loading.gif',
+            loaderText: 'Lade nächste Seite...'
+        });
+    }
+
+    /*
+     * Show 'Back to top'-link (src: http://jsfiddle.net/panman8201/mkzrm/10/)
+     */
+    if (($(window).height() + 200) < $(document).height() ) {
+        $('#hp-top-link').removeClass('hidden').affix({
+            // how far to scroll down before link "slides" into view
+            offset: { top:200 }
+        });
+        $('#hp-top-link a').click(function(event) {
+            $('html,body').animate({scrollTop:0});
+            return false;
+        });
+    }
 
 	/*
 	 * ADD COMMENTS

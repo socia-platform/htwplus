@@ -566,6 +566,10 @@ div.well.notification a span.glyphicon {
     color: #76b900;
 }
 
+div.well.notification {
+    margin-bottom: 10px;
+}
+
 div.hp-mailto a:hover span.glyphicon,
 div.notifications-mark-as-read a:hover span.glyphicon,
 div.well.notification a:hover span.glyphicon {
@@ -818,6 +822,20 @@ div.hp-pagination {
 .ajax-loader img {
     width: 32px;
     height: 32px;
+}
+
+/** SCROLL TO TOP **/
+#hp-top-link.affix-top {
+    position: absolute; /* allows it to "slide" up into view */
+    bottom: -190px; /* negative of the offset - height of link element */
+    left: 10px; /* padding from the left side of the window */
+    z-index: 3; /* .form-control has z-index 2 */
+}
+#hp-top-link.affix {
+    position: fixed; /* keeps it on the bottom once in view */
+    bottom: 10px; /* height of link element */
+    left: 10px; /* padding from the left side of the window */
+    z-index: 3; /* .form-control has z-index 2 */
 }
 
 /*============================== Post & Comment View ==============================*/

@@ -37,11 +37,11 @@ public class PostController extends BaseController {
 		}
 		
 		if(post.belongsToGroup()) {
-			Navigation.set(Level.GROUPS, "Post", post.group.title, controllers.routes.GroupController.stream(post.group.id, PAGE));
+			Navigation.set(Level.GROUPS, "Post", post.group.title, controllers.routes.GroupController.stream(post.group.id, PAGE, false));
 		}
 		
 		if(post.belongsToAccount()) {
-			Navigation.set(Level.FRIENDS, "Post", post.account.name, controllers.routes.ProfileController.stream(post.account.id, PAGE));
+			Navigation.set(Level.FRIENDS, "Post", post.account.name, controllers.routes.ProfileController.stream(post.account.id, PAGE, false));
 		}
 		
 		return ok(view.render(post, postForm));
@@ -75,7 +75,7 @@ public class PostController extends BaseController {
 				flash("info", Messages.get("post.join_group_first"));
 			}
             
-			return redirect(controllers.routes.GroupController.stream(group.id, PAGE));
+			return redirect(controllers.routes.GroupController.stream(group.id, PAGE, false));
 		}
 		
 		if (target.equals(Post.PROFILE)) {
@@ -93,11 +93,11 @@ public class PostController extends BaseController {
 					}
 				}
 
-				return redirect(controllers.routes.ProfileController.stream(anyId, PAGE));
+				return redirect(controllers.routes.ProfileController.stream(anyId, PAGE, false));
 			}
             
 			flash("info", Messages.get("post.post_on_stream_only"));
-			return redirect(controllers.routes.ProfileController.stream(anyId, PAGE));
+			return redirect(controllers.routes.ProfileController.stream(anyId, PAGE, false));
 		}
 		
 		if (target.equals(Post.STREAM)) {
@@ -111,11 +111,11 @@ public class PostController extends BaseController {
 					post.owner = account;
 					post.create();
 				}
-				return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
+				return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE, false));
 			}
             
 			flash("info", Messages.get("post.post_on_stream_only"));
-			return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE));
+			return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE, false));
 		}
         
 		return redirect(controllers.routes.Application.index());
@@ -236,7 +236,7 @@ public class PostController extends BaseController {
 			
 			//verify redirect
 			if (post.group != null) {
-				routesTo = controllers.routes.GroupController.stream(post.group.id, PAGE);
+				routesTo = controllers.routes.GroupController.stream(post.group.id, PAGE, false);
 			}
 			
 			if (post.account != null) {
@@ -245,7 +245,7 @@ public class PostController extends BaseController {
 			
 			if (post.parent != null) {
 				if (post.parent.group != null) {
-					routesTo = controllers.routes.GroupController.stream(post.parent.group.id, PAGE);
+					routesTo = controllers.routes.GroupController.stream(post.parent.group.id, PAGE, false);
 				} else if (post.parent.account != null) {
 					routesTo = controllers.routes.Application.index();
 				}
