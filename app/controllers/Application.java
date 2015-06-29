@@ -51,7 +51,7 @@ public class Application extends BaseController {
 	public static Result index() {
 		Navigation.set(Level.STREAM, "Alles");
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all", GroupAccount.findEstablished(currentAccount), Friendship.findFriends(currentAccount)));
+		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
 	}
 	
 	public static Result help() {
