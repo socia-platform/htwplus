@@ -34,14 +34,17 @@ public class AccountController extends BaseController {
 	public static Result authenticate() {
 		DynamicForm form = form().bindFromRequest();
 		String username = form.field("email").value();
-	
+
+        // save originURL before clearing the session (it gets cleared in defaultAuthenticate() and LdapAuthenticate())
+        String redirect = session().get("originURL");
+
 		if (username.contains("@")) {
-			return defaultAuthenticate();
+			return defaultAuthenticate(redirect);
 		} else if (username.length() == 0) {
 			flash("error", "Also deine Matrikelnummer brauchen wir schon!");
 			return badRequest(landingpage.render());
 		} else {
-			return LdapAuthenticate();
+			return LdapAuthenticate(redirect);
 		}
 	}
 
@@ -50,7 +53,7 @@ public class AccountController extends BaseController {
      *
      * @return Result
      */
-	private static Result LdapAuthenticate() {
+	private static Result LdapAuthenticate(final String redirect) {
 		Form<Login> form = form(Login.class).bindFromRequest();
 		String matriculationNumber = form.field("email").value();
 		String password = form.field("password").value();
@@ -102,10 +105,10 @@ public class AccountController extends BaseController {
 			session("rememberMe", "1");
 		}
 
-		return redirect(controllers.routes.Application.index());
+		return redirect(redirect);
 	}
 
-	private static Result defaultAuthenticate() {
+	private static Result defaultAuthenticate(final String redirect) {
 		Form<Login> loginForm = form(Login.class).bindFromRequest();
 		if (loginForm.hasErrors()) {
 			flash("error", loginForm.globalError().message());
@@ -119,10 +122,45 @@ public class AccountController extends BaseController {
 			if (loginForm.get().rememberMe != null) {
 				session("rememberMe", "1");
 			}
-			
-			return redirect(controllers.routes.Application.index());
+
+			return redirect(redirect);
 		}
 	}
+
+    /**
+     * Checks if the specified password is correct for the current used
+     *
+     * @param accountId the account which password should be checked
+     * @param password the password to check
+     * @return true, if the password is correct
+     */
+    public static boolean checkPassword(Long accountId, String password) {
+        Account account = Account.findById(accountId);
+
+        if(password == null || password.length() == 0) {
+            flash("error", Messages.get("Kein Passwort angegeben!"));
+            return false;
+        }
+
+        if(account.loginname == null || account.loginname.length() == 0) { // not an LDAP Account
+            Account auth = Account.authenticate(account.email, password);
+            if(auth == null || auth.id != account.id) {
+                flash("error", Messages.get("profile.delete.wrongpassword"));
+                return false;
+            } else {
+                return true;
+            }
+        } else { // LDAP Account
+            LdapService ldap = LdapService.getInstance();
+            try {
+                ldap.connect(account.loginname, password); // try logging in with the specified password
+                return true; // login successful
+            } catch (LdapService.LdapConnectorException e) {
+                flash("error", e.getMessage());
+                return false;
+            }
+        }
+    }
 
 	/**
 	 * Logout and clean the session.

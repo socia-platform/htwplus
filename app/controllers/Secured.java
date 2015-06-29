@@ -58,8 +58,9 @@ public class Secured extends Security.Authenticator {
 	 */
 	@Override
     public Result onUnauthorized(Context ctx) {
-		Logger.info("Unauthorized - Redirect to Login");
-		return ok(landingpage.render());
+        // cookie outdated? save originURL to prevent redirect to index page after login
+        ctx.session().put("originURL", ctx.request().path());
+		return unauthorized(landingpage.render());
     }
 
 	/**
@@ -71,6 +72,16 @@ public class Secured extends Security.Authenticator {
 		Account current = Component.currentAccount();
 		return current.role == AccountRole.ADMIN;
 	}
+
+    /**
+     * Returns true, if the currently logged in user is the @param user.
+     *
+     * @return True, if currentUser.id is @param id
+     */
+    public static boolean isMe(Long id) {
+        Account current = Component.currentAccount();
+        return current.equals(Account.findById(id));
+    }
 
 	/**
 	 * Returns true, if an account is member of a group.
@@ -301,6 +312,20 @@ public class Secured extends Security.Authenticator {
     }
 
     /**
+     * Returns true, if given account has bookmarked a specific post.
+     *
+     * @param account Account
+     * @param post Post
+     * @return true, if given account has bookmarked the given post
+     */
+    public static boolean isPostBookmarkedByAccount(Account account, Post post) {
+        if (post == null) {
+            return false;
+        }
+        return PostBookmark.isPostBookmarkedByAccount(account, post);
+    }
+
+    /**
      * Returns true if the post is still editable by the given account.
      * This includes the {@code isAllowedToEditPost} check
      *
@@ -465,6 +490,20 @@ public class Secured extends Security.Authenticator {
 		return Component.currentAccount().equals(account);
 	}
 
+    /**
+     * Returns true, if the currently logged in account is allowed to delete a specific account.
+     *
+     * @param account the account to be deleted
+     * @return True, if logged in account is allowed to delete the specified account
+     */
+    public static boolean deleteAccount(Account account) {
+        if(Secured.isAdmin())
+            return true;
+
+        Account current = Component.currentAccount();
+        return current.equals(account);
+    }
+
 	/**
 	 * Returns true, if the currently logged in account is allowed to upload media into a specific group.
 	 *
@@ -533,5 +572,9 @@ public class Secured extends Security.Authenticator {
 	public static boolean hasAccessToNotification(Notification notification) {
 		return notification.recipient.equals(Component.currentAccount());
 	}
+
+    public static boolean isNotNull(Object object) {
+        return object != null;
+    }
 
 }

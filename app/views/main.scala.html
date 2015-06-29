@@ -15,12 +15,12 @@
 	</head>
 	
 	<body>
-		@if(user != null){
-			@views.html.snippets.navi()
-			@views.html.snippets.breadcrumb()
-		}
-		
-		<div class="hp-container container" id="hp-top">
+        @if(user != null){
+            @views.html.snippets.navi()
+            @views.html.snippets.breadcrumb()
+            @views.html.snippets.feedFilter()
+        }
+		<div id="hp-top" class="hp-container container">
 
 			@if(!flash.isEmpty()) {
 				<div class="row">
@@ -53,8 +53,7 @@
                         <span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
                         <div class="hp-easy-feedback">Feedback</div>
                     </a>
-                    @views.html.snippets.notepad{ @content }
-
+                    @views.html.snippets.notepad(title) { @content }
 				</div> <!-- /col-xs-9 -->
 			</div> <!-- /row -->
 		</div> <!-- /container -->

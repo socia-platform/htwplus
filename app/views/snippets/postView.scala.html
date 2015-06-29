@@ -5,7 +5,7 @@
 
 <div class="hp-post-container hp-pagination-container">
 @defining(Component.currentAccount()) { currentUser =>
-	<br />
+
 	@views.html.snippets.deletePostModal(post.id)
 
 	<div class="well@if(post.isBroadcastMessage){ broadcast}">
@@ -35,6 +35,12 @@
                     }
 				</h4>
 				<small>@services.TemplateService.getDateColloquially(post.createdAt)</small>
+                @defining(Secured.isPostBookmarkedByAccount(currentUser, post)) {  bookmark =>
+                    <a href="#bookmark-@post.id" class="hp-post-bookmark-icon" rel="tooltip" data-original-title="Post @if(bookmark) {vergessen} else {merken}">
+                        <span class='glyphicon glyphicon-star@if(bookmark) {} else {-empty}'></span>
+                    </a>
+                }
+
 			</div>
 		</div>
 		<br />

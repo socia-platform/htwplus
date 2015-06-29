@@ -1,4 +1,4 @@
-@(user: Account)
+@(user: Account, adminOptions: Boolean = false)
 @import helper._
 
 <!-- confirmDeleteFriendModal -->
@@ -6,6 +6,11 @@
     @views.html.Friends.snippets.deleteFriendModal(user)
 </div>
 <!-- Ende confirmDeleteFriendModal -->
+
+<!-- confirmAccountDeleteModal -->
+@if(adminOptions) {
+    @views.html.Admin.snippets.deleteAccountModal(user)
+}
 
 <div class="dropdown">
     <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
@@ -38,6 +43,13 @@
             <span class="glyphicon glyphicon-user"></span><br>Profil
         </a></li>
 
+        }
+
+        @if(adminOptions) {
+            <li><a href="#hp-confirmDeleteModal@user.id" data-toggle="modal">
+                <span class="glyphicon glyphicon-remove"></span><br>
+                Account löschen
+            </a></li>
         }
 
     </ul>

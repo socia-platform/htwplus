@@ -4,6 +4,7 @@ import static play.data.Form.form;
 
 import models.Account;
 import models.Group;
+import models.Login;
 import models.Post;
 import models.enums.AccountRole;
 import models.services.ElasticsearchService;
@@ -84,6 +85,30 @@ public class AdminController extends BaseController {
 
 	}
 
+    @Transactional
+    public static Result deleteAccount(Long accountId) {
+        Account current = Account.findById(accountId);
+
+        if(!Secured.deleteAccount(current)) {
+            flash("error", Messages.get("profile.delete.nopermission"));
+            return redirect(controllers.routes.AdminController.listAccounts());
+        }
+
+        DynamicForm df = play.data.Form.form().bindFromRequest();
+        if(!df.get("confirmText").toLowerCase().equals("account wirklich löschen")) {
+            flash("error", Messages.get("admin.delete_account.wrongconfirm"));
+            return redirect(controllers.routes.AdminController.listAccounts());
+        }
+
+        // ACTUAL DELETION //
+        Logger.info("Deleting Account[#"+current.id+"]...");
+        current.delete();
+
+        // override logout message
+        flash("success", Messages.get("admin.delete_account.success"));
+        return redirect(routes.AdminController.listAccounts());
+    }
+
     public static Result indexing() {
         return ok(indexing.render());
     }
@@ -93,10 +118,8 @@ public class AdminController extends BaseController {
             ElasticsearchService.deleteIndex();
             flash("info","index gelöscht");
         } catch(IndexMissingException ime) {
-            Logger.info("index "+ime.getMessage());
             flash("error","index "+ime.getMessage());
         } catch(NoNodeAvailableException nna) {
-            Logger.error(nna.getMessage());
             flash("error",nna.getMessage());
         }
 
@@ -104,24 +127,24 @@ public class AdminController extends BaseController {
     }
 
     public static Result indexSettings() throws IOException {
-        try {
-            ElasticsearchService.createAnalyzer();
-            ElasticsearchService.createMapping();
-            flash("success","Mapping und Anazyler erfolgreich erstellt!");
-        } catch(NoNodeAvailableException nnae) {
-            Logger.error(nnae.getMessage());
-            flash("error",nnae.getMessage());
-        } catch(IndexAlreadyExistsException iaee) {
-            Logger.info("index "+iaee.getMessage());
-            flash("error","index "+iaee.getMessage());
+        if (ElasticsearchService.isClientAvailable()) {
+            if (!ElasticsearchService.isIndexExists()) {
+                ElasticsearchService.createAnalyzer();
+                ElasticsearchService.createMapping();
+                flash("success","Mapping und Anazyler erfolgreich erstellt!");
+            } else {
+                flash("error","Index bereits vorhanden.");
+            }
+        } else {
+            flash("error", "Elasticsearch nicht erreichbar!");
         }
+
         return ok(indexing.render());
     }
 
     public static Result indexAccounts() throws IOException {
         long time = Account.indexAllAccounts();
         String out = "Alle Accounts indexiert ("+Long.toString(time)+"ms)";
-        Logger.info(out);
         flash("info",out);
         return ok(indexing.render());
     }
@@ -129,7 +152,6 @@ public class AdminController extends BaseController {
     public static Result indexGroups() throws IOException {
         long time = Group.indexAllGroups();
         String out = "Alle Gruppen indexiert ("+Long.toString(time)+"ms)";
-        Logger.info(out);
         flash("info",out);
         return ok(indexing.render());
     }
@@ -137,7 +159,6 @@ public class AdminController extends BaseController {
     public static Result indexPosts() throws IOException {
         long time = Post.indexAllPosts();
         String out = "Alle Posts indexiert ("+Long.toString(time)+"ms)";
-        Logger.info(out);
         flash("info",out);
         return ok(indexing.render());
     }

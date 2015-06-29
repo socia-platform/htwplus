@@ -8,10 +8,8 @@ import models.services.NotificationService;
 import play.Play;
 import play.api.mvc.Call;
 import play.data.Form;
-import play.db.jpa.JPA;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
-import play.libs.F;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Post.view;
@@ -21,6 +19,7 @@ public class PostController extends BaseController {
 	
 	static Form<Post> postForm = Form.form(Post.class);
 	static final int PAGE = 1;
+    static final String STREAM_FILTER = "all";
 	
 	public static Result view (Long id) {
 		Post post = Post.findById(id);
@@ -81,7 +80,7 @@ public class PostController extends BaseController {
 		
 		if (target.equals(Post.PROFILE)) {
 			Account profile = Account.findById(anyId);
-			if (Secured.isFriend(profile) || profile.equals(account) || Secured.isAdmin()) {
+			if (Secured.isNotNull(profile) && (Secured.isFriend(profile) || profile.equals(account) || Secured.isAdmin())) {
 				if (filledForm.hasErrors()) {
 					flash("error", Messages.get("post.try_with_content"));
 				} else {
@@ -103,7 +102,7 @@ public class PostController extends BaseController {
 		
 		if (target.equals(Post.STREAM)) {
 			Account profile = Account.findById(anyId);
-			if(profile.equals(account)){
+			if(Secured.isNotNull(profile) && profile.equals(account)){
 				if (filledForm.hasErrors()) {
 					flash("error", Messages.get("post.try_with_content"));
 				} else {
@@ -112,11 +111,11 @@ public class PostController extends BaseController {
 					post.owner = account;
 					post.create();
 				}
-				return redirect(controllers.routes.Application.stream(PAGE, false));
+				return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE, false));
 			}
             
 			flash("info", Messages.get("post.post_on_stream_only"));
-			return redirect(controllers.routes.Application.stream(PAGE, false));
+			return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE, false));
 		}
         
 		return redirect(controllers.routes.Application.index());
@@ -251,9 +250,6 @@ public class PostController extends BaseController {
 					routesTo = controllers.routes.Application.index();
 				}
 			}
-			
-			
-			
 			post.delete();
 			flash("success", "Gelöscht!");
 			
@@ -267,4 +263,22 @@ public class PostController extends BaseController {
 
 		return redirect(routesTo);
 	}
+
+    public static Result bookmarkPost(Long postId) {
+        Account account = Component.currentAccount();
+        Post post = Post.findById(postId);
+        String returnStatement = "";
+
+        if(Secured.viewPost(post)) {
+            PostBookmark possibleBookmark = PostBookmark.findByAccountAndPost(account, post);
+            if(possibleBookmark == null) {
+                new PostBookmark(account, post).create();
+                returnStatement = "setBookmark";
+            } else {
+                possibleBookmark.delete();
+                returnStatement = "removeBookmark";
+            }
+        }
+        return ok(returnStatement);
+    }
 }

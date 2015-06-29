@@ -63,6 +63,11 @@ public class Media extends BaseNotifiable implements INotifiable {
 			return null;
 		}
 	}
+
+    @SuppressWarnings("unchecked")
+    public static List<Media> listAllOwnedBy(Long id) {
+        return JPA.em().createQuery("FROM Media m WHERE m.owner.id = "+id).getResultList();
+    }
 	
 	public boolean existsInGroup(Group group) {
 		List<Media> media = group.media;

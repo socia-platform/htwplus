@@ -1,4 +1,4 @@
-@(users: List[Account])
+@(users: List[Account], adminOptions: Boolean = false)
 @import models.enums.GroupType
 @import helper._
 	
@@ -24,7 +24,7 @@
 				<td>@views.html.snippets.userLink(user)</td>
 				<td class="hp-optionsMenu">
                     @if(user != Component.currentAccount) {
-                        @views.html.snippets.accountOptionMenu(user)
+                        @views.html.snippets.accountOptionMenu(user, adminOptions)
                     }
 				</td>
 			</tr>

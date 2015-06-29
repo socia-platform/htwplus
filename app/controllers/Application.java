@@ -54,9 +54,9 @@ public class Application extends BaseController {
 
 	@Security.Authenticated(Secured.class)
 	public static Result index() {
-		Navigation.set(Level.STREAM);
+		Navigation.set(Level.STREAM, "Alles");
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount), LIMIT, PAGE));
+		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
 	}
 	
 	public static Result help() {
@@ -65,14 +65,29 @@ public class Application extends BaseController {
 	}
 	
 	@Security.Authenticated(Secured.class)
-	public static Result stream(int page, boolean raw) {
-        Navigation.set(Level.STREAM);
+	public static Result stream(String filter, int page, boolean raw) {
+        switch (filter) {
+            case "account":
+                Navigation.set(Level.STREAM, "Eigene Posts");
+                break;
+            case "group":
+                Navigation.set(Level.STREAM, "Gruppen");
+                break;
+            case "contact":
+                Navigation.set(Level.STREAM, "Kontakte");
+                break;
+            case "bookmark":
+                Navigation.set(Level.STREAM, "Favoriten");
+                break;
+            default:
+                Navigation.set(Level.STREAM, "Alles");
+        }
 		Account currentAccount = Component.currentAccount();
 
         if(raw) {
-            return ok(streamRaw.render(Post.getStream(currentAccount, LIMIT, page), postForm, Post.countStream(currentAccount), LIMIT, page));
+            return ok(streamRaw.render(Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
         } else {
-            return ok(stream.render(currentAccount, Post.getStream(currentAccount, LIMIT, page), postForm, Post.countStream(currentAccount), LIMIT, page));
+            return ok(stream.render(currentAccount, Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
         }
 	}
 
@@ -82,12 +97,13 @@ public class Application extends BaseController {
     }
 
     public static Result searchHome() {
+        Navigation.set(Level.SEARCH);
         return ok(search.render());
     }
 	
 	@Security.Authenticated(Secured.class)
 	public static Result search(int page) throws ExecutionException, InterruptedException {
-        Navigation.set("Suche");
+        Navigation.set(Level.SEARCH);
         Account currentAccount = Component.currentAccount();
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();
@@ -107,8 +123,6 @@ public class Application extends BaseController {
             keyword=keyword.replaceAll("\\"+s, "");
             flash("info","Dein Suchwort enthielt ungültige Zeichen, die für die Suche entfernt wurden!");
         }
-
-        Logger.info(currentAccount.id + " is searching for: "+keyword+" on mode: "+mode);
 
         List<Object> resultList = new ArrayList<>();
 
@@ -165,8 +179,6 @@ public class Application extends BaseController {
                     break;
             }
         }
-
-        Logger.info("found: "+userCount+" users, "+groupCount+" groups and "+postCount+" posts.");
 
         return ok(views.html.searchresult.render(keyword, mode, page, LIMIT, resultList, response.getTookInMillis(), userCount+groupCount+postCount, userCount, groupCount, postCount));
 	}

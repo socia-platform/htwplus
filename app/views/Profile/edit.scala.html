@@ -1,4 +1,4 @@
-@(profile: Account, profileForm: Form[Account])
+@(profile: Account, profileForm: Form[Account], loginForm: Form[Login])
 @import helper._
 @import models._
 @import models.enums._
@@ -6,6 +6,7 @@
 @main("Editieren") {
 
 @views.html.Profile.snippets.navTabs(profile)
+@views.html.Profile.snippets.deleteModal(profile, loginForm)
 <h2>Profil bearbeiten</h2>
 <br>
 
@@ -124,6 +125,9 @@
 		</dd>
 
 	</dl>
+    <div class="pull-left">
+        <a id="hp-delete-account" href="#hp-deleteModal" data-toggle="modal"><button class="btn btn-danger">ACCOUNT LÖSCHEN</button></a>
+    </div>
 	<div class="pull-right">
 		<input type="hidden" id="avatar" name="avatar" value="">
 		<input type="submit" class="btn btn-warning" value="Speichern">

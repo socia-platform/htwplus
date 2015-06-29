@@ -52,11 +52,10 @@ public class GroupController extends BaseController {
 
         return ok(view.render(group));
     }
-		
+
 	@Transactional(readOnly=true)
 	public static Result stream(Long id, int page, boolean raw) {
 		Group group = Group.findById(id);
-        Logger.info("Show group with id: " +id+group.type);
 
         if(!Secured.viewGroup(group)){
 			return redirect(routes.GroupController.view(group.id));
