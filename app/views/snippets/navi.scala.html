@@ -78,7 +78,7 @@
                         </a>
                         <ul class="dropdown-menu hp-dropdown-menu" role="menu">
                             @if(Secured.isAdmin()) {
-                                <li><a href="@routes.AdminController.index()">Control Center</a></li>
+                                <li><a href="@routes.AdminController.index()" style="color: red">Control Center</a></li>
                             }
                             <li><a href="@routes.ProfileController.stream(user.id)">Mein öffentlicher Newsstream</a></li>
                             <li><a href="@routes.ProfileController.me()">Mein Profil ansehen</a></li>

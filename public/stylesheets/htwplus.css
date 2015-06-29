@@ -419,10 +419,6 @@ div[id*='hp-feature-text-'] table {
 
 /*============================== Navigation ==============================*/
 
-.hp-dropdown-menu li:first-child a {
-    color: red;
-}
-
 .navbar-right li a.hp-nav-user {
     padding: 9px 10px;
 }
