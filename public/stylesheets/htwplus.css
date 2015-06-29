@@ -729,6 +729,11 @@ div.hp-sitenav {
     margin-bottom: 10px;
 }
 
+div.hp-sitenav hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 div.addmargin {
     margin-top: 45px;
 }
