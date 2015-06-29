@@ -2,9 +2,7 @@ package controllers;
 
 import com.typesafe.config.ConfigFactory;
 import controllers.Navigation.Level;
-import models.Account;
-import models.Group;
-import models.Post;
+import models.*;
 import models.services.ElasticsearchService;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.elasticsearch.action.search.SearchResponse;
@@ -53,7 +51,7 @@ public class Application extends BaseController {
 	public static Result index() {
 		Navigation.set(Level.STREAM, "Alles");
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
+		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all", GroupAccount.findEstablished(currentAccount), Friendship.findFriends(currentAccount)));
 	}
 	
 	public static Result help() {

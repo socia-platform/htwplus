@@ -1,9 +1,27 @@
-@(currentUser: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String)
+@(currentUser: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String, groups: List[Group], contacts: List[Account])
 
 @main("Newsstream") {
+    @views.html.snippets.feedFilter()
+    <div class="row">
+        <div class="col-lg-9" role="main">
+            <div class="hp-notepad-content">
+                <br />
+                @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
 
-    <br />
-	@views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
-
-    @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage, filter)
+                @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage, filter)
+            </div>
+        </div>
+        <div class="col-lg-3" role="complementary">
+            <nav class="hidden-xs hidden-sm">
+                <div class="hp-sitenav">
+                    <b><span class="glyphicon glyphicon-user"></span> Kontakte</b>
+                    @views.html.Friends.snippets.listAccountsLight(contacts)
+                </div>
+                <div class="hp-sitenav">
+                    <b><span class="glyphicon glyphicon-list"></span> Gruppen & Kurse</b>
+                    @views.html.Group.snippets.listGroupsLight(groups, currentUser)
+                </div>
+            </nav>
+        </div>
+    </div>
 }
