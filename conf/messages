@@ -59,6 +59,9 @@ landingpage.features.newsstream.description=Dein persönlicher Newsstream hält 
 landingpage.features.notifications.title=Keine Neuigkeiten verpassen
 landingpage.features.notifications.description=Ob neue Posts, Kommentare, Freundschaftsanfragen oder Gruppeneinladungen - du wirst über alles informiert. Auf Wunsch auch per Email.
 
+# --- Main page
+mainpage.backtotop=Nach oben
+
 # --- LDAP connector
 ldap.noConnection=Keine Verbindung zum LDAP-Server möglich. Bitte versuche es später noch einmal.
 ldap.wrongCredentials=Ungültiges Passwort und/oder Matrikelnummer.

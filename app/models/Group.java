@@ -189,7 +189,7 @@ public class Group extends BaseNotifiable implements INotifiable {
     @Override
     public String getTargetUrl() {
         if (this.type.equals(Group.GROUP_REQUEST_SUCCESS)) {
-            return controllers.routes.GroupController.stream(this.id, 1).toString();
+            return controllers.routes.GroupController.stream(this.id, 1, false).toString();
         }
 
         return controllers.routes.GroupController.index().toString();

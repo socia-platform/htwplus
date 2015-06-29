@@ -19,11 +19,5 @@
 }
 	@views.html.snippets.postForm(user.id, models.Post.PROFILE, postForm)
 		
-	@if(posts != null) {
-		@for(post <- posts) {
-			@views.html.snippets.postView(post, postForm, models.Post.PROFILE, Play.application().configuration().getInt("htwplus.comments.init"))
-		}
-	}
-	
-	@views.html.pagination(count, limit, currentPage, routes.ProfileController.stream(user.id).toString, "?")
+	@views.html.Profile.snippets.streamRaw(user, posts, postForm, count, limit, currentPage)
 }

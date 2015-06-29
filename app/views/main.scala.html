@@ -20,7 +20,7 @@
             @views.html.snippets.breadcrumb()
             @views.html.snippets.feedFilter()
         }
-		<div class="hp-container container">
+		<div id="hp-top" class="hp-container container">
 
 			@if(!flash.isEmpty()) {
 				<div class="row">
@@ -57,30 +57,16 @@
 				</div> <!-- /col-xs-9 -->
 			</div> <!-- /row -->
 		</div> <!-- /container -->
-	
-		<footer>
-			<div class="container">
-				<div class="row">
-					<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
-						<div id="hp-footer">
-							<div id="hp-footer-links">
-								<a href="@routes.Application.index()" data-toggle="modal">Home</a> |
-								<a href="#impressumModal" data-toggle="modal">Impressum</a> |
-								<a href="#datenschutzModal" data-toggle="modal">Datenschutz</a> |
-								<a href="@routes.Application.feedback()">Feedback</a> |
-								<a href="@routes.Application.feedback()">Kontakt</a> |
-								<a href="@routes.Application.help()">Hilfe</a>
-							</div>
-							<div id="hp-footer-logo"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-			@views.html.snippets.impressumModal()
-			@views.html.snippets.datenschutzModal()
-		</footer>
 
+        @views.html.snippets.impressumModal()
+        @views.html.snippets.datenschutzModal()
 
+        <!-- 'Go to top' link -->
+        <span id="hp-top-link" class="hidden">
+            <a href="#hp-top" class="btn btn-success">
+                <i class="glyphicon glyphicon-chevron-up"></i> @Messages("mainpage.backtotop")
+            </a>
+        </span>
 
 		<script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
         <script type="text/javascript" src='@routes.Assets.at("bower_components/jquery/dist/jquery.min.js")'></script>

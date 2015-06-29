@@ -1,14 +1,16 @@
 package controllers;
 
 import com.typesafe.config.ConfigFactory;
+import controllers.Navigation.Level;
 import models.Account;
 import models.Group;
 import models.Post;
 import models.services.ElasticsearchService;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.apache.commons.lang3.*;
 import play.Logger;
 import play.Routes;
 import play.data.Form;
@@ -18,6 +20,8 @@ import play.mvc.Security;
 import views.html.*;
 import controllers.Navigation.Level;
 import org.elasticsearch.action.search.SearchResponse;
+import models.services.AvatarService;
+import views.html.snippets.streamRaw;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,7 +65,7 @@ public class Application extends BaseController {
 	}
 	
 	@Security.Authenticated(Secured.class)
-	public static Result stream(String filter, int page) {
+	public static Result stream(String filter, int page, boolean raw) {
         switch (filter) {
             case "account":
                 Navigation.set(Level.STREAM, "Eigene Posts");
@@ -79,7 +83,12 @@ public class Application extends BaseController {
                 Navigation.set(Level.STREAM, "Alles");
         }
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getFilteredStream(currentAccount, LIMIT, page, filter),postForm,Post.countStream(currentAccount, filter), LIMIT, page, filter));
+
+        if(raw) {
+            return ok(streamRaw.render(Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
+        } else {
+            return ok(stream.render(currentAccount, Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
+        }
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
