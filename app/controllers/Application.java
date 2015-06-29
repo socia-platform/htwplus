@@ -18,9 +18,6 @@ import play.db.jpa.Transactional;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.*;
-import controllers.Navigation.Level;
-import org.elasticsearch.action.search.SearchResponse;
-import models.services.AvatarService;
 import views.html.snippets.streamRaw;
 
 import java.util.ArrayList;

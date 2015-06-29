@@ -1,11 +1,9 @@
 @(currentUser: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String)
 
-@import play._
-
 @main("Newsstream") {
 
     <br />
 	@views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
 
-    @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage)
+    @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage, filter)
 }
