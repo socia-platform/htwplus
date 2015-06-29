@@ -416,6 +416,9 @@ div[id*='hp-feature-text-'] table {
 	-webkit-transform: rotate(345deg);
 }
 
+#hp-navbar li a .glyphicon {
+   color: inherit !important
+}
 
 /*============================== Navigation ==============================*/
 
