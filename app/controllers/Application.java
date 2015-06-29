@@ -186,10 +186,9 @@ public class Application extends BaseController {
 	}
 	
 	public static Result feedback() {
-		Navigation.set("Feedback");
-		return ok(feedback.render(postForm));
-		
-	}
+        Navigation.set("Feedback");
+        return ok(feedback.render(postForm));
+    }
 	
 	public static Result addFeedback() {
 		
@@ -208,13 +207,23 @@ public class Application extends BaseController {
 		} else {
 			Post p = filledForm.get();
 			p.owner = account;
-			p.group = group;
-			p.create();
-			flash("success","Vielen Dank für Dein Feedback!");
+            p.group = group;
+            p.create();
+            flash("success","Vielen Dank für Dein Feedback!");
 		}
 
 		return redirect(controllers.routes.Application.index());
 	}
+
+    public static Result imprint() {
+        Navigation.set("Impressum");
+        return ok(imprint.render());
+    }
+
+    public static Result privacy() {
+        Navigation.set("Datenschutzerklärung");
+        return ok(privacy.render());
+    }
 
 	public static Result defaultRoute(String path) {
 		Logger.info(path+" nicht gefunden");

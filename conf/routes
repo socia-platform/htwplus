@@ -13,6 +13,8 @@ GET         /logout                                    controllers.AccountContro
 GET         /help                                      controllers.Application.help()
 GET         /feedback                                  controllers.Application.feedback()
 POST        /feedback/add                              controllers.Application.addFeedback()
+GET         /imprint                                   controllers.Application.imprint()
+GET         /privacy                                   controllers.Application.privacy()
 GET         /404                                       controllers.Application.error()
 
 # JavaScript Routes
@@ -63,7 +65,7 @@ GET         /user/:id/avatar                           controllers.ProfileContro
 POST        /user/:id/edit                             controllers.ProfileController.update(id:Long)
 GET         /user/:id/stream                           controllers.ProfileController.stream(id:Long,page: Integer ?= 1, raw: Boolean ?= false)
 GET         /user/:id/groups                           controllers.ProfileController.groups(id:Long)
-POST 	/user/:id/delete					           controllers.ProfileController.deleteProfile(id:Long)
+POST        /user/:id/delete                           controllers.ProfileController.deleteProfile(id:Long)
 
 
 #Friends
@@ -93,21 +95,21 @@ GET         /websocket                                 controllers.WebSocketCont
 GET         /assets/*file                              controllers.Assets.at(path="/public", file)
 
 # Admin
-GET		/admin								controllers.AdminController.index()
-GET		/admin/user/create					controllers.AdminController.createAccountForm()
-POST	/admin/user/create					controllers.AdminController.createAccount()
-POST    /admin/user/:id/delete				controllers.AdminController.deleteAccount(id: Long)
-GET		/admin/user/list					controllers.AdminController.listAccounts()
-GET		/admin/media/						controllers.AdminController.viewMediaTemp()
-GET		/admin/media/clean					controllers.AdminController.cleanMediaTemp()
-GET     /admin/broadcast_notification       controllers.AdminController.broadcastNotificationForm()
-POST    /admin/broadcast_notification       controllers.AdminController.broadcastNotification()
-GET     /admin/indexing                     controllers.AdminController.indexing()
-GET     /admin/indexing/accounts            controllers.AdminController.indexAccounts()
-GET     /admin/indexing/groups              controllers.AdminController.indexGroups()
-GET     /admin/indexing/posts               controllers.AdminController.indexPosts()
-GET     /admin/indexing/indexSettings       controllers.AdminController.indexSettings()
-GET     /admin/indexing/indexDelete         controllers.AdminController.indexDelete()
+GET         /admin                                     controllers.AdminController.index()
+GET         /admin/user/create                         controllers.AdminController.createAccountForm()
+POST        /admin/user/create                         controllers.AdminController.createAccount()
+POST        /admin/user/:id/delete                     controllers.AdminController.deleteAccount(id: Long)
+GET         /admin/user/list                           controllers.AdminController.listAccounts()
+GET         /admin/media/                              controllers.AdminController.viewMediaTemp()
+GET         /admin/media/clean                         controllers.AdminController.cleanMediaTemp()
+GET         /admin/broadcast_notification              controllers.AdminController.broadcastNotificationForm()
+POST        /admin/broadcast_notification              controllers.AdminController.broadcastNotification()
+GET         /admin/indexing                            controllers.AdminController.indexing()
+GET         /admin/indexing/accounts                   controllers.AdminController.indexAccounts()
+GET         /admin/indexing/groups                     controllers.AdminController.indexGroups()
+GET         /admin/indexing/posts                      controllers.AdminController.indexPosts()
+GET         /admin/indexing/indexSettings              controllers.AdminController.indexSettings()
+GET         /admin/indexing/indexDelete                controllers.AdminController.indexDelete()
 
 
 
