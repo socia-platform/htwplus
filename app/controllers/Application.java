@@ -140,20 +140,26 @@ public class Application extends BaseController {
         for (SearchHit searchHit : response.getHits().getHits()) {
             switch (searchHit.type()) {
                 case "user":
-                    resultList.add(Account.findById(Long.parseLong(searchHit.getId())));
+                    Account account = Account.findById(Long.parseLong(searchHit.getId()));
+                    if(account != null)
+                        resultList.add(account);
                     break;
                 case "post":
                     Post post = Post.findById(Long.parseLong(searchHit.getId()));
-                    String searchContent = post.content;
-                    if(!searchHit.getHighlightFields().isEmpty())
-                        searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
-                    post.searchContent = StringEscapeUtils.escapeHtml4(searchContent)
-                            .replace("[startStrong]","<strong>")
-                            .replace("[endStrong]","</strong>");
-                    resultList.add(post);
+                    if(post != null) {
+                        String searchContent = post.content;
+                        if (!searchHit.getHighlightFields().isEmpty())
+                            searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
+                        post.searchContent = StringEscapeUtils.escapeHtml4(searchContent)
+                                .replace("[startStrong]", "<strong>")
+                                .replace("[endStrong]", "</strong>");
+                        resultList.add(post);
+                    }
                     break;
                 case "group":
-                    resultList.add(Group.findById(Long.parseLong(searchHit.getId())));
+                    Group group = Group.findById(Long.parseLong(searchHit.getId()));
+                    if(group != null)
+                        resultList.add(group);
                     break;
                 default: Logger.info("no matching case for ID: "+searchHit.getId());
             }
