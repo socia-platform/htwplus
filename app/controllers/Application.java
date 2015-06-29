@@ -51,7 +51,7 @@ public class Application extends BaseController {
 	public static Result index() {
 		Navigation.set(Level.STREAM, "Alles");
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
+		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all", GroupAccount.findGroupsEstablished(currentAccount), Friendship.findFriends(currentAccount)));
 	}
 	
 	public static Result help() {
@@ -82,12 +82,12 @@ public class Application extends BaseController {
         if(raw) {
             return ok(streamRaw.render(Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
         } else {
-            return ok(stream.render(currentAccount, Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
+            return ok(stream.render(currentAccount, Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter, GroupAccount.findGroupsEstablished(currentAccount), Friendship.findFriends(currentAccount)));
         }
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        SearchResponse response = ElasticsearchService.doSearch("searchSuggestions", query, "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
+        SearchResponse response = ElasticsearchService.doSearch("searchSuggestions", query, "all", 1, Component.currentAccount().id.toString(), asList("name", "title"), asList("user.friends", "group.member"));
         return ok(response.toString());
     }
 
