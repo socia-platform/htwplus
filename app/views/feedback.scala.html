@@ -2,22 +2,26 @@
 @import helper._
 
 @main("Feedback") {
+    <div class="row">
+        <div class="col-lg-12" role="main">
+            <div class="hp-notepad-content addmargin">
+                <h1>
+                    <strong>Feedback</strong>
+                </h1>
 
-<h1>
-	<strong>Feedback</strong>
-</h1>
-
-<br />
-@form(routes.Application.addFeedback(), 'class -> "hp-post-form", 'id -> "addPost") {
-	<div class="hp-horizontal-form col-xs-12">
-		<div class="input-group">
-			@textarea(postForm("Content"), 'class -> "form-control", 'id -> "hp-feedback-content", 'placeholder -> "Bei Problemen bitte die E-Mail Adresse mit angeben!")
-			<span class="input-group-btn">
-				<button type="submit" class="btn btn-warning">Abschicken</button> 
-			</span>
-		</div>
-	</div>
-	<div>Oder möchtest du uns lieber direkt eine <a href="mailto:wecare@@htwplus.de?Subject=Feedback" target="_top">E-Mail schicken</a> ?</div>
-}
-
+                <br />
+                @form(routes.Application.addFeedback(), 'class -> "hp-post-form", 'id -> "addPost") {
+                    <div class="hp-horizontal-form col-xs-12">
+                        <div class="input-group">
+                            @textarea(postForm("Content"), 'class -> "form-control", 'id -> "hp-feedback-content", 'placeholder -> "Bei Problemen bitte die E-Mail Adresse mit angeben!")
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-warning">Abschicken</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div>Oder möchtest du uns lieber direkt eine <a href="mailto:wecare@@htwplus.de?Subject=Feedback" target="_top">E-Mail schicken</a> ?</div>
+                }
+            </div>
+        </div>
+    </div>
 }

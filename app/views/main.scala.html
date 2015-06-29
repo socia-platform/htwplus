@@ -15,16 +15,19 @@
 	</head>
 	
 	<body>
+        <a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
+            <span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
+            <div class="hp-easy-feedback">Feedback</div>
+        </a>
         @if(user != null){
             @views.html.snippets.navi()
             @views.html.snippets.breadcrumb()
             @views.html.snippets.feedFilter()
         }
-		<div id="hp-top" class="hp-container container">
-
+		<div id="hp-top" class="container">
 			@if(!flash.isEmpty()) {
 				<div class="row">
-					<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
+					<div class="col-lg-12">
 						@if(flash.containsKey("success")) {
 							<div class="alert alert-success fade in">
 								<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
@@ -46,18 +49,13 @@
 					</div>
 				</div>
 			}
-
-			<div class="row">
-				<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
-                    <a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
-                        <span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
-                        <div class="hp-easy-feedback">Feedback</div>
-                    </a>
-                    @views.html.snippets.notepad(title) { @content }
-				</div> <!-- /col-xs-9 -->
-			</div> <!-- /row -->
 		</div> <!-- /container -->
 
+        <div class="container">
+        @views.html.snippets.notepad(title) { @content }
+        </div>
+        
+        
         @views.html.snippets.impressumModal()
         @views.html.snippets.datenschutzModal()
 
