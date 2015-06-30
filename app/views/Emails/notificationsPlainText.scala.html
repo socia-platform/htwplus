@@ -1,5 +1,6 @@
 @(notifications: List[Notification], recipient: Account)
 @import helper._
+@import com.typesafe.config.ConfigFactory
 
 @if(notifications.size > 1) {
 @Html(Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size)).toString().replaceAll("\\<[^>]*>", "")
@@ -11,4 +12,4 @@
 @notification.rendered.replaceAll("\\<[^>]*>", "")
 }}
 Seite besuchen:
-@defining("https://localhost:9000") { baseURL =>@if(notifications.size > 1) {@baseURL@controllers.routes.NotificationController.showAll(1)} else {@baseURL@controllers.routes.NotificationController.forward(notifications(0).id)}}
+@defining(ConfigFactory.load().getString("htwplus.base_url")) { baseURL =>@if(notifications.size > 1) {@baseURL@controllers.routes.NotificationController.showAll(1)} else {@baseURL@controllers.routes.NotificationController.forward(notifications(0).id)}}

@@ -1,7 +1,8 @@
 @(notifications: List[Notification], recipient: Account)
 @import helper._
+@import com.typesafe.config.ConfigFactory
 
-@defining("https://localhost:9000") { baseURL=>
+@defining(ConfigFactory.load().getString("htwplus.base_url")) { baseURL=>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
