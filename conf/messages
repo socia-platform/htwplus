@@ -33,6 +33,7 @@ error.fileToBig=Die Datei ist zu groß
 error.contentTypeNotSupported=Das Dateiformat wird nicht unterstützt
 error.resolutionLow=Die Auflösung ist zu gering
 error.resolutionHigh=Die Auflösung ist zu hoch
+error.access_denied=Darauf hast du keinen Zugriff!
 
 # --- authenticate
 authenticate.matriculationNumberMissing=Also deine Matrikelnummer brauchen wir schon!
