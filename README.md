@@ -16,11 +16,10 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 ### Setup
 
 * Clone this repository
-* Copy conf/application.sample.conf to application.conf
+* Copy conf/application.sample.conf to conf/application.conf
 * Edit the application.conf
  * Provide database settings
  * Provide media.path and media.tempPath
-* Copy conf/META-INF/persistence.sample.xml to persistence.xml
 * Open the repository directory in shell
 * Install Node.js packages with `npm install`
 * Install frontend dependencies with Bower

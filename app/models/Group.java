@@ -145,6 +145,11 @@ public class Group extends BaseNotifiable implements INotifiable {
         return JPA.em().createQuery("FROM Group").getResultList();
 	}
 
+    @SuppressWarnings("unchecked")
+    public static List<Group> listAllGroupsOwnedBy(Long id) {
+        return JPA.em().createQuery("FROM Group g WHERE g.owner.id = "+id).getResultList();
+    }
+
     /**
      * Returns true, if an account is member of a group.
      *
@@ -184,7 +189,7 @@ public class Group extends BaseNotifiable implements INotifiable {
     @Override
     public String getTargetUrl() {
         if (this.type.equals(Group.GROUP_REQUEST_SUCCESS)) {
-            return controllers.routes.GroupController.stream(this.id, 1).toString();
+            return controllers.routes.GroupController.stream(this.id, 1, false).toString();
         }
 
         return controllers.routes.GroupController.index().toString();

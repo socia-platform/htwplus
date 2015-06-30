@@ -17,6 +17,7 @@ import play.mvc.Call;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Group.*;
+import views.html.Group.snippets.streamRaw;
 
 
 @Transactional
@@ -45,27 +46,29 @@ public class GroupController extends BaseController {
             return redirect(controllers.routes.GroupController.index());
         }
         if (Secured.viewGroup(group)) {
-            return redirect(routes.GroupController.stream(group.id, PAGE));
+            return redirect(routes.GroupController.stream(group.id, PAGE, false));
         }
         Navigation.set(Level.GROUPS, "Info", group.title, controllers.routes.GroupController.view(group.id));
 
         return ok(view.render(group));
     }
-		
+
 	@Transactional(readOnly=true)
-	public static Result stream(Long id, int page) {
+	public static Result stream(Long id, int page, boolean raw) {
 		Group group = Group.findById(id);
-        Logger.info("Show group with id: " +id+group.type);
 
         if(!Secured.viewGroup(group)){
 			return redirect(routes.GroupController.view(group.id));
 		}
 
-        Navigation.set(Level.GROUPS, "Newsstream", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
+        Navigation.set(Level.GROUPS, "Newsstream", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
         List<Post> posts = Post.getPostsForGroup(group, LIMIT, page);
 
-        return ok(stream.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page));
-
+        if(raw) {
+            return ok(streamRaw.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page));
+        } else {
+            return ok(stream.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page));
+        }
 	}
 	
 	@Transactional(readOnly=true)
@@ -80,7 +83,7 @@ public class GroupController extends BaseController {
 		if (group == null) {
 			return redirect(controllers.routes.GroupController.index());
 		} else {
-			Navigation.set(Level.GROUPS, "Media", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
+			Navigation.set(Level.GROUPS, "Media", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
 			List<Media> mediaSet = group.media; 
 			return ok(media.render(group, mediaForm, mediaSet));
 		}
@@ -142,7 +145,7 @@ public class GroupController extends BaseController {
 			
 			group.createWithGroupAccount(Component.currentAccount());
 			flash("success", successMsg+" erstellt!");
-			return redirect(controllers.routes.GroupController.stream(group.id, PAGE));
+			return redirect(controllers.routes.GroupController.stream(group.id, PAGE, false));
 		}
 	}
 
@@ -154,7 +157,7 @@ public class GroupController extends BaseController {
 		if (group == null) {
 			return redirect(controllers.routes.GroupController.index());
 		} else {
-			Navigation.set(Level.GROUPS, "Bearbeiten", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
+			Navigation.set(Level.GROUPS, "Bearbeiten", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
 			Form<Group> groupForm = Form.form(Group.class).fill(group);
 			groupForm.data().put("type", String.valueOf(group.groupType.ordinal()));
 			return ok(edit.render(group, groupForm));
@@ -164,7 +167,7 @@ public class GroupController extends BaseController {
 	@Transactional
 	public static Result update(Long groupId) {
 		Group group = Group.findById(groupId);
-		Navigation.set(Level.GROUPS, "Bearbeiten", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
+		Navigation.set(Level.GROUPS, "Bearbeiten", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
 		
 		// Check rights
 		if(!Secured.editGroup(group)) {
@@ -201,7 +204,7 @@ public class GroupController extends BaseController {
 		group.description = description;
 		group.update();
 		flash("success", "'" + group.title + "' erfolgreich bearbeitet!");
-		return redirect(controllers.routes.GroupController.stream(groupId, PAGE));
+		return redirect(controllers.routes.GroupController.stream(groupId, PAGE, false));
 		
 	}
 
@@ -219,7 +222,7 @@ public class GroupController extends BaseController {
 	
 	public static Result token(Long groupId) {
 		Group group = Group.findById(groupId);
-		Navigation.set(Level.GROUPS, "Token eingeben", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
+		Navigation.set(Level.GROUPS, "Token eingeben", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
 		return ok(token.render(group, groupForm));
 	}
 	
@@ -228,10 +231,10 @@ public class GroupController extends BaseController {
 		
 		if(Secured.isMemberOfGroup(group, Component.currentAccount())){
 			flash("error", "Du bist bereits Mitglied dieser Gruppe!");
-			return redirect(controllers.routes.GroupController.stream(groupId, PAGE));
+			return redirect(controllers.routes.GroupController.stream(groupId, PAGE, false));
 		}
 		
-		Navigation.set(Level.GROUPS, "Token eingeben", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
+		Navigation.set(Level.GROUPS, "Token eingeben", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
 		Form<Group> filledForm = groupForm.bindFromRequest();
 		String enteredToken = filledForm.data().get("token");
 		
@@ -240,7 +243,7 @@ public class GroupController extends BaseController {
 			GroupAccount groupAccount = new GroupAccount(account, group, LinkType.establish);
 			groupAccount.create();
 			flash("success", "Kurs erfolgreich beigetreten!");
-			return redirect(controllers.routes.GroupController.stream(groupId, PAGE));
+			return redirect(controllers.routes.GroupController.stream(groupId, PAGE, false));
 		} else {
 			flash("error", "Hast du dich vielleicht vertippt? Der Token ist leider falsch.");
 			return badRequest(token.render(group, filledForm));
@@ -256,7 +259,7 @@ public class GroupController extends BaseController {
 		if (Secured.isMemberOfGroup(group, account)) {
 			Logger.debug("User is already member of group or course");
 			flash("error", "Du bist bereits Mitglied dieser Gruppe!");
-			return redirect(controllers.routes.GroupController.stream(id, PAGE));
+			return redirect(controllers.routes.GroupController.stream(id, PAGE, false));
 		}
 		
 		// is already requested?
@@ -282,7 +285,7 @@ public class GroupController extends BaseController {
 			groupAccount = new GroupAccount(account, group, LinkType.establish);
 			groupAccount.create();
 			flash("success", "'" + group.title + "' erfolgreich beigetreten!");
-			return redirect(controllers.routes.GroupController.stream(id, PAGE));
+			return redirect(controllers.routes.GroupController.stream(id, PAGE, false));
 		} else if (group.groupType.equals(GroupType.close)) {
 			groupAccount = new GroupAccount(account, group, LinkType.request);
 			groupAccount.create();
@@ -396,7 +399,7 @@ public class GroupController extends BaseController {
     @Transactional
 	public static Result invite(long groupId) {
 		Group group = Group.findById(groupId);
-		Navigation.set(Level.GROUPS, "Freunde einladen", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
+		Navigation.set(Level.GROUPS, "Freunde einladen", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
 		return ok(invite.render(group, Friendship.friendsToInvite(Component.currentAccount(), group), GroupAccount.findAccountsByGroup(group, LinkType.invite)));
 	}
 
@@ -443,7 +446,7 @@ public class GroupController extends BaseController {
 		}
 		
 		flash("success", Messages.get("group.invite_invited"));
-		return redirect(controllers.routes.GroupController.stream(groupId, PAGE));
+		return redirect(controllers.routes.GroupController.stream(groupId, PAGE, false));
 	}
 	
 	public static Result acceptInvitation(long groupId, long accountId){
@@ -456,7 +459,7 @@ public class GroupController extends BaseController {
 			
 		}
 		
-		return redirect(controllers.routes.GroupController.stream(groupId, PAGE));
+		return redirect(controllers.routes.GroupController.stream(groupId, PAGE, false));
 	}
 	
 	public static Result declineInvitation(long groupId, long accountId){

@@ -4,7 +4,7 @@
 
 # Home page
 GET         /                                          controllers.Application.index()
-GET         /stream                                    controllers.Application.stream(page: Integer ?= 1)
+GET         /stream                                    controllers.Application.stream(filter: String, page: Integer ?= 1, raw: Boolean ?= false)
 GET         /search                                    controllers.Application.search(page: Integer ?= 1)
 GET         /searchHome                                controllers.Application.searchHome()
 GET         /suggestions                               controllers.Application.searchSuggestions(query: String)
@@ -13,6 +13,8 @@ GET         /logout                                    controllers.AccountContro
 GET         /help                                      controllers.Application.help()
 GET         /feedback                                  controllers.Application.feedback()
 POST        /feedback/add                              controllers.Application.addFeedback()
+GET         /imprint                                   controllers.Application.imprint()
+GET         /privacy                                   controllers.Application.privacy()
 GET         /404                                       controllers.Application.error()
 
 # JavaScript Routes
@@ -23,7 +25,7 @@ GET         /groups                                    controllers.GroupControll
 POST        /group/create                              controllers.GroupController.add()
 GET         /group/create                              controllers.GroupController.create()
 GET         /group/:id                                 controllers.GroupController.view(id:Long)
-GET         /group/:id/stream                          controllers.GroupController.stream(id:Long, page: Integer ?= 1)
+GET         /group/:id/stream                          controllers.GroupController.stream(id:Long, page: Int ?= 1, raw: Boolean ?= false)
 GET         /group/:id/media                           controllers.GroupController.media(id:Long)
 GET         /group/:id/edit                            controllers.GroupController.edit(id:Long)
 POST        /group/:id/update                          controllers.GroupController.update(id:Long)
@@ -40,13 +42,14 @@ GET         /group/:id/declineInvite/:accountId        controllers.GroupControll
 POST        /group/:id/validate                        controllers.GroupController.validateToken(id:Long)
 
 #Post and Comments
-GET		/post/olderComments				    controllers.PostController.getOlderComments(id:Long,current:Integer)
-GET		/post/:id							controllers.PostController.view(id:Long)
-POST	/post/:id/addComment				controllers.PostController.addComment(id:Long)
-POST	/:target/:id/addPost				controllers.PostController.addPost(id:Long, target:String)
-GET     /post/:id/getEditForm               controllers.PostController.getEditForm(id:Long)
-POST    /post/:id/updatePost                controllers.PostController.updatePost(id:Long)
-GET		/post/:postId/deletePost			controllers.PostController.deletePost(postId:Long)
+GET         /post/olderComments                        controllers.PostController.getOlderComments(id:Long,current:Integer)
+GET         /post/:id                                  controllers.PostController.view(id:Long)
+POST        /post/:id/addComment                       controllers.PostController.addComment(id:Long)
+POST        /:target/:id/addPost                       controllers.PostController.addPost(id:Long, target:String)
+GET         /post/:id/getEditForm                      controllers.PostController.getEditForm(id:Long)
+POST        /post/:id/updatePost                       controllers.PostController.updatePost(id:Long)
+GET         /post/:postId/deletePost                   controllers.PostController.deletePost(postId:Long)
+PUT         /post/:id/bookmark                         controllers.PostController.bookmarkPost(id:Long)
 
 
 #User
@@ -60,7 +63,9 @@ GET         /user/:id/tempavatar                       controllers.ProfileContro
 POST        /user/:id/createavatar                     controllers.ProfileController.createAvatar(id:Long)
 GET         /user/:id/avatar                           controllers.ProfileController.getAvatar(id:Long, size:String ?= "small")
 POST        /user/:id/edit                             controllers.ProfileController.update(id:Long)
-GET         /user/:id/stream                           controllers.ProfileController.stream(id:Long,page: Integer ?= 1)
+GET         /user/:id/stream                           controllers.ProfileController.stream(id:Long,page: Integer ?= 1, raw: Boolean ?= false)
+GET         /user/:id/groups                           controllers.ProfileController.groups(id:Long)
+POST        /user/:id/delete                           controllers.ProfileController.deleteProfile(id:Long)
 
 
 #Friends
@@ -93,6 +98,7 @@ GET         /assets/*file                              controllers.Assets.at(pat
 GET         /admin                                     controllers.AdminController.index()
 GET         /admin/user/create                         controllers.AdminController.createAccountForm()
 POST        /admin/user/create                         controllers.AdminController.createAccount()
+POST        /admin/user/:id/delete                     controllers.AdminController.deleteAccount(id: Long)
 GET         /admin/user/list                           controllers.AdminController.listAccounts()
 GET         /admin/media/                              controllers.AdminController.viewMediaTemp()
 GET         /admin/media/clean                         controllers.AdminController.cleanMediaTemp()

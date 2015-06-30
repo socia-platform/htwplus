@@ -10,11 +10,12 @@ html {
 body {
 	margin-top: 91px;
 	overflow-x: hidden;
+    background: url('../images/crossword.png');
+    background-repeat:repeat;
 }
 
 div.alert {
-	margin-left: -10px;
-    margin-right: -10px;
+    margin-top: 10px;
 }
 
 a {
@@ -122,8 +123,8 @@ a.hp-nohref {
 	cursor: pointer;	
 }
 
-.hp-container {
-    margin-top: 15px;
+.hp-nolabel label {
+    display: none;
 }
 
 /*============================== Landingpage ==============================*/
@@ -178,9 +179,8 @@ body#hp-landingpage {
     }
 }
 
-#hp-landingpage div#hp-login .hp-logo img {
-	margin: 0;
-	padding: 0;
+#hp-landingpage div#hp-login .hp-landing-logo img {
+	width: 100%;
     max-height: 300px;
 }
 
@@ -345,13 +345,14 @@ div[id*='hp-feature-text-'] table {
 	#hp-landingpage div#hp-feature-demo .hp-notepad-content {
 		position: relative;
 	    min-height: inherit;
+        margin-top: 40px;
 	}
 
     #hp-landingpage div#hp-features div[id*='hp-feature-demo-'] {
         display: none;
         opacity: 0;
         position: absolute;
-        top: 5px;
+        top: 0px;
         left: 30px;
         right: 15px;
         z-index: 1000;
@@ -415,24 +416,14 @@ div[id*='hp-feature-text-'] table {
 	-webkit-transform: rotate(345deg);
 }
 
+#hp-navbar li a .glyphicon {
+   color: inherit !important
+}
 
 /*============================== Navigation ==============================*/
 
-#hp-navbar {
-    max-height: 51px;
-}
-
-.hp-navbar-container {
-	max-width: 1000px;
-	margin: 0 auto;
-}
-
-.hp-navbar-container .navbar-right {
-    margin-right: 0 !important;
-}
-
-.hp-nav-user {
-	padding: 9px 10px !important;
+.navbar-right li a.hp-nav-user {
+    padding: 9px 10px;
 }
 
 .hp-dropdown-notifications,
@@ -453,35 +444,16 @@ div[id*='hp-feature-text-'] table {
 	}
 }
 
-.hp-dropdown-search .hp-search-form {
-	width: 100%;
-	position: relative;
-	padding-right: 10px;
-}
-
-.hp-dropdown-search .hp-search-form .form-group {
-	margin-bottom: 0;
+.hp-dropdown-search .hp-search-form button {
+    position: relative;
+    top: 0px;
+    right: 5px;
 }
 
 .hp-dropdown-search .hp-search-form input {
-	background-color: white;
-	width: 100%;
+    width: auto;
 }
 
-.hp-dropdown-search .hp-search-form button {
-	position: absolute;
-	top: 5px;
-	right: 11px;
-}
-
-.hp-navbar-container > .hp-search-form {
-	padding-right: 7px;
-}
-
-.hp-navbar-container > .hp-search-form input {
-	padding-right: 20px;
-	background-color: #E0F2BF;
-}
 #hp-search-home > .hp-search-form input {
     width: 275px;
 }
@@ -489,6 +461,10 @@ div[id*='hp-feature-text-'] table {
 #hp-search-home {
   margin: auto;
   width: 300px;
+}
+
+.hp-search-form {
+    height: 31px;
 }
 
 .hp-search-form button {
@@ -504,8 +480,8 @@ div[id*='hp-feature-text-'] table {
 	color: #76B900 !important;
 }
 
-#hp-navbar li a .glyphicon {
-	color: inherit !important;
+.hp-navbar li a .glyphicon {
+	color: inherit
 }
 
 .hp-breadcrumb {
@@ -589,6 +565,10 @@ div.well.notification a span.glyphicon {
     color: #76b900;
 }
 
+div.well.notification {
+    margin-bottom: 10px;
+}
+
 div.hp-mailto a:hover span.glyphicon,
 div.notifications-mark-as-read a:hover span.glyphicon,
 div.well.notification a:hover span.glyphicon {
@@ -637,7 +617,7 @@ input.hp-notification-hour {
 /*============================== Nav-Tabs ==============================*/
 
 .hp-nav-tabs {
-	margin-top: -40px;
+	margin-top: -28px;
 }
 
 .hp-nav-tabs > li {
@@ -676,37 +656,22 @@ input.hp-notification-hour {
 
 /*============================== Logo ==============================*/
 
+.hp-landing-logo {
+    text-align: center;
+}
+
+.hp-navbar-brand {
+    padding: 5.5px 10px;
+}
+
 .hp-logo {
-	width: 100%;
-	text-align: center;
+    width: 40px;
+    height: 40px;
+    background-image: url(../images/logos/plus_logo.png);
+    background-position: 40px 100%;
 }
-
-.hp-logo img {
-	width: 90%;
-	height: auto;
-	margin: 50px 0 100px;
-}
-
-#hp-navbar .hp-logo {
-	height: 49px;
-	padding: 5px;
-    padding-right: 15px;
-}
-
-#hp-navbar .hp-logo img {
-	height: 100%;
-	width: auto;
-	margin: 0;
-}
-
-#hp-navbar .hp-logo:hover #hover,
-#hp-navbar .hp-logo #normal {
-	display: inherit!important;
-}
-
-#hp-navbar .hp-logo #hover,
-#hp-navbar .hp-logo:hover #normal {
-	display: none!important;
+.hp-logo:hover {
+    background-position: 40px 0%;
 }
 
 #hp-plusi {
@@ -736,79 +701,36 @@ input.hp-notification-hour {
 
 /*============================== Notepad ==============================*/
 
-div.hp-notepad-right {
-	position: relative;
-    background: url(../images/vertical.png) repeat-y right 0;
-    margin: 20px -10px 0;
-}
-
-@media (max-width: 767px) {
-    div.hp-notepad-right  {
-        margin-right: -25px;
-        margin-left: -49px;
-    }
-}
-
-div.hp-notepad-topRight {
-	width: 48px;
-	height: 15px;
-	position: absolute;
-	top: 0;
-	right: 0;
-    background: url(../images/backgrounds.png) no-repeat -50px -15px;
-}
-
-div.hp-notepad-bottomRight {
-	width: 48px;
-	height: 22px;
-	position: absolute;
-	bottom: 0;
-	right: 0;
-    background: url(../images/backgrounds.png) no-repeat -50px -30px;
-}
-
-div.hp-notepad-left {
-	margin-right: 24px;
-    background: url(../images/vertical.png) repeat-y 0 15px;
-}
-
-div.hp-notepad-topLeft {
-	width: 50px;
-	height: 15px;
-	vertical-align: top;
-	position: absolute;
-	top: 0;
-	left: 0;
-    background: url(../images/backgrounds.png) no-repeat 0 -15px;
-}
-
-div.hp-notepad-bottomLeft {
-	width: 50px;
-	height: 22px;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-    background: url(../images/backgrounds.png) no-repeat 0 -30px;
-}
-
-div.hp-notepad-top {
-	margin-left: 50px;
-	padding-top: 15px;
-    background: url(../images/backgrounds.png) repeat-x 0 top;
-}
-
-div.hp-notepad-bottom {
-	padding-bottom: 22px;
-    background: url(../images/backgrounds.png) repeat-x 0 bottom;
-}
-
 div.hp-notepad-content {
 	min-height: 500px;
-	padding: 5px 30px 0;
-	background-color: white;
+	padding: 5px 30px 15px;
+    margin-bottom: 15px;
 	box-sizing: content-box;
+    background-color: white;
 	-moz-box-sizing: content-box;
 	-webkit-box-sizing: content-box;
+    border-radius: 4px;
+    -moz-box-shadow: 0 0 3px #888;
+    -webkit-box-shadow: 0 0 3px #888;
+    box-shadow: 0 0 3px #888;
+
+}
+
+div.hp-sitenav {
+    padding: 10px;
+    box-sizing: content-box;
+    background-color: white;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    border-radius: 4px;
+    -moz-box-shadow: 0 0 3px #888;
+    -webkit-box-shadow: 0 0 3px #888;
+    box-shadow: 0 0 3px #888;
+    margin-bottom: 10px;
+}
+
+div.addmargin {
+    margin-top: 45px;
 }
 
 div.hp-notepad-content > *:last-child {
@@ -822,6 +744,12 @@ div.hp-notepad-content > *:last-child {
     }
 }
 
+div.hp-feed-filter {
+    text-align: right;
+    margin-top: 10px;
+    margin-bottom: 7px;
+}
+
 div#hp-footer {
 	margin: 5px 44px 0 69px;
 }
@@ -831,10 +759,10 @@ div#hp-footer-links {
 }
 
 div#hp-footer-logo {
-	height: 46px;
-	width: 200px;
-    background: url(../images/backgrounds.png) no-repeat right -52px;
+    background: url(../images/logos/HTW_Logo_quer_Grau.jpg) no-repeat;
     float: right;
+    width: 200px;
+    height: 47px;
 }
 
 
@@ -887,6 +815,27 @@ div.hp-pagination {
 	color: white;	
 }
 
+.nextPage {
+    border-radius: 4px;
+}
+.ajax-loader img {
+    width: 32px;
+    height: 32px;
+}
+
+/** SCROLL TO TOP **/
+#hp-top-link.affix-top {
+    position: absolute; /* allows it to "slide" up into view */
+    bottom: -190px; /* negative of the offset - height of link element */
+    left: 10px; /* padding from the left side of the window */
+    z-index: 3; /* .form-control has z-index 2 */
+}
+#hp-top-link.affix {
+    position: fixed; /* keeps it on the bottom once in view */
+    bottom: 10px; /* height of link element */
+    left: 10px; /* padding from the left side of the window */
+    z-index: 3; /* .form-control has z-index 2 */
+}
 
 /*============================== Post & Comment View ==============================*/
 
@@ -907,7 +856,7 @@ div.hp-pagination {
 
 #hp-new-comment-content,
 #hp-new-post-content {
-	height: 31px;
+	height: 60px;
     transition: height 0.5s ease 0.2s;
 	-webkit-transition: height 0.5s ease 0.2s;
 	-moz-transition: height 0.5s ease 0.2s;
@@ -952,7 +901,7 @@ div.hp-pagination {
 
 .well {
 	padding: 15px;
-	margin-bottom: 0;
+    margin: 20px 0px;
 }
 .well.broadcast {
     border: 1px solid #76b900;
@@ -990,6 +939,13 @@ div.hp-pagination {
     top: 0;
 }
 
+.hp-post-bookmark-icon {
+    float: right;
+    font-size: 16px;
+    position: relative;
+    top: -25px;
+}
+
 /*============================== Avatare ==============================*/
 
 #hp-avatars img {
@@ -1010,7 +966,7 @@ div.hp-pagination {
 }
 
 @media (max-width: 350px) {
-    .hp-nav li > a {
+    .hp-navbar li > a {
         padding-left: 10px;
         padding-right: 10px;
     }
@@ -1339,4 +1295,37 @@ div.hp-avatar-default-9 {
 
 .searchresult-container {
     margin-top: 10px;
+}
+
+/*========= Account Deletion ==========*/
+
+.hp-warningModal .modal-header {
+    background-color: #d43f3a;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding-right: 18px;
+    color: white;
+}
+
+.hp-warningModal .close {
+    margin-top: 0px;
+    font-size: 24px;
+    opacity: 0.3;
+}
+
+.hp-warningModal .close:hover , .hp-warningModal .close:focus {
+    opacity: 0.6;
+}
+
+.hp-warningModal .modal-title {
+    text-align: center;
+    font-size: 20px;
+}
+
+.hp-warningModal .hp-bigcaption {
+    font-size: 16px;
+}
+
+#hp-deleteConfirmPassword {
+    margin-bottom: 0px;
 }

@@ -1,14 +1,3 @@
-
-function resizeRings() {
-	$('.hp-notepad-content').each(function() {
-		var offset = ($(this).height() + parseInt($(this).css('padding-top'))) % 12.0;
-		if (offset !== 0)
-			$(this).css('padding-bottom', (12.0 - offset) + "px");
-		else
-			$(this).css('padding-bottom', '0');
-	});
-}
-
 function toggleMediaSelection(parent) {
 	var childs = document.getElementById("mediaList").getElementsByTagName("input");
 	for (i = 0; i < childs.length; i++) {
@@ -20,10 +9,10 @@ function toggleMediaSelection(parent) {
 function autolinkUrls() {
     $('.hp-truncate').each(function(){
 		$(this).linkify({
-			tagName: 'a', 
-			target: '_blank', 
-			newLine: '\n', 
-			linkClass: 'hp-postLink', 
+			tagName: 'a',
+			target: '_blank',
+			newLine: '\n',
+			linkClass: 'hp-postLink',
 			linkAttributes: null
 		});
 	});
@@ -37,7 +26,7 @@ function truncateBreadcrumb() {
 	var lastBreadcrumb = $("#hp-navbar-breadcrumb .breadcrumb > li:last-child");
 	var index = 3;	// first breadcrumb item which is hidden
 	// hide breadcrumb items while last item isn't visible
-	while (lastBreadcrumb.length && 
+	while (lastBreadcrumb.length &&
 		lastBreadcrumb.position().left + lastBreadcrumb.width() > $("#hp-navbar-breadcrumb .breadcrumb").width()) {
 		$("#hp-navbar-breadcrumb #hp-navbar-breadcrumb-truncate").removeClass("hidden");
 		$("#hp-navbar-breadcrumb .breadcrumb > li:nth-child("+index+")").addClass("hidden");
@@ -70,7 +59,8 @@ $('.hp-optionsMenu>div').on('shown.bs.dropdown', function() {
     $(this).find('.dropdown-toggle>span').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
     var menu = $(this).find('ul.dropdown-menu');
     var row = $(this).parents('tr');
-    var top = row.offset().top + row.height() - $('.hp-notepad-right').offset().top;
+    // hacky: 45 belongs to div.hp-notepad-content.addmargin    
+    var top = 45 + row.offset().top + row.height() - $('.hp-notepad-content').offset().top;
     menu.css('top', top + 'px');
 });
 
@@ -175,6 +165,30 @@ $("li > a").click(function(e) {
 	}
 });
 
+/*
+ *  prevent easy copying of account deletion confirmation text
+ */
+$(document).on("copy", function(e) {
+    if ($("#hp-deleteModal").is(":visible")) { // if the deletion confirmation is actually visible
+        var selection = window.getSelection();
+        if (selection.toString().contains("ösche ich meinen Account von dieser wundervolle")) { // check if the user copied the 'forbidden' string (or at least the middle part of it)
+            var newdiv = document.createElement('div');
+
+            //hide the newly created container
+            newdiv.style.position = 'absolute';
+            newdiv.style.left = '-9999px';
+
+            //insert the container, fill it with the extended text, and define the new selection
+            document.body.appendChild(newdiv);
+            newdiv.innerHTML = "It's not that easy!";
+            selection.selectAllChildren(newdiv);
+
+            window.setTimeout(function () {
+                document.body.removeChild(newdiv);
+            }, 100);
+        }
+    }
+});
 
 $(document).ready(function () {
 
@@ -192,7 +206,7 @@ $(document).ready(function () {
 		} else {
 			$("#token-input").fadeOut();
 		}
-		
+
 	});
 
 	/*
@@ -202,12 +216,40 @@ $(document).ready(function () {
 		beforeSend:function(){
 			$(".loading").show();
 			$(".loading").css('display', 'inline-block');
-		}, 
+		},
 		complete:function(){
 			$(".loading").hide();
 			autolinkUrls();
 		}
 	});
+
+    /*
+     * Auto-pagination with jQuery plugin (modified version of jquery.auto.pagination.js)
+     */
+    if($('a.nextPage').length > 0) { // only apply on pages with a nextPage link
+        $('.hp-notepad-content').AutoPagination({
+            nextPageSelector: 'a.nextPage',
+            panelSelector: '.hp-pagination-container',
+            loaderDivClass: 'ajax-loader',
+            loaderDivStyle: 'text-align:center;margin-top:20px;font-weight:bold;',
+            loaderImage: 'assets/images/loading.gif',
+            loaderText: 'Lade nächste Seite...'
+        });
+    }
+
+    /*
+     * Show 'Back to top'-link (src: http://jsfiddle.net/panman8201/mkzrm/10/)
+     */
+    if (($(window).height() + 200) < $(document).height() ) {
+        $('#hp-top-link').removeClass('hidden').affix({
+            // how far to scroll down before link "slides" into view
+            offset: { top:200 }
+        });
+        $('#hp-top-link a').click(function(event) {
+            $('html,body').animate({scrollTop:0});
+            return false;
+        });
+    }
 
 	/*
 	 * ADD COMMENTS
@@ -281,6 +323,30 @@ $(document).ready(function () {
     autolinkUrls();
 
     /*
+     * Add Countdown to Account deletion button
+     */
+    $("#hp-deleteModal").on("show.bs.modal", function() {
+        $("#hp-deleteConfirmSubmit").attr("disabled", "disabled");
+
+        if($.disableDeleteFunctionTimeout) {
+            clearTimeout($.disableDeleteFunctionTimeout);
+        }
+
+        var disableTimeLeft = 10;
+        var disableCountdown = function() {
+            if(disableTimeLeft > 0) {
+                $("#hp-deleteConfirmSubmit").val("Warte "+disableTimeLeft+"s...");
+                disableTimeLeft--;
+                $.disableDeleteFunctionTimeout = setTimeout(disableCountdown, 1000);
+            } else {
+                $("#hp-deleteConfirmSubmit").removeAttr("disabled");
+                $("#hp-deleteConfirmSubmit").val("LÖSCHEN");
+            }
+        };
+        disableCountdown();
+    });
+
+    /*
      * SEARCH: AutoSuggestion
      */
     var autoSuggestResult = new Bloodhound({
@@ -333,7 +399,7 @@ $(document).ready(function () {
 
     autoSuggestResult.initialize();
 
-    $('.hp-easy-search').typeahead(
+    $('.hp-search-form .form-control').typeahead(
         {
             hint: true,
             highlight: false,
@@ -363,14 +429,13 @@ $(document).ready(function () {
                     "<span class='glyphicon glyphicon-{{groupIcon}} autosuggest-group-icon'></span>{{{hLabel}}}" +
                     "{{/if}}")
             }
-
-        }).on('typeahead:selected', function($e, searchResult){
-            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
-        });
+        }
+    ).on('typeahead:selected', function($e, searchResult){
+        window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
+    });
 });
 
 $(window).resize(function() {
-	resizeRings();
 	truncateBreadcrumb();
 });
 
@@ -383,8 +448,32 @@ $('body').popover({
 });
 
 $('.hp-focus-search').click(function() {
-    $('.hp-easy-search').focus();
+    $('#hp-search').focus();
 });
 
-resizeRings();
+/*
+ * SET OR REMOVE BOOKMARKS
+ */
+$('.hp-post-bookmark-icon').click(function(){
+    var id = $(this).attr('href').split('-')[1];
+    var context = this;
+    var icon = this.children[0];
+    $.ajax({
+        url: "/post/"+id + "/bookmark",
+        type: "PUT",
+        success: function(data){
+            if(data === "setBookmark") {
+                $(icon).addClass('glyphicon-star');
+                $(icon).removeClass('glyphicon-star-empty');
+                $(context).attr("data-original-title", "Post vergessen").tooltip('fixTitle').tooltip('show');
+            }
+            if(data === "removeBookmark") {
+                $(icon).addClass('glyphicon-star-empty');
+                $(icon).removeClass('glyphicon-star');
+                $(context).attr("data-original-title", "Post merken").tooltip('fixTitle').tooltip('show');
+            }
+        }
+    });
+});
+
 truncateBreadcrumb();

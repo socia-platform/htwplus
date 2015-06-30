@@ -15,16 +15,18 @@
 	</head>
 	
 	<body>
-		@if(user != null){
-			@views.html.snippets.navi()
-			@views.html.snippets.breadcrumb()
-		}
-		
-		<div class="hp-container container">
-
+        <a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
+            <span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
+            <div class="hp-easy-feedback">Feedback</div>
+        </a>
+        @if(user != null){
+            @views.html.snippets.navi()
+            @views.html.snippets.breadcrumb()
+        }
+		<div class="container">
 			@if(!flash.isEmpty()) {
 				<div class="row">
-					<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
+					<div class="col-lg-12">
 						@if(flash.containsKey("success")) {
 							<div class="alert alert-success fade in">
 								<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
@@ -46,40 +48,18 @@
 					</div>
 				</div>
 			}
-
-			<div class="row">
-				<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
-                    <a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
-                        <span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
-                        <div class="hp-easy-feedback">Feedback</div>
-                    </a>
-                    @views.html.snippets.notepad{ @content }
-
-				</div> <!-- /col-xs-9 -->
-			</div> <!-- /row -->
 		</div> <!-- /container -->
-	
-		<footer>
-			<div class="container">
-				<div class="row">
-					<div class="col-xs-12 col-xs-offset-0 col-md-10 col-md-offset-1">
-						<div id="hp-footer">
-							<div id="hp-footer-links">
-								<a href="@routes.Application.index()" data-toggle="modal">Home</a> |
-								<a href="#impressumModal" data-toggle="modal">Impressum</a> |
-								<a href="#datenschutzModal" data-toggle="modal">Datenschutz</a> |
-								<a href="@routes.Application.feedback()">Feedback</a> |
-								<a href="@routes.Application.feedback()">Kontakt</a> |
-								<a href="@routes.Application.help()">Hilfe</a>
-							</div>
-							<div id="hp-footer-logo"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-			@views.html.snippets.impressumModal()
-			@views.html.snippets.datenschutzModal()
-		</footer>
+
+        <div id="hp-top" class="container">
+        @views.html.snippets.notepad(title) { @content }
+        </div>
+        
+        <!-- 'Go to top' link -->
+        <span id="hp-top-link" class="hidden">
+            <a href="#hp-top" class="btn btn-success">
+                <i class="glyphicon glyphicon-chevron-up"></i> @Messages("mainpage.backtotop")
+            </a>
+        </span>
 
 		<script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
         <script type="text/javascript" src='@routes.Assets.at("bower_components/jquery/dist/jquery.min.js")'></script>
@@ -89,6 +69,7 @@
         <script type="text/javascript" src='@routes.Assets.at("bower_components/handlebars/handlebars.min.js")'></script>
 		<script type="text/javascript" src='@routes.Assets.at("bower_components/dropzone/dist/min/dropzone.min.js")'></script>
 		<script type="text/javascript" src='@routes.Assets.at("bower_components/cropper/dist/cropper.min.js")'></script>
+        <script type="text/javascript" src="@routes.Assets.at("javascript/jquery.auto.pagination-1.0-modified.js")"></script>
 
 		<script type="text/javascript" src='@routes.Assets.at("javascripts/htwplus.js")'></script>
 		<script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>

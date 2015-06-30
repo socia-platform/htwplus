@@ -11,8 +11,6 @@ import models.Group;
 import models.Post;
 import models.enums.AccountRole;
 import models.enums.GroupType;
-import org.elasticsearch.client.transport.NoNodeAvailableException;
-import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import play.Play;
@@ -63,7 +61,24 @@ public class Global extends GlobalSettings {
             },
             Akka.system().dispatcher()
         );
-		
+
+        // trying to connect to Elasticsearch
+        ElasticsearchService.getInstance().getClient();
+        Logger.info("trying to connect to Elasticsearch");
+        if (ElasticsearchService.isClientAvailable()) {
+            Logger.info("... success");
+            Logger.info("trying to create HTWPlus index and mapping");
+            if (!ElasticsearchService.isIndexExists()) {
+                ElasticsearchService.createAnalyzer();
+                ElasticsearchService.createMapping();
+                Logger.info("... success");
+            } else {
+                Logger.info("... failed (it already exists?)");
+            }
+        } else {
+            Logger.info("... failed");
+        }
+
 		InitialData.insert(app);
 
 	}
@@ -150,7 +165,10 @@ public class Global extends GlobalSettings {
 			final String adminGroupTitle = app.configuration().getString("htwplus.admin.group");
 			final String adminMail = app.configuration().getString("htwplus.admin.mail");
 			final String adminPassword = app.configuration().getString("htwplus.admin.pw");
-			
+
+            final String dummyMail = app.configuration().getString("htwplus.dummy.mail");
+            final String dummyPassword = app.configuration().getString("htwplus.dummy.pw");
+            
 			// Do some inital db stuff
 			JPA.withTransaction(new play.libs.F.Callback0() {
 				@Override
@@ -166,6 +184,23 @@ public class Global extends GlobalSettings {
                         admin.avatar = "a1";
                         admin.password = Component.md5(adminPassword);
                         admin.create();
+                    }
+
+                    // create Dummy anonymous account, if it doesn't exist //
+                    Account dummy = Account.findByEmail(dummyMail);
+                    if (dummy == null) {
+                        dummy = new Account();
+                        dummy.email = dummyMail;
+                        dummy.firstname = "Gelöschter";
+                        dummy.lastname = "Account";
+                        dummy.role = AccountRole.DUMMY;
+                        dummy.avatar = "aDefault";
+                        dummy.password = Component.md5(dummyPassword);
+                        dummy.create();
+                    } else if(dummy.firstname.equals("Anonym")) {
+                        dummy.firstname = "Gelöschter";
+                        dummy.lastname = "Account";
+                        dummy.update();
                     }
 
                     // create Admin group if none exists
@@ -187,17 +222,6 @@ public class Global extends GlobalSettings {
                         group.description = "Du hast Wünsche, Ideen, Anregungen, Kritik oder Probleme mit der Seite? Hier kannst du es loswerden!";
                         group.createWithGroupAccount(admin);
                     }
-
-                    // try creating elasticsearch analyzer and mapping
-                    try {
-                        ElasticsearchService.createAnalyzer();
-                        ElasticsearchService.createMapping();
-                    } catch(NoNodeAvailableException nnae) {
-                        Logger.error(nnae.getMessage());
-                    } catch(IndexAlreadyExistsException iaee) {
-                        Logger.info("index "+iaee.getMessage());
-                    }
-
 
 				}
 			});

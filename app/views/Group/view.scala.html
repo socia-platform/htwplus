@@ -1,47 +1,54 @@
 @(group: Group)
 @import models.enums.GroupType
 @import models.enums.LinkType
-@main("Group View") {
 
-<h2 class="hp-truncate">
-    @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
-    @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
-    @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
-    @group.title
-</h2>
-<br />
+@main("Gruppenübersicht") {
+    <div class="row">
+        <div class="col-lg-12" role="main">
+            <div class="hp-notepad-content addmargin">
 
-<dl>
-    <dt>Gründer</dt>
-    <dd>@views.html.snippets.userLink(group.owner)</dd>
-</dl>
-<dl>
-    <dt>Erstellt am</dt>
-    <dd>@group.createdAt.format("dd.MM.yyyy")</dd>
-</dl>
+                <h2 class="hp-truncate">
+                    @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
+                    @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
+                    @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
+                    @group.title
+                </h2>
+                <br />
 
-@if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
-<dl>
-    <dt>Token</dt>
-    <dd>@group.token</dd>
-</dl>
-}
+                <dl>
+                    <dt>Gründer</dt>
+                    <dd>@views.html.snippets.userLink(group.owner)</dd>
+                </dl>
+                <dl>
+                    <dt>Erstellt am</dt>
+                    <dd>@group.createdAt.format("dd.MM.yyyy")</dd>
+                </dl>
 
-<dl>
-    <dt>Beschreibung</dt>
-    <dd>@group.description</dd>
-</dl>
-<dl>
-    <dt>Mitglieder</dt>
-    @defining(GroupAccount.findAccountsByGroup(group, LinkType.establish)) { accounts =>
-    @for(account <- accounts) {
-    <dd> @views.html.snippets.userLink(account)</dd>
-    }
-    }
-</dl>
-<dl>
-    <a href="@routes.GroupController.join(group.id)">
-        <span class="glyphicon glyphicon-envelope"></span> Beitrittsanfrage
-    </a>
-</dl>
+                @if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
+                    <dl>
+                        <dt>Token</dt>
+                        <dd>@group.token</dd>
+                    </dl>
+                }
+
+                <dl>
+                    <dt>Beschreibung</dt>
+                    <dd>@group.description</dd>
+                </dl>
+                <dl>
+                    <dt>Mitglieder</dt>
+                    @defining(GroupAccount.findAccountsByGroup(group, LinkType.establish)) { accounts =>
+                        @for(account <- accounts) {
+                            <dd> @views.html.snippets.userLink(account)</dd>
+                        }
+                    }
+                </dl>
+                <dl>
+                    <a href="@routes.GroupController.join(group.id)">
+                        <span class="glyphicon glyphicon-envelope"></span> Beitrittsanfrage
+                    </a>
+                </dl>
+            </div>
+        </div>
+    </div>
 }

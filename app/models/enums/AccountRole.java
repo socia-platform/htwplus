@@ -7,7 +7,8 @@ public enum AccountRole {
 	
 	STUDENT("Student"),
 	TUTOR("Dozent"),
-	ADMIN("Administrator");
+    ADMIN("Administrator"),
+    DUMMY("Dummy");
 
 	private String displayName;
 	

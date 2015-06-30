@@ -8,10 +8,8 @@ import models.services.NotificationService;
 import play.Play;
 import play.api.mvc.Call;
 import play.data.Form;
-import play.db.jpa.JPA;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
-import play.libs.F;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Post.view;
@@ -21,6 +19,7 @@ public class PostController extends BaseController {
 	
 	static Form<Post> postForm = Form.form(Post.class);
 	static final int PAGE = 1;
+    static final String STREAM_FILTER = "all";
 	
 	public static Result view (Long id) {
 		Post post = Post.findById(id);
@@ -38,11 +37,11 @@ public class PostController extends BaseController {
 		}
 		
 		if(post.belongsToGroup()) {
-			Navigation.set(Level.GROUPS, "Post", post.group.title, controllers.routes.GroupController.stream(post.group.id, PAGE));
+			Navigation.set(Level.GROUPS, "Post", post.group.title, controllers.routes.GroupController.stream(post.group.id, PAGE, false));
 		}
 		
 		if(post.belongsToAccount()) {
-			Navigation.set(Level.FRIENDS, "Post", post.account.name, controllers.routes.ProfileController.stream(post.account.id, PAGE));
+			Navigation.set(Level.FRIENDS, "Post", post.account.name, controllers.routes.ProfileController.stream(post.account.id, PAGE, false));
 		}
 		
 		return ok(view.render(post, postForm));
@@ -76,12 +75,12 @@ public class PostController extends BaseController {
 				flash("info", Messages.get("post.join_group_first"));
 			}
             
-			return redirect(controllers.routes.GroupController.stream(group.id, PAGE));
+			return redirect(controllers.routes.GroupController.stream(group.id, PAGE, false));
 		}
 		
 		if (target.equals(Post.PROFILE)) {
 			Account profile = Account.findById(anyId);
-			if (Secured.isFriend(profile) || profile.equals(account) || Secured.isAdmin()) {
+			if (Secured.isNotNull(profile) && (Secured.isFriend(profile) || profile.equals(account) || Secured.isAdmin())) {
 				if (filledForm.hasErrors()) {
 					flash("error", Messages.get("post.try_with_content"));
 				} else {
@@ -94,16 +93,16 @@ public class PostController extends BaseController {
 					}
 				}
 
-				return redirect(controllers.routes.ProfileController.stream(anyId, PAGE));
+				return redirect(controllers.routes.ProfileController.stream(anyId, PAGE, false));
 			}
             
 			flash("info", Messages.get("post.post_on_stream_only"));
-			return redirect(controllers.routes.ProfileController.stream(anyId, PAGE));
+			return redirect(controllers.routes.ProfileController.stream(anyId, PAGE, false));
 		}
 		
 		if (target.equals(Post.STREAM)) {
 			Account profile = Account.findById(anyId);
-			if(profile.equals(account)){
+			if(Secured.isNotNull(profile) && profile.equals(account)){
 				if (filledForm.hasErrors()) {
 					flash("error", Messages.get("post.try_with_content"));
 				} else {
@@ -112,11 +111,11 @@ public class PostController extends BaseController {
 					post.owner = account;
 					post.create();
 				}
-				return redirect(controllers.routes.Application.stream(PAGE));
+				return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE, false));
 			}
             
 			flash("info", Messages.get("post.post_on_stream_only"));
-			return redirect(controllers.routes.Application.stream(PAGE));
+			return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE, false));
 		}
         
 		return redirect(controllers.routes.Application.index());
@@ -237,7 +236,7 @@ public class PostController extends BaseController {
 			
 			//verify redirect
 			if (post.group != null) {
-				routesTo = controllers.routes.GroupController.stream(post.group.id, PAGE);
+				routesTo = controllers.routes.GroupController.stream(post.group.id, PAGE, false);
 			}
 			
 			if (post.account != null) {
@@ -246,14 +245,11 @@ public class PostController extends BaseController {
 			
 			if (post.parent != null) {
 				if (post.parent.group != null) {
-					routesTo = controllers.routes.GroupController.stream(post.parent.group.id, PAGE);
+					routesTo = controllers.routes.GroupController.stream(post.parent.group.id, PAGE, false);
 				} else if (post.parent.account != null) {
 					routesTo = controllers.routes.Application.index();
 				}
 			}
-			
-			
-			
 			post.delete();
 			flash("success", "Gelöscht!");
 			
@@ -267,4 +263,22 @@ public class PostController extends BaseController {
 
 		return redirect(routesTo);
 	}
+
+    public static Result bookmarkPost(Long postId) {
+        Account account = Component.currentAccount();
+        Post post = Post.findById(postId);
+        String returnStatement = "";
+
+        if(Secured.viewPost(post)) {
+            PostBookmark possibleBookmark = PostBookmark.findByAccountAndPost(account, post);
+            if(possibleBookmark == null) {
+                new PostBookmark(account, post).create();
+                returnStatement = "setBookmark";
+            } else {
+                possibleBookmark.delete();
+                returnStatement = "removeBookmark";
+            }
+        }
+        return ok(returnStatement);
+    }
 }
