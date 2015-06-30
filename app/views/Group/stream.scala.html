@@ -1,10 +1,10 @@
-@(group: Group, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer)
+@(group: Group, posts: List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, mediaList: List[Media])
 
 @import models.enums._
 
 @main("Gruppenstream") {
     <div class="row">
-        <div class="col-lg-12" role="main">
+        <div class="col-lg-9 col-md-9" role="main">
             <div class="hp-notepad-content addmargin">
 
                     <!-- Start infoModal -->
@@ -29,9 +29,15 @@
 
                 <div class="clear">
                     <h2 class="hp-truncate">
-                        @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
-                        @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
-                        @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
+                        @if(group.groupType.equals(GroupType.open)) {
+                            <span class="glyphicon glyphicon-globe"></span>
+                        }
+                        @if(group.groupType.equals(GroupType.close)) {
+                            <span class="glyphicon glyphicon-lock"></span>
+                        }
+                        @if(group.groupType.equals(GroupType.course)) {
+                            <span class="glyphicon glyphicon-briefcase"></span>
+                        }
                         @group.title
                     </h2>
                     <br />
@@ -40,9 +46,58 @@
                     @views.html.snippets.postForm(group.id, models.Post.GROUP, postForm)
 
                     @views.html.Group.snippets.streamRaw(group, posts, postForm, count, limit, currentPage)
-                    
+
                 </div>
             </div>
+        </div>
+        <div class="col-lg-3 col-md-3" role="complementary">
+            <nav class="hidden-xs hidden-sm">
+                <div class="hp-sitenav addmargin">
+                    <b><span class="glyphicon glyphicon-info-sign"></span> Info</b>
+                    <hr>
+                    <dl>
+                        <dt>Gründer</dt>
+                        <dd>@views.html.snippets.userLink(group.owner)</dd>
+                    </dl>
+                    <dl>
+                        <dt>Erstellt am</dt>
+                        <dd>@group.createdAt.format("dd.MM.yyyy")</dd>
+                    </dl>
+                    @if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
+                        <dl>
+                            <dt>Token</dt>
+                            <dd>@group.token</dd>
+                        </dl>
+                    }
+
+                    <dl>
+                        <dt>Beschreibung</dt>
+                        <dd>@group.description</dd>
+                    </dl>
+                    <dl>
+                        <dt>Mitglieder</dt>
+                        @defining(GroupAccount.findAccountsByGroup(group, LinkType.establish)) { accounts =>
+                            @for(account <- accounts) {
+                                <dd> @views.html.snippets.userLink(account)</dd>
+                            }
+                        }
+                    </dl>
+                </div>
+                <div class="hp-sitenav">
+                    <b><span class="glyphicon glyphicon-file"></span> Medien</b>
+                    <hr>
+                    <tbody id="mediaList" class="hp-optionsTable">
+                    @for(m <- mediaList) {
+                        <tr>
+                            <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500" data-original-title="von @m.owner.name">@m.title</a></td>
+                            <td><small>(@{
+                                MediaController.bytesToString(m.size, false)
+                            })</small></td>
+                        </tr>
+                    }
+                    </tbody>
+                </div>
+            </nav>
         </div>
     </div>
 }
