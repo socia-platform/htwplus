@@ -6,6 +6,7 @@ import play.db.jpa.JPA;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
+import javax.persistence.NoResultException;
 import javax.persistence.OneToOne;
 
 /**
@@ -33,5 +34,15 @@ public class Grant extends BaseModel {
     @Override
     public void delete() {
 
+    }
+
+    public static Grant findByUserId(Long id) {
+        try{
+            return (Grant) JPA.em()
+                    .createQuery("from Grant a where a.user = :id")
+                    .setParameter("user", id).getSingleResult();
+        } catch (NoResultException exp) {
+            return null;
+        }
     }
 }
