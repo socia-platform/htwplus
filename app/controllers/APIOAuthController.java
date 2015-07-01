@@ -2,6 +2,7 @@ package controllers;
 
 import models.Client;
 import models.Grant;
+import models.Token;
 import play.mvc.Security;
 import play.mvc.Result;
 
@@ -41,4 +42,18 @@ public class APIOAuthController extends BaseController {
             return redirect(grant.client.callBack + "?code=" + authorizationCode);
         }
     }
+
+    @Security.Authenticated(Secured.class)
+    public static Result getToken(String clientId, String clientSecret, String code, String callback) {
+        if (Grant.findByUserId(Component.currentAccount().id).code.equals(code)) {
+            Token token = new Token();
+            token.accessToken = UUID.randomUUID().toString();
+            token.client = Client.findByClientId(clientId);
+            token.user = Component.currentAccount();
+            token.create();
+            return redirect(callback + "?access_token=" + token.accessToken);
+        } else
+            return badRequest("Incorrect authorization code.");
+    }
+
 }
