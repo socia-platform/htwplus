@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class APIPostController extends BaseController {
 
     public static Result post() {
+
         if (JsonCollectionUtil.hasJsonCollection(request()))
         {
             Collection jcol = JsonCollectionUtil.getJsonCollection(request());

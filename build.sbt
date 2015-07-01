@@ -23,4 +23,5 @@ libraryDependencies ++= Seq(
   "net.hamnaberg.rest" % "json-collection" % "3.1.0"
 )
 
+
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
