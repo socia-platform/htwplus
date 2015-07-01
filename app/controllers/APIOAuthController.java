@@ -1,14 +1,13 @@
 package controllers;
 
 import models.Client;
-import play.api.data.Form;
-import play.mvc.Controller;
-import play.mvc.Http;
+import models.Grant;
+import play.mvc.Security;
 import play.mvc.Result;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import
+import java.util.UUID;
 
 /**
  * Created by richard on 01.07.15.
@@ -28,12 +27,18 @@ public class APIOAuthController extends BaseController {
         return ok();
     }
 
-    public static Result authorize(String clientId) {
+    @Security.Authenticated(Secured.class)
+    public static Result authorize(String clientId, String user) {
         if (request().method().equals("GET")) {
             return ok("getmethod" + clientId); //redirect to authorization view
         } else {
-
-            return ok("postmethod" + clientId);
+            Grant grant = new Grant();
+            grant.user = Component.currentAccount();
+            grant.client = Client.findByClientId(clientId);
+            String authorizationCode = UUID.randomUUID().toString();
+            grant.code = authorizationCode;
+            grant.create();
+            return redirect(grant.client.callBack + "?code=" + authorizationCode);
         }
     }
 }
