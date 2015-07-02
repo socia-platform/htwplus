@@ -4,6 +4,7 @@ import models.base.BaseModel;
 import play.db.jpa.JPA;
 
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import java.util.Date;
@@ -20,6 +21,7 @@ public class Token extends BaseModel {
     @ManyToOne
     public Account user;
 
+    @Column(unique=true)
     public String accessToken;
 
     public Date expires;
