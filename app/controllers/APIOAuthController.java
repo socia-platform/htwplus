@@ -8,6 +8,7 @@ import play.data.Form;
 import play.mvc.Security;
 import play.mvc.Result;
 import views.html.OAuth2.authorizeClient;
+import views.html.OAuth2.editClients;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,19 +19,37 @@ import java.util.UUID;
  */
 public class APIOAuthController extends BaseController {
 
+    private static Form<Client> clientForm = Form.form(Client.class);
+
+    @Security.Authenticated(Secured.class)
     public static Result addClient() {
-        DynamicForm requestData = Form.form().bindFromRequest();
-        Client client = new Client();
-        client.clientName = requestData.get("clientName");
-        client.clientId = UUID.randomUUID().toString();
-        client.clientSecret = UUID.randomUUID().toString();
-        try {
-            client.callback = new URI(requestData.get("callbackUri"));
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+        if (request().method().equals("GET")) {
+            if (Secured.isAdmin()) {
+                return ok(editClients.render(Client.findAll(), clientForm));
+            }
+            else
+                return unauthorized();
+        } else {
+            Form<Client> filledForm= clientForm.bindFromRequest();
+            if (filledForm.data().get("clientName").isEmpty())
+                filledForm.reject("Bitte gib einen Namen an.");
+            if (filledForm.data().get("callback").isEmpty())
+                filledForm.reject("Bitte gib eine Callback-URI an.");
+            if(filledForm.hasErrors()) {
+                return badRequest(editClients.render(Client.findAll(), filledForm));
+            }
+            Client client = new Client();
+            client.clientName = filledForm.data().get("clientName");
+            client.clientId = UUID.randomUUID().toString();
+            client.clientSecret = UUID.randomUUID().toString();
+            try {
+                client.callback = new URI(filledForm.data().get("callback"));
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+            client.create();
+            return ok(editClients.render(Client.findAll(), filledForm));
         }
-        client.create();
-        return ok();
     }
 
     @Security.Authenticated(Secured.class)
