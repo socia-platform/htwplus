@@ -14,28 +14,14 @@
         <div class="col-lg-3" role="complementary">
             <nav class="hidden-xs hidden-sm">
                 <div class="hp-sitenav">
-                    <b><span class="glyphicon glyphicon-comment"></span> HTWplus News</b>
-                    <hr>
-                    <small style="float: right">am 29.06.2015</small>
-                    <br />
-                    <span class="glyphicon glyphicon-fire"></span> Verbesserung der Suche!
-                    <br />
-                    <span class="glyphicon glyphicon-fire"></span> Bessere Gruppenuebersicht!
-                    <br />
-                    <small style="float: right">am 25.06.2015</small>
-                    <br />
-                    <span class="glyphicon glyphicon-fire"></span> Neue Landingpage!
-                    <br />
-                    <span class="glyphicon glyphicon-fire"></span> Neues Suchsystem!
+                    <b><span class="glyphicon glyphicon-list"></span> Gruppen & Kurse</b>
+                    @views.html.Group.snippets.listGroupsLight(groups, currentUser)
                 </div>
                 <div class="hp-sitenav">
                     <b><span class="glyphicon glyphicon-user"></span> Kontakte</b>
                     @views.html.Friends.snippets.listAccountsLight(contacts)
                 </div>
-                <div class="hp-sitenav">
-                    <b><span class="glyphicon glyphicon-list"></span> Gruppen & Kurse</b>
-                    @views.html.Group.snippets.listGroupsLight(groups, currentUser)
-                </div>
+
             </nav>
         </div>
     </div>
