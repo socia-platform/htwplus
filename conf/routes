@@ -117,7 +117,7 @@ GET         /api/posts                                      controllers.APIPostC
 GET         /api/posts/:id                                  controllers.APIPostController.get(id:Long)
 
 # API OAuth
-POST        /api/oauth2/client        controllers.APIOAuthController.addClient
+POST        /api/oauth2/client                              controllers.APIOAuthController.addClient
 GET         /api/oauth2/auth                                controllers.APIOAuthController.authorize
 POST        /api/oauth2/auth                                controllers.APIOAuthController.authorize
 

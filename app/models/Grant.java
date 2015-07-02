@@ -12,11 +12,13 @@ import javax.persistence.OneToOne;
 /**
  * Created by richard on 01.07.15.
  */
-
+@Entity
 public class Grant extends BaseModel {
 
+    @OneToOne
     public Account user;
 
+    @OneToOne
     public Client client;
 
     public String code;

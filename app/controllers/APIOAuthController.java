@@ -7,6 +7,7 @@ import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Security;
 import play.mvc.Result;
+import views.html.OAuth2.authorizeClient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -36,8 +37,12 @@ public class APIOAuthController extends BaseController {
     public static Result authorize() {
         DynamicForm requestData = Form.form().bindFromRequest();
         if (request().method().equals("GET")) {
-            return ok("getmethod" + requestData.get("clientId")); //redirect to authorization view
-        } else {
+            /*Client client = Client.findByClientId(requestData.get("clientId"));
+            if (client != null) {
+                return ok(authorizeClient.render(client.clientName));
+            }*/
+            return ok(authorizeClient.render("App"));
+        } else if (requestData.get("accepted").equals("true")) {
             Grant grant = new Grant();
             grant.user = Component.currentAccount();
             grant.client = Client.findByClientId(requestData.get("clientId"));
@@ -46,6 +51,7 @@ public class APIOAuthController extends BaseController {
             grant.create();
             return redirect(grant.client.callback + "?code=" + authorizationCode);
         }
+        return internalServerError();
     }
 
     @Security.Authenticated(Secured.class)
