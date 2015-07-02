@@ -1,11 +1,13 @@
 package models;
 
 import models.base.BaseModel;
+import play.data.validation.Constraints;
 import play.db.jpa.JPA;
 
 import javax.persistence.Entity;
 import javax.persistence.NoResultException;
 import java.net.URI;
+import java.util.List;
 
 /**
  * Created by richard on 01.07.15.
@@ -13,9 +15,14 @@ import java.net.URI;
 @Entity
 public class Client extends BaseModel {
 
+    @Constraints.Required
     public String clientName;
+
     public String clientId;
+
     public String clientSecret;
+
+    @Constraints.Required
     public URI callback;
 
     @Override
@@ -44,5 +51,9 @@ public class Client extends BaseModel {
         } catch (NoResultException exp) {
             return null;
         }
+    }
+
+    public static List<Client> findAll(){
+        return JPA.em().createQuery("SELECT a FROM Client a ORDER BY a.clientName").getResultList();
     }
 }
