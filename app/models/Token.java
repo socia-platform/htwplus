@@ -3,10 +3,10 @@ package models;
 import models.base.BaseModel;
 import play.db.jpa.JPA;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.NoResultException;
 import java.util.Date;
 
 /**
@@ -39,5 +39,15 @@ public class Token extends BaseModel {
     @Override
     public void delete() {
 
+    }
+
+    public static Token findByAccesToken(String accessToken) {
+        try{
+            return (Token) JPA.em()
+                    .createQuery("from Token a where a.accessToken = :accessToken")
+                    .setParameter("accessToken", accessToken).getSingleResult();
+        } catch (NoResultException exp) {
+            return null;
+        }
     }
 }
