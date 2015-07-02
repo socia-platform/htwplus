@@ -1,13 +1,9 @@
 package models;
 
 import models.base.BaseModel;
-import org.hibernate.annotations.ManyToAny;
 import play.db.jpa.JPA;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.NoResultException;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 /**
  * Created by richard on 01.07.15.
@@ -15,10 +11,10 @@ import javax.persistence.OneToOne;
 @Entity
 public class Grant extends BaseModel {
 
-    @OneToOne
-    public Account user;
+    @ManyToOne
+    public Account account;
 
-    @OneToOne
+    @ManyToOne
     public Client client;
 
     public String code;
@@ -38,11 +34,11 @@ public class Grant extends BaseModel {
 
     }
 
-    public static Grant findByUserId(Long id) {
+    public static Grant findByCode(String code) {
         try{
             return (Grant) JPA.em()
-                    .createQuery("from Grant a where a.user = :id")
-                    .setParameter("user", id).getSingleResult();
+                    .createQuery("from Grant a where a.ccode = :code")
+                    .setParameter("code", code).getSingleResult();
         } catch (NoResultException exp) {
             return null;
         }

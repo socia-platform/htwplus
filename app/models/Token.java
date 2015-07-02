@@ -3,19 +3,26 @@ package models;
 import models.base.BaseModel;
 import play.db.jpa.JPA;
 
+
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import java.util.Date;
 
 /**
  * Created by richard on 01.07.15.
  */
-
+@Entity
 public class Token extends BaseModel {
 
+    @ManyToOne
     public Client client;
 
+    @ManyToOne
     public Account user;
 
     public String accessToken;
+
+    public Date expires;
 
     @Override
     public void create() {
