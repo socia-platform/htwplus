@@ -1,0 +1,61 @@
+@(clients: List[Client], clientForm: Form[Client])
+@import helper._
+@import models._
+@import models.enums._
+
+@main("Clients bearbeiten") {
+
+	<h2>Clients</h2>
+	<br>
+
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Client-Id</th>
+				<th>Callback-URI</th>
+			</tr>
+		</thead>
+		<tbody class="hp-optionsTable">
+			@if(clients.isEmpty) {
+				<tr>
+					<td></td>
+					<td>- keine Treffer -</td>
+					<td class="hp-optionsMenu"></td>
+				</tr>
+			}
+			@for(client <- clients) {
+				<tr>
+					<td>@client.clientName</td>
+					<td>@client.clientId</td>
+					<td>@client.callback.toString</td>
+					@*<td>@views.html.snippets.userLink(client)</td>*@
+				</tr>
+			}
+		</tbody>
+	</table>
+	<br>
+	<h2>Client hinzufügen</h2>
+	<br>
+	<form action="/api/oauth2/clients" method="POST">
+		<dl class="dl-horizontal">
+			@inputText(
+				clientForm("clientName"),
+				'class -> "form-control",
+				'_label -> "Client-Name *",
+				'_error -> clientForm.globalError
+			)
+			@inputText(
+				clientForm("callback"),
+				'class -> "form-control",
+				'_label -> "Callback-URI *",
+				'_error -> clientForm.globalError
+			)
+		</dl>
+		<div class="pull-right">
+			<button type="submit" formmethod="POST" id="submitSignup" class="btn btn-warning">Speichern</button>
+		</div>
+	</form>
+}
+
+
