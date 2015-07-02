@@ -13,9 +13,10 @@ import java.net.URI;
 @Entity
 public class Client extends BaseModel {
 
+    public String clientName;
     public String clientId;
     public String clientSecret;
-    public URI callBack;
+    public URI callback;
 
     @Override
     public void create() {
