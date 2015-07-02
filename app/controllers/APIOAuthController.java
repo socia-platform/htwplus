@@ -34,10 +34,10 @@ public class APIOAuthController extends BaseController {
 
     @Security.Authenticated(Secured.class)
     public static Result authorize() {
+        DynamicForm requestData = Form.form().bindFromRequest();
         if (request().method().equals("GET")) {
-            return ok("getmethod"); //redirect to authorization view
+            return ok("getmethod" + requestData.get("clientId")); //redirect to authorization view
         } else {
-            DynamicForm requestData = Form.form().bindFromRequest();
             Grant grant = new Grant();
             grant.user = Component.currentAccount();
             grant.client = Client.findByClientId(requestData.get("clientId"));
