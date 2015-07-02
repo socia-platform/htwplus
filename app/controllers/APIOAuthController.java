@@ -1,7 +1,7 @@
 package controllers;
 
 import models.Client;
-import models.Grant;
+import models.UserGrant;
 import models.Token;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -13,7 +13,6 @@ import views.html.OAuth2.editClients;
 import javax.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -65,13 +64,13 @@ public class APIOAuthController extends BaseController {
                 return ok(authorizeClient.render(client.clientName, client.clientId));
             }
         } else if (requestData.get("accepted").equals("true")) {
-            Grant grant = new Grant();
-            grant.account = Component.currentAccount();
+            UserGrant grant = new UserGrant();
+            grant.user = Component.currentAccount();
             grant.client = Client.findByClientId(requestData.get("clientId"));
             String authorizationCode = UUID.randomUUID().toString();
             grant.code = authorizationCode;
             grant.create();
-            return ok();
+            return ok(grant.client.callback + "?authorizationCode=" + authorizationCode);
         }
         return internalServerError();
     }
@@ -80,7 +79,7 @@ public class APIOAuthController extends BaseController {
     @Transactional
     public static Result getToken() {
         DynamicForm requestData = Form.form().bindFromRequest();
-        Grant grant = Grant.findByCode(requestData.get("code"));
+        UserGrant grant = UserGrant.findByCode(requestData.get("code"));
         if (grant != null) {
             Client client = grant.client;
             Token token = new Token();

@@ -6,8 +6,10 @@ import play.db.jpa.JPA;
 
 import javax.persistence.Entity;
 import javax.persistence.NoResultException;
+import javax.persistence.OneToMany;
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by richard on 01.07.15.

@@ -54,8 +54,6 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	@Expose(name ="firstname")
 	public String firstname;
 
-	public String funfunf;
-
 	@Required
 	@Expose(name = "lastname")
 	public String lastname;
