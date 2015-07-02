@@ -4,7 +4,9 @@ import models.Post;
 import models.enums.CustomContentType;
 import net.hamnaberg.json.*;
 import net.hamnaberg.json.Error;
+import play.db.jpa.Transactional;
 import play.mvc.Result;
+import play.mvc.Security;
 import util.JsonCollectionUtil;
 
 import java.net.URI;
@@ -36,6 +38,8 @@ public class APIPostController extends BaseController {
         }
     }
 
+    @Transactional
+    @Security.Authenticated(SecuredWithToken.class)
     public static Result get(final Long id) {
         if(request().getHeader("Accept").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
             URI uri = URI.create(request().host() + request().path());
