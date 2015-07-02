@@ -3,6 +3,8 @@ package controllers;
 import models.Client;
 import models.Grant;
 import models.Token;
+import play.data.DynamicForm;
+import play.data.Form;
 import play.mvc.Security;
 import play.mvc.Result;
 
@@ -15,12 +17,14 @@ import java.util.UUID;
  */
 public class APIOAuthController extends BaseController {
 
-    public static Result addClient(String clientId, String clientSecret, String callback) {
+    public static Result addClient() {
+        DynamicForm requestData = Form.form().bindFromRequest();
         Client client = new Client();
-        client.clientId = clientId;
-        client.clientSecret = clientSecret;
+        client.clientName = requestData.get("clientName");
+        client.clientId = UUID.randomUUID().toString();
+        client.clientSecret = UUID.randomUUID().toString();
         try {
-            client.callBack = new URI(callback);
+            client.callback = new URI(requestData.get("callbackUri"));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -29,29 +33,33 @@ public class APIOAuthController extends BaseController {
     }
 
     @Security.Authenticated(Secured.class)
-    public static Result authorize(String clientId, String user) {
+    public static Result authorize() {
         if (request().method().equals("GET")) {
-            return ok("getmethod" + clientId); //redirect to authorization view
+            return ok("getmethod"); //redirect to authorization view
         } else {
+            DynamicForm requestData = Form.form().bindFromRequest();
             Grant grant = new Grant();
             grant.user = Component.currentAccount();
-            grant.client = Client.findByClientId(clientId);
+            grant.client = Client.findByClientId(requestData.get("clientId"));
             String authorizationCode = UUID.randomUUID().toString();
             grant.code = authorizationCode;
             grant.create();
-            return redirect(grant.client.callBack + "?code=" + authorizationCode);
+            return redirect(grant.client.callback + "?code=" + authorizationCode);
         }
     }
 
     @Security.Authenticated(Secured.class)
-    public static Result getToken(String clientId, String clientSecret, String code, String callback) {
-        if (Grant.findByUserId(Component.currentAccount().id).code.equals(code)) {
+    public static Result getToken() {
+        DynamicForm requestData = Form.form().bindFromRequest();
+        Grant grant = Grant.findByUserId(Component.currentAccount().id);
+        if ((grant != null) && (grant.code.equals(requestData.get("code")))) {
+            Client client = grant.client;
             Token token = new Token();
             token.accessToken = UUID.randomUUID().toString();
-            token.client = Client.findByClientId(clientId);
+            token.client = client;
             token.user = Component.currentAccount();
             token.create();
-            return redirect(callback + "?access_token=" + token.accessToken);
+            return redirect(client.callback.toString() + "?access_token=" + token.accessToken);
         } else
             return badRequest("Incorrect authorization code.");
     }
