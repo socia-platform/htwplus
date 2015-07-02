@@ -39,7 +39,7 @@ public class UserGrant extends BaseModel {
     public static UserGrant findByCode(String code) {
         try{
             return (UserGrant) JPA.em()
-                    .createQuery("from Grant a where a.ccode = :code")
+                    .createQuery("from UserGrant a where a.code = :code")
                     .setParameter("code", code).getSingleResult();
         } catch (NoResultException exp) {
             return null;
