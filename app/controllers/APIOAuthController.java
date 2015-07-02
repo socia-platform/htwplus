@@ -79,7 +79,7 @@ public class APIOAuthController extends BaseController {
     @Transactional
     public static Result getToken() {
         DynamicForm requestData = Form.form().bindFromRequest();
-        UserGrant grant = UserGrant.findByCode(requestData.get("code"));
+        UserGrant grant = UserGrant.findByCode(requestData.get("authorizationCode"));
         if (grant != null) {
             Client client = grant.client;
             Token token = new Token();
