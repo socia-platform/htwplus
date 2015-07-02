@@ -1,4 +1,4 @@
-@(clientName: String)
+@(clientName: String, clientId: String)
 @import helper._
 @import models._
 
@@ -8,6 +8,7 @@
 	<br>
 
 	<form method="POST" action="/api/oauth2/auth">
+		<input name="clientId" value="@clientId" hidden>
 		<button class="btn btn-success" type="submit" name="accepted" value="true">Ja</button>
 		<button class="btn btn-danger" type="submit" name="accepted" value="false">Nein</button>
 	</form>
