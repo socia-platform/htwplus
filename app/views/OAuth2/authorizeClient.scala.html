@@ -1,0 +1,15 @@
+@(clientName: String)
+@import helper._
+@import models._
+
+@main("OAuth2 Client Authorization") {
+	<h2>Zugang erlauben</h2>
+	<p>@clientName zugriff erlauben?</p>
+	<br>
+
+	<form method="POST" action="/api/oauth2/auth">
+		<button class="btn btn-success" type="submit" name="accepted" value="true">Ja</button>
+		<button class="btn btn-danger" type="submit" name="accepted" value="false">Nein</button>
+	</form>
+
+}
