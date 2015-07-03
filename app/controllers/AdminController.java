@@ -89,30 +89,30 @@ public class AdminController extends BaseController {
     }
 
     public static Result indexDelete() {
-        try {
-            ElasticsearchService.deleteIndex();
-            flash("info","index gelöscht");
-        } catch(IndexMissingException ime) {
-            flash("error","index "+ime.getMessage());
-        } catch(NoNodeAvailableException nna) {
-            flash("error",nna.getMessage());
-        }
+        // try {
+        //     ElasticsearchService.deleteIndex();
+        //     flash("info","index gelöscht");
+        // } catch(IndexMissingException ime) {
+        //     flash("error","index "+ime.getMessage());
+        // } catch(NoNodeAvailableException nna) {
+        //     flash("error",nna.getMessage());
+        // }
 
         return ok(indexing.render());
     }
 
     public static Result indexSettings() throws IOException {
-        if (ElasticsearchService.isClientAvailable()) {
-            if (!ElasticsearchService.isIndexExists()) {
-                ElasticsearchService.createAnalyzer();
-                ElasticsearchService.createMapping();
-                flash("success","Mapping und Anazyler erfolgreich erstellt!");
-            } else {
-                flash("error","Index bereits vorhanden.");
-            }
-        } else {
-            flash("error", "Elasticsearch nicht erreichbar!");
-        }
+        // if (ElasticsearchService.isClientAvailable()) {
+        //     if (!ElasticsearchService.isIndexExists()) {
+        //         ElasticsearchService.createAnalyzer();
+        //         ElasticsearchService.createMapping();
+        //         flash("success","Mapping und Anazyler erfolgreich erstellt!");
+        //     } else {
+        //         flash("error","Index bereits vorhanden.");
+        //     }
+        // } else {
+        //     flash("error", "Elasticsearch nicht erreichbar!");
+        // }
 
         return ok(indexing.render());
     }

@@ -67,12 +67,12 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	@Required
 	public String password;
-	
+
 	public String avatar;
 
 	@OneToMany(mappedBy = "account")
 	public Set<Friendship> friends;
-	
+
 	@OneToMany(mappedBy="account")
 	public Set<GroupAccount> groupMemberships;
 
@@ -108,7 +108,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
      * @param id Account ID
      * @return Account instance
      */
-	public static Account findById(Long id) {
+	public static Account findById(long id) {
 		return JPA.em().find(Account.class, id);
 	}
 
@@ -121,11 +121,11 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public void create() {
 		this.name = firstname+" "+lastname;
 		JPA.em().persist(this);
-        try {
-            ElasticsearchService.indexAccount(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     ElasticsearchService.indexAccount(this);
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
     }
 
 	@Override
@@ -138,7 +138,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public void delete() {
 		// TODO Auto-generated method stub
 	}
-		
+
 	/**
      * Retrieve a User from email.
      */
@@ -154,7 +154,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	    	return null;
 		}
     }
-    
+
 	/**
      * Retrieve a User by loginname
      */
@@ -184,7 +184,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
     /**
      * Authenticates a user by email and password.
      * @param email of the user who wants to be authenticate
-     * @param password of the user should match to the email ;) 
+     * @param password of the user should match to the email ;)
      * @return Returns the current account or Null
      */
 	public static Account authenticate(String email, String password) {
@@ -209,7 +209,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	static public int AVATAR_MEDIUM_SIZE = 140;
 	static public int AVATAR_SMALL_SIZE = 70;
 	static public String AVATAR_CUSTOM = "custom";
-	static public enum AVATAR_SIZE {
+	public enum AVATAR_SIZE {
 		SMALL, MEDIUM, LARGE
 	}
 
@@ -344,12 +344,12 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		sb.append(Character.toUpperCase(this.lastname.charAt(0)));
 		return sb.toString();
 	}
-	
+
 	public static boolean isOwner(Long accountId, Account currentUser) {
 		Account a = JPA.em().find(Account.class, accountId);
 		if(a.equals(currentUser)){
 			return true;
-		} else { 
+		} else {
 			return false;
 		}
 	}
@@ -392,7 +392,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
         return node;
     }
-	
+
 	@SuppressWarnings("unchecked")
     public static List<Account> getAllNames(){
         return JPA.em().createQuery("SELECT a.id, a.name FROM Account a").getResultList();
@@ -402,11 +402,11 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
      * Index the current account
      */
     public void indexAccount() {
-        try {
-            ElasticsearchService.indexAccount(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     ElasticsearchService.indexAccount(this);
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
     }
 
     /**
@@ -414,7 +414,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
      */
     public static long indexAllAccounts() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Account account: all()) ElasticsearchService.indexAccount(account);
+        // for (Account account: all()) ElasticsearchService.indexAccount(account);
         return (System.currentTimeMillis() - start) / 100;
 
     }
@@ -423,7 +423,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
 		@Constraints.Required
 		public Integer x;
-		
+
 		@Constraints.Required
 		public Integer y;
 

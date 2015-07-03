@@ -23,11 +23,11 @@ public class Friendship extends BaseNotifiable implements INotifiable {
     public static final String FRIEND_REQUEST_DECLINE = "request_decline";
     public static final String FRIEND_NEW_REQUEST = "new_request";
     public static final int PAGE = 1;
-	
+
 	@ManyToOne
 	@NotNull
 	public Account account;
-	
+
 	@ManyToOne
 	@NotNull
 	public Account friend;
@@ -35,16 +35,16 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 	@Enumerated(EnumType.STRING)
 	@NotNull
 	public LinkType linkType;
-	
+
 	public Friendship() {
 	}
-	
+
 	public Friendship(Account account, Account friend, LinkType type) {
 		this.account = account;
 		this.friend = friend;
 		this.linkType = type;
 	}
-	
+
 	public static Friendship findById(Long id) {
 		return JPA.em().find(Friendship.class, id);
 	}
@@ -60,11 +60,11 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 
         // each account document contains information about their friends
         // if a user accepts a friendship -> (re)index this.account document
-        try {
-            ElasticsearchService.indexAccount(this.account);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     ElasticsearchService.indexAccount(this.account);
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
 	}
 
 	@Override
@@ -75,12 +75,11 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 
         // each account document contains information about their friends
         // if a user deletes his friendship -> (re)index this.account document
-        try {
-            ElasticsearchService.indexAccount(this.account);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        // try {
+        //     ElasticsearchService.indexAccount(this.account);
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
 	}
 
 	public static Friendship findRequest(Account me, Account potentialFriend) {
@@ -91,7 +90,7 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 			return null;
 		}
 	}
-	
+
 	public static Friendship findReverseRequest(Account me, Account potentialFriend) {
 		try{
 			return (Friendship) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.friend.id = ?1 AND fs.account.id = ?2 AND fs.linkType = ?3")
@@ -100,7 +99,7 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 			return null;
 		}
 	}
-	
+
 	public static Friendship findFriendLink(Account account, Account target) {
 		try{
 			return (Friendship) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 and fs.friend.id = ?2 AND fs.linkType = ?3")
@@ -126,7 +125,7 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 		}
 		return true;
 	}
-	
+
 	public static boolean alreadyRejected(Account me, Account potentialFriend) {
 		try {
 			JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 and fs.friend.id = ?2 AND fs.linkType = ?3")
@@ -147,36 +146,36 @@ public class Friendship extends BaseNotifiable implements INotifiable {
         return (List<Long>) JPA.em().createQuery("SELECT fs.friend.id FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
                 .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList();
     }
-	
+
 	@SuppressWarnings("unchecked")
 	public static List<Friendship> findRequests(final Account account) {
 		return (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE (fs.friend.id = ?1 OR fs.account.id = ?1) AND fs.linkType = ?2")
                 .setParameter(1, account.id).setParameter(2, LinkType.request).getResultList();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static List<Friendship> findRejects(final Account account) {
 		return (List<Friendship>) JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
                 .setParameter(1, account.id).setParameter(2, LinkType.reject).getResultList();
 	}
-	
+
 	public static List<Account> friendsToInvite(Account account, Group group) {
 		List<Account> inevitableFriends = findFriends(account);
-		
+
 		if (inevitableFriends != null) {
 			Iterator<Account> it = inevitableFriends.iterator();
 			Account friend;
-			
+
 			while(it.hasNext()) {
 				friend = it.next();
-				
+
 				//remove account from list if there is any type of link (requests, invite, already member)
 				if (GroupAccount.hasLinkTypes(friend, group)) {
 					it.remove();
 				}
-			}	        
+			}
 		}
-		
+
 		return inevitableFriends;
 	}
 

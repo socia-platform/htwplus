@@ -49,11 +49,11 @@ public class GroupAccount extends BaseModel {
 
         // each group document contains information about their member
         // if a user create or join to this.group -> (re)index this.group document
-        try {
-            ElasticsearchService.indexGroup(this.group);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     ElasticsearchService.indexGroup(this.group);
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
     }
 
 	@Override
@@ -63,15 +63,15 @@ public class GroupAccount extends BaseModel {
         // each group document contains information about their member
         // if a user gets access to this.group -> (re)index this.group document
         // and (re)index all containing post documents
-        try {
-            ElasticsearchService.indexGroup(this.group);
-            for (Post post : Post.getPostsForGroup(this.group, 0, 0)) {
-                ElasticsearchService.indexPost(post);
-            }
-            ;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     ElasticsearchService.indexGroup(this.group);
+        //     for (Post post : Post.getPostsForGroup(this.group, 0, 0)) {
+        //         ElasticsearchService.indexPost(post);
+        //     }
+        //     ;
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
 	}
 
 	@Override
@@ -82,13 +82,13 @@ public class GroupAccount extends BaseModel {
 
         // each group document contains information about their member
         // if a user leaves this.group -> (re)index this.group document
-        try {
-            ElasticsearchService.indexGroup(this.group);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     ElasticsearchService.indexGroup(this.group);
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
 	}
-	
+
 	/**
 	 * Find all groups and courses where given account is owner or member
 	 */
@@ -117,7 +117,7 @@ public class GroupAccount extends BaseModel {
 				.setParameter(3, GroupType.course).getResultList();
 		return groupAccounts;
 	}
-	
+
 	/**
 	 * Find all courses where given account is owner or member.
 	 */
@@ -134,7 +134,7 @@ public class GroupAccount extends BaseModel {
 		return courseAccounts;
 	}
 	/**
-	 * Find all open groups where given account is owner or member 
+	 * Find all open groups where given account is owner or member
 	 */
     @SuppressWarnings("unchecked")
 	public static List<Group> findPublicEstablished(final Account account) {
@@ -150,7 +150,7 @@ public class GroupAccount extends BaseModel {
 	/**
 	 * Find all requests and rejects for summarization under "Offene Anfragen"
 	 * for given Account
-	 * 
+	 *
 	 * @param account Account instance
 	 * @return List of group accounts
 	 */
@@ -164,7 +164,7 @@ public class GroupAccount extends BaseModel {
 				.setParameter(3, LinkType.reject).setParameter(4, LinkType.invite).getResultList();
 		return groupAccounts;
 	}
-	
+
 	/**
 	 * Has account any link-types to given group?
      *
@@ -181,7 +181,7 @@ public class GroupAccount extends BaseModel {
 		}
 		return true;
 	}
-	
+
 	/**
      * Retrieve Accounts from Group with given LinkType.
      */

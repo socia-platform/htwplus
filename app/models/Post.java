@@ -134,15 +134,15 @@ public class Post extends BaseNotifiable implements INotifiable {
 
         return validated;
     }
-		
+
 	public void create() {
 		JPA.em().persist(this);
-        try {
-            if (!this.owner.role.equals(AccountRole.ADMIN))
-            ElasticsearchService.indexPost(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     if (!this.owner.role.equals(AccountRole.ADMIN))
+        //     ElasticsearchService.indexPost(this);
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
     }
 
     public String validate() {
@@ -169,11 +169,11 @@ public class Post extends BaseNotifiable implements INotifiable {
         Notification.deleteReferences(this);
 
         // Delete Elasticsearch document
-        ElasticsearchService.deletePost(this);
+        // ElasticsearchService.deletePost(this);
 
         JPA.em().remove(this);
 	}
-	
+
 	protected static Query limit(Query query, int limit, int offset) {
 		query.setMaxResults(limit);
 		if (offset >= 0) {
@@ -181,7 +181,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 		}
 		return query;
 	}
-		
+
 	public static Post findById(Long id) {
         return JPA.em().find(Post.class, id);
 	}
@@ -197,20 +197,20 @@ public class Post extends BaseNotifiable implements INotifiable {
 
         return query.getResultList();
 	}
-	
+
 	public static int countPostsForGroup(final Group group) {
 		return ((Number)JPA.em().createQuery("SELECT COUNT(p) FROM Post p WHERE p.group.id = ?1").setParameter(1, group.id).getSingleResult()).intValue();
 	}
-	
-	
+
+
 	@SuppressWarnings("unchecked")
 	public static List<Post> getCommentsForPost(Long id, int limit, int offset) {
 		Query query = JPA.em()
                 .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
                 .setParameter(1, id);
-		
+
 		query = limit(query, limit, offset);
-		
+
 		return (List<Post>) query.getResultList();
 	}
 
@@ -227,7 +227,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 		final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, bookmarkList, filter, "");
         return ((Number) query.getSingleResult()).intValue();
 	}
-	
+
 	/**
 	 * @param account - Account (usually: current user or a contact)
 	 * @param groupList - a list containing all groups we want to search in (usually all groups from account)
@@ -342,17 +342,17 @@ public class Post extends BaseNotifiable implements INotifiable {
 
         return assembledClauses;
     }
-	
+
 	public static int countCommentsForPost(final Long id) {
 		return ((Number)JPA.em().createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
     }
-	
+
 	public int getCountComments() {
 		return Post.countCommentsForPost(this.id);
 	}
-	
+
 	public boolean belongsToGroup() { return this.group != null; }
-		
+
 	public boolean belongsToAccount() { return this.account != null; }
 
     public boolean belongsToPost() { return this.parent != null; }
@@ -368,7 +368,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 		List<Account> friendList = Friendship.findFriends(account);
 		List<Group> groupList = GroupAccount.findEstablished(account);
         List<Post> bookmarkList = PostBookmark.findByAccount(account);
-		
+
 		int offset = (page * limit) - limit;
 		return findStreamForAccount(account, groupList, friendList, bookmarkList, "all", limit, offset);
 	}
@@ -381,8 +381,8 @@ public class Post extends BaseNotifiable implements INotifiable {
         int offset = (page * limit) - limit;
         return findStreamForAccount(account, GroupAccount.findEstablished(account), Friendship.findFriends(account), PostBookmark.findByAccount(account), filter, limit, offset);
     }
-	
-	
+
+
 	/**
 	 * @param account Account (current user)
 	 * @return Number of Posts
@@ -530,7 +530,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     public static long indexAllPosts() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Post post: allWithoutAdmin()) ElasticsearchService.indexPost(post);
+        // for (Post post: allWithoutAdmin()) ElasticsearchService.indexPost(post);
         return (System.currentTimeMillis() - start) / 100;
 
     }

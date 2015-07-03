@@ -11,6 +11,8 @@ import models.Group;
 import models.Post;
 import models.enums.AccountRole;
 import models.enums.GroupType;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
+import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import play.Play;
@@ -26,7 +28,7 @@ import scala.concurrent.duration.Duration;
 
 @SuppressWarnings("unused")
 public class Global extends GlobalSettings {
-	
+
 	@Override
 	public void beforeStart(Application app) {
 		Logger.info(" Global beforeStart");
@@ -62,22 +64,23 @@ public class Global extends GlobalSettings {
             Akka.system().dispatcher()
         );
 
+
         // trying to connect to Elasticsearch
-        ElasticsearchService.getInstance().getClient();
-        Logger.info("trying to connect to Elasticsearch");
-        if (ElasticsearchService.isClientAvailable()) {
-            Logger.info("... success");
-            Logger.info("trying to create HTWPlus index and mapping");
-            if (!ElasticsearchService.isIndexExists()) {
-                ElasticsearchService.createAnalyzer();
-                ElasticsearchService.createMapping();
-                Logger.info("... success");
-            } else {
-                Logger.info("... failed (it already exists?)");
-            }
-        } else {
-            Logger.info("... failed");
-        }
+        // ElasticsearchService.getInstance().getClient();
+        // Logger.info("trying to connect to Elasticsearch");
+        // if (ElasticsearchService.isClientAvailable()) {
+        //     Logger.info("... success");
+        //     Logger.info("trying to create HTWPlus index and mapping");
+        //     if (!ElasticsearchService.isIndexExists()) {
+        //         ElasticsearchService.createAnalyzer();
+        //         ElasticsearchService.createMapping();
+        //         Logger.info("... success");
+        //     } else {
+        //         Logger.info("... failed (it already exists?)");
+        //     }
+        // } else {
+        //     Logger.info("... failed");
+        // }
 
 		InitialData.insert(app);
 
@@ -86,7 +89,7 @@ public class Global extends GlobalSettings {
     @Override
     public void onStop(Application app) {
         Logger.info("closing ES client...");
-        ElasticsearchService.getInstance().closeClient();
+        // ElasticsearchService.getInstance().closeClient();
         Logger.info("ES client closed");
     }
 
@@ -131,11 +134,11 @@ public class Global extends GlobalSettings {
                 ? next.plusHours(24)
                 : next;
     }
-	
+
 	@Override
 	public Promise<Result> onError(final RequestHeader rh, final Throwable t) {
 		Logger.error("onError "+ rh + " " + t);
-				
+
 		JPA.withTransaction(new play.libs.F.Callback0() {
 			@Override
 			public void invoke() throws Throwable {
@@ -149,8 +152,8 @@ public class Global extends GlobalSettings {
                 }
 			}
 		});
-		
-		
+
+
 		// prod mode? return 404 page
 		if(Play.isProd()){
 			return Promise.pure(play.mvc.Results.redirect(routes.Application.error()));
@@ -158,14 +161,14 @@ public class Global extends GlobalSettings {
 
 		return super.onError(rh, t);
 	}
-	
+
 	static class InitialData {
 		public static void insert(Application app) {
-			
+
 			final String adminGroupTitle = app.configuration().getString("htwplus.admin.group");
 			final String adminMail = app.configuration().getString("htwplus.admin.mail");
 			final String adminPassword = app.configuration().getString("htwplus.admin.pw");
-			
+
 			// Do some inital db stuff
 			JPA.withTransaction(new play.libs.F.Callback0() {
 				@Override
@@ -202,6 +205,16 @@ public class Global extends GlobalSettings {
                         group.description = "Du hast Wünsche, Ideen, Anregungen, Kritik oder Probleme mit der Seite? Hier kannst du es loswerden!";
                         group.createWithGroupAccount(admin);
                     }
+
+                    // try creating elasticsearch analyzer and mapping
+                    // try {
+                    //     ElasticsearchService.createAnalyzer();
+                    //     ElasticsearchService.createMapping();
+                    // } catch(NoNodeAvailableException nnae) {
+                    //     Logger.error(nnae.getMessage());
+                    // } catch(IndexAlreadyExistsException iaee) {
+                    //     Logger.info("index "+iaee.getMessage());
+                    // }
 
 				}
 			});
