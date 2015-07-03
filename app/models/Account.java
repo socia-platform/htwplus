@@ -363,6 +363,19 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
         return JPA.em().createQuery("FROM Account").getResultList();
 	}
 
+	/**
+	 * Try to get a chunk of accounts
+	 * @param offset First x accounts will be skipped
+	 * @param count Get only x accounts
+	 * @return
+	 */
+	public static List<Account> some(int offset, int count) {
+		return JPA.em().createQuery("From Account")
+				.setFirstResult(offset)
+				.setMaxResults(count)
+				.getResultList();
+	}
+
 
     /**
      * Returns a list of account instances by an ID collection of Strings.

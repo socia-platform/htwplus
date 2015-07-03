@@ -1,53 +1,42 @@
 package controllers;
 
 import models.Account;
+import models.base.BaseModel;
 import models.enums.CustomContentType;
 import net.hamnaberg.json.*;
 import net.hamnaberg.json.Error;
 import play.mvc.Result;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class APIUserController extends BaseController {
 
-    public static Result get(final Long id) {
+    public static Result get(final long id) {
         if (request().getHeader("Accept").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
-
-            // I don't like the way they did it, but that's the way this framework fixed the protocol thing
-            // https://github.com/playframework/playframework/issues/842
-            String protocol = request().secure() ? "https://" : "http://";
-            
-            URI uri = URI.create(protocol + request().host() + request().path());
-
             Error error = Error.EMPTY;
-            List<Item> items = null;
+            List<Item> items;
 
             if (id == 0) {  // http GET .../users
-                items = Account.all()
-                        .stream()
-                        .map(a -> Item.create(URI.create(uri.toString() + "/" + a.id), a.getProperties()))
-                        .collect(Collectors.toList());
-
+//                items = BaseModel.getRequestedItems(Account.class, Account.all()); // Get all users from DB and limit them
+                items = BaseModel.getRequestedItems(Account.class, Account::some);   // Better get only limited users from DB
             } else {  // http GET .../users/:id
                 Account account = Account.findById(id);
-                items = new ArrayList<Item>();
+                items = new ArrayList<>();
                 if (account == null) {
                     error = net.hamnaberg.json.Error.create("Account not found", "404", "The " +
                                                             "requested account does not seem to exist.");
                 } else {
-                    items.add(Item.create(uri, account.getProperties()));
+                    items.add(Item.create(getBaseUri(), account.getProperties()));
                 }
             }
 
             Collection collection = Collection.create(
-                    uri,
-                    new ArrayList<Link>(),
+                    getFullUri(),
+                    new ArrayList<>(),
                     items,
-                    new ArrayList<Query>(),
+                    new ArrayList<>(),
                     Template.create(Account.EXAMPLE.getProperties()),
                     error
             );
