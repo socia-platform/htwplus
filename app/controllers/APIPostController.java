@@ -38,8 +38,8 @@ public class APIPostController extends BaseController {
         }
     }
 
-    @Transactional
-    @Security.Authenticated(SecuredWithToken.class)
+    /*@Transactional
+    @Security.Authenticated(SecuredWithToken.class)*/
     public static Result get(final Long id) {
         if(request().getHeader("Accept").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
             URI uri = URI.create(request().host() + request().path());
