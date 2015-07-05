@@ -5,6 +5,7 @@ import models.Post;
 import models.enums.CustomContentType;
 import net.hamnaberg.json.Collection;
 import play.mvc.Result;
+import play.mvc.Security;
 import util.JsonCollectionUtil;
 
 /**
@@ -13,8 +14,7 @@ import util.JsonCollectionUtil;
 public class APIPostController extends BaseController {
 
     public static Result post() {
-        if (JsonCollectionUtil.hasJsonCollection(request()))
-        {
+        if (JsonCollectionUtil.hasJsonCollection(request())) {
             Collection jcol = JsonCollectionUtil.getJsonCollection(request());
             jcol = Post.validatePost(jcol);
             if (!jcol.hasError()) {
@@ -24,12 +24,13 @@ public class APIPostController extends BaseController {
             } else {
                 return badRequest(jcol.asJson());
             }
-        }
-        else {
-            return internalServerError();
+        } else {
+            return statusWithWarning(NOT_ACCEPTABLE, "Only accepting Accept header: " + CustomContentType.JSON_COLLECTION.getIdentifier());
         }
     }
 
+    /*@Transactional
+    @Security.Authenticated(SecuredWithToken.class)*/
     public static Result get(final Long id) {
         if(request().getHeader("Accept").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
             Collection collection;
@@ -48,7 +49,7 @@ public class APIPostController extends BaseController {
             }
 
             response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
-            return ok(collection.toString());
+            return ok(collection.asJson());
         } else {
             return statusWithWarning(NOT_ACCEPTABLE, "Only accepting Accept header: " + CustomContentType.JSON_COLLECTION.getIdentifier());
         }

@@ -116,5 +116,12 @@ POST        /api/posts                                 controllers.APIPostContro
 GET         /api/posts                                 controllers.APIPostController.get(id:Long = -1)
 GET         /api/posts/:id                             controllers.APIPostController.get(id:Long)
 
+# API OAuth
+GET         /api/oauth2/clients                        controllers.APIOAuthController.addClient()
+POST        /api/oauth2/clients                        controllers.APIOAuthController.addClient()
+GET         /api/oauth2/authorize                      controllers.APIOAuthController.authorize()
+POST        /api/oauth2/authorize                      controllers.APIOAuthController.authorize()
+GET         /api/oauth2/token                          controllers.APIOAuthController.getToken()
+
 # No route found? take this
 GET         /*path                                     controllers.Application.defaultRoute(path: String)
