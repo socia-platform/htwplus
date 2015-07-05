@@ -1,16 +1,11 @@
 package controllers;
 
+import com.google.common.collect.Lists;
 import models.Post;
 import models.enums.CustomContentType;
-import net.hamnaberg.json.*;
-import net.hamnaberg.json.Error;
+import net.hamnaberg.json.Collection;
 import play.mvc.Result;
 import util.JsonCollectionUtil;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by richard on 17.06.15.
@@ -37,36 +32,23 @@ public class APIPostController extends BaseController {
 
     public static Result get(final Long id) {
         if(request().getHeader("Accept").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
-            URI uri = URI.create(request().host() + request().path());
-            Error error = Error.EMPTY;
-            List<Item> items = null;
-
-            if (id == 0) { // http GET .../users
-                items = Post.allWithoutAdmin()
-                        .stream()
-                        .map(a -> Item.create(URI.create(uri.toString() + "/" + a.id), a.getProperties()))
-                        .collect(Collectors.toList());
-            } else { // http GET .../users/:id
+            Collection collection;
+            if (id >= 0) { // http GET .../users/:id
                 Post post = Post.findById(id);
-                items = new ArrayList<Item>();
+
                 if (post == null) {
-                    error = Error.create("Post not found", "404", "The requested post does not seem to exist.");
+                    collection = JsonCollectionUtil.getErrorCollection(Post.class,
+                            "Post not found", "404", "The requested post does not seem to exist.");
                 } else {
-                    items.add(Item.create(uri, post.getProperties()));
+                    collection = JsonCollectionUtil.getRequestedCollection(Post.class, Lists.newArrayList(post));
                 }
+            } else { // http GET ...users
+                collection = JsonCollectionUtil.getRequestedCollection(Post.class, Post.allWithoutAdmin()); // Get all users from DB and limit them
+//                collection = JsonCollectionUtil.getRequestedCollection(Post.class, Post::some, Error.EMPTY);           // Better get only limited users from DB
             }
 
-            Collection collection = Collection.create(
-                    uri,
-                    new ArrayList<Link>(),
-                    items,
-                    new ArrayList<Query>(),
-                    Template.create(),
-                    error
-            );
-
             response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
-            return ok(collection.asJson());
+            return ok(collection.toString());
         } else {
             return statusWithWarning(NOT_ACCEPTABLE, "Only accepting Accept header: " + CustomContentType.JSON_COLLECTION.getIdentifier());
         }

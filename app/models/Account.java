@@ -51,17 +51,17 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public String name;
 
 	@Required
-	@Expose(name ="firstname")
+	@Expose(name ="firstname", template = "John")
 	public String firstname;
 
 	public String funfunf;
 
 	@Required
-	@Expose(name = "lastname")
+	@Expose(name = "lastname", template = "Doe")
 	public String lastname;
 
 	@Email
-	@Expose(name = "email")
+	@Expose(name = "email", template = "john@doe-online.com")
 	@Column(unique=true)
 	public String email;
 
@@ -93,14 +93,6 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
     public Integer dailyEmailNotificationHour;
 
 	public Boolean approved;
-
-    // used for collection+JSON template generation
-    public static final Account EXAMPLE = new Account();
-    static {
-        EXAMPLE.firstname = "John";
-        EXAMPLE.lastname = "Doe";
-        EXAMPLE.email = "john@doe-online.com";
-    }
 
     /**
      * Returns an account by account ID.

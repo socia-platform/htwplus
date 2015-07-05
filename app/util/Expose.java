@@ -12,4 +12,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface Expose {
     String name();
+    String template() default "";
+    boolean filterable() default false;
+    String dbname() default "";
 }
