@@ -29,7 +29,7 @@ public class APIUserController extends BaseController {
             response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
             return ok(collection.toString());
         } else {
-            return statusWithWarning(NOT_ACCEPTABLE, "Only accepting Accept header: " + CustomContentType.JSON_COLLECTION.getIdentifier());
+            return statusWithWarning(NOT_ACCEPTABLE, CustomContentType.JSON_COLLECTION.getAcceptHeaderMessage());
         }
     }
 }

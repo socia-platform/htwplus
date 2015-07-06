@@ -25,7 +25,7 @@ public class APIPostController extends BaseController {
                 return badRequest(jcol.asJson());
             }
         } else {
-            return statusWithWarning(NOT_ACCEPTABLE, "Only accepting Accept header: " + CustomContentType.JSON_COLLECTION.getIdentifier());
+            return statusWithWarning(NOT_ACCEPTABLE, CustomContentType.JSON_COLLECTION.getAcceptHeaderMessage());
         }
     }
 
@@ -51,7 +51,7 @@ public class APIPostController extends BaseController {
             response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
             return ok(collection.asJson());
         } else {
-            return statusWithWarning(NOT_ACCEPTABLE, "Only accepting Accept header: " + CustomContentType.JSON_COLLECTION.getIdentifier());
+            return statusWithWarning(NOT_ACCEPTABLE, CustomContentType.JSON_COLLECTION.getAcceptHeaderMessage());
         }
     }
 }
