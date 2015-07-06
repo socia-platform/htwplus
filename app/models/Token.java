@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.NoResultException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
@@ -68,5 +69,12 @@ public class Token extends BaseModel {
         } catch (NoResultException exp) {
             return null;
         }
+    }
+
+    public boolean hasExpired() {
+        if (expires != null)
+            return expires.after(Date.from(Instant.now()));
+        else
+            return false;
     }
 }
