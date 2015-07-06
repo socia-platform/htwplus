@@ -22,7 +22,7 @@ public class APIPostController extends BaseController {
                 post.create();
                 return ok();
             } else {
-                return badRequest(jcol.asJson());
+                return badRequest(JsonCollectionUtil.addTemplate(Post.class, jcol).asJson());
             }
         } else {
             return statusWithWarning(NOT_ACCEPTABLE, CustomContentType.JSON_COLLECTION.getAcceptHeaderMessage());
