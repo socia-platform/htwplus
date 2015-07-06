@@ -10,6 +10,7 @@ import play.db.jpa.Transactional;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
+import util.JsonCollectionUtil;
 import views.html.landingpage;
 
 import java.net.URI;
@@ -26,7 +27,7 @@ public class SecuredWithToken extends Security.Authenticator {
     public String getUsername(Http.Context ctx) {
         DynamicForm form = Form.form().bindFromRequest();
         Token token = Token.findByAccesToken(form.get("accessToken"));
-        if (token != null && token.user != null)
+        if (token != null && !token.hasExpired())
             return token.user.name;
         else
             return null;
