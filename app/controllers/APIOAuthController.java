@@ -1,12 +1,16 @@
 package controllers;
 
+import com.google.common.collect.Lists;
 import models.Client;
 import models.UserGrant;
 import models.Token;
+import models.enums.CustomContentType;
+import net.hamnaberg.json.Collection;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Security;
 import play.mvc.Result;
+import util.JsonCollectionUtil;
 import views.html.OAuth2.authorizeClient;
 import views.html.OAuth2.editClients;
 
@@ -82,12 +86,11 @@ public class APIOAuthController extends BaseController {
         UserGrant grant = UserGrant.findByCode(requestData.get("authorizationCode"));
         if (grant != null) {
             Client client = grant.client;
-            Token token = new Token();
-            token.accessToken = UUID.randomUUID().toString();
-            token.client = client;
-            token.user = Component.currentAccount();
+            Token token = new Token(client, Component.currentAccount(), null);
             token.create();
-            return ok(client.callback.toString() + "?access_token=" + token.accessToken);
+            Collection collection = JsonCollectionUtil.getRequestedCollection(Token.class, Lists.newArrayList(token));
+            response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
+            return ok(client.callback.toString() + "?token=" + collection.asJson());
         } else
             return badRequest("Incorrect authorization code.");
     }
