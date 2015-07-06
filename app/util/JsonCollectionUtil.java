@@ -231,4 +231,16 @@ public class JsonCollectionUtil {
                 Error.create(title, code, message)
         );
     }
+
+    public static <T extends BaseModel> Collection addTemplate(Class<T> t, Collection collection) {
+        Collection withTemplate = Collection.create(
+                collection.getHref().get(),
+                collection.getLinks(),
+                collection.getItems(),
+                collection.getQueries(),
+                templateFromStream(ExposeTools.streamTemplate(t)),
+                collection.getError().get()
+        );
+        return withTemplate;
+    }
 }
