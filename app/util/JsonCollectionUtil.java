@@ -238,9 +238,13 @@ public class JsonCollectionUtil {
                 collection.getLinks(),
                 collection.getItems(),
                 collection.getQueries(),
-                templateFromStream(ExposeTools.streamTemplate(t)),
+                getTemplate(t),
                 collection.getError().get()
         );
         return withTemplate;
+    }
+
+    public static <T extends BaseModel> Template getTemplate(Class<T> t) {
+        return templateFromStream(ExposeTools.streamTemplate(t));
     }
 }
