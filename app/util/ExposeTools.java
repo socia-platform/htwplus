@@ -34,6 +34,13 @@ public class ExposeTools {
                 .map(e -> new Pair<>(e.name(), e.template()));
     }
 
+    public static Stream<Pair<String,String>> streamTemplate(Class<?> t) {
+        return streamAllExposedFields(t)
+                .map(f -> f.second())
+                .filter(e -> !e.template().isEmpty())
+                .map(e -> new Pair<>(e.name(), e.template()));
+    }
+
     public static Stream<Pair<Field,Expose>> streamFilterableFieldsExposes(Class<?> t) {
         return streamAllExposedFields(t).filter(f -> f.second().filterable());
     }
