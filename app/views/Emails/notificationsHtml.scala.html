@@ -17,12 +17,12 @@
     </head>
     <body style="margin: 0; padding: 0;">
         <table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td> <!-- OUTER CONTAINER -->
-            <table align="center" border="0" cellpadding="0" cellspacing="0" style="min-width: 450px; max-width:600px; border-collapse: collapse; box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5); border: 1px solid rgb(204, 204, 204);;"> <!-- INNER CONTAINER -->
+            <table align="center" border="0" cellpadding="0" cellspacing="0" style="min-width: 450px; max-width:600px; border-collapse: collapse;"> <!-- INNER CONTAINER -->
                 <tr><td bgcolor="#76b900" align="center" colspan="2" style="font-size: 50px; font-weight: bold; color: white; line-height: 146px;">
                     <a href="@baseURL@controllers.routes.Application.index()" style="color:white;text-decoration: none"><img alt="HTWplus" src="https://plus.f4.htw-berlin.de/assets/images/logos/logo-white.svg" width="227" height="146" style="display:block"></a>
                 </td></tr>
 
-                <tr align="left" style="text-align: left"><td colspan="2" style="padding:5px 10px"><p>
+                <tr align="left" style="text-align: left"><td colspan="2" style="padding: 15px 10px 5px 10px"><p>
                     @if(notifications.size > 1) {
                         @Html(Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size))
                     } else {
@@ -43,8 +43,7 @@
                                     </p>
                                 </div>
                             </a>
-                        }
-                        <br>
+                        }<br>
                     </td></tr>
                 }
 
