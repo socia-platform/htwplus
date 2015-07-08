@@ -594,7 +594,7 @@ div.well.notification div.notification-read.unread {
 
 input.hp-notification-hour {
 	display: inline;
-	width: inherit;
+	width: 60px;
 }
 
 .notifications-mark-as-read {
