@@ -53,10 +53,38 @@
         <div class="col-lg-3 col-md-3" role="complementary">
             <nav class="hidden-xs hidden-sm">
                 <div class="hp-sitenav addmargin">
+                    <b><span class="glyphicon glyphicon-cog"></span> Optionen</b>
+                    <hr>
+                    @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
+                            <a href="@routes.GroupController.join(group.id)" role="button" class="btn btn-default btn-sm" rel="tooltip" data-original-title="Tritt der Gruppe bei" data-container="body">
+                                <span class="glyphicon glyphicon-ok"></span>
+                                <span class="hidden-xs"> Beitreten</span>
+                            </a>
+                    }
+                    @if(Secured.editGroup(group)) {
+                            <a href="@routes.GroupController.edit(group.id)" role="button" class="btn btn-default btn-sm" rel="tooltip" data-original-title="Bearbeite die Gruppe" data-container="body">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="hidden-xs"> Bearbeiten</span>
+                            </a>
+                    }
+                    @if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
+                        <a href="#confirmLeaveGroup" role="button" class="btn btn-default btn-sm" data-toggle="modal">
+                            <span class="glyphicon glyphicon-remove"></span>
+                            <span class="hidden-xs"> Gruppe verlassen</span>
+                        </a>
+                    }
+                    @if(Secured.deleteGroup(group)) {
+                        <a href="#confirmDeleteGroup" role="button" class="btn btn-default btn-sm" rel="tooltip" data-toggle="modal" data-original-title="Lösche die Gruppe" data-container="body">
+                            <span class="glyphicon glyphicon-trash"></span>
+                            <span class="hidden-xs"> Löschen</span>
+                        </a>
+                    }
+                </div>
+                <div class="hp-sitenav">
                     <b><span class="glyphicon glyphicon-info-sign"></span> Info</b>
                     <hr>
                     <dl>
-                        <dt>Gr�nder</dt>
+                        <dt>Gründer</dt>
                         <dd>@views.html.snippets.userLink(group.owner)</dd>
                     </dl>
                     <dl>
@@ -75,7 +103,14 @@
                         <dd>@group.description</dd>
                     </dl>
                     <dl>
-                        <dt>Mitglieder</dt>
+                        <dt>Mitglieder
+                            @if(Secured.editGroup(group)) {
+                                <a href="@routes.GroupController.invite(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-xs">
+                                    <span class="glyphicon glyphicon-plus"></span> einladen
+                                </a>
+                            }
+                        </dt>
+
                         @defining(GroupAccount.findAccountsByGroup(group, LinkType.establish)) { accounts =>
                             @for(account <- accounts) {
                                 <dd> @views.html.snippets.userLink(account)</dd>
@@ -85,8 +120,17 @@
                 </div>
                 <div class="hp-sitenav">
                     <b><span class="glyphicon glyphicon-file"></span> Medien</b>
+                    <a href="@routes.GroupController.media(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-xs">
+                        <span class="glyphicon glyphicon-plus"></span> hinzufügen
+                    </a>
                     <hr>
                     <tbody id="mediaList" class="hp-optionsTable">
+                    @if(mediaList.isEmpty) {
+                        <tr>
+                            <td></td>
+                            <td>- keine Treffer -</td>
+                        </tr>
+                    }
                     @for(m <- mediaList) {
                         <tr>
                             <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500" data-original-title="von @m.owner.name">@m.title</a></td>

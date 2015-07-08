@@ -734,6 +734,10 @@ div.hp-sitenav hr {
     margin-bottom: 10px;
 }
 
+div.hp-sitenav .hp-sitenav-button {
+    float: right;
+}
+
 div.addmargin {
     margin-top: 45px;
 }
