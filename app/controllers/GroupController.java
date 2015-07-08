@@ -64,11 +64,12 @@ public class GroupController extends BaseController {
         Navigation.set(Level.GROUPS, "Newsstream", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
         List<Post> posts = Post.getPostsForGroup(group, LIMIT, page);
         List<Media> mediaSet = group.media;
+        List<Account> memberList = GroupAccount.findAccountsByGroup(group, LinkType.establish);
 
         if(raw) {
             return ok(streamRaw.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page));
         } else {
-            return ok(stream.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page, mediaSet));
+            return ok(stream.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page, mediaSet, memberList));
         }
 	}
 	
