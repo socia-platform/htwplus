@@ -22,7 +22,7 @@ public class APIPostController extends BaseController {
                 post.create();
                 return ok();
             } else {
-                return badRequest(JsonCollectionUtil.addTemplate(Post.class, jcol).asJson());
+                return badRequest(JsonCollectionUtil.addTemplate(Post.class, jcol).toString());
             }
         } else {
             return statusWithWarning(NOT_ACCEPTABLE, CustomContentType.JSON_COLLECTION.getAcceptHeaderMessage());
@@ -49,7 +49,7 @@ public class APIPostController extends BaseController {
             }
 
             response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
-            return ok(collection.asJson());
+            return ok(collection.toString());
         } else {
             return statusWithWarning(NOT_ACCEPTABLE, CustomContentType.JSON_COLLECTION.getAcceptHeaderMessage());
         }
