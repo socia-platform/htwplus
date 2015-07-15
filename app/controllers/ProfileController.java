@@ -178,9 +178,9 @@ public class ProfileController extends BaseController {
 			account.password = Component.md5(password);
             account.email = email;
 			account.update();
-			flash("success", "Passwort erfolgreich geändert.");
+			flash("success", "Account erfolgreich konvertiert.");
 		}
-		return redirect(controllers.routes.ProfileController.me());
+		return redirect(controllers.routes.ProfileController.view(id));
 	}
 
 	public static Result edit(Long id) {
