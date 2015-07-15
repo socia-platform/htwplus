@@ -735,8 +735,21 @@ div.hp-sitenav hr {
 }
 
 div.hp-sitenav .hp-sitenav-button {
-    float: right;
+    margin-bottom: 5px;
 }
+
+@media (min-width: 992px) {
+    #hp-site-navigation {
+        width: 220px;
+    }
+}
+
+@media (min-width: 1200px) {
+    #hp-site-navigation {
+        width: 270px;
+    }
+}
+
 
 div.addmargin {
     margin-top: 45px;
@@ -1013,6 +1026,10 @@ table td .hp-avatar-small {
     border-radius: 5px;
     display: inline-block;
 	line-height: 72px;
+}
+
+.hp-avatar-list {
+    margin: 5px 5px 0px 0px;
 }
 
 div[class*="hp-avatar-default-"] {

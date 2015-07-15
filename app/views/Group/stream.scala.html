@@ -1,17 +1,11 @@
-@(group: Group, posts: List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, mediaList: List[Media], memberList: List[Account])
+@(group: Group, posts: List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, memberList: List[Account])
 
 @import models.enums._
 
 @main("Gruppenstream") {
     <div class="row">
-        <div class="col-md-9" role="main">
+        <div class="col-md-9 col-lg-9" role="main">
             <div class="hp-notepad-content addmargin">
-
-                    <!-- Start infoModal -->
-                <div id="infoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
-                @views.html.Group.snippets.infoModal(group)
-                </div>
-                    <!-- Ende infoModal -->
 
                     <!-- Start confirmDeleteGroupModal -->
                 <div id="confirmDeleteGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
@@ -25,7 +19,9 @@
                 </div>
                     <!-- End confirmDeleteGroupModal -->
 
+                @***
                 @views.html.Group.snippets.navTabs(group)
+                ***@
 
                 <div class="clear">
                     <h2 class="hp-truncate">
@@ -50,22 +46,27 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3" role="complementary">
-            <nav class="hidden-xs hidden-sm">
+        <div class="col-md-3 col-lg-3" role="complementary">
+            <nav id="hp-site-navigation" class="hidden-xs hidden-sm affix">
                 <div class="hp-sitenav addmargin">
                     <b><span class="glyphicon glyphicon-cog"></span> Optionen</b>
                     <hr>
                     @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
-                            <a href="@routes.GroupController.join(group.id)" role="button" class="btn btn-default btn-sm" rel="tooltip" data-original-title="Tritt der Gruppe bei" data-container="body">
+                            <a href="@routes.GroupController.join(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip" data-original-title="Tritt der Gruppe bei" data-container="body">
                                 <span class="glyphicon glyphicon-ok"></span>
                                 <span class="hidden-xs"> Beitreten</span>
                             </a>
                     }
                     @if(Secured.editGroup(group)) {
-                            <a href="@routes.GroupController.edit(group.id)" role="button" class="btn btn-default btn-sm" rel="tooltip" data-original-title="Bearbeite die Gruppe" data-container="body">
+                            <a href="@routes.GroupController.edit(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip" data-original-title="Bearbeite die Gruppe" data-container="body">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs"> Bearbeiten</span>
                             </a>
+                    }
+                    @if(Secured.editGroup(group)) {
+                        <a href="@routes.GroupController.invite(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip" data-original-title="Lade deine Kontakte ein" data-container="body">
+                            <span class="glyphicon glyphicon-plus"></span> Einladen
+                        </a>
                     }
                     @if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
                         <a href="#confirmLeaveGroup" role="button" class="btn btn-default btn-sm" data-toggle="modal">
@@ -102,38 +103,26 @@
                         </dl>
                     }
                     <dl>
-                        <dt>Mitglieder
-                            @if(Secured.editGroup(group)) {
-                                <a href="@routes.GroupController.invite(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-xs">
-                                    <span class="glyphicon glyphicon-plus"></span> einladen
-                                </a>
-                            }
-                        </dt>
-                        @views.html.Friends.snippets.listAccountsLight(memberList)
+                        <dt>Medien</dt>
+                        <dd><a href="@routes.GroupController.media(group.id)">@group.media.size() Datei(en)</a></dd>
                     </dl>
-                </div>
-                <div class="hp-sitenav">
-                    <b><span class="glyphicon glyphicon-file"></span> Medien</b>
-                    <a href="@routes.GroupController.media(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-xs">
-                        <span class="glyphicon glyphicon-plus"></span> hinzufügen
-                    </a>
-                    <hr>
-                    <tbody id="mediaList" class="hp-optionsTable">
-                    @if(mediaList.isEmpty) {
-                        <tr>
-                            <td></td>
-                            <td>- keine Treffer -</td>
-                        </tr>
-                    }
-                    @for(m <- mediaList) {
-                        <tr>
-                            <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500" data-original-title="von @m.owner.name">@m.title</a></td>
-                            <td><small>(@{
-                                MediaController.bytesToString(m.size, false)
-                            })</small></td>
-                        </tr>
-                    }
-                    </tbody>
+                    <dl>
+                        <dt>Mitglieder
+
+                        </dt>
+                        <dd>
+                        @for(user <- memberList) {
+                            <a class="pull-left hp-nohref hp-avatar-list" href="@routes.ProfileController.view(user.id)" rel="tooltip" data-original-title="@user.name" data-container="body">
+                            @if(user.hasAvatar){
+                                <img alt="avatar" src="@routes.ProfileController.getAvatar(user.id)" class="hp-avatar-small" />
+                            } else {
+                                <div class="hp-avatar-small hp-avatar-default-@user.avatar">@user.getInitials</div>
+                            }
+                            </a>
+                        }
+                            <div class="clearfix"></div>
+                        </dd>
+                    </dl>
                 </div>
             </nav>
         </div>

@@ -76,7 +76,8 @@ public class AdminController extends BaseController {
 		a.lastname = filledForm.data().get("lastname");
 		a.email = filledForm.data().get("email");
 		a.password = Component.md5(filledForm.data().get("password"));
-		a.avatar = "a1";
+        Random generator = new Random();
+        a.avatar = String.valueOf(generator.nextInt(9));
 		a.role = AccountRole.values()[Integer.parseInt(filledForm.data().get("role"))];
 		a.create();
 

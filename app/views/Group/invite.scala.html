@@ -25,7 +25,9 @@
                 </div>
                     <!-- End confirmDeleteGroupModal -->
 
+                @***
                 @views.html.Group.snippets.navTabs(group)
+                ***@
 
                 <div class="clear">
                     <h2 class="hp-truncate">
@@ -89,7 +91,10 @@
                     } else {
                         <p><i>Du hast keine Freunde zum Einladen. Jetzt Freunde <b><a class="hp-focus-search">suchen</a></b>.</i></p>
                     }
-
+                    <div class="pull-right">
+                        <a type="button" class="btn btn-default" href="@routes.GroupController.stream(group.id)">Abbrechen</a>
+                    </div>
+                    <div class="clearfix"></div>
 
                 </div>
             </div>

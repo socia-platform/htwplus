@@ -3,7 +3,7 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th style="width:36px"></th>
+            <th style="width:36px;"></th>
             <th></th>
         </tr>
     </thead>
@@ -15,10 +15,10 @@
             </tr>
         }
         @for(user <- users) {
-            <tr>
+            <li>
                 <td>@views.html.snippets.userLinkAvatar(user)</td>
                 <td>@views.html.snippets.userLink(user)</td>
-            </tr>
+            </li>
         }
     </tbody>
 </table>
