@@ -1,34 +1,15 @@
-@(currentUser: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String, groups: List[Group], contacts: List[Account])
+@(currentUser: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String)
 
 @main("Newsstream") {
     @views.html.snippets.feedFilter()
     <div class="row">
-        <div class="col-md-9" role="main">
+        <div class="col-md-12" role="main">
             <div class="hp-notepad-content">
                 <br />
                 @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
 
                 @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage, filter)
             </div>
-        </div>
-        <div class="col-md-3" role="complementary">
-            <nav class="hidden-xs hidden-sm">
-                <div class="hp-sitenav">
-                    <b><span class="glyphicon glyphicon-list"></span> Gruppen & Kurse</b>
-                    <a href="@routes.GroupController.add()" role="button" class="hp-sitenav-button btn btn-default btn-xs" rel="tooltip" data-original-title="Erstelle eine neue Gruppe" data-container="body">
-                        <span class="glyphicon glyphicon-plus"></span> Neu
-                    </a>
-                    @views.html.Group.snippets.listGroupsLight(groups, currentUser)
-                </div>
-                <div class="hp-sitenav">
-                    <b><span class="glyphicon glyphicon-user"></span> Kontakte</b>
-                    <a href="/search?keyword=&mode=user" role="button" class="hp-sitenav-button btn btn-default btn-xs" rel="tooltip" data-original-title="Suche neue Kontakte" data-container="body">
-                        <span class="glyphicon glyphicon-search"></span> Suchen
-                    </a>
-                    @views.html.Friends.snippets.listAccountsLight(contacts)
-                </div>
-
-            </nav>
         </div>
     </div>
 }

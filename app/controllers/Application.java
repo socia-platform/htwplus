@@ -51,7 +51,7 @@ public class Application extends BaseController {
 	public static Result index() {
 		Navigation.set(Level.STREAM, "Alles");
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all", GroupAccount.findGroupsEstablished(currentAccount), Friendship.findFriends(currentAccount)));
+		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
 	}
 	
 	public static Result help() {
@@ -82,7 +82,7 @@ public class Application extends BaseController {
         if(raw) {
             return ok(streamRaw.render(Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
         } else {
-            return ok(stream.render(currentAccount, Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter, GroupAccount.findGroupsEstablished(currentAccount), Friendship.findFriends(currentAccount)));
+            return ok(stream.render(currentAccount, Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
         }
 	}
 
