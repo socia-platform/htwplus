@@ -528,7 +528,7 @@ public class GroupController extends BaseController {
             flash("error", Messages.get("group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
-        
+
 		Account account = Account.findById(accountId);
 		GroupAccount groupAccount = GroupAccount.find(account,group);
 		

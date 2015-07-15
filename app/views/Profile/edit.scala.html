@@ -1,7 +1,6 @@
 @(profile: Account, profileForm: Form[Account], loginForm: Form[Login])
 @import helper._
 @import models._
-@import models.enums._
 
 @main("Editieren") {
     <div class="row">
@@ -130,6 +129,10 @@
                     </dl>
                     <div class="pull-left">
                         <a id="hp-delete-account" href="#hp-deleteModal" data-toggle="modal"><button class="btn btn-danger">ACCOUNT LÖSCHEN</button></a>
+                        @if(Secured.isAdmin()) {
+                            <a href="@routes.ProfileController.convert(profile.id)" role="button" class="btn btn-warning">
+                                Account konvertieren</a>
+                        }
                     </div>
                     <div class="pull-right">
                         <input type="hidden" id="avatar" name="avatar" value="">
