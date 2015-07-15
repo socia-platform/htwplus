@@ -1,13 +1,19 @@
 @main("Suche"){
-        <h2>Suche:</h2>
-	<br />
-    <div id="hp-search-home">
-        <form class="hp-search-form navbar-form" role="search" action="@routes.Application.search(1)" method="GET">
-            <div class="form-group">
-                <input id="autocomplete" class="form-control hp-easy-search" rel="tooltip" data-placement="bottom" type="text" placeholder="Suche" name="keyword">
-                <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
-            </div>
-        </form>
-    </div>
+    <div class="row">
+        <div class="col-lg-12" role="main">
+            <div class="hp-notepad-content addmargin">
+                <h2>Suche:</h2>
+                <br />
+                <div id="hp-search-home">
+                    <form class="hp-search-form navbar-form" role="search" action="@routes.Application.search(1)" method="GET">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Suche" name="keyword">
+                            <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+                        </div>
+                    </form>
+                </div>
 
+            </div>
+        </div>
+    </div>
 } 

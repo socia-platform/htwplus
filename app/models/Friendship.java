@@ -143,6 +143,17 @@ public class Friendship extends BaseNotifiable implements INotifiable {
                 .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList();
     }
 
+    /**
+     * Lists all friendships of the specified account (in both directions and of all LinkTypes)
+     * @param accountId the account id
+     * @return the list of Friendships
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Friendship> listAllFriendships(Long accountId){
+        return JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 OR fs.friend.id = ?1")
+                .setParameter(1, accountId).getResultList();
+    }
+
     public static List<Long> findFriendsId(final Account account){
         return (List<Long>) JPA.em().createQuery("SELECT fs.friend.id FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
                 .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList();
@@ -201,7 +212,7 @@ public class Friendship extends BaseNotifiable implements INotifiable {
         }
 
         if (this.type.equals(Friendship.FRIEND_REQUEST_SUCCESS)) {
-            return controllers.routes.ProfileController.stream(this.account.id, Friendship.PAGE).toString();
+            return controllers.routes.ProfileController.stream(this.account.id, Friendship.PAGE, false).toString();
         }
 
         return super.getTargetUrl();

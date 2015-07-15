@@ -59,6 +59,9 @@ landingpage.features.newsstream.description=Dein persönlicher Newsstream hält 
 landingpage.features.notifications.title=Keine Neuigkeiten verpassen
 landingpage.features.notifications.description=Ob neue Posts, Kommentare, Freundschaftsanfragen oder Gruppeneinladungen - du wirst über alles informiert. Auf Wunsch auch per Email.
 
+# --- Main page
+mainpage.backtotop=Nach oben
+
 # --- LDAP connector
 ldap.noConnection=Keine Verbindung zum LDAP-Server möglich. Bitte versuche es später noch einmal.
 ldap.wrongCredentials=Ungültiges Passwort und/oder Matrikelnummer.
@@ -127,6 +130,14 @@ admin.broadcast_notification.success=Broadcast Nachrichten werden erzeugt und de
 admin.broadcast_notification.intro=Wähle einen oder mehrere Empfänger dieser Nachricht aus. Sollte kein expliziter Empfänger ausgewählt sein, wird die Nachricht an sämtliche User verschickt.
 admin.broadcast_notification.error.no_message=Bitte gebe zumindest eine Broadcast Nachricht ein
 admin.indexing=Indexieren
+admin.delete_account.success=Der Account wurde erfolgreich gelöscht.
+admin.delete_account.wrongconfirm=Wenn du den Account löschen willst, gib zur Bestätigung den Text ein!
 
 # --- search
 search.headline=Suchergebnisse für <b>{0}</b>
+
+# --- Profile Editing
+profile.delete.nopassword=Wenn du deinen Account löschen willst, gib dein Passwort zur Bestätigung ein!
+profile.delete.wrongpassword=Ungültiges Passwort!
+profile.delete.success=Dein Account wurde erfolgreich gelöscht. Ich hoffe, man sieht sich bald wieder! :)
+profile.delete.nopermission=Du bist nicht dazu berechtigt, diesen Account zu löschen!

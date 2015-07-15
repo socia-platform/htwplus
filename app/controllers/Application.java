@@ -1,14 +1,14 @@
 package controllers;
 
 import com.typesafe.config.ConfigFactory;
-import models.Account;
-import models.Group;
-import models.Post;
+import controllers.Navigation.Level;
+import models.*;
 import models.services.ElasticsearchService;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.apache.commons.lang3.*;
 import play.Logger;
 import play.Routes;
 import play.data.Form;
@@ -16,8 +16,7 @@ import play.db.jpa.Transactional;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.*;
-import controllers.Navigation.Level;
-import org.elasticsearch.action.search.SearchResponse;
+import views.html.snippets.streamRaw;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,7 +61,7 @@ public class Application extends BaseController {
 	}
 	
 	@Security.Authenticated(Secured.class)
-	public static Result stream(String filter, int page) {
+	public static Result stream(String filter, int page, boolean raw) {
         switch (filter) {
             case "account":
                 Navigation.set(Level.STREAM, "Eigene Posts");
@@ -80,7 +79,12 @@ public class Application extends BaseController {
                 Navigation.set(Level.STREAM, "Alles");
         }
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getFilteredStream(currentAccount, LIMIT, page, filter),postForm,Post.countStream(currentAccount, filter), LIMIT, page, filter));
+
+        if(raw) {
+            return ok(streamRaw.render(Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
+        } else {
+            return ok(stream.render(currentAccount, Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
+        }
 	}
 
     public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
@@ -148,20 +152,26 @@ public class Application extends BaseController {
         for (SearchHit searchHit : response.getHits().getHits()) {
             switch (searchHit.type()) {
                 case "user":
-                    resultList.add(Account.findById(Long.parseLong(searchHit.getId())));
+                    Account account = Account.findById(Long.parseLong(searchHit.getId()));
+                    if(account != null)
+                        resultList.add(account);
                     break;
                 case "post":
                     Post post = Post.findById(Long.parseLong(searchHit.getId()));
-                    String searchContent = post.content;
-                    if(!searchHit.getHighlightFields().isEmpty())
-                        searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
-                    post.searchContent = StringEscapeUtils.escapeHtml4(searchContent)
-                            .replace("[startStrong]","<strong>")
-                            .replace("[endStrong]","</strong>");
-                    resultList.add(post);
+                    if(post != null) {
+                        String searchContent = post.content;
+                        if (!searchHit.getHighlightFields().isEmpty())
+                            searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
+                        post.searchContent = StringEscapeUtils.escapeHtml4(searchContent)
+                                .replace("[startStrong]", "<strong>")
+                                .replace("[endStrong]", "</strong>");
+                        resultList.add(post);
+                    }
                     break;
                 case "group":
-                    resultList.add(Group.findById(Long.parseLong(searchHit.getId())));
+                    Group group = Group.findById(Long.parseLong(searchHit.getId()));
+                    if(group != null)
+                        resultList.add(group);
                     break;
                 default: Logger.info("no matching case for ID: "+searchHit.getId());
             }
@@ -225,10 +235,9 @@ public class Application extends BaseController {
 	}
 	
 	public static Result feedback() {
-		Navigation.set("Feedback");
-		return ok(feedback.render(postForm));
-		
-	}
+        Navigation.set("Feedback");
+        return ok(feedback.render(postForm));
+    }
 	
 	public static Result addFeedback() {
 		
@@ -247,13 +256,23 @@ public class Application extends BaseController {
 		} else {
 			Post p = filledForm.get();
 			p.owner = account;
-			p.group = group;
-			p.create();
-			flash("success","Vielen Dank für Dein Feedback!");
+            p.group = group;
+            p.create();
+            flash("success","Vielen Dank für Dein Feedback!");
 		}
 
 		return redirect(controllers.routes.Application.index());
 	}
+
+    public static Result imprint() {
+        Navigation.set("Impressum");
+        return ok(imprint.render());
+    }
+
+    public static Result privacy() {
+        Navigation.set("Datenschutzerklärung");
+        return ok(privacy.render());
+    }
 
 	public static Result defaultRoute(String path) {
 		Logger.info(path+" nicht gefunden");

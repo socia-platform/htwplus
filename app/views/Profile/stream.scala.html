@@ -1,13 +1,14 @@
 @(user: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer)
 
-@import play._
-
 @main("Profilstream") {
-@defining(Component.currentAccount()) { curUser =>
+    <div class="row">
+        <div class="col-lg-12" role="main">
+            <div class="hp-notepad-content addmargin">
+                @defining(Component.currentAccount()) { curUser =>
 
-	<!-- confirmDeleteFriendModal -->
-	<div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog">@views.html.Friends.snippets.deleteFriendModal(user)</div>
-	<!-- Ende confirmDeleteFriendModal -->
+                    <!-- confirmDeleteFriendModal -->
+                    <div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog">@views.html.Friends.snippets.deleteFriendModal(user)</div>
+                    <!-- Ende confirmDeleteFriendModal -->
 
     @views.html.Profile.snippets.navTabs(user)
 	<h2>@user.name's Newsstream</h2>
@@ -19,11 +20,8 @@
 }
 	@views.html.snippets.postForm(user.id, models.Post.PROFILE, postForm)
 		
-	@if(posts != null) {
-		@for(post <- posts) {
-			@views.html.snippets.postView(post, postForm, models.Post.PROFILE, Play.application().configuration().getInt("htwplus.comments.init"))
-		}
-	}
-	
-	@views.html.pagination(count, limit, currentPage, routes.ProfileController.stream(user.id).toString, "?")
+	@views.html.Profile.snippets.streamRaw(user, posts, postForm, count, limit, currentPage)
+            </div>
+        </div>
+    </div>
 }

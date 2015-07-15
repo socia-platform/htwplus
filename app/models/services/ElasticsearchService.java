@@ -4,8 +4,7 @@ import com.typesafe.config.ConfigFactory;
 import models.*;
 import models.enums.LinkType;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -31,6 +30,7 @@ import static org.elasticsearch.index.query.FilterBuilders.*;
 public class ElasticsearchService {
     private static ElasticsearchService instance = null;
     private static Client client = null;
+    private static final String ES_SERVER = ConfigFactory.load().getString("elasticsearch.server");
     private static final String ES_SETTINGS = ConfigFactory.load().getString("elasticsearch.settings");
     private static final String ES_USER_MAPPING = ConfigFactory.load().getString("elasticsearch.userMapping");
     private static final String ES_GROUP_MAPPING = ConfigFactory.load().getString("elasticsearch.groupMapping");
@@ -42,8 +42,7 @@ public class ElasticsearchService {
     private static final int ES_RESULT_SIZE = ConfigFactory.load().getInt("elasticsearch.search.limit");
 
     private ElasticsearchService() {
-        client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
-
+        client = new TransportClient().addTransportAddress(new InetSocketTransportAddress(ES_SERVER, 9300));
     }
 
     public static ElasticsearchService getInstance() {
@@ -61,31 +60,42 @@ public class ElasticsearchService {
         client.close();
     }
 
-    public static void deleteIndex() {
-        getInstance().getClient().admin().indices().delete(new DeleteIndexRequest(ES_INDEX)).actionGet();
+    public static boolean isClientAvailable() {
+        if(((TransportClient) getInstance().getClient()).connectedNodes().size() == 0)
+            return false;
+        return true;
     }
-    public static void createAnalyzer() throws IOException {
-        getInstance().getClient().admin().indices().prepareCreate(ES_INDEX)
+
+    public static boolean isIndexExists() {
+        return getInstance().getClient().admin().indices().exists(new IndicesExistsRequest(ES_INDEX)).actionGet().isExists();
+    }
+
+    public static void deleteIndex() {
+        if(isClientAvailable()) getInstance().getClient().admin().indices().delete(new DeleteIndexRequest(ES_INDEX)).actionGet();
+    }
+
+    public static void createAnalyzer() {
+        if(isClientAvailable()) getInstance().getClient().admin().indices().prepareCreate(ES_INDEX)
                 .setSettings(ES_SETTINGS)
                 .execute().actionGet();
     }
 
-    public static void createMapping() throws IOException {
-        getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_USER)
+    public static void createMapping() {
+        if(isClientAvailable()) getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_USER)
                 .setSource(ES_USER_MAPPING)
                 .execute().actionGet();
 
-        getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_POST)
+        if(isClientAvailable()) getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_POST)
                 .setSource(ES_POST_MAPPING)
                 .execute().actionGet();
 
-        getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_GROUP)
+        if(isClientAvailable()) getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_GROUP)
                 .setSource(ES_GROUP_MAPPING)
                 .execute().actionGet();
     }
 
     public static void indexPost(Post post) throws IOException {
-        getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_POST, post.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("content", post.content)
@@ -98,7 +108,7 @@ public class ElasticsearchService {
     }
 
     public static void indexGroup(Group group) throws IOException {
-        getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("title", group.title)
@@ -112,7 +122,7 @@ public class ElasticsearchService {
     }
 
     public static void indexAccount(Account account) throws IOException {
-        getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_USER, account.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .setSource(jsonBuilder()
                                 .startObject()
                                 .field("name", account.name)
@@ -124,8 +134,7 @@ public class ElasticsearchService {
                                 .field("avatar", account.avatar)
                                 .field("public", true)
                                 .field("friends", Friendship.findFriendsId(account))
-                                .endObject()
-                )
+                                .endObject())
                 .execute()
                 .actionGet();
     }
@@ -235,19 +244,19 @@ public class ElasticsearchService {
     }
 
     public static void deleteGroup(Group group) {
-        DeleteResponse response = client.prepareDelete(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareDelete(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .execute()
                 .actionGet();
     }
 
     public static void deletePost(Post post) {
-        DeleteResponse response = client.prepareDelete(ES_INDEX, ES_TYPE_POST, post.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareDelete(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .execute()
                 .actionGet();
     }
 
     public static void deleteAccount(Account account) {
-        DeleteResponse response = client.prepareDelete(ES_INDEX, ES_TYPE_USER, account.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareDelete(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .execute()
                 .actionGet();
     }

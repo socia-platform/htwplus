@@ -1,0 +1,27 @@
+@(profile: Account, loginForm: Form[Login])
+
+<div aria-hidden="true" aria-labelledby="hp-deleteModalLabel" id="hp-deleteModal" class="modal fade hp-warningModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                <h4 id="hp-deleteModalLabel" class="modal-title hp-truncate">
+                    <b> WARNUNG </b>
+                </h4>
+            </div>
+            @helper.form(action = routes.ProfileController.deleteProfile(profile.id), 'id -> "hp-deleteConfirmForm", 'class -> "hp-nolabel") {
+                <div class="modal-body">
+                    <b class="hp-bigcaption">Du bist im Begriff, deinen Account unwiderruflich zu löschen!</b><br>
+                    Deine Posts und Kommentare werden in anonymisierter Form bestehen bleiben. Wenn du dich das nächste mal einloggst wird ein komplett neuer Account erstellt.<br>
+                    <br>
+                    <p>Wenn du dir wirklich sicher bist, gib dein Passwort in das folgende Feld ein:</p>
+                    @helper.inputPassword(loginForm("password"), '_id -> "hp-deleteConfirmPassword", 'class -> "form-control", 'placeholder -> "Passwort")
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" id="hp-deleteConfirmSubmit" class="btn btn-danger" value="LÖSCHEN">
+                    <button data-dismiss="modal" class="btn btn-success">Nicht löschen</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
