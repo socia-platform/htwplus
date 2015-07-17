@@ -128,7 +128,7 @@ public class ElasticsearchService {
                                 .field("name", account.name)
                                 .field("studycourse", account.studycourse != null ? account.studycourse.title : "")
                                 .field("degree", account.degree != null ? account.degree : "")
-                                .field("semester", account.semester != null ? account.semester : "")
+                                .field("semester", account.semester != null ? String.valueOf(account.semester) : "")
                                 .field("role", account.role != null ? account.role.getDisplayName() : "")
                                 .field("initial", account.getInitials())
                                 .field("avatar", account.avatar)
@@ -220,6 +220,7 @@ public class ElasticsearchService {
         // Add term aggregation for facet count
         searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("types").field("_type"));
 
+
         if (filter.equals("user")) {
             searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("studycourse").field("user.studycourse"));
             searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("degree").field("user.degree"));
@@ -236,7 +237,7 @@ public class ElasticsearchService {
 
 
 
-        Logger.info(searchRequest.toString());
+        //Logger.info(searchRequest.toString());
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
 

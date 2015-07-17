@@ -3,6 +3,7 @@ package controllers;
 import com.typesafe.config.ConfigFactory;
 import controllers.Navigation.Level;
 import models.*;
+import models.services.ElasticsearchResponse;
 import models.services.ElasticsearchService;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.elasticsearch.action.search.SearchResponse;
@@ -11,13 +12,17 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import play.Logger;
 import play.Routes;
+import play.api.libs.json.Json;
 import play.data.Form;
 import play.db.jpa.Transactional;
+import play.mvc.BodyParser;
 import play.mvc.Result;
 import play.mvc.Security;
+import play.utils.UriEncoding;
 import views.html.*;
 import views.html.snippets.streamRaw;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,7 +57,7 @@ public class Application extends BaseController {
 	public static Result index() {
 		Navigation.set(Level.STREAM, "Alles");
 		Account currentAccount = Component.currentAccount();
-		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
+		return ok(stream.render(currentAccount, Post.getStream(currentAccount, LIMIT, PAGE), postForm, Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
 	}
 	
 	public static Result help() {
@@ -94,12 +99,11 @@ public class Application extends BaseController {
 
     public static Result searchHome() {
         Navigation.set(Level.SEARCH);
-        return ok(search.render());
+        return ok(views.html.Search.search.render());
     }
 	
 	@Security.Authenticated(Secured.class)
 	public static Result search(int page) throws ExecutionException, InterruptedException {
-        Navigation.set(Level.SEARCH);
         Account currentAccount = Component.currentAccount();
         String keyword = Form.form().bindFromRequest().field("keyword").value();
         String mode = Form.form().bindFromRequest().field("mode").value();
@@ -107,6 +111,8 @@ public class Application extends BaseController {
         String degreeParam = Form.form().bindFromRequest().field("degree").value();
         String semesterParam = Form.form().bindFromRequest().field("semester").value();
         String roleParam = Form.form().bindFromRequest().field("role").value();
+
+        Navigation.set(Level.SEARCH, "\""+keyword+"\"");
 
         HashMap<String, String[]> userFacets = new HashMap<>();
         userFacets.put("studycourse", buildUserFacetList(studycourseParam));
@@ -117,7 +123,7 @@ public class Application extends BaseController {
 
         if (keyword == null) {
             flash("info","Nach was suchst du?");
-            return redirect(routes.Application.searchHome());
+            return redirect(controllers.routes.Application.searchHome());
         }
 
         if (mode == null) mode = "all";
@@ -131,103 +137,36 @@ public class Application extends BaseController {
             flash("info","Dein Suchwort enthielt ungültige Zeichen, die für die Suche entfernt wurden!");
         }
 
-        List<Object> resultList = new ArrayList<>();
-
         SearchResponse response;
-        long userCount = 0;
-        long groupCount = 0;
-        long postCount = 0;
+        ElasticsearchResponse searchResponse;
 
         try {
             response = ElasticsearchService.doSearch("search", keyword.toLowerCase(), mode, userFacets, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
+            searchResponse = new ElasticsearchResponse(response, keyword, mode);
         } catch (NoNodeAvailableException nna) {
             flash("error", "Leider steht die Suche zur Zeit nicht zur Verfügung!");
-            return ok(search.render());
-        }
-
-        /**
-         * Iterate over response and add each searchHit to one list.
-         * Pay attention to view rights for post.content.
-         */
-        for (SearchHit searchHit : response.getHits().getHits()) {
-            switch (searchHit.type()) {
-                case "user":
-                    Account account = Account.findById(Long.parseLong(searchHit.getId()));
-                    if(account != null)
-                        resultList.add(account);
-                    break;
-                case "post":
-                    Post post = Post.findById(Long.parseLong(searchHit.getId()));
-                    if(post != null) {
-                        String searchContent = post.content;
-                        if (!searchHit.getHighlightFields().isEmpty())
-                            searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
-                        post.searchContent = StringEscapeUtils.escapeHtml4(searchContent)
-                                .replace("[startStrong]", "<strong>")
-                                .replace("[endStrong]", "</strong>");
-                        resultList.add(post);
-                    }
-                    break;
-                case "group":
-                    Group group = Group.findById(Long.parseLong(searchHit.getId()));
-                    if(group != null)
-                        resultList.add(group);
-                    break;
-                default: Logger.info("no matching case for ID: "+searchHit.getId());
-            }
-        }
-
-        Terms terms = response.getAggregations().get("types");
-        Collection<Terms.Bucket> buckets = terms.getBuckets();
-        for (Terms.Bucket bucket : buckets) {
-            switch (bucket.getKey()) {
-                case "user":
-                    userCount = bucket.getDocCount();
-                    break;
-                case "group":
-                    groupCount = bucket.getDocCount();
-                    break;
-                case "post":
-                    postCount = bucket.getDocCount();
-                    break;
-            }
-        }
-
-        HashMap studycoursesMap = new HashMap<String, Long>();
-        HashMap degreeMap = new HashMap<String, Long>();
-        HashMap semesterMap = new HashMap<String, Long>();
-        HashMap roleMap = new HashMap<String, Long>();
-
-        if (mode.equals("user")) {
-            Terms termAggregation = response.getAggregations().get("studycourse");
-            buckets = termAggregation.getBuckets();
-            for (Terms.Bucket bucket : buckets) {
-                studycoursesMap.put(bucket.getKey(), bucket.getDocCount());
-            }
-            termAggregation = response.getAggregations().get("degree");
-            buckets = termAggregation.getBuckets();
-            for (Terms.Bucket bucket : buckets) {
-                degreeMap.put(bucket.getKey(), bucket.getDocCount());
-            }
-            termAggregation = response.getAggregations().get("semester");
-            buckets = termAggregation.getBuckets();
-            for (Terms.Bucket bucket : buckets) {
-                semesterMap.put(bucket.getKey(), bucket.getDocCount());
-            }
-            termAggregation = response.getAggregations().get("role");
-            buckets = termAggregation.getBuckets();
-            for (Terms.Bucket bucket : buckets) {
-                roleMap.put(bucket.getKey(), bucket.getDocCount());
-            }
+            return ok(views.html.Search.search.render());
         }
 
         String uri = ctx().request().uri();
                 if(uri.contains("&page=")){
                     uri = uri.substring(0, uri.lastIndexOf("&"));
                 }
-        return ok(views.html.searchresult.render(uri, studycourseParam, degreeParam, semesterParam, roleParam, keyword, mode, page, LIMIT, resultList, response.getHits().getTotalHits(),
-                response.getTookInMillis(), userCount+groupCount+postCount, userCount, groupCount, postCount, studycoursesMap, degreeMap, semesterMap, roleMap));
+        return ok(views.html.Search.searchresult.render(
+                page,
+                LIMIT,
+                searchResponse));
 	}
+
+    /**
+     * searchResponse.resultList,
+     searchResponse.response.getTookInMillis(),
+     searchResponse.getDocumentCount(),
+     searchResponse.lUserDocuments,
+     searchResponse.lGroupDocuments,
+     searchResponse.lPostDocuments
+     * @return
+     */
 
 	public static Result error() {
 		Navigation.set("404");
@@ -274,14 +213,14 @@ public class Application extends BaseController {
         return ok(privacy.render());
     }
 
-	public static Result defaultRoute(String path) {
+    public static Result defaultRoute(String path) {
 		Logger.info(path+" nicht gefunden");
 		return redirect(controllers.routes.Application.index());
 	}
 
     private static String[] buildUserFacetList(String parameter) {
         if (parameter != null) {
-            return  parameter.split(",");
+            return parameter.split(",");
         }
         return new String[0];
     }

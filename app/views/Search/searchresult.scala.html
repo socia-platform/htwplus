@@ -1,43 +1,38 @@
-@(keyword: String, searchMode: String, currentPage: Int, searchLimit: Int, searchResults: List[Object], searchDuration: Long, searchHits: Long, searchUserHits: Long, searchGroupHits: Long, searchPostHits: Long)
+@(currentPage: Int, searchLimit: Int, response : models.services.ElasticsearchResponse)
 @import helper._
 @import play._
 @import models.enums._
 @import java.math.BigInteger; var paginationSearchHits=0;
-@main(keyword){
+@main(response.keyword){
+
     <div class="row">
-        <div class="col-lg-12" role="main">
+        <div class="col-lg-9" role="main">
             <div class="hp-notepad-content addmargin">
 
             @defining(Component.currentAccount()) { currentUser =>
 
-                <h2>@searchHits @Html(Messages("search.headline", truncate(keyword,30)))</h2>
-            @ctx.args.put("searchKeyword", keyword)
+                <h3>@response.getDocumentCount @Html(Messages("search.headline", truncate(response.keyword,30)))</h3>
+            @ctx.args.put("searchKeyword", response.keyword)
                 <br />
 
-            @if(searchHits != 0) {
+            @if(response.getDocumentCount != 0) {
 
-                @if(searchMode.equals("all")){ @{paginationSearchHits = searchHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
-                <a class="@if(searchHits == 0) {disabled}" href='/search?keyword=@keyword&mode=all'>Alles (@searchHits)</a><span> | </span>
-                @if(searchMode.equals("user")){ @{paginationSearchHits = searchUserHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
-                <a class="@if(searchUserHits == 0) {disabled}" href='/search?keyword=@keyword&mode=user'>Personen (@searchUserHits)</a><span> | </span>
-                @if(searchMode.equals("group")){ @{paginationSearchHits = searchGroupHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
-                <a class="@if(searchGroupHits == 0) {disabled}" href='/search?keyword=@keyword&mode=group'>Gruppen und Kurse (@searchGroupHits)</a><span> | </span>
-                @if(searchMode.equals("post")){ @{paginationSearchHits = searchPostHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
-                <a class="@if(searchPostHits == 0) {disabled}" href='/search?keyword=@keyword&mode=post'>Post und Kommentare (@searchPostHits)</a>
-                <br/>
-                <br />
+                @if(response.searchMode.equals("all")){ @{paginationSearchHits = response.getDocumentCount.toInt} }
+                @if(response.searchMode.equals("user")){ @{paginationSearchHits = response.lUserDocuments.toInt} }
+                @if(response.searchMode.equals("group")){ @{paginationSearchHits = response.lGroupDocuments.toInt} }
+                @if(response.searchMode.equals("post")){ @{paginationSearchHits = response.lPostDocuments.toInt} }
 
-                @for(result <- searchResults) {
+                @for(result <- response.resultList) {
 
                     @result match {
                         case account: Account => {
-                            @if(searchMode.equals("user") || searchMode.equals("all")) {
+                            @if(response.searchMode.equals("user") || response.searchMode.equals("all")) {
                                 <div class="well searchresult-container hp-pagination-container">
                                     <div class="account-result media">
                                         @views.html.snippets.userLinkAvatar(account)
                                         <div class="media-body">
                                             <div class="media-heading">
-                                            @views.html.snippets.userLink(account)
+                                            @views.html.snippets.userLink(account, "top")
                                             </div>
                                             <small>
                                             @if(Friendship.alreadyFriendly(currentUser, account)) {
@@ -54,7 +49,7 @@
                         }
 
                         case group: Group => {
-                            @if(searchMode.equals("group") || searchMode.equals("all")) {
+                            @if(response.searchMode.equals("group") || response.searchMode.equals("all")) {
                                 <div class="well searchresult-container hp-pagination-container">
                                     <div class="group-result">
                                         @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
@@ -68,7 +63,7 @@
                         }
 
                         case post: Post => {
-                            @if(searchMode.equals("post") || searchMode.equals("all")) {
+                            @if(response.searchMode.equals("post") || response.searchMode.equals("all")) {
                                 <div class="well searchresult-container hp-pagination-container">
                                     <div class="post-result media">
                                         @views.html.snippets.userLinkAvatar(post.owner)
@@ -92,10 +87,15 @@
                         case _ => { @result }
                     }
                 }
-    @views.html.pagination(paginationSearchHits, searchLimit, currentPage, "/search?keyword="+keyword+"&mode="+searchMode+"", "&")
-    }
-}
-</div>
-</div>
-</div>
+                @views.html.pagination(paginationSearchHits, searchLimit, currentPage, "/search?keyword="+response.keyword+"&mode="+response.searchMode, "&")
+            }
+            }
+            </div>
+        </div>
+        @if(response.searchMode.equals("all")) { @views.html.Search.snippets.siteNavigation(response) }
+        @if(response.searchMode.equals("user")) { @views.html.Search.snippets.userSiteNavigation(response) }
+        @if(response.searchMode.equals("group")) { @views.html.Search.snippets.groupSiteNavigation(response) }
+        @if(response.searchMode.equals("post")) { @views.html.Search.snippets.postSiteNavigation(response) }
+    </div>
+
 }

@@ -23,6 +23,7 @@ public class Navigation {
 		callMapping.put(Level.HELP, controllers.routes.Application.help());
 		callMapping.put(Level.ADMIN, controllers.routes.AdminController.index());
         callMapping.put(Level.NOTIFICATIONS, controllers.routes.NotificationController.showAll(1));
+        callMapping.put(Level.SEARCH, controllers.routes.Application.search(1));
 	}
 	
 	private static Map<Level,String> titleMapping = new HashMap<Navigation.Level, String>();

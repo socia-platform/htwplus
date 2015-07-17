@@ -1,0 +1,17 @@
+@(response : models.services.ElasticsearchResponse)
+
+<div class="col-lg-3" role="complementary">
+    <div class="hp-sitenav addmargin">
+        <b><span class="glyphicon glyphicon-cog"></span> Kategorien</b>
+        <hr>
+        <div>
+            <span class="glyphicon glyphicon-star"></span>
+            <a class="" href='/search?keyword=@response.keyword&mode=all'>Alle Kategorien</a>
+        </div>
+        <div class="hp-searchfacet-remove">
+            <span class="glyphicon glyphicon-user"></span>
+            <span>Gruppen und Kurse </span><small>(@response.lGroupDocuments)</small>
+            <a href='/search?keyword=@response.keyword&mode=all'><span class="glyphicon glyphicon-remove"></span></a>
+        </div>
+    </div>
+</div>
