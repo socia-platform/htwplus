@@ -1,0 +1,89 @@
+@(response : models.services.ElasticsearchResponse)
+
+<div class="col-lg-3" role="complementary">
+    <div class="hp-sitenav addmargin">
+        <b><span class="glyphicon glyphicon-cog"></span> Kategorien</b>
+        <hr>
+        <div>
+            <span class="glyphicon glyphicon-star"></span>
+            <a class="" href='/search?keyword=@response.keyword&mode=all'>Alle Kategorien</a>
+        </div>
+        <div class="hp-searchfacet-remove">
+            <span class="glyphicon glyphicon-user"></span>
+            <span>Personen </span><small>(@response.lUserDocuments)</small>
+            <a href='/search?keyword=@response.keyword&mode=all'><span class="glyphicon glyphicon-remove"></span></a>
+        </div>
+    </div>
+</div>
+<div class="col-lg-3" role="complementary">
+    <div class="hp-sitenav">
+        <b><span class="glyphicon glyphicon-cog"></span> Studiengang</b>
+        <hr>
+        @for((key, value) <- response.studycoursesMap) {
+            @if(ctx().request().uri().contains("studycourse")) {
+                <div class="hp-searchfacet-remove">
+                    <span>@if(key.equals("")) {Undefiniert} else {@key} (@value)</span>
+                    <a href='@ctx().request().uri().replace("&studycourse="+helper.urlEncode(key.toString()),"")'><span class="glyphicon glyphicon-remove"></span></a>
+                </div>
+            } else {
+                <div>
+                    <a href='@ctx().request().uri()&studycourse=@helper.urlEncode(key.toString)'>@if(key.equals("")) {Undefiniert} else {@key}</a><small> (@value)</small>
+                </div>
+            }
+        }
+    </div>
+</div>
+<div class="col-lg-3" role="complementary">
+    <div class="hp-sitenav">
+        <b><span class="glyphicon glyphicon-cog"></span> Abschluss</b>
+        <hr>
+        @for((key, value) <- response.degreeMap) {
+            @if(ctx().request().uri().contains("degree")) {
+                <div class="hp-searchfacet-remove">
+                    <span>@if(key.equals("")) {Undefiniert} else {@key} (@value)</span>
+                    <a href='@ctx().request().uri().replace("&degree="+key.toString(),"")'><span class="glyphicon glyphicon-remove"></span></a>
+                </div>
+            } else {
+                <div>
+                    <a href='@ctx().request().uri()&degree=@key'>@if(key.equals("")) {Undefiniert} else {@key}</a><small> (@value)</small>
+                </div>
+            }
+        }
+    </div>
+</div>
+<div class="col-lg-3" role="complementary">
+    <div class="hp-sitenav">
+        <b><span class="glyphicon glyphicon-cog"></span> Fachsemester</b>
+        <hr>
+        @for((key, value) <- response.semesterMap) {
+            @if(ctx().request().uri().contains("semester")) {
+                <div class="hp-searchfacet-remove">
+                    <span>@if(key.equals("")) {Undefiniert} else {@key} (@value)</span>
+                    <a href='@ctx().request().uri().replace("&semester="+key.toString(),"")'><span class="glyphicon glyphicon-remove"></span></a>
+                </div>
+            } else {
+                <div>
+                    <a href='@ctx().request().uri()&semester=@key'>@if(key.equals("")) {Undefiniert} else {@key}</a><small> (@value)</small>
+                </div>
+            }
+        }
+    </div>
+</div>
+<div class="col-lg-3" role="complementary">
+    <div class="hp-sitenav">
+        <b><span class="glyphicon glyphicon-cog"></span> Funktion</b>
+        <hr>
+        @for((key, value) <- response.roleMap) {
+            @if(ctx().request().uri().contains("role")) {
+                <div class="hp-searchfacet-remove">
+                    <span>@if(key.equals("")) {Undefiniert} else {@key} (@value)</span>
+                    <a href='@ctx().request().uri().replace("&role="+key.toString(),"")'><span class="glyphicon glyphicon-remove"></span></a>
+                </div>
+            } else {
+                <div>
+                    <a href='@ctx().request().uri()&role=@key'>@if(key.equals("")) {Undefiniert} else {@key}</a><small> (@value)</small>
+                </div>
+            }
+        }
+    </div>
+</div>
