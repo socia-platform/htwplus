@@ -8,7 +8,7 @@ import org.junit.Test;
 import play.db.jpa.JPA;
 import play.libs.F;
 
-
+import static org.fest.assertions.Assertions.*;
 
 /**
  * Testing security mechanisms.
@@ -39,7 +39,7 @@ public class SecurityTest extends FakeApplicationTest {
     public void testGetUsername() {
         Account testAccount = this.getTestAccount(1);
         this.loginAccount(testAccount);
-        //assertThat(testAccount.id.toString()).isEqualTo(SecurityTest.getSecured().getUsername(this.getContext()));
+        assertThat(testAccount.id.toString()).isEqualTo(SecurityTest.getSecured().getUsername(this.getContext()));
     }
 
     /**
@@ -49,11 +49,11 @@ public class SecurityTest extends FakeApplicationTest {
     public void testIsAdmin() {
         // test, if test account is not admin
         this.loginTestAccount(1);
-        //assertThat(Secured.isAdmin()).isFalse();
+        assertThat(Secured.isAdmin()).isFalse();
 
         // test, if admin account is admin
         this.loginAdminAccount();
-        //assertThat(Secured.isAdmin()).isTrue();
+        assertThat(Secured.isAdmin()).isTrue();
     }
 
     /**
@@ -72,9 +72,9 @@ public class SecurityTest extends FakeApplicationTest {
         JPA.withTransaction(new F.Callback0() {
             @Override
             public void invoke() throws Throwable {
-                //assertThat(Secured.isMemberOfGroup(testGroup, testAccount1)).isTrue();
-                //assertThat(Secured.isMemberOfGroup(testGroup, testAccount2)).isTrue();
-                //assertThat(Secured.isMemberOfGroup(testGroup, testAccount3)).isFalse();
+                assertThat(Secured.isMemberOfGroup(testGroup, testAccount1)).isTrue();
+                assertThat(Secured.isMemberOfGroup(testGroup, testAccount2)).isTrue();
+                assertThat(Secured.isMemberOfGroup(testGroup, testAccount3)).isFalse();
             }
         });
     }
@@ -91,8 +91,8 @@ public class SecurityTest extends FakeApplicationTest {
         JPA.withTransaction(new F.Callback0() {
             @Override
             public void invoke() throws Throwable {
-                //assertThat(Secured.isOwnerOfAccount(testAccount1.id)).isTrue();
-                //assertThat(Secured.isOwnerOfAccount(testAccount2.id)).isFalse();
+                assertThat(Secured.isOwnerOfAccount(testAccount1.id)).isTrue();
+                assertThat(Secured.isOwnerOfAccount(testAccount2.id)).isFalse();
             }
         });
     }
@@ -106,9 +106,9 @@ public class SecurityTest extends FakeApplicationTest {
         Account testAccount2 = this.getTestAccount(2);
         Group testGroup = this.getTestGroup(1, testAccount1);
 
-//        assertThat(Secured.isOwnerOfGroup(null, testAccount1)).isFalse();
-//        assertThat(Secured.isOwnerOfGroup(testGroup, testAccount1)).isTrue();
-//        assertThat(Secured.isOwnerOfGroup(testGroup, testAccount2)).isFalse();
+        assertThat(Secured.isOwnerOfGroup(null, testAccount1)).isFalse();
+        assertThat(Secured.isOwnerOfGroup(testGroup, testAccount1)).isTrue();
+        assertThat(Secured.isOwnerOfGroup(testGroup, testAccount2)).isFalse();
     }
 
     /**
@@ -120,16 +120,16 @@ public class SecurityTest extends FakeApplicationTest {
         testAccount1.role = AccountRole.TUTOR;
 
         this.loginAccount(testAccount1);
-        //assertThat(Secured.createCourse()).isTrue();
+        assertThat(Secured.createCourse()).isTrue();
 
         Account testAccount2 = this.getTestAccount(2);
         testAccount2.role = AccountRole.ADMIN;
         this.loginAccount(testAccount2);
-        //assertThat(Secured.createCourse()).isTrue();
+        assertThat(Secured.createCourse()).isTrue();
 
         Account testAccount3 = this.getTestAccount(3);
         this.loginAccount(testAccount3);
-        //assertThat(Secured.createCourse()).isFalse();
+        assertThat(Secured.createCourse()).isFalse();
     }
 
     /**
@@ -142,21 +142,21 @@ public class SecurityTest extends FakeApplicationTest {
 
         // test, if admin is allowed to view
         this.loginAdminAccount();
-//        JPA.withTransaction(new F.Callback0() {
-//            @Override
-//            public void invoke() throws Throwable {
-//                assertThat(Secured.viewGroup(testGroup)).isTrue();
-//            }
-//        });
+        JPA.withTransaction(new F.Callback0() {
+            @Override
+            public void invoke() throws Throwable {
+                assertThat(Secured.viewGroup(testGroup)).isTrue();
+            }
+        });
 
         // test, if member of group is allowed to view
         this.loginAccount(testAccount1);
-//        JPA.withTransaction(new F.Callback0() {
-//            @Override
-//            public void invoke() throws Throwable {
-//                assertThat(Secured.viewGroup(testGroup)).isTrue();
-//            }
-//        });
+        JPA.withTransaction(new F.Callback0() {
+            @Override
+            public void invoke() throws Throwable {
+                assertThat(Secured.viewGroup(testGroup)).isTrue();
+            }
+        });
 
         // test, if no member of group is disallowed to view
         Account testAccount3 = this.getTestAccount(3);
@@ -165,7 +165,7 @@ public class SecurityTest extends FakeApplicationTest {
         JPA.withTransaction(new F.Callback0() {
             @Override
             public void invoke() throws Throwable {
-                //assertThat(Secured.viewGroup(testGroup)).isFalse();
+                assertThat(Secured.viewGroup(testGroup)).isFalse();
             }
         });
     }
@@ -180,17 +180,17 @@ public class SecurityTest extends FakeApplicationTest {
 
         // test, if admin is allowed to edit
         this.loginAdminAccount();
-        //assertThat(Secured.editGroup(testGroup)).isTrue();
+        assertThat(Secured.editGroup(testGroup)).isTrue();
 
         // test, if owner of group is allowed to edit
         this.loginAccount(testAccount1);
-        //assertThat(Secured.editGroup(testGroup)).isTrue();
+        assertThat(Secured.editGroup(testGroup)).isTrue();
 
         // test, if not owner of group is disallowed to edit
         Account testAccount2 = this.getTestAccount(3);
         this.establishGroupMembership(testAccount2, testGroup);
         this.loginAccount(testAccount2);
-        //assertThat(Secured.editGroup(testGroup)).isFalse();
+        assertThat(Secured.editGroup(testGroup)).isFalse();
     }
 
     /**
@@ -203,17 +203,17 @@ public class SecurityTest extends FakeApplicationTest {
 
         // test, if admin is allowed to delete
         this.loginAdminAccount();
-        //assertThat(Secured.deleteGroup(testGroup)).isTrue();
+        assertThat(Secured.deleteGroup(testGroup)).isTrue();
 
         // test, if owner of group is allowed to delete
         this.loginAccount(testAccount1);
-        //assertThat(Secured.deleteGroup(testGroup)).isTrue();
+        assertThat(Secured.deleteGroup(testGroup)).isTrue();
 
         // test, if not owner of group is disallowed to delete
         Account testAccount2 = this.getTestAccount(3);
         this.establishGroupMembership(testAccount2, testGroup);
         this.loginAccount(testAccount2);
-        //assertThat(Secured.deleteGroup(testGroup)).isFalse();
+        assertThat(Secured.deleteGroup(testGroup)).isFalse();
     }
 
     /**
@@ -224,23 +224,23 @@ public class SecurityTest extends FakeApplicationTest {
         Account testAccount1 = this.getTestAccount(1);
         final Group testGroup = this.getTestGroup(1, testAccount1);
 
-//        // test, if no group returns false
-//        assertThat(Secured.removeGroupMember(null, testAccount1)).isFalse();
-//
-//        // test, if owner of group cannot be removed
-//        this.loginAccount(testAccount1);
-//        assertThat(Secured.removeGroupMember(testGroup, testAccount1)).isFalse();
-//
-//        // test, if admin is allowed to remove group member
-//        Account testAccount2 = this.getTestAccount(2);
-//        this.loginAdminAccount();
-//        assertThat(Secured.removeGroupMember(testGroup, testAccount2)).isTrue();
-//
-//        // test, if no admin and no group owner can remove himself but no other from the group
-//        this.loginAccount(testAccount2);
-//        Account testAccount3 = this.getTestAccount(3);
-//        assertThat(Secured.removeGroupMember(testGroup, testAccount2)).isTrue();
-//        assertThat(Secured.removeGroupMember(testGroup, testAccount3)).isFalse();
+        // test, if no group returns false
+        assertThat(Secured.removeGroupMember(null, testAccount1)).isFalse();
+
+        // test, if owner of group cannot be removed
+        this.loginAccount(testAccount1);
+        assertThat(Secured.removeGroupMember(testGroup, testAccount1)).isFalse();
+
+        // test, if admin is allowed to remove group member
+        Account testAccount2 = this.getTestAccount(2);
+        this.loginAdminAccount();
+        assertThat(Secured.removeGroupMember(testGroup, testAccount2)).isTrue();
+
+        // test, if no admin and no group owner can remove himself but no other from the group
+        this.loginAccount(testAccount2);
+        Account testAccount3 = this.getTestAccount(3);
+        assertThat(Secured.removeGroupMember(testGroup, testAccount2)).isTrue();
+        assertThat(Secured.removeGroupMember(testGroup, testAccount3)).isFalse();
     }
 
     /**
@@ -251,21 +251,21 @@ public class SecurityTest extends FakeApplicationTest {
         Account testAccount1 = this.getTestAccount(1);
         final Group testGroup = this.getTestGroup(1, testAccount1);
 
-//        // test, if no group returns false
-//        assertThat(Secured.inviteMember(null)).isFalse();
-//
-//        // test, if owner of group can invite
-//        this.loginAccount(testAccount1);
-//        assertThat(Secured.inviteMember(testGroup)).isTrue();
-//
-//        // test, if admin is allowed to invite
-//        this.loginAdminAccount();
-//        assertThat(Secured.inviteMember(testGroup)).isTrue();
-//
-//        // test, if no owner is disallowed to invite
-//        Account testAccount2 = this.getTestAccount(2);
-//        this.loginAccount(testAccount2);
-//        assertThat(Secured.inviteMember(testGroup)).isFalse();
+        // test, if no group returns false
+        assertThat(Secured.inviteMember(null)).isFalse();
+
+        // test, if owner of group can invite
+        this.loginAccount(testAccount1);
+        assertThat(Secured.inviteMember(testGroup)).isTrue();
+
+        // test, if admin is allowed to invite
+        this.loginAdminAccount();
+        assertThat(Secured.inviteMember(testGroup)).isTrue();
+
+        // test, if no owner is disallowed to invite
+        Account testAccount2 = this.getTestAccount(2);
+        this.loginAccount(testAccount2);
+        assertThat(Secured.inviteMember(testGroup)).isFalse();
     }
 
     /**
@@ -276,16 +276,16 @@ public class SecurityTest extends FakeApplicationTest {
         Account testAccount1 = this.getTestAccount(1);
         final Group testGroup = this.getTestGroup(1, testAccount1);
 
-//        // test, if no group returns false
-//        assertThat(Secured.acceptInvitation(null)).isFalse();
-//
-//        // test, if the owner of the group can accept invitation
-//        this.loginAccount(testAccount1);
-//        GroupAccount groupAccount = this.getGroupAccount(testAccount1, testGroup);
-//        assertThat(Secured.acceptInvitation(groupAccount)).isTrue();
-//
-//        // test, if the admin can accept invitation
-//        this.loginAdminAccount();
-//        assertThat(Secured.inviteMember(testGroup)).isTrue();
+        // test, if no group returns false
+        assertThat(Secured.acceptInvitation(null)).isFalse();
+
+        // test, if the owner of the group can accept invitation
+        this.loginAccount(testAccount1);
+        GroupAccount groupAccount = this.getGroupAccount(testAccount1, testGroup);
+        assertThat(Secured.acceptInvitation(groupAccount)).isTrue();
+
+        // test, if the admin can accept invitation
+        this.loginAdminAccount();
+        assertThat(Secured.inviteMember(testGroup)).isTrue();
     }
 }

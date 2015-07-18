@@ -20,7 +20,9 @@ libraryDependencies ++= Seq(
   "org.elasticsearch" % "elasticsearch" % "1.4.1",
   "eu.medsea.mimeutil" % "mime-util" % "2.1.3",
   "org.imgscalr" % "imgscalr-lib" % "4.2",
-  "joda-time" % "joda-time" % "2.7"
+  "joda-time" % "joda-time" % "2.7",
+  "org.mockito" % "mockito-all" % "1.10.19",
+  "org.easytesting" % "fest-assert" % "1.4"
 )
 
 libraryDependencies += evolutions

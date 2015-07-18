@@ -5,8 +5,9 @@ import org.junit.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
-/**clea
+import static org.fest.assertions.Assertions.*;
+
+/**
  * Tests for JsonService.
  */
 public class JsonTest {
@@ -24,19 +25,18 @@ public class JsonTest {
         map.put("Object", new Object());
 
         ObjectNode testNode = JsonService.getInstance().getObjectNodeFromMap(map);
-        assertNotNull(testNode);
-//        assertThat(testNode).isNotNull();
-//        assertThat(testNode.has("String")).isTrue();
-//        assertThat(testNode.get("String").asText()).contains("Hello World");
-//        assertThat(testNode.has("Integer")).isTrue();
-//        assertThat(testNode.get("Integer").asInt()).isEqualTo(1000);
-//        assertThat(testNode.has("Long")).isTrue();
-//        assertThat(testNode.get("Long").asLong()).isEqualTo(2000L);
-//        assertThat(testNode.has("Date")).isTrue();
-//        assertThat(testNode.get("Date").asLong()).isEqualTo(date.getTime());
-//        assertThat(testNode.has("Object")).isTrue();
-//        assertThat(testNode.get("Object").asText()).contains("java.lang.Object");
-//        assertThat(testNode.has("Nothing")).isFalse();
+        assertThat(testNode).isNotNull();
+        assertThat(testNode.has("String")).isTrue();
+        assertThat(testNode.get("String").asText()).contains("Hello World");
+        assertThat(testNode.has("Integer")).isTrue();
+        assertThat(testNode.get("Integer").asInt()).isEqualTo(1000);
+        assertThat(testNode.has("Long")).isTrue();
+        assertThat(testNode.get("Long").asLong()).isEqualTo(2000L);
+        assertThat(testNode.has("Date")).isTrue();
+        assertThat(testNode.get("Date").asLong()).isEqualTo(date.getTime());
+        assertThat(testNode.has("Object")).isTrue();
+        assertThat(testNode.get("Object").asText()).contains("java.lang.Object");
+        assertThat(testNode.has("Nothing")).isFalse();
     }
 
     /**
@@ -52,14 +52,14 @@ public class JsonTest {
         list.add(new MockJsonSerializable());
 
         List<ObjectNode> testList = JsonService.getInstance().getJsonList(list);
-//        assertThat(testList).isNotNull();
-//        assertThat(testList.size()).isEqualTo(list.size());
-//        for (ObjectNode node : testList) {
-//            assertThat(node.has("class_name")).isTrue();
-//            assertThat(node.has("time")).isTrue();
-//            assertThat(node.has("random")).isTrue();
-//            assertThat(node.has("nothing")).isFalse();
-//            assertThat(node.get("class_name").asText()).contains("MockJsonSerializable");
-//        }
+        assertThat(testList).isNotNull();
+        assertThat(testList.size()).isEqualTo(list.size());
+        for (ObjectNode node : testList) {
+            assertThat(node.has("class_name")).isTrue();
+            assertThat(node.has("time")).isTrue();
+            assertThat(node.has("random")).isTrue();
+            assertThat(node.has("nothing")).isFalse();
+            assertThat(node.get("class_name").asText()).contains("MockJsonSerializable");
+        }
     }
 }

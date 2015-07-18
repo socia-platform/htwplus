@@ -22,7 +22,7 @@ import play.test.Helpers;
 import java.util.Collections;
 import java.util.Map;
 
-//import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 /**
  * You can extend your test classes from this class to provide a complete fake environment.
@@ -31,7 +31,7 @@ public abstract class FakeApplicationTest {
     /**
      * Mocks a HTTP request instance.
      */
-    //private final Http.Request request = mock(Http.Request.class);
+    private final Http.Request request = mock(Http.Request.class);
 
     /**
      * Hols the FakeApplication instance.
@@ -73,9 +73,9 @@ public abstract class FakeApplicationTest {
         Map<String, String> flashData = Collections.emptyMap();
         Map<String, Object> argData = Collections.emptyMap();
         Long id = 2L;
-       //play.api.mvc.RequestHeader header = mock(play.api.mvc.RequestHeader.class);
-        //Http.Context context = new Http.Context(id, header, this.request, flashData, flashData, argData);
-       //Http.Context.current.set(context);
+        play.api.mvc.RequestHeader header = mock(play.api.mvc.RequestHeader.class);
+        Http.Context context = new Http.Context(id, header, this.request, flashData, flashData, argData);
+        Http.Context.current.set(context);
     }
 
     @AfterClass
