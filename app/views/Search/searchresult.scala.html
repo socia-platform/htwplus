@@ -1,4 +1,4 @@
-@(currentPage: Int, searchLimit: Int, response : models.services.ElasticsearchResponse)
+@(currentPage: Integer, searchLimit: Integer, response : models.services.ElasticsearchResponse)
 @import helper._
 @import play._
 @import models.enums._
@@ -17,10 +17,7 @@
 
             @if(response.getDocumentCount != 0) {
 
-                @if(response.searchMode.equals("all")){ @{paginationSearchHits = response.getDocumentCount.toInt} }
-                @if(response.searchMode.equals("user")){ @{paginationSearchHits = response.lUserDocuments.toInt} }
-                @if(response.searchMode.equals("group")){ @{paginationSearchHits = response.lGroupDocuments.toInt} }
-                @if(response.searchMode.equals("post")){ @{paginationSearchHits = response.lPostDocuments.toInt} }
+                @{paginationSearchHits = response.getDocumentCount.toInt}
 
                 @for(result <- response.resultList) {
 
@@ -87,7 +84,7 @@
                         case _ => { @result }
                     }
                 }
-                @views.html.pagination(paginationSearchHits, searchLimit, currentPage, "/search?keyword="+response.keyword+"&mode="+response.searchMode, "&")
+                @views.html.pagination(paginationSearchHits, searchLimit, currentPage, Navigation.getUriWithoutPagination, "&", true)
             }
             }
             </div>

@@ -148,10 +148,7 @@ public class Application extends BaseController {
             return ok(views.html.Search.search.render());
         }
 
-        String uri = ctx().request().uri();
-                if(uri.contains("&page=")){
-                    uri = uri.substring(0, uri.lastIndexOf("&"));
-                }
+
         return ok(views.html.Search.searchresult.render(
                 page,
                 LIMIT,
