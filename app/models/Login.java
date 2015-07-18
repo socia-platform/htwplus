@@ -10,7 +10,7 @@ public class Login {
 
 		@Transactional
 		public String validate() {
-			if (Account.authenticate(email, password) == null) {
+			if (Account.authenticate(this.email, this.password) == null) {
 				return "Bitte melde dich mit deiner Matrikelnummer an.";
 			}
 			return null;

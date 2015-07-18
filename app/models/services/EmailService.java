@@ -1,7 +1,8 @@
 package models.services;
 
-import com.typesafe.plugin.MailerAPI;
-import com.typesafe.plugin.MailerPlugin;
+import play.libs.mailer.Email;
+import play.libs.mailer.MailerClient;
+import javax.inject.Inject;
 import models.Account;
 import models.Notification;
 import play.Logger;
@@ -21,6 +22,8 @@ public class EmailService {
     static final String EMAIL_SENDER = Play.application().configuration().getString("htwplus.email.sender");
     static final String PLAIN_TEXT_TEMPLATE = "views.html.Emails.notificationsPlainText";
     static final String HTML_TEMPLATE = "views.html.Emails.notificationsHtml";
+
+    @Inject MailerClient mailerClient;
 
     /**
      * Singleton instance
@@ -54,21 +57,25 @@ public class EmailService {
      * @param mailHtml HTML content of the mail (allowed to be null)
      */
     public void sendEmail(String subject, String recipient, String mailPlainText, String mailHtml) {
-        MailerAPI mail = play.Play.application().plugin(MailerPlugin.class).email();
+        Email mail = new Email();
+        //MailerAPI mail = play.Play.application().plugin(MailerPlugin.class).email();
         mail.setSubject(subject);
-        mail.setRecipient(recipient);
+        mail.addTo(recipient);
         mail.setFrom(EmailService.EMAIL_SENDER);
 
         // send email either in plain text, HTML or both
         if (mailPlainText != null) {
             if (mailHtml != null) {
-                mail.send(mailPlainText, mailHtml);
+                mail.setBodyHtml(mailHtml);
+                mail.setBodyText(mailPlainText);
             } else {
-                mail.send(mailPlainText);
+                mail.setBodyText(mailPlainText);
             }
         } else if (mailHtml != null) {
-            mail.sendHtml(mailHtml);
+            mail.setBodyHtml(mailHtml);
         }
+
+        mailerClient.send(mail);
     }
 
     /**
