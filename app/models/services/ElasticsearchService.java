@@ -179,24 +179,23 @@ public class ElasticsearchService {
             boolFilterBuilder.must(typeFilter(filter));
         }
 
-        if(userFacets.get("studycourse").length != 0) {
-            boolFilterBuilder.must(termsFilter("user.studycourse", userFacets.get("studycourse")));
+        if(userFacets != null) {
+            if(userFacets.get("studycourse").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.studycourse", userFacets.get("studycourse")));
+            }
+
+            if(userFacets.get("degree").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.degree", userFacets.get("degree")));
+            }
+
+            if(userFacets.get("semester").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.semester", userFacets.get("semester")));
+            }
+
+            if(userFacets.get("role").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.role", userFacets.get("role")));
+            }
         }
-
-        if(userFacets.get("degree").length != 0) {
-            boolFilterBuilder.must(termsFilter("user.degree", userFacets.get("degree")));
-        }
-
-        if(userFacets.get("semester").length != 0) {
-            boolFilterBuilder.must(termsFilter("user.semester", userFacets.get("semester")));
-        }
-
-        if(userFacets.get("role").length != 0) {
-            boolFilterBuilder.must(termsFilter("user.role", userFacets.get("role")));
-        }
-
-
-
 
         // Build filteredQuery to apply viewableFilter to completeQuery
         QueryBuilder filteredQuery = QueryBuilders.filteredQuery(completeQuery, boolFilterBuilder);
