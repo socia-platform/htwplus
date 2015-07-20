@@ -59,7 +59,12 @@ public class Secured extends Security.Authenticator {
 	@Override
     public Result onUnauthorized(Context ctx) {
         // cookie outdated? save originURL to prevent redirect to index page after login
-        ctx.session().put("originURL", ctx.request().path());
+
+		if (ctx.request().getQueryString("clientId") != null)
+			ctx.session().put("originURL", ctx.request().path() + "?clientId=" + ctx.request().getQueryString("clientId"));
+		else
+			ctx.session().put("originURL", ctx.request().path());
+
 		return unauthorized(landingpage.render());
     }
 
