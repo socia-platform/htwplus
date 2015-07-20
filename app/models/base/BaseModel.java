@@ -19,6 +19,7 @@ public abstract class BaseModel {
      */
 	@Id
 	@GeneratedValue
+	@Expose(name="id")
 	public Long id;
 
     /**
