@@ -12,11 +12,7 @@ import java.util.stream.Stream;
  */
 public class ExposeTools {
     public static Stream<Pair<Field,Expose>> streamAllExposedFields(Class t) {
-        if (t.getSuperclass() != Object.class)
-            return Stream.concat(streamAllExposedFields(t.getSuperclass()), Stream.of(t.getDeclaredFields()).
-                    filter(f -> f.isAnnotationPresent(Expose.class)).
-                    map(f -> new Pair<>(f, f.getAnnotation(Expose.class))));
-        return Stream.of(t.getDeclaredFields()).
+        return Stream.of(t.getFields()).
                 filter(f -> f.isAnnotationPresent(Expose.class)).
                 map(f -> new Pair<>(f, f.getAnnotation(Expose.class)));
     }
