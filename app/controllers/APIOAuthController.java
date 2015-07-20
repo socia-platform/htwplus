@@ -74,7 +74,8 @@ public class APIOAuthController extends BaseController {
             String authorizationCode = UUID.randomUUID().toString();
             grant.code = authorizationCode;
             grant.create();
-            return ok(grant.client.callback + "?authorizationCode=" + authorizationCode);
+            String red = (request().secure() ? "https://" : "http://") + grant.client.callback + "?authorizationCode=" + authorizationCode;
+            return redirect(red);
         }
         return internalServerError();
     }
@@ -90,7 +91,7 @@ public class APIOAuthController extends BaseController {
             token.create();
             Collection collection = JsonCollectionUtil.getRequestedCollection(Token.class, Lists.newArrayList(token));
             response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
-            return ok(client.callback.toString() + "?token=" + collection.asJson());
+            return ok(collection.asJson());
         } else
             return badRequest("Incorrect authorization code.");
     }
