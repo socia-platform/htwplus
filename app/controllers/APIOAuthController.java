@@ -88,6 +88,7 @@ public class APIOAuthController extends BaseController {
         if (grant != null) {
             Client client = grant.client;
             Token token = new Token(client, Component.currentAccount(), null);
+            token.user = Component.currentAccount();
             token.create();
             Collection collection = JsonCollectionUtil.getRequestedCollection(Token.class, Lists.newArrayList(token));
             response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
