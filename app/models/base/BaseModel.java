@@ -19,13 +19,14 @@ public abstract class BaseModel {
      */
 	@Id
 	@GeneratedValue
-	@Expose(name="id")
+	@Expose(name = "id")
 	public Long id;
 
     /**
      * Date of the creation time of this model.
      */
 	@Column(name = "created_at")
+	@Expose(name = "created_at")
 	public Date createdAt;
 
     /**
