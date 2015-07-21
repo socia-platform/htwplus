@@ -80,8 +80,8 @@ public class APIOAuthController extends BaseController {
         return internalServerError();
     }
 
-    @Security.Authenticated(Secured.class)
-    @Transactional
+    /*@Security.Authenticated(Secured.class)
+    @Transactional*/
     public static Result getToken() {
         DynamicForm requestData = Form.form().bindFromRequest();
         UserGrant grant = UserGrant.findByCode(requestData.get("authorizationCode"));
