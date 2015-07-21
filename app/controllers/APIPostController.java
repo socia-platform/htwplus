@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import models.Post;
 import models.enums.CustomContentType;
 import net.hamnaberg.json.Collection;
+import play.db.jpa.Transactional;
 import play.mvc.Result;
 import play.mvc.Security;
 import util.JsonCollectionUtil;
@@ -11,6 +12,8 @@ import util.JsonCollectionUtil;
 /**
  * Created by richard on 17.06.15.
  */
+@Transactional
+@Security.Authenticated(SecuredWithToken.class)
 public class APIPostController extends BaseController {
 
     public static Result post() {
@@ -29,8 +32,6 @@ public class APIPostController extends BaseController {
         }
     }
 
-    /*@Transactional
-    @Security.Authenticated(SecuredWithToken.class)*/
     public static Result get(final Long id) {
         if(request().getHeader("Accept").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
             Collection collection;
