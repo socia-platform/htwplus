@@ -48,7 +48,8 @@ public class SecuredWithToken extends Security.Authenticator {
                     Template.create(),
                     error
             );
-            return (unauthorized(collection.asJson()));
+            ctx.response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
+            return (unauthorized(collection.toString()));
         } else {
             ctx.session().put("originURL", ctx.request().path());
             return unauthorized(landingpage.render());
