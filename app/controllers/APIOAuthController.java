@@ -92,7 +92,7 @@ public class APIOAuthController extends BaseController {
             token.create();
             Collection collection = JsonCollectionUtil.getRequestedCollection(Token.class, Lists.newArrayList(token));
             response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
-            return ok(collection.asJson());
+            return ok(collection.toString());
         } else
             return badRequest("Incorrect authorization code.");
     }
