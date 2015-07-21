@@ -38,7 +38,7 @@ public class Token extends BaseModel {
 
     public Token() {}
 
-    public Token(Client client, Account User, Date expires) {
+    public Token(Client client, Account user, Date expires) {
         this.client = client;
         this.user = user;
         this.expires = expires;
