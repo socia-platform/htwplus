@@ -1,12 +1,10 @@
 @(currentPage: Integer, searchLimit: Integer, response : models.services.ElasticsearchResponse)
 @import helper._
-@import play._
 @import models.enums._
-@import java.math.BigInteger; var paginationSearchHits=0;
 @main(response.keyword){
 
     <div class="row">
-        <div class="col-lg-9" role="main">
+        <div class="col-sm-9" role="main">
             <div class="hp-notepad-content addmargin">
 
             @defining(Component.currentAccount()) { currentUser =>
@@ -16,8 +14,6 @@
                 <br />
 
             @if(response.getDocumentCount != 0) {
-
-                @{paginationSearchHits = response.getDocumentCount.toInt}
 
                 @for(result <- response.resultList) {
 
@@ -48,12 +44,28 @@
                         case group: Group => {
                             @if(response.searchMode.equals("group") || response.searchMode.equals("all")) {
                                 <div class="well searchresult-container hp-pagination-container">
-                                    <div class="group-result">
+                                    <div class="group-result media">
+                                        <div class="pull-left">
                                         @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
                                         @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
                                         @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
-                                        <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
-                                        @if(Secured.isMemberOfGroup(group, currentUser)) { <span class="glyphicon glyphicon-ok"></span> }
+                                        </div>
+                                        <div class="media-body">
+                                            <div class="media-heading">
+                                                <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
+                                            </div>
+                                            <small>
+                                                <span class="glyphicon glyphicon-user"></span>
+                                                @views.html.snippets.userLink(group.owner)
+                                                <br />
+                                            </small>
+                                            <small>
+                                            @if(Secured.isMemberOfGroup(group, currentUser)) {
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                                <span> Du bist bereits Mitglied dieser Gruppe.</span>
+                                            }
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
                             }
@@ -84,7 +96,7 @@
                         case _ => { @result }
                     }
                 }
-                @views.html.pagination(paginationSearchHits, searchLimit, currentPage, Navigation.getUriWithoutPagination, "&", true)
+                @views.html.pagination(response.getDocumentCount.toInt, searchLimit, currentPage, Navigation.getUriWithoutPagination, "&", true)
             }
             }
             </div>

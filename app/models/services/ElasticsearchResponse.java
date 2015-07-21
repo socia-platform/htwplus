@@ -33,6 +33,7 @@ public class ElasticsearchResponse {
     public HashMap degreeMap = new HashMap<String, Long>();
     public HashMap semesterMap = new HashMap<String, Long>();
     public HashMap roleMap = new HashMap<String, Long>();
+    public HashMap grouptypeMap = new HashMap<String, Long>();
 
 
     public ElasticsearchResponse(final SearchResponse response, final String keyword, final String mode) {
@@ -95,9 +96,6 @@ public class ElasticsearchResponse {
             }
         }
 
-
-
-
         if (searchMode.equals("user")) {
             Terms termAggregation = elasticsearchResponse.getAggregations().get("studycourse");
             buckets = termAggregation.getBuckets();
@@ -118,6 +116,14 @@ public class ElasticsearchResponse {
             buckets = termAggregation.getBuckets();
             for (Terms.Bucket bucket : buckets) {
                 roleMap.put(bucket.getKey(), bucket.getDocCount());
+            }
+        }
+
+        if (searchMode.equals("group")) {
+            Terms termAggregation = elasticsearchResponse.getAggregations().get("grouptype");
+            buckets = termAggregation.getBuckets();
+            for (Terms.Bucket bucket : buckets) {
+                grouptypeMap.put(bucket.getKey(), bucket.getDocCount());
             }
         }
 

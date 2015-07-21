@@ -152,7 +152,7 @@ public class ElasticsearchService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public static SearchResponse doSearch(String caller, String query, String filter, HashMap<String, String[]> userFacets, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
+    public static SearchResponse doSearch(String caller, String query, String filter, HashMap<String, String[]> facets, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
 
         QueryBuilder searchQuery;
 
@@ -179,21 +179,25 @@ public class ElasticsearchService {
             boolFilterBuilder.must(typeFilter(filter));
         }
 
-        if(userFacets != null) {
-            if(userFacets.get("studycourse").length != 0) {
-                boolFilterBuilder.must(termsFilter("user.studycourse", userFacets.get("studycourse")));
+        if(facets != null) {
+            if(facets.get("studycourse").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.studycourse", facets.get("studycourse")));
             }
 
-            if(userFacets.get("degree").length != 0) {
-                boolFilterBuilder.must(termsFilter("user.degree", userFacets.get("degree")));
+            if(facets.get("degree").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.degree", facets.get("degree")));
             }
 
-            if(userFacets.get("semester").length != 0) {
-                boolFilterBuilder.must(termsFilter("user.semester", userFacets.get("semester")));
+            if(facets.get("semester").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.semester", facets.get("semester")));
             }
 
-            if(userFacets.get("role").length != 0) {
-                boolFilterBuilder.must(termsFilter("user.role", userFacets.get("role")));
+            if(facets.get("role").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.role", facets.get("role")));
+            }
+
+            if(facets.get("grouptype").length != 0) {
+                boolFilterBuilder.must(termFilter("group.grouptype", facets.get("grouptype")));
             }
         }
 
@@ -219,12 +223,17 @@ public class ElasticsearchService {
         // Add term aggregation for facet count
         searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("types").field("_type"));
 
-
+        // Add user aggregations
         if (filter.equals("user")) {
             searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("studycourse").field("user.studycourse"));
             searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("degree").field("user.degree"));
             searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("semester").field("user.semester"));
             searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("role").field("user.role"));
+        }
+
+        // Add group aggregations
+        if (filter.equals("group")) {
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("grouptype").field("group.grouptype"));
         }
 
         // Apply PostFilter if request mode is not 'all'

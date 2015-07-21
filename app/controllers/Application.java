@@ -111,14 +111,16 @@ public class Application extends BaseController {
         String degreeParam = Form.form().bindFromRequest().field("degree").value();
         String semesterParam = Form.form().bindFromRequest().field("semester").value();
         String roleParam = Form.form().bindFromRequest().field("role").value();
+        String grouptypeParam = Form.form().bindFromRequest().field("grouptype").value();
 
         Navigation.set(Level.SEARCH, "\""+keyword+"\"");
 
-        HashMap<String, String[]> userFacets = new HashMap<>();
-        userFacets.put("studycourse", buildUserFacetList(studycourseParam));
-        userFacets.put("degree", buildUserFacetList(degreeParam));
-        userFacets.put("semester", buildUserFacetList(semesterParam));
-        userFacets.put("role", buildUserFacetList(roleParam));
+        HashMap<String, String[]> facets = new HashMap<>();
+        facets.put("studycourse", buildUserFacetList(studycourseParam));
+        facets.put("degree", buildUserFacetList(degreeParam));
+        facets.put("semester", buildUserFacetList(semesterParam));
+        facets.put("role", buildUserFacetList(roleParam));
+        facets.put("grouptype", buildUserFacetList(grouptypeParam));
 
 
         if (keyword == null) {
@@ -141,7 +143,7 @@ public class Application extends BaseController {
         ElasticsearchResponse searchResponse;
 
         try {
-            response = ElasticsearchService.doSearch("search", keyword.toLowerCase(), mode, userFacets, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
+            response = ElasticsearchService.doSearch("search", keyword.toLowerCase(), mode, facets, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
             searchResponse = new ElasticsearchResponse(response, keyword, mode);
         } catch (NoNodeAvailableException nna) {
             flash("error", "Leider steht die Suche zur Zeit nicht zur Verfügung!");

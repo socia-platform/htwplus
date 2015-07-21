@@ -1,6 +1,6 @@
 @(response : models.services.ElasticsearchResponse)
 
-<div class="col-lg-3" role="complementary">
+<div class="col-sm-3" role="complementary">
     <div class="hp-sitenav addmargin">
         <b><span class="glyphicon glyphicon-cog"></span> Kategorien</b>
         <hr>
@@ -13,5 +13,23 @@
             <span>Gruppen und Kurse </span><small>(@response.lGroupDocuments)</small>
             <a href='/search?keyword=@response.keyword&mode=all'><span class="glyphicon glyphicon-remove"></span></a>
         </div>
+    </div>
+</div>
+<div class="col-sm-3" role="complementary">
+    <div class="hp-sitenav">
+        <b><span class="glyphicon glyphicon-cog"></span> Typ</b>
+        <hr>
+        @for((key, value) <- response.grouptypeMap) {
+            @if(ctx().request().uri().contains("grouptype")) {
+                <div class="hp-searchfacet-remove">
+                    <span>@if(key.equals("")) {Undefiniert} else {@Messages("search.group.grouptype."+key)} (@value)</span>
+                    <a href='@ctx().request().uri().replace("&grouptype="+helper.urlEncode(key.toString()),"")'><span class="glyphicon glyphicon-remove"></span></a>
+                </div>
+            } else {
+                <div>
+                    <a href='@ctx().request().uri()&grouptype=@helper.urlEncode(key.toString)'>@if(key.equals("")) {Undefiniert} else {@Messages("search.group.grouptype."+key)}</a><small> (@value)</small>
+                </div>
+            }
+        }
     </div>
 </div>
