@@ -487,6 +487,8 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in account is allowed to edit account
 	 */
 	public static boolean editAccount(Account account) {
+        if(Secured.isAdmin())
+            return true;
 		return Component.currentAccount().equals(account);
 	}
 
