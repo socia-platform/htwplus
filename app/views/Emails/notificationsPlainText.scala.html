@@ -1,9 +1,15 @@
 @(notifications: List[Notification], recipient: Account)
 @import helper._
-@if(notifications.size > 1) {@Html(Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size)).toString().replaceAll("\\<[^>]*>", "")} else {@Html(Messages("notification.email_notifications.single.intro_text", recipient.name)).toString().replaceAll("\\<[^>]*>", "")}
-@if(notifications != null) {
-@for(notification <- notifications) {
+@import com.typesafe.config.ConfigFactory
+
+@if(notifications.size > 1) {
+@Html(Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size)).toString().replaceAll("\\<[^>]*>", "")
+} else {
+ @Html(Messages("notification.email_notifications.single.intro_text", recipient.name)).toString().replaceAll("\\<[^>]*>", "")
+}
+@if(notifications != null) {@for(notification <- notifications) {
 @Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm"))).toString().replaceAll("\\<[^>]*>", "")
 @notification.rendered.replaceAll("\\<[^>]*>", "")
-}
-}
+}}
+Seite besuchen:
+@defining(ConfigFactory.load().getString("htwplus.base_url")) { baseURL =>@if(notifications.size > 1) {@baseURL@controllers.routes.NotificationController.showAll(1)} else {@baseURL@controllers.routes.NotificationController.forward(notifications(0).id)}}
