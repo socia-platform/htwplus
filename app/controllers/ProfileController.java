@@ -229,7 +229,7 @@ public class ProfileController extends BaseController {
 			filledForm.reject("email", "Diese Mail wird bereits verwendet!");
 			return badRequest(edit.render(account, filledForm, loginForm));
 		}
-		
+		System.out.println(filledForm.errorsAsJson());
 		// Perform JPA Validation
 		if (filledForm.hasErrors()) {
 			return badRequest(edit.render(account, filledForm, loginForm));
@@ -277,6 +277,19 @@ public class ProfileController extends BaseController {
 				studycourse = null;
 			}
 			account.studycourse = studycourse;
+
+			if (!filledForm.field("about").value().isEmpty()) {
+				account.about = filledForm.field("about").value();
+			} else {
+				account.about = null;
+			}
+
+			if (!filledForm.field("homepage").value().isEmpty()) {
+				account.homepage = filledForm.field("homepage").value();
+			} else {
+				account.homepage = null;
+			}
+
 			account.update();
 		
 			flash("success", "Profil erfolgreich gespeichert.");

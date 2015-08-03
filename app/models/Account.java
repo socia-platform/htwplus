@@ -23,6 +23,8 @@ import models.base.ValidationException;
 
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
+import org.hibernate.annotations.Type;
+import org.hibernate.validator.constraints.URL;
 import play.Logger;
 import play.data.validation.Constraints;
 import play.i18n.Messages;
@@ -58,6 +60,12 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public String password;
 	
 	public String avatar;
+
+	@Type(type = "org.hibernate.type.TextType")
+	public String about;
+
+	@URL(message = "error.homepage")
+	public String homepage;
 
 	@OneToMany(mappedBy = "account", orphanRemoval = true)
 	public Set<Friendship> friends;
