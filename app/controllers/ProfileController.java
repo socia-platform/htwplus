@@ -108,7 +108,7 @@ public class ProfileController extends BaseController {
 		return redirect(controllers.routes.ProfileController.view(accountId));
 	}
 
-	public static Result editPassword(Long id) {
+	public static Result convert(Long id) {
 		Account account = Account.findById(id);
 		
 		if (account == null) {
@@ -116,15 +116,15 @@ public class ProfileController extends BaseController {
 			return redirect(controllers.routes.Application.index());
 		}
 		// Check Access
-		if(!Secured.editAccount(account)) {
+		if(!Secured.isAdmin()) {
 			return redirect(controllers.routes.Application.index());
 		}
 		
-		Navigation.set(Level.PROFILE, "Editieren");
-		return ok(editPassword.render(account, accountForm.fill(account)));
+		Navigation.set(Level.PROFILE, "Konvertieren");
+		return ok(convert.render(account, accountForm.fill(account)));
 	}
 
-	public static Result updatePassword(Long id) {
+	public static Result saveConvert(Long id) {
 		// Get regarding Object
 		Account account = Account.findById(id);
 		if (account == null) {
@@ -136,7 +136,7 @@ public class ProfileController extends BaseController {
 		Boolean error = false;
 		
 		// Check Access
-		if(!Secured.editAccount(account)) {
+		if(!Secured.isAdmin()) {
 			return redirect(controllers.routes.Application.index());
 		}
 		
@@ -147,10 +147,9 @@ public class ProfileController extends BaseController {
 		// Remove all unnecessary fields
 		filledForm.errors().remove("firstname");
 		filledForm.errors().remove("lastname");
-		filledForm.errors().remove("email");
 
 		// Store old and new password for validation
-		String oldPassword = filledForm.field("oldPassword").value();
+        String email = filledForm.field("email").value();
 		String password = filledForm.field("password").value();
 		String repeatPassword = filledForm.field("repeatPassword").value();
 		
@@ -158,18 +157,11 @@ public class ProfileController extends BaseController {
 		if(filledForm.hasErrors()) {
 			error = true;
 		}
-		
-		// Custom Validations
-		if (!oldPassword.isEmpty()) {
-			if (!account.password.equals(Component.md5(oldPassword))) {
-				filledForm.reject("oldPassword", "Dein altes Passwort ist nicht korrekt.");
-				error = true;
-			}
-		} else {
-			filledForm.reject("oldPassword","Bitte gebe Dein altes Passwort ein.");
-			error = true;
-		}
 
+        if (email.isEmpty()) {
+            filledForm.reject("email", "Für einen lokalen Account ist eine EMail nötig!");
+            error = true;
+        }
 		if (password.length() < 6) {
 			filledForm.reject("password", "Das Passwort muss mindestens 6 Zeichen haben.");
 			error = true;
@@ -181,13 +173,14 @@ public class ProfileController extends BaseController {
 		}
 
 		if (error) {
-			return badRequest(editPassword.render(account, filledForm));
+			return badRequest(convert.render(account, filledForm));
 		} else {
 			account.password = Component.md5(password);
+            account.email = email;
 			account.update();
-			flash("success", "Passwort erfolgreich geändert.");
+			flash("success", "Account erfolgreich konvertiert.");
 		}
-		return redirect(controllers.routes.ProfileController.me());
+		return redirect(controllers.routes.ProfileController.view(id));
 	}
 
 	public static Result edit(Long id) {

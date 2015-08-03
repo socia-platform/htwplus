@@ -1,7 +1,5 @@
 package models.services;
 
-import com.typesafe.plugin.MailerAPI;
-import com.typesafe.plugin.MailerPlugin;
 import models.Account;
 import models.Notification;
 import play.Logger;
@@ -9,6 +7,8 @@ import play.Play;
 import play.db.jpa.JPA;
 import play.i18n.Messages;
 import play.libs.F;
+import play.libs.mailer.Email;
+import play.libs.mailer.MailerPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,21 +54,19 @@ public class EmailService {
      * @param mailHtml HTML content of the mail (allowed to be null)
      */
     public void sendEmail(String subject, String recipient, String mailPlainText, String mailHtml) {
-        MailerAPI mail = play.Play.application().plugin(MailerPlugin.class).email();
+        Email mail = new Email();
         mail.setSubject(subject);
-        mail.setRecipient(recipient);
         mail.setFrom(EmailService.EMAIL_SENDER);
+        mail.addTo(recipient);
 
         // send email either in plain text, HTML or both
         if (mailPlainText != null) {
-            if (mailHtml != null) {
-                mail.send(mailPlainText, mailHtml);
-            } else {
-                mail.send(mailPlainText);
-            }
-        } else if (mailHtml != null) {
-            mail.sendHtml(mailHtml);
+            mail.setBodyText(mailPlainText);
         }
+        if (mailHtml != null) {
+            mail.setBodyHtml(mailHtml);
+        }
+        MailerPlugin.send(mail);
     }
 
     /**
@@ -81,7 +79,8 @@ public class EmailService {
         try {
             String subject = notifications.size() > 1
                     ? Messages.get("notification.email_notifications.collected.subject", notifications.size())
-                    : Messages.get("notification.email_notifications.single.subject");
+                    : Messages.get("notification.email_notifications.single.subject_specific",
+                        notifications.get(0).rendered.replaceAll("<[^>]*>", ""));
             // send the email
             this.sendEmail(subject, recipient.name + " <" + recipient.email + ">",
                     TemplateService.getInstance().getRenderedTemplate(EmailService.PLAIN_TEXT_TEMPLATE, notifications, recipient),

@@ -1,0 +1,38 @@
+@(profile: Account, profileForm: Form[Account])
+@import helper._
+@import models._
+
+@main("Konvertieren") {
+    <div class="row">
+        <div class="col-lg-12" role="main">
+            <div class="hp-notepad-content addmargin">
+                <h2>Erzeuge lokalen Account</h2>
+                <br>
+                @form(routes.ProfileController.saveConvert(profile.id)) {
+                    @inputText(
+                        profileForm("email"),
+                        'class -> "form-control",
+                        '_label -> "Email",
+                        '_error -> profileForm.error("email"),
+                        'placeholder -> "max.mustermann@muster.de"
+                    )
+                    @inputPassword(
+                        profileForm("password"),
+                        '_label -> "Neues Passwort",
+                        '_error -> profileForm.error("password")
+                    )
+                    @inputPassword(
+                        profileForm("repeatPassword"),
+                        '_label -> "Wiederholung",
+                        '_error -> profileForm.error("repeatPassword")
+                    )
+                    <div class="pull-right">
+                        <input type="submit" class="btn btn-warning" value="Speichern">
+                        <a type="button" class="btn btn-default" href="@routes.ProfileController.edit(profile.id)">Abbrechen</a>
+                    </div>
+                    <div class="clearfix"></div>
+                }
+            </div>
+        </div>
+    </div>
+}
