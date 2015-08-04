@@ -1,10 +1,6 @@
 package models;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -25,10 +21,6 @@ import models.services.AvatarService;
 import models.services.FileService;
 import models.base.ValidationException;
 
-import models.services.ElasticsearchService;
-import net.hamnaberg.json.Item;
-import net.hamnaberg.json.Property;
-import net.hamnaberg.json.Template;
 import play.Logger;
 import play.data.validation.Constraints;
 import play.i18n.Messages;
@@ -38,8 +30,7 @@ import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import controllers.Component;
 import play.libs.Json;
-import scala.Char;
-import util.Expose;
+import util.ExposeField;
 
 @Entity
 public class Account extends BaseModel implements IJsonNodeSerializable {
@@ -51,15 +42,15 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public String name;
 
 	@Required
-	@Expose(name ="firstname", template = "John")
+	@ExposeField(name ="firstname", template = "John")
 	public String firstname;
 
 	@Required
-	@Expose(name = "lastname", template = "Doe")
+	@ExposeField(name = "lastname", template = "Doe")
 	public String lastname;
 
 	@Email
-	@Expose(name = "email", template = "john@doe-online.com")
+	@ExposeField(name = "email", template = "john@doe-online.com")
 	@Column(unique=true)
 	public String email;
 
@@ -79,7 +70,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public String studentId;
 
 	@OneToOne
-	@Expose(name = "studycourse")
+	@ExposeField(name = "studycourse")
 	public Studycourse studycourse;
 	public String degree;
 	public Integer semester;

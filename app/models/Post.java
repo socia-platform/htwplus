@@ -6,11 +6,8 @@ import java.util.*;
 import javax.persistence.*;
 import javax.persistence.Query;
 
-import controllers.Component;
-import models.enums.AccountRole;
 import models.enums.GroupType;
 import models.enums.LinkType;
-import models.services.ElasticsearchService;
 import models.base.BaseModel;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
@@ -22,7 +19,7 @@ import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 
 import org.hibernate.annotations.Type;
-import util.Expose;
+import util.ExposeField;
 import util.JsonCollectionUtil;
 
 @Entity
@@ -35,25 +32,25 @@ public class Post extends BaseNotifiable implements INotifiable {
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
     public static final String BROADCAST = "broadcast";                     // broadcast post from admin control center
 
-    @Expose(name = "content", template = "The Content.")
+    @ExposeField(name = "content", template = "The Content.")
     @Required
     @Lob
     @Type(type = "org.hibernate.type.TextType")
 	public String content;
 
-    @Expose(name = "parent_id")
+    @ExposeField(name = "parent_id")
 	@ManyToOne
 	public Post parent;
 
-    @Expose(name = "group_id")
+    @ExposeField(name = "group_id")
 	@ManyToOne
 	public Group group;
 
-    @Expose(name = "account_id")
+    @ExposeField(name = "account_id")
 	@ManyToOne
 	public Account account;
 
-    @Expose(name = "owner_id")
+    @ExposeField(name = "owner_id")
 	@ManyToOne
 	public Account owner;
 

@@ -1,6 +1,6 @@
 package models.base;
 
-import util.Expose;
+import util.ExposeField;
 import util.Pagination;
 
 import java.lang.reflect.Field;
@@ -19,14 +19,14 @@ public abstract class BaseModel {
      */
 	@Id
 	@GeneratedValue
-	@Expose(name = "id")
+	@ExposeField(name = "id")
 	public Long id;
 
     /**
      * Date of the creation time of this model.
      */
 	@Column(name = "created_at")
-	@Expose(name = "created_at")
+	@ExposeField(name = "created_at")
 	public Date createdAt;
 
     /**
@@ -83,8 +83,8 @@ public abstract class BaseModel {
 		List<String> nameList = new ArrayList<>();
 		Field[] fields = this.getClass().getDeclaredFields();
 		for (Field f : fields) {
-			if (f.getAnnotation(Expose.class) != null) {
-				nameList.add(f.getAnnotation(Expose.class).name());
+			if (f.getAnnotation(ExposeField.class) != null) {
+				nameList.add(f.getAnnotation(ExposeField.class).name());
 			}
 		}
 		return nameList;

@@ -3,14 +3,12 @@ package models;
 import models.base.BaseModel;
 import play.data.validation.Constraints;
 import play.db.jpa.JPA;
-import util.Expose;
+import util.ExposeField;
 
 import javax.persistence.Entity;
 import javax.persistence.NoResultException;
-import javax.persistence.OneToMany;
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by richard on 01.07.15.
@@ -18,7 +16,7 @@ import java.util.Set;
 @Entity
 public class Client extends BaseModel {
 
-    @Expose(name ="client_name")
+    @ExposeField(name ="client_name")
     @Constraints.Required
     public String clientName;
 
@@ -26,7 +24,7 @@ public class Client extends BaseModel {
 
     public String clientSecret;
 
-    @Expose(name = "callback_uri")
+    @ExposeField(name = "callback_uri")
     @Constraints.Required
     public URI callback;
 

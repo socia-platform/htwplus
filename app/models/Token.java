@@ -2,7 +2,7 @@ package models;
 
 import models.base.BaseModel;
 import play.db.jpa.JPA;
-import util.Expose;
+import util.ExposeField;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,22 +18,22 @@ import java.util.UUID;
 @Entity
 public class Token extends BaseModel {
 
-    @Expose(name = "client")
+    @ExposeField(name = "client")
     @ManyToOne
     public Client client;
 
-    @Expose(name = "user")
+    @ExposeField(name = "user")
     @ManyToOne
     public Account user;
 
-    @Expose(name = "access_token")
+    @ExposeField(name = "access_token")
     @Column(unique=true)
     public String accessToken;
 
-    @Expose(name = "refresh_token")
+    @ExposeField(name = "refresh_token")
     public String refreshToken;
 
-    @Expose(name = "expiration_date")
+    @ExposeField(name = "expiration_date")
     public Date expires;
 
     public Token() {}

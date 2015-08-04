@@ -10,9 +10,8 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Expose {
+public @interface ExposeField {
     String name();
     String template() default "";
     boolean filterable() default false;
-    String dbname() default "";
 }
