@@ -735,18 +735,24 @@ div.hp-sitenav hr {
 }
 
 div.hp-sitenav .hp-sitenav-button {
-    margin-bottom: 5px;
+    margin: 2px 0px;
 }
 
 @media (min-width: 992px) {
     #hp-site-navigation {
         width: 220px;
     }
+    div.hp-sitenav .hp-sitenav-button {
+        width: 98px;
+    }
 }
 
 @media (min-width: 1200px) {
     #hp-site-navigation {
         width: 270px;
+    }
+    div.hp-sitenav .hp-sitenav-button {
+        width: 120px;
     }
 }
 

@@ -49,19 +49,27 @@
         <div class="col-md-3 col-lg-3" role="complementary">
             <nav id="hp-site-navigation" class="hidden-xs hidden-sm affix">
                 <div class="hp-sitenav addmargin">
-                    <b><span class="glyphicon glyphicon-cog"></span> Optionen</b>
-                    <hr>
+
                     @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
-                            <a href="@routes.GroupController.join(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip" data-original-title="Tritt der Gruppe bei" data-container="body">
-                                <span class="glyphicon glyphicon-ok"></span>
-                                <span class="hidden-xs"> Beitreten</span>
-                            </a>
+                        <a href="@routes.GroupController.join(group.id)" role="button"
+                           class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip"
+                           data-original-title="Tritt der Gruppe bei" data-container="body">
+                            <span class="glyphicon glyphicon-ok"></span>
+                            <span class="hidden-xs"> Beitreten</span>
+                        </a>
                     }
+                    <a href="@routes.GroupController.media(group.id)" role="button"
+                       class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip"
+                       data-original-title="Medien der Gruppe" data-container="body">
+                        <span class="glyphicon glyphicon-file"></span>
+                        <span class="hidden-xs"> Medien</span>
+                    </a>
+
                     @if(Secured.editGroup(group)) {
-                            <a href="@routes.GroupController.edit(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip" data-original-title="Bearbeite die Gruppe" data-container="body">
-                                <span class="glyphicon glyphicon-pencil"></span>
-                                <span class="hidden-xs"> Bearbeiten</span>
-                            </a>
+                        <a href="@routes.GroupController.edit(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip" data-original-title="Bearbeite die Gruppe" data-container="body">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                            <span class="hidden-xs"> Bearbeiten</span>
+                        </a>
                     }
                     @if(Secured.editGroup(group)) {
                         <a href="@routes.GroupController.invite(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip" data-original-title="Lade deine Kontakte ein" data-container="body">
@@ -69,13 +77,13 @@
                         </a>
                     }
                     @if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
-                        <a href="#confirmLeaveGroup" role="button" class="btn btn-default btn-sm" data-toggle="modal">
+                        <a href="#confirmLeaveGroup" role="button" class="hp-sitenav-button btn btn-default btn-sm" data-toggle="modal">
                             <span class="glyphicon glyphicon-remove"></span>
                             <span class="hidden-xs"> Gruppe verlassen</span>
                         </a>
                     }
                     @if(Secured.deleteGroup(group)) {
-                        <a href="#confirmDeleteGroup" role="button" class="btn btn-default btn-sm" rel="tooltip" data-toggle="modal" data-original-title="Lösche die Gruppe" data-container="body">
+                        <a href="#confirmDeleteGroup" role="button" class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip" data-toggle="modal" data-original-title="Lösche die Gruppe" data-container="body">
                             <span class="glyphicon glyphicon-trash"></span>
                             <span class="hidden-xs"> Löschen</span>
                         </a>
