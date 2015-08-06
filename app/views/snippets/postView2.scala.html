@@ -1,0 +1,115 @@
+@(post: Post, postForm: Form[Post], currentView: String, commentLimit: Integer)
+@import helper._
+@import play._
+@import com.typesafe.config.ConfigFactory
+
+
+<div class="col-md-1" role="main">
+    @if(post.owner.hasAvatar){
+    <img alt="avatar" src='@routes.ProfileController.getAvatar(post.owner.id, "medium")' class="hp-avatar-medium"/>
+    } else {
+    <div class="hp-avatar-medium hp-avatar-default-@post.owner.avatar">@post.owner.getInitials</div>
+    }
+</div>
+<div class="col-md-11" role="complementary">
+    <div class="hp-post-container hp-pagination-container">
+        @defining(Component.currentAccount()) { currentUser =>
+
+        @views.html.snippets.deletePostModal(post.id)
+
+        <div class="hp-post-area">
+            <div class="hp-post-header">
+                <h4>
+                    @views.html.snippets.userLink(post.owner)
+                    @if(post.belongsToGroup && currentView != "group"){schrieb in <a
+                        href="@routes.GroupController.stream(post.group.id)">@truncate(post.group.title,50)</a>}
+                    @if(post.belongsToAccount && currentUser != post.account && post.account != post.owner){&rarr;
+                    @views.html.snippets.userLink(post.account)}
+                    @if(post.belongsToAccount && currentUser == post.account && post.account != post.owner){&rarr;
+                    @views.html.snippets.userLink(currentUser)}
+
+                </h4>
+                <small>@services.TemplateService.getDateColloquially(post.createdAt)</small>
+            </div>
+
+            <hr>
+
+            <div class="hp-post-content">
+                <br/>
+
+                <div class="hp-truncate hp-white-space" id="@post.id">@post.content</div>
+                <br/>
+                <hr/>
+                <div class="hp-comments" id="comments-@post.id">
+                    @if(post.getCountComments() > Play.application().configuration().getInt("htwplus.comments.init") &&
+                    commentLimit != Play.application().configuration().getInt("htwplus.comments.singlepost")) {
+                    <a href="#collapse-@post.id" class="olderComments unloaded">Alle Kommentare anzeigen...</a>
+
+                    <div id="collapse-@post.id" class="collapse"></div>
+                    }
+
+                    @defining(PostController.getComments(post.id, commentLimit)) { comments =>
+                    @if(comments != null) {
+                    @for(comment <- comments){
+                    @views.html.snippets.postComment(comment)
+                    }
+                    }
+                    }
+                    @if(Secured.addComment(post)) {
+                    @form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form", 'id ->
+                    ("addComment-"+post.id)) {
+                    <div class="hp-horizontal-form col-xs-12">
+                        <div class="input-group">
+                            @textarea(postForm("Content"), 'class -> "form-control", 'id -> "hp-new-comment-content",
+                            'placeholder -> "Erstelle ein Kommentar...")
+							<span class="input-group-btn">
+								<button type="submit" class="btn btn-sm btn-warning commentSubmit">Kommentieren</button>
+							</span>
+                        </div>
+                    </div>
+                    }
+                    }
+                </div>
+                <div class="clear"></div>
+                <br/>
+            </div>
+
+            <hr>
+
+            <div class="hp-post-footer">
+                @defining(Secured.isPostBookmarkedByAccount(currentUser, post)) { bookmark =>
+                    <a href="#bookmark-@post.id" class="hp-nohref btn btn-default btn-xs" role="button">
+                        @if(!bookmark) { <span class='glyphicon glyphicon-star-empty'></span><span> MERKEN</span> } else { <span
+                            class='glyphicon glyphicon-star'></span><span> VERGESSEN</span> }
+                    </a>
+                }
+                @if(Secured.isAllowedToEditPost(post, currentUser)) {
+                @if(Secured.isPostStillEditable(post, currentUser)) {
+                <a id="hp-editPost_@post.id" class="btn btn-default btn-xs" href="#" role="button">
+                    <span class="glyphicon glyphicon-pencil"></span><span> BEARBEITEN</span>
+                </a>
+                } else {
+                <a class="hp-post-edit btn btn-default btn-xs hp-nohref disabled" role="button" rel="tooltip"
+                   data-original-title="Posts lassen sich nur @ConfigFactory.load().getInt(" htwplus.post.editTimeLimit")
+                Minuten nach Erstellung bearbeiten.">
+                <span class="glyphicon glyphicon-pencil"></span><span> BEARBEITEN</span>
+                </a>
+                }
+                }
+                @if(Secured.isAllowedToDeletePost(post, currentUser)){
+                <a href="#confirmModalDeletePost@post.id" class="hp-nohref btn btn-default btn-xs" role="button"
+                   data-toggle="modal">
+                    <span class="glyphicon glyphicon-trash"></span><span> LÖSCHEN</span>
+                </a>
+                }
+            </div>
+
+
+            <div class="clear"></div>
+        </div>
+        }
+    </div>
+</div>
+
+
+

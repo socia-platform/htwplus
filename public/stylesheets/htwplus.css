@@ -891,6 +891,9 @@ div.hp-pagination {
 	-ms-transition: height 0.5s ease 0.2s;
 	-o-transition: height 0.5s ease 0.2s;
 }
+#hp-new-comment-content {
+    height: 32px;
+}
 
 #hp-new-comment-content:focus,
 #hp-new-post-content:focus {
@@ -1032,6 +1035,7 @@ table td .hp-avatar-small {
     border-radius: 5px;
     display: inline-block;
 	line-height: 72px;
+	font-size: 36px;
 }
 
 .hp-avatar-list {
@@ -1360,4 +1364,82 @@ div.hp-avatar-default-9 {
 
 #hp-deleteConfirmPassword {
     margin-bottom: 0px;
+}
+
+
+/*===== Feed Design =====*/
+
+.hp-post-create-area {
+    padding: 10px;
+    margin-bottom: 20px;
+    box-sizing: content-box;
+    background-color: white;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    box-shadow: 0 0 1px #888
+}
+
+.hp-post-area {
+    margin-bottom: 15px;
+    box-sizing: content-box;
+    background-color: white;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    box-shadow: 0 0 1px #888
+}
+
+.hp-post-area .hp-post-content {
+    padding: 10px;
+    background-color: #f5f5f5;
+}
+
+.hp-post-area .hp-post-header {
+    padding: 10px;
+}
+
+.hp-post-area .hp-post-header h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.hp-post-area .hp-post-header small {
+    color: #999;
+}
+
+.hp-post-area .hp-post-footer {
+    padding: 10px;
+}
+.hp-post-area .hp-post-footer a {
+    background-color: whitesmoke;
+    border-radius: 0px;
+}
+
+.hp-post-area hr {
+    margin: 0px;
+    border: 0;
+    border-top: 1px solid #eee;
+}
+
+.hp-newsfeed-sitenav {
+    box-sizing: content-box;
+    background-color: white;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    -moz-box-shadow: 0 0 3px #888;
+    -webkit-box-shadow: 0 0 3px #888;
+    box-shadow: 0 0 1px #888;
+    margin-bottom: 10px;
+}
+
+.hp-newsfeed-sitenav a {
+    padding-left: 20px;
+    display: block;
+    color: #999;
+    text-decoration: none;
+    line-height: 35px;
+ }
+
+.hp-newsfeed-sitenav a.active, .hp-newsfeed-sitenav a:hover {
+     background-color: #76b900;
+     color: white;
 }

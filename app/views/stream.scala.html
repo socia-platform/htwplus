@@ -1,15 +1,64 @@
 @(currentUser: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String)
 
 @main("Newsstream") {
-    @views.html.snippets.feedFilter()
-    <div class="row">
-        <div class="col-md-12" role="main">
-            <div class="hp-notepad-content">
-                <br />
-                @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
 
-                @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage, filter)
+@***
+@views.html.snippets.feedFilter()
+<div class="row">
+    <div class="col-md-12" role="main">
+        <div class="hp-notepad-content">
+            <br/>
+            @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
+
+            @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage, filter)
+        </div>
+    </div>
+</div>
+***@
+
+<div class="row">
+    <div class="col-md-10" role="main">
+        <div class="addmargin">
+            <div class="row">
+                <div class="col-md-1" role="main">
+                    @if(currentUser.hasAvatar){
+                        <img alt="avatar"
+                             src='@routes.ProfileController.getAvatar(currentUser.id, "medium")'
+                             class="hp-avatar-medium"/>
+                    } else {
+                    <div class="hp-avatar-medium hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
+                    }
+                </div>
+                <div class="col-md-11" role="complementary">
+                    <div class="hp-post-create-area">
+                        @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</div>
+
+<div class="row">
+    <div class="col-md-10" role="main">
+        <div class="row">
+            @if(posts != null) {
+                @for(post <- posts) {
+                    @views.html.snippets.postView2(post, postForm, models.Post.STREAM, 2)
+                }
+            }
+        </div>
+    </div>
+    <div class="col-md-2" role="complementary">
+        <div class="hp-newsfeed-sitenav">
+            <a href='@routes.Application.index()' class='@if(filter.equals("all")) {active}'>Alles</a>
+            <a href='@routes.Application.stream("account")' class='@if(filter.equals("account")) {active}'>Eigene Posts</a>
+            <a href='@routes.Application.stream("bookmark")' class='@if(filter.equals("bookmark")) {active}'>Gemerkte Posts</a>
+            <a href='@routes.Application.stream("group")' class='@if(filter.equals("group")) {active}'>Gruppen</a>
+            <a href='@routes.Application.stream("contact")' class='@if(filter.equals("contact")) {active}'>Kontakte</a>
+        </div>
+    </div>
+</div>
+
+</div>
 }
