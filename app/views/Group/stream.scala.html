@@ -3,6 +3,8 @@
 @import models.enums._
 
 @main("Gruppenstream") {
+
+@***
     <div class="row">
         <div class="col-md-9 col-lg-9" role="main">
             <div class="hp-notepad-content addmargin">
@@ -19,9 +21,9 @@
                 </div>
                     <!-- End confirmDeleteGroupModal -->
 
-                @***
+
                 @views.html.Group.snippets.navTabs(group)
-                ***@
+
 
                 <div class="clear">
                     <h2 class="hp-truncate">
@@ -135,4 +137,125 @@
             </nav>
         </div>
     </div>
+***@
+
+<div class="row">
+    <div class="col-md-12" role="main">
+        <div class="addmargin">
+            <div id="hp-profile-header">
+
+                @if(group.groupType.equals(GroupType.open)) {
+                <span class="avatar glyphicon glyphicon-globe"></span>
+                }
+                @if(group.groupType.equals(GroupType.close)) {
+                <span class="avatar glyphicon glyphicon-lock"></span>
+                }
+                @if(group.groupType.equals(GroupType.course)) {
+                <span class="avatar glyphicon glyphicon-briefcase"></span>
+                }
+
+
+                <div class="headline">
+                    <h2>@group.title -
+                        <div class="dropdown">
+                            <a class="title hp-nohref" data-toggle="dropdown" aria-expanded="false">
+                                @Navigation.getTitle() <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="@routes.GroupController.stream(group.id)" rel="tooltip" data-original-title="Newsstream der Gruppe" data-container="body">
+                                        <span class="glyphicon glyphicon-comment"></span> Newsstream
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="@routes.GroupController.media(group.id)" rel="tooltip" data-original-title="Medien der Gruppe" data-container="body">
+                                        <span class="glyphicon glyphicon-file"></span> Medien
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </h2>
+                </div>
+                <div class="bottomline">
+                    <small>
+                        <b>#Gründer: </b>@views.html.snippets.userLink(group.owner)
+                        <b>#Medien: </b><a href="@routes.GroupController.media(group.id)">@group.media.size() Datei(en)</a>
+                        <br />
+                        <b>#Beschreibung: </b>@group.description
+                    </small>
+                </div>
+                <div class="links">
+
+                    @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
+                    <a href="@routes.GroupController.join(group.id)" role="button"
+                       class="btn btn-default btn-xs" rel="tooltip"
+                       data-original-title="Tritt der Gruppe bei" data-container="body">
+                        <span class="glyphicon glyphicon-ok"></span> BEITRETEN
+                    </a>
+                    }
+                    @if(Secured.editGroup(group)) {
+                    <a href="@routes.GroupController.edit(group.id)" role="button" class="btn btn-default btn-xs" rel="tooltip" data-original-title="Bearbeite die Gruppe" data-container="body">
+                        <span class="glyphicon glyphicon-pencil"></span> BEARBEITEN
+                    </a>
+                    }
+                    @if(Secured.editGroup(group)) {
+                    <a href="@routes.GroupController.invite(group.id)" role="button" class="btn btn-default btn-xs" rel="tooltip" data-original-title="Lade deine Kontakte ein" data-container="body">
+                        <span class="glyphicon glyphicon-plus"></span> EINLADEN
+                    </a>
+                    }
+                    @if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
+                    <a href="#confirmLeaveGroup" role="button" class="btn btn-default btn-xs" data-toggle="modal">
+                        <span class="glyphicon glyphicon-remove"></span> VERLASSEN
+                    </a>
+                    }
+                    @if(Secured.deleteGroup(group)) {
+                    <a href="#confirmDeleteGroup" role="button" class="btn btn-default btn-xs" rel="tooltip" data-toggle="modal" data-original-title="Lösche die Gruppe" data-container="body">
+                        <span class="glyphicon glyphicon-trash"></span> LÖSCHEN
+                    </a>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12" role="main">
+        <div class="addmargin">
+            <div class="row">
+                @defining(Component.currentAccount()) { currentUser =>
+                <div class="col-md-1" role="main">
+                    @if(currentUser.hasAvatar){
+                    <img alt="avatar"
+                         src='@routes.ProfileController.getAvatar(currentUser.id, "medium")'
+                         class="hp-avatar-medium"/>
+                    } else {
+                    <div class="hp-avatar-medium hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
+                    }
+                </div>
+                <div class="col-md-11" role="complementary">
+                    <div class="hp-post-create-area">
+                        @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12" role="main">
+
+        <div class="row">
+            @if(posts != null) {
+            @for(post <- posts) {
+            @views.html.snippets.postView2(post, postForm, models.Post.STREAM, 2)
+            }
+            }
+        </div>
+
+    </div>
+</div>
 }
