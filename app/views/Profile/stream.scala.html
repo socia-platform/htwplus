@@ -1,6 +1,7 @@
 @(user: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer)
 
 @main("Profilstream") {
+@***
     <div class="row">
         <div class="col-lg-12" role="main">
             <div class="hp-notepad-content addmargin">
@@ -24,4 +25,141 @@
             </div>
         </div>
     </div>
+***@
+
+<div class="row">
+    <div class="col-md-12" role="main">
+        <div class="addmargin">
+                <div id="hp-profile-header">
+
+                    @if(user.hasAvatar) {
+                    <img alt="avatar"
+                         src='@routes.ProfileController.getAvatar(user.id, "large")'
+                         class="avatar"/>
+                    } else {
+                    <div class="avatar hp-avatar-default-@user.avatar">@user.getInitials</div>
+                    }
+
+                        <div class="headline">
+                            <h2>@user.name's
+                                <div class="dropdown">
+                                    <a class="hp-nohref" data-toggle="dropdown" aria-expanded="false">
+                                        @Navigation.getTitle() <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        @if(Secured.isFriend(user) || Component.currentAccount() == user) {
+                                        @defining(if(Navigation.getTitle().equals("Newsstream")){"active"} else {"deactive"}) { status =>
+                                        <li>
+                                        <a href="@routes.ProfileController.stream(user.id)" data-placement="left" rel="tooltip" data-original-title="Dein öffentlicher Newsstream" data-container="body">
+                                            Newsstream
+                                        </a>
+                                        </li>
+                                        }
+                                        }
+                                        @defining(if(Navigation.getTitle().equals("Gruppen & Kurse")) {"active"} else {"deactive"}) { status =>
+                                        <li>
+                                        <a href="@routes.ProfileController.groups(user.id)" rel="tooltip" data-placement="left" data-original-title="Gruppen- und Kursübersicht" data-container="body">
+                                            Gruppen
+                                        </a>
+                                        </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </h2>
+                        </div>
+                        <div class="bottomline">
+                            <small>
+                                <b>Email: </b>@if(user.email != null) {
+                                <a href="mailto:@user.email">@user.email</a>
+                                } else { <span>Keine Angabe</span> }
+                                |
+                                <b>Studiengang: </b>@if(user.studycourse != null) {
+                                <span>@user.studycourse.title @if(user.degree != null) { (@user.degree) }</span>
+                                } else {
+                                <span>Keine Angabe</span>
+                                }
+                                |
+                                <b>Semester: </b>@if(user.semester != null) {
+                                <span>@{user.semester + "."} Semester</span>
+                                } else {
+                                <span>Keine Angabe</span>
+                                }
+                                |
+                                <b>Rolle: </b><span>@user.role.getDisplayName()</span>
+                            </small>
+                        </div>
+                        <div class="links">
+                            @if(Secured.isFriend(user)) {
+
+                            <a href="#confirmDeleteFriend@user.id" class="hp-nohref btn btn-default btn-xs" role="button" data-toggle="modal">
+                                <span class="glyphicon glyphicon-trash"></span> FREUNDSCHAFT BEENDEN
+                            </a>
+
+                            } else {
+                            @if(Component.currentAccount() != user) {
+                            <a href="@routes.FriendshipController.requestFriend(user.id)"
+                               class="hp-nohref btn btn-default btn-xs"
+                               role="button"
+                               rel="tooltip"
+                               data-placement="left"
+                               data-original-title="Sende eine Freundschaftsanfrage"
+                               data-container="body">
+                                <span class="glyphicon glyphicon-plus"></span> FREUNDSCHAFTSANFRAGE SENDEN
+                            </a>
+                            }
+                            }
+                        </div>
+
+                </div>
+        </div>
+    </div>
+</div>
+
+@if(posts.isEmpty()) {
+<div class="row">
+    <div class="col-md-12" role="main">
+        <h3>@user.name hat noch nichts auf seinen Stream geschrieben.</h3>
+        <h2>Sei der Erste!</h2>
+    </div>
+</div>
+}
+
+<div class="row">
+    <div class="col-md-12" role="main">
+        <div class="addmargin">
+            <div class="row">
+                @defining(Component.currentAccount()) { currentUser =>
+                <div class="col-md-1" role="main">
+                    @if(currentUser.hasAvatar){
+                    <img alt="avatar"
+                         src='@routes.ProfileController.getAvatar(currentUser.id, "medium")'
+                         class="hp-avatar-medium"/>
+                    } else {
+                    <div class="hp-avatar-medium hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
+                    }
+                </div>
+                <div class="col-md-11" role="complementary">
+                    <div class="hp-post-create-area">
+                        @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12" role="main">
+
+            <div class="row">
+                @if(posts != null) {
+                @for(post <- posts) {
+                @views.html.snippets.postView2(post, postForm, models.Post.STREAM, 2)
+                }
+                }
+            </div>
+
+    </div>
+</div>
 }

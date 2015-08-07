@@ -1443,3 +1443,98 @@ div.hp-avatar-default-9 {
      background-color: #76b900;
      color: white;
 }
+
+
+/*====== Profile Design ======*/
+
+.hp-profile-sitenav {
+    box-sizing: content-box;
+    background-color: white;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    -moz-box-shadow: 0 0 3px #888;
+    -webkit-box-shadow: 0 0 3px #888;
+    box-shadow: 0 0 1px #888;
+    margin-bottom: 10px;
+}
+
+.hp-profile-sitenav a {
+    padding-left: 20px;
+    display: block;
+    color: #999;
+    text-decoration: none;
+    line-height: 35px;
+}
+
+.hp-profile-sitenav a.active, .hp-profile-sitenav a:hover {
+  background-color: #76b900;
+  color: white;
+}
+
+#hp-profile-header {
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 0;
+    margin-bottom: 20px;
+    min-height: 210px;
+}
+
+#hp-profile-header .hp-circle {
+    width: 110px;
+    margin-top: 30px;
+    position: relative;
+    background-color: white;
+    margin-left: 10%;
+    margin-right: auto;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    padding: 5px;
+}
+
+#hp-profile-header .avatar {
+    border: 1px solid #ddd;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    line-height: 140px;
+    font-size: 60px;
+}
+
+#hp-profile-header .headline {
+     border-bottom: 1px solid #ddd;
+     padding-left: 190px;
+     padding-top: 50px;
+     background-color: #f9f9f9;
+ }
+
+#hp-profile-header .headline .dropdown {
+  position: relative;
+  display: inline;
+}
+
+
+
+#hp-profile-header .bottomline {
+    text-align: right;
+    padding-bottom: 52px;
+    padding-top: 5px;
+    padding-right: 10px;
+}
+
+#hp-profile-header .postForm {
+    padding: 10px 40px;
+}
+
+#hp-profile-header .links {
+    text-align: right;
+    padding-right: 10px;
+}
+
+#hp-profile-header .links a {
+    background-color: whitesmoke;
+    border-radius: 0px;
+}
