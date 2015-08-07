@@ -182,6 +182,17 @@
                         <b>#Medien: </b><a href="@routes.GroupController.media(group.id)">@group.media.size() Datei(en)</a>
                         <br />
                         <b>#Beschreibung: </b>@group.description
+                        <br />
+                        <br />
+                        @for(user <- memberList) {
+                        <a class="pull-right hp-nohref hp-avatar-list" href="@routes.ProfileController.view(user.id)" rel="tooltip" data-original-title="@user.name" data-container="body">
+                            @if(user.hasAvatar){
+                            <img alt="avatar" src="@routes.ProfileController.getAvatar(user.id)" class="hp-avatar-small" />
+                            } else {
+                            <div class="hp-avatar-small hp-avatar-default-@user.avatar">@user.getInitials</div>
+                            }
+                        </a>
+                        }
                     </small>
                 </div>
                 <div class="links">
