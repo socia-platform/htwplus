@@ -84,20 +84,20 @@ public class Group extends BaseNotifiable implements INotifiable {
 	@Override
 	public void create() {
         JPA.em().persist(this);
-        // try {
-        //     ElasticsearchService.indexGroup(this);
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+         try {
+             ElasticsearchService.indexGroup(this);
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
     }
 
 	@Override
 	public void update() {
-        // try {
-        //     ElasticsearchService.indexGroup(this);
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+         try {
+             ElasticsearchService.indexGroup(this);
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
 		JPA.em().merge(this);
 	}
 
@@ -118,7 +118,7 @@ public class Group extends BaseNotifiable implements INotifiable {
         Notification.deleteReferences(this);
 
         // Delete Elasticsearch document
-        // ElasticsearchService.deleteGroup(this);
+         ElasticsearchService.deleteGroup(this);
 
 		JPA.em().remove(this);
 	}
@@ -192,7 +192,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     public static long indexAllGroups() throws IOException {
         final long start = System.currentTimeMillis();
-        // for (Group group: all()) ElasticsearchService.indexGroup(group);
+        for (Group group: all()) ElasticsearchService.indexGroup(group);
         return (System.currentTimeMillis() - start) / 100;
 
     }

@@ -1,29 +1,17 @@
 package controllers;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import controllers.Navigation.Level;
 import models.*;
-import models.enums.CustomContentType;
 import models.services.NotificationService;
-import net.hamnaberg.funclite.Predicate;
-import net.hamnaberg.json.Collection;
-import net.hamnaberg.json.Item;
-import net.hamnaberg.json.data.JsonObjectFromData;
-import net.hamnaberg.json.parser.CollectionParser;
 import play.Play;
-import play.api.libs.json.Json;
 import play.api.mvc.Call;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
-import play.mvc.BodyParser;
-import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
-import util.JsonCollectionUtil;
 import views.html.Post.view;
 
 @Security.Authenticated(Secured.class)
@@ -35,11 +23,11 @@ public class PostController extends BaseController {
 	
 	public static Result view (Long id) {
 		Post post = Post.findById(id);
-		
+
 		if(post == null){
 			return redirect(controllers.routes.Application.error());
 		}
-		
+
 		if(post.parent != null) {
 			return redirect(controllers.routes.Application.error());
 		}
@@ -86,7 +74,7 @@ public class PostController extends BaseController {
 			} else {
 				flash("info", Messages.get("post.join_group_first"));
 			}
-            
+
 			return redirect(controllers.routes.GroupController.stream(group.id, PAGE));
 		}
 		

@@ -58,13 +58,13 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 	public void update() {
 		JPA.em().merge(this);
 
-        // each account document contains information about their friends
-        // if a user accepts a friendship -> (re)index this.account document
-        // try {
-        //     ElasticsearchService.indexAccount(this.account);
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+         // each account document contains information about their friends
+         // if a user accepts a friendship -> (re)index this.account document
+         try {
+             ElasticsearchService.indexAccount(this.account);
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
 	}
 
 	@Override
@@ -75,11 +75,11 @@ public class Friendship extends BaseNotifiable implements INotifiable {
 
         // each account document contains information about their friends
         // if a user deletes his friendship -> (re)index this.account document
-        // try {
-        //     ElasticsearchService.indexAccount(this.account);
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+         try {
+             ElasticsearchService.indexAccount(this.account);
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
 	}
 
 	public static Friendship findRequest(Account me, Account potentialFriend) {

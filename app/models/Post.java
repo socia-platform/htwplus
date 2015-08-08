@@ -6,8 +6,10 @@ import java.util.*;
 import javax.persistence.*;
 import javax.persistence.Query;
 
+import models.enums.AccountRole;
 import models.enums.GroupType;
 import models.enums.LinkType;
+import models.services.ElasticsearchService;
 import models.base.BaseModel;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
@@ -139,12 +141,12 @@ public class Post extends BaseNotifiable implements INotifiable {
 
 	public void create() {
 		JPA.em().persist(this);
-        // try {
-        //     if (!this.owner.role.equals(AccountRole.ADMIN))
-        //     ElasticsearchService.indexPost(this);
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+        try {
+            if (!this.owner.role.equals(AccountRole.ADMIN))
+            ElasticsearchService.indexPost(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String validate() {
@@ -171,7 +173,7 @@ public class Post extends BaseNotifiable implements INotifiable {
         Notification.deleteReferences(this);
 
         // Delete Elasticsearch document
-        // ElasticsearchService.deletePost(this);
+        ElasticsearchService.deletePost(this);
 
         JPA.em().remove(this);
 	}
@@ -527,12 +529,12 @@ public class Post extends BaseNotifiable implements INotifiable {
      * @return
      */
     public static List<Post> allWithoutAdmin() {
-        return JPA.em().createQuery("Post p WHERE p.owner.id != 1").getResultList();
+        return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
     }
 
     public static long indexAllPosts() throws IOException {
         final long start = System.currentTimeMillis();
-        // for (Post post: allWithoutAdmin()) ElasticsearchService.indexPost(post);
+        for (Post post: allWithoutAdmin()) ElasticsearchService.indexPost(post);
         return (System.currentTimeMillis() - start) / 100;
 
     }

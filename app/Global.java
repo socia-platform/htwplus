@@ -65,22 +65,22 @@ public class Global extends GlobalSettings {
         );
 
 
-        // trying to connect to Elasticsearch
-        // ElasticsearchService.getInstance().getClient();
-        // Logger.info("trying to connect to Elasticsearch");
-        // if (ElasticsearchService.isClientAvailable()) {
-        //     Logger.info("... success");
-        //     Logger.info("trying to create HTWPlus index and mapping");
-        //     if (!ElasticsearchService.isIndexExists()) {
-        //         ElasticsearchService.createAnalyzer();
-        //         ElasticsearchService.createMapping();
-        //         Logger.info("... success");
-        //     } else {
-        //         Logger.info("... failed (it already exists?)");
-        //     }
-        // } else {
-        //     Logger.info("... failed");
-        // }
+         // trying to connect to Elasticsearch
+         ElasticsearchService.getInstance().getClient();
+         Logger.info("trying to connect to Elasticsearch");
+         if (ElasticsearchService.isClientAvailable()) {
+             Logger.info("... success");
+             Logger.info("trying to create HTWPlus index and mapping");
+             if (!ElasticsearchService.isIndexExists()) {
+                 ElasticsearchService.createAnalyzer();
+                 ElasticsearchService.createMapping();
+                 Logger.info("... success");
+             } else {
+                 Logger.info("... failed (it already exists?)");
+             }
+         } else {
+             Logger.info("... failed");
+         }
 
 		InitialData.insert(app);
 
@@ -89,7 +89,7 @@ public class Global extends GlobalSettings {
     @Override
     public void onStop(Application app) {
         Logger.info("closing ES client...");
-        // ElasticsearchService.getInstance().closeClient();
+        ElasticsearchService.getInstance().closeClient();
         Logger.info("ES client closed");
     }
 
@@ -207,14 +207,14 @@ public class Global extends GlobalSettings {
                     }
 
                     // try creating elasticsearch analyzer and mapping
-                    // try {
-                    //     ElasticsearchService.createAnalyzer();
-                    //     ElasticsearchService.createMapping();
-                    // } catch(NoNodeAvailableException nnae) {
-                    //     Logger.error(nnae.getMessage());
-                    // } catch(IndexAlreadyExistsException iaee) {
-                    //     Logger.info("index "+iaee.getMessage());
-                    // }
+                     try {
+                         ElasticsearchService.createAnalyzer();
+                         ElasticsearchService.createMapping();
+                     } catch(NoNodeAvailableException nnae) {
+                         Logger.error(nnae.getMessage());
+                     } catch(IndexAlreadyExistsException iaee) {
+                         Logger.info("index "+iaee.getMessage());
+                     }
 
 				}
 			});

@@ -21,6 +21,7 @@ import models.services.AvatarService;
 import models.services.FileService;
 import models.base.ValidationException;
 
+import models.services.ElasticsearchService;
 import play.Logger;
 import play.data.validation.Constraints;
 import play.i18n.Messages;
@@ -102,11 +103,11 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public void create() {
 		this.name = firstname+" "+lastname;
 		JPA.em().persist(this);
-        // try {
-        //     ElasticsearchService.indexAccount(this);
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+        try {
+            ElasticsearchService.indexAccount(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 	@Override
@@ -396,11 +397,11 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
      * Index the current account
      */
     public void indexAccount() {
-        // try {
-        //     ElasticsearchService.indexAccount(this);
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+        try {
+            ElasticsearchService.indexAccount(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -408,7 +409,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
      */
     public static long indexAllAccounts() throws IOException {
         final long start = System.currentTimeMillis();
-        // for (Account account: all()) ElasticsearchService.indexAccount(account);
+        for (Account account: all()) ElasticsearchService.indexAccount(account);
         return (System.currentTimeMillis() - start) / 100;
 
     }
