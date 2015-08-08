@@ -31,9 +31,11 @@ import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import controllers.Component;
 import play.libs.Json;
+import util.ExposeClass;
 import util.ExposeField;
 
 @Entity
+@ExposeClass
 public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	private final static Logger.ALogger logger = Logger.of(Account.class);
