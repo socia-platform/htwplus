@@ -19,10 +19,12 @@ import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 
 import org.hibernate.annotations.Type;
+import util.ExposeClass;
 import util.ExposeField;
 import util.JsonCollectionUtil;
 
 @Entity
+@ExposeClass
 public class Post extends BaseNotifiable implements INotifiable {
 	public static final String GROUP = "group";                             // post to group news stream
 	public static final String PROFILE = "profile";                         // post to own news stream
@@ -525,7 +527,7 @@ public class Post extends BaseNotifiable implements INotifiable {
      * @return
      */
     public static List<Post> allWithoutAdmin() {
-        return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
+        return JPA.em().createQuery("Post p WHERE p.owner.id != 1").getResultList();
     }
 
     public static long indexAllPosts() throws IOException {

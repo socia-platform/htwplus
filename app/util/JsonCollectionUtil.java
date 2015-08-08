@@ -140,14 +140,14 @@ public class JsonCollectionUtil {
         String offset = request.getQueryString("start");
         String limit = request.getQueryString("page-size");
 
-        Pagination pagination = t.isAnnotationPresent(Pagination.class) ?
-                t.getAnnotation(Pagination.class) :
-                BaseModel.class.getAnnotation(Pagination.class);
+        ExposeClass exposeClass = t.isAnnotationPresent(ExposeClass.class) ?
+                t.getAnnotation(ExposeClass.class) :
+                BaseModel.class.getAnnotation(ExposeClass.class);
 
         int off = (offset == null || !offset.matches("\\d+") ? 0 : Integer.parseInt(offset));
         int lim = (limit == null || !limit.matches("\\d+") ?
-                pagination.pageSize() :
-                Math.min(Integer.parseInt(limit), pagination.maxPageSize()));
+                exposeClass.defaultLimit() :
+                Math.min(Integer.parseInt(limit), exposeClass.maxLimit()));
 
         return modelsToItems(t, models.apply(off, lim).limit(lim));
     }
@@ -199,7 +199,7 @@ public class JsonCollectionUtil {
                 links,
                 items.collect(Collectors.toList()),
                 new ArrayList<>(),
-                templateFromStream(ExposeTools.streamTemplate(t, fields)),
+                templateFromStream(ExposeTools.streamTemplate(t)),
                 Error.EMPTY
         );
     }
@@ -227,7 +227,7 @@ public class JsonCollectionUtil {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 new ArrayList<>(),
-                templateFromStream(ExposeTools.streamTemplate(t, fields)),
+                templateFromStream(ExposeTools.streamTemplate(t)),
                 Error.create(title, code, message)
         );
     }

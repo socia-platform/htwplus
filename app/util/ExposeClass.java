@@ -10,7 +10,8 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface Pagination {
-    int pageSize() default 100;
-    int maxPageSize() default 500;
+public @interface ExposeClass {
+    String name() default "";
+    int defaultLimit() default 100;
+    int maxLimit() default 500;
 }

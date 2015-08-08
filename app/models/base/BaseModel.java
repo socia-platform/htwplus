@@ -1,7 +1,7 @@
 package models.base;
 
 import util.ExposeField;
-import util.Pagination;
+import util.ExposeClass;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -12,21 +12,20 @@ import javax.persistence.*;
  * Provides a base model with standard attributes like ID, creation/modification date for all persistence models.
  */
 @MappedSuperclass
-@Pagination
+@ExposeClass
 public abstract class BaseModel {
     /**
      * Model ID.
      */
 	@Id
 	@GeneratedValue
-	@ExposeField(name = "id")
+	@ExposeField(name = "id", template = "8")
 	public Long id;
 
     /**
      * Date of the creation time of this model.
      */
 	@Column(name = "created_at")
-	@ExposeField(name = "created_at")
 	public Date createdAt;
 
     /**
