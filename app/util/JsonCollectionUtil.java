@@ -278,7 +278,7 @@ public class JsonCollectionUtil {
     }
 
     public static <T extends BaseModel> Collection addTemplate(Class<T> t, Collection collection) {
-        Collection withTemplate = Collection.create(
+        return Collection.create(
                 collection.getHref().get(),
                 collection.getLinks(),
                 collection.getItems(),
@@ -286,7 +286,6 @@ public class JsonCollectionUtil {
                 getTemplate(t),
                 collection.getError().get()
         );
-        return withTemplate;
     }
 
     public static <T extends BaseModel> Template getTemplate(Class<T> t) {
