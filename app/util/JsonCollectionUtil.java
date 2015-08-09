@@ -368,4 +368,40 @@ public class JsonCollectionUtil {
     public static <T extends BaseModel> Template getTemplate(Class<T> t) {
         return templateFromStream(ExposeTools.streamTemplate(t));
     }
+
+    /**
+     * Get the requested collection. If ID is smaller than 0 the collection has no error and the count of items depends
+     * on filter, limit, offset etc. If ID is bigger than -1, the Collection has no error and one Item, if an item with
+     * this id exists, else the collection has no items and a error.
+     * @param t Entity class that should be processed.
+     * @param id ID of the requested item (id < 0 => all items that match the filter params, id > -1 => collection with
+     *           one item or collection with error).
+     * @param resourceName Name of the resource, to provide a good error message. Please do it with uppercase first.
+     * @param <T> Type of the entity (resolved from t).
+     * @return A collection with requested resources as items
+     */
+    public static <T extends BaseModel> Collection getRequestedCollection(Class<T> t, long id, String resourceName) {
+        if (id >= 0) { // http GET .../users/:id
+            List<T> model = BaseModel.one(t, id);
+            return model == null || model.isEmpty() ?
+                    getErrorCollection(t, resourceName +" not found", "404", "The requested " + resourceName.toLowerCase() + " does not seem to exist.") :
+                    getRequestedCollection(t, model);
+        } // http GET ...users
+        return getRequestedCollection(t); // Best get only limited users from DB with filter
+    }
+
+    /**
+     * Get the requested collection as Json. If ID is smaller than 0 the collection has no error and the count of items
+     * depends on filter, limit, offset etc. If ID is bigger than -1, the Collection has no error and one Item, if an
+     * item with this id exists, else the collection has no items and a error.
+     * @param t Entity class that should be processed.
+     * @param id ID of the requested item (id < 0 => all items that match the filter params, id > -1 => collection with
+     *           one item or collection with error).
+     * @param resourceName Name of the resource, to provide a good error message. Please do it with uppercase first.
+     * @param <T> Type of the entity (resolved from t).
+     * @return A collection with requested resources as items
+     */
+    public static <T extends BaseModel> String getRequestedCollectionString(Class<T> t, long id, String resourceName) {
+        return getRequestedCollection(t, id, resourceName).toString();
+    }
 }
