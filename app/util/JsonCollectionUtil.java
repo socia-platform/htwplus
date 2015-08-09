@@ -1,5 +1,10 @@
 package util;
 
+// TODO: queries href (path, all filterable fields)
+// TODO: filter subresources / links (subresource.id || subresource_id)
+// TODO: build queries (next, prev, last), needs count of requested resources
+// TODO: expand
+
 import akka.japi.Pair;
 import controllers.BaseController;
 import models.base.BaseModel;
