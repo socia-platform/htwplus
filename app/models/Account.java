@@ -45,15 +45,15 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public String name;
 
 	@Required
-	@ExposeField(name ="firstname", template = "John")
+	@ExposeField(template = "John")
 	public String firstname;
 
 	@Required
-	@ExposeField(name = "lastname", template = "Doe")
+	@ExposeField(template = "Doe")
 	public String lastname;
 
 	@Email
-	@ExposeField(name = "email", template = "john@doe-online.com")
+	@ExposeField(template = "john@doe-online.com")
 	@Column(unique=true)
 	public String email;
 
@@ -73,7 +73,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public String studentId;
 
 	@OneToOne
-	@ExposeField(name = "studycourse")
+	@ExposeField
 	public Studycourse studycourse;
 	public String degree;
 	public Integer semester;

@@ -36,25 +36,25 @@ public class Post extends BaseNotifiable implements INotifiable {
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
     public static final String BROADCAST = "broadcast";                     // broadcast post from admin control center
 
-    @ExposeField(name = "content", template = "The Content.")
+    @ExposeField(template = "The Content.")
     @Required
     @Lob
     @Type(type = "org.hibernate.type.TextType")
 	public String content;
 
-    @ExposeField(name = "parent_id")
+    @ExposeField
 	@ManyToOne
 	public Post parent;
 
-    @ExposeField(name = "group_id")
+    @ExposeField
 	@ManyToOne
 	public Group group;
 
-    @ExposeField(name = "account_id")
+    @ExposeField
 	@ManyToOne
 	public Account account;
 
-    @ExposeField(name = "owner_id")
+    @ExposeField
 	@ManyToOne
 	public Account owner;
 

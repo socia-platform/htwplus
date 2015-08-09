@@ -18,11 +18,11 @@ import java.util.UUID;
 @Entity
 public class Token extends BaseModel {
 
-    @ExposeField(name = "client")
+    @ExposeField
     @ManyToOne
     public Client client;
 
-    @ExposeField(name = "user")
+    @ExposeField
     @ManyToOne
     public Account user;
 

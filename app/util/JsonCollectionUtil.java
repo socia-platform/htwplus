@@ -124,16 +124,46 @@ public class JsonCollectionUtil {
                 .filter(Objects::nonNull);
     }
 
+    public static Long getId(BaseModel model) {
+        return model == null ? null : model.id;
+    }
+
+    public static URI getUri(BaseModel model, String baseUri) {
+        String href = ApiRoutes.getRoute(model);
+        return href == null ? null : URI.create(baseUri + href);
+    }
+
+    public static Link getLink(BaseModel model, String rel, String baseUri) {
+        URI uri = getUri(model, baseUri);
+        return uri == null ? null : Link.create(uri, rel);
+    }
+
     /**
      * Transform this model to JSON+Collection-Item
      * @param baseUri Uri to the collection of this model
      * @param fields Fields that should be extracted
      * @return A JSON+Collection-Item that represents this model
      */
-    public static Item modelToItem(BaseModel model, String baseUri, List<Pair<String, Field>> fields) {
-        return Item.create(
-                URI.create(baseUri + "/" + model.id),
-                properties(model, fields.stream(), baseUri).collect(Collectors.toList()));
+    public static Item modelToItem(BaseModel model, String baseUri, Map<BaseModelType,List<Pair<String,Field>>> fields) {
+        String route = ApiRoutes.getRoute(model);
+        if(route == null) {
+            System.err.println("JSON-Api: Tried to publish property of type with no @ExposeClass annotation");
+            return null;
+        }
+        List<Link> links = fields.getOrDefault(BaseModelType.exposed, new LinkedList<>()).stream()
+                .map(f -> getLink((BaseModel) getValue(model, f.second()), f.first(), baseUri))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        List<Property> properties = Stream.concat(Stream.concat(
+                        fields.getOrDefault(BaseModelType.notExposed, new LinkedList<>()).stream()
+                                .map(f -> Property.value(f.first() + responseIdPostfix, getId((BaseModel) getValue(model, f.second())))),
+                        fields.getOrDefault(BaseModelType.none, new LinkedList<>()).stream()
+                                .map(f -> Property.value(f.first(), getValue(model, f.second())))),
+                        fields.getOrDefault(BaseModelType.exposed, new LinkedList<>()).stream()
+                                .map(f -> Property.value(f.first() + "_id", getId((BaseModel)getValue(model, f.second())))))
+                        .collect(Collectors.toList());
+        return Item.create(URI.create(baseUri + route), properties, links);
+//        return Item.create(URI.create(route), properties(model, fields.stream()).collect(Collectors.toList()));
     }
 
     /**
@@ -148,7 +178,9 @@ public class JsonCollectionUtil {
         if(models == null) return null;
         String baseUri = BaseController.getBaseUri().toString();
         String filter = Controller.request().getQueryString(paramFields);
-        List<Pair<String, Field>> fields = ExposeTools.streamFields(t, filter).collect(Collectors.toList());
+        Map<BaseModelType,List<Pair<String,Field>>> fields = ExposeTools.streamFields(t, filter)
+                .collect(Collectors.groupingBy(f -> getType(f.second().getType())));
+
         return models
                 .map(m -> modelToItem(m, baseUri, fields))
                 .filter(Objects::nonNull);
