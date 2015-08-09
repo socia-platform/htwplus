@@ -83,6 +83,15 @@ public class JsonCollectionUtil {
                 .collect(Collectors.toList()));
     }
 
+    public static Object getValue(Object object, Field field) {
+        try {
+            return field.get(object);
+        } catch(IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     /**
      * Get a property that represents the given field
      * @param name Name of the Property
