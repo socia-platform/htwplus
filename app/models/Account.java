@@ -360,7 +360,6 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 				.getResultList();
 	}
 
-
     /**
      * Returns a list of account instances by an ID collection of Strings.
      *

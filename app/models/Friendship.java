@@ -142,6 +142,7 @@ public class Friendship extends BaseNotifiable implements INotifiable {
                 .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList();
     }
 
+	@SuppressWarnings("unchecked")
     public static List<Long> findFriendsId(final Account account){
         return (List<Long>) JPA.em().createQuery("SELECT fs.friend.id FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
                 .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList();
