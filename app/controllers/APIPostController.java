@@ -1,6 +1,5 @@
 package controllers;
 
-import com.google.common.collect.Lists;
 import models.Post;
 import models.enums.CustomContentType;
 import net.hamnaberg.json.Collection;
@@ -34,23 +33,8 @@ public class APIPostController extends BaseController {
 
     public static Result get(final Long id) {
         if(request().getHeader("Accept").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
-            Collection collection;
-            if (id >= 0) { // http GET .../users/:id
-                Post post = Post.findById(id);
-
-                if (post == null) {
-                    collection = JsonCollectionUtil.getErrorCollection(Post.class,
-                            "Post not found", "404", "The requested post does not seem to exist.");
-                } else {
-                    collection = JsonCollectionUtil.getRequestedCollection(Post.class, Lists.newArrayList(post));
-                }
-            } else { // http GET ...users
-                collection = JsonCollectionUtil.getRequestedCollection(Post.class, Post.allWithoutAdmin()); // Get all users from DB and limit them
-//                collection = JsonCollectionUtil.getRequestedCollection(Post.class, Post::some, Error.EMPTY);           // Better get only limited users from DB
-            }
-
             response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
-            return ok(collection.toString());
+            return ok(JsonCollectionUtil.getRequestedCollectionString(Post.class, id, "Post"));
         } else {
             return statusWithWarning(NOT_ACCEPTABLE, CustomContentType.JSON_COLLECTION.getAcceptHeaderMessage());
         }
