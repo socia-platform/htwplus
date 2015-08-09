@@ -121,7 +121,7 @@ public class JsonCollectionUtil {
     public static Stream<Property> properties(Object obj, Stream<Pair<String, Field>> fields, String baseUri) {
         return fields
                 .map(f -> getProperty(obj, f.first(), f.second(), baseUri))
-                .filter(p -> p != null);
+                .filter(Objects::nonNull);
     }
 
     /**
@@ -150,7 +150,8 @@ public class JsonCollectionUtil {
         String filter = Controller.request().getQueryString(paramFields);
         List<Pair<String, Field>> fields = ExposeTools.streamFields(t, filter).collect(Collectors.toList());
         return models
-                .map(m -> modelToItem(m, baseUri, fields));
+                .map(m -> modelToItem(m, baseUri, fields))
+                .filter(Objects::nonNull);
     }
 
     /**
