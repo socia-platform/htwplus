@@ -4,7 +4,9 @@ import akka.japi.Pair;
 import controllers.BaseController;
 import models.base.BaseModel;
 import models.enums.CustomContentType;
+import net.hamnaberg.funclite.Optional;
 import net.hamnaberg.json.*;
+import net.hamnaberg.json.Collection;
 import net.hamnaberg.json.Error;
 import net.hamnaberg.json.parser.CollectionParser;
 import play.mvc.Controller;
@@ -13,11 +15,8 @@ import play.mvc.Http;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.*;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -194,9 +193,22 @@ public class JsonCollectionUtil {
         return requestedItemsFromStreamFunction(t, (Integer off, Integer lim) -> models.skip(off).limit(lim));
     }
 
+    public static Query createQuery(URI baseUri, String rel, Map<String,String[]> params, Map<String,Set<String>> filter) {
+        return Query.create(
+                baseUri,
+                rel,
+                Optional.<String>none(),
+                params.entrySet().stream()
+                        .filter(e -> !filter.containsKey(e.getKey()) || filter.get(e.getKey()) != null)
+                        .flatMap(e -> Arrays.stream(e.getValue())
+                                .filter(v -> !filter.containsKey(e.getKey()) || !filter.get(e.getKey()).contains(v))
+                                .map(v -> Property.value(e.getKey(), v)))
+                        .collect(Collectors.toList()));
+    }
+
     public static <T extends BaseModel>
     Collection getCollectionFromItems(Class<T> t, Stream<Item> items) {
-        String baseUri = BaseController.getBaseUri().toString();
+        URI baseUri = BaseController.getBaseUri();
         URI fullUri = BaseController.getFullUri();
         Map<String, String[]> params = Controller.request().queryString();
         Map<String, String[]> paramsFirst = new HashMap<>(params);
@@ -204,6 +216,11 @@ public class JsonCollectionUtil {
 
         List<Link> links = new ArrayList<>();
         links.add(Link.create(fullUri, "self"));
+
+        List<Query> queries = new ArrayList<>();
+        Map<String,Set<String>> firstMap = new HashMap<>();
+        firstMap.put(paramOffset, null);
+        queries.add(createQuery(baseUri, "first", params, firstMap));
 //		links.add(Link.create(URI.create("href"), "first"));
 //		links.add(Link.create(URI.create("href"), "previous"));
 //		links.add(Link.create(URI.create("href"), "next"));
@@ -213,7 +230,7 @@ public class JsonCollectionUtil {
                 fullUri,
                 links,
                 items.collect(Collectors.toList()),
-                new ArrayList<>(),
+                queries,
                 templateFromStream(ExposeTools.streamTemplate(t)),
                 Error.EMPTY
         );
