@@ -100,10 +100,13 @@ public class JsonCollectionUtil {
      *
      * if access denied "null" else
      */
-    public static Property getProperty(Object obj, String name, Field field) {
+    public static Property getProperty(Object obj, String name, Field field, String baseUri) {
         try {
             Object value = field.get(obj);
-            return Property.value(name, value instanceof BaseModel ? ((BaseModel) value).id : value);
+            if(value instanceof BaseModel)
+                return Property.value(name, baseUri + ApiRoutes.getRoute((BaseModel)value)); // TODO: Expand?
+            else
+                return Property.value(name, value); // TODO: Expand?
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return null;
@@ -115,9 +118,9 @@ public class JsonCollectionUtil {
      * @param fields Fields that should be extracted
      * @return A list of properties that represents the given fields (not accessible files are not included)
      */
-    public static Stream<Property> properties(Object obj, Stream<Pair<String, Field>> fields) {
+    public static Stream<Property> properties(Object obj, Stream<Pair<String, Field>> fields, String baseUri) {
         return fields
-                .map(f -> getProperty(obj, f.first(), f.second()))
+                .map(f -> getProperty(obj, f.first(), f.second(), baseUri))
                 .filter(p -> p != null);
     }
 
@@ -130,7 +133,7 @@ public class JsonCollectionUtil {
     public static Item modelToItem(BaseModel model, String baseUri, List<Pair<String, Field>> fields) {
         return Item.create(
                 URI.create(baseUri + "/" + model.id),
-                properties(model, fields.stream()).collect(Collectors.toList()));
+                properties(model, fields.stream(), baseUri).collect(Collectors.toList()));
     }
 
     /**
