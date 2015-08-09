@@ -25,6 +25,22 @@ import java.util.stream.Stream;
  * Created by richard on 11.06.15.
  */
 public class JsonCollectionUtil {
+    public static final String paramFilterPrefix = "filter_";
+    public static final String paramFields = "fields";
+    public static final String paramOrderBy = "order_by";
+    public static final String paramOffset = "offset";
+    public static final String paramLimit = "limit";
+    public static final String responseIdPostfix = "_id";
+    public enum BaseModelType { none, notExposed, exposed }
+
+    public static BaseModelType getType(Class<?> c) {
+        return !BaseModel.class.isAssignableFrom(c) ? BaseModelType.none :
+                ExposeTools.isExposed(c) ? BaseModelType.exposed : BaseModelType.notExposed;
+    }
+
+    public static BaseModelType getType(Object object) {
+        return getType(object.getClass());
+    }
 
     public static boolean hasJsonCollection(Http.Request request) {
         return request.getHeader("Content-Type").contains(CustomContentType.JSON_COLLECTION.getIdentifier());
@@ -120,7 +136,7 @@ public class JsonCollectionUtil {
     Stream<Item> modelsToItems(Class<T> t, Stream<T> models) {
         if(models == null) return null;
         String baseUri = BaseController.getBaseUri().toString();
-        String filter = Controller.request().getQueryString("fields");
+        String filter = Controller.request().getQueryString(paramFields);
         List<Pair<String, Field>> fields = ExposeTools.streamFields(t, filter).collect(Collectors.toList());
         return models
                 .map(m -> modelToItem(m, baseUri, fields));
@@ -137,8 +153,8 @@ public class JsonCollectionUtil {
     public static <T extends BaseModel>
     Stream<Item> requestedItemsFromStreamFunction(Class<T> t, BiFunction<Integer, Integer, Stream<T>> models) {
         Http.Request request = Controller.request();
-        String offset = request.getQueryString("start");
-        String limit = request.getQueryString("page-size");
+        String offset = request.getQueryString(paramOffset);
+        String limit = request.getQueryString(paramLimit);
 
         ExposeClass exposeClass = t.isAnnotationPresent(ExposeClass.class) ?
                 t.getAnnotation(ExposeClass.class) :
@@ -180,12 +196,11 @@ public class JsonCollectionUtil {
 
     public static <T extends BaseModel>
     Collection getCollectionFromItems(Class<T> t, Stream<Item> items) {
-        String fields = Controller.request().getQueryString("fields");
         String baseUri = BaseController.getBaseUri().toString();
         URI fullUri = BaseController.getFullUri();
         Map<String, String[]> params = Controller.request().queryString();
         Map<String, String[]> paramsFirst = new HashMap<>(params);
-        paramsFirst.remove("start"); // Map<String, String[]> to ?params
+        paramsFirst.remove(paramOffset); // Map<String, String[]> to ?params
 
         List<Link> links = new ArrayList<>();
         links.add(Link.create(fullUri, "self"));
@@ -221,7 +236,7 @@ public class JsonCollectionUtil {
 
     public static <T extends BaseModel>
     Collection getErrorCollection(Class<T> t, String title, String code, String message) {
-        String fields = Controller.request().getQueryString("fields");
+        String fields = Controller.request().getQueryString(paramFields);
         return Collection.create(
                 BaseController.getFullUri(),
                 new ArrayList<>(),
