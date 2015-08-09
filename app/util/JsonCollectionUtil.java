@@ -216,6 +216,25 @@ public class JsonCollectionUtil {
      * Get a stream of JSON+Collection-Items, that contain the the exposed fields which are requested. Fields, offset
      * and limit is extracted from request
      * @param t Class of items
+     * @param models Function, that give a chunk (offset, limit, filter, order) of models to transform
+     * @param <T> Type of models to transform
+     * @return A list of items that represent the requested models
+     */
+    public static <T extends BaseModel>
+    Stream<Item> filteredRequestedItemsFromListFunction(Class<T> t, QuinFunction<Class<T>, Integer, Integer,
+            Map<String,String[]>, String, List<T>> models) {
+        Map<String,String> nameMap = ExposeTools.filterableNamesToFieldNames(t, paramFilterPrefix);
+        String order = Controller.request().getQueryString(paramOrderBy);
+        Map<String,String[]> filter = Controller.request().queryString().entrySet().stream()
+                .filter(e -> nameMap.containsKey(e.getKey()))
+                .collect(Collectors.toMap(e -> nameMap.get(e.getKey()), Map.Entry::getValue));
+        return requestedItemsFromStreamFunction(t, (off, lim) -> models.apply(t, off, lim, filter, order).stream());
+    }
+
+    /**
+     * Get a stream of JSON+Collection-Items, that contain the the exposed fields which are requested. Fields, offset
+     * and limit is extracted from request
+     * @param t Class of items
      * @param models Function, that give a chunk (offset, limit) of models to transform
      * @param <T> Type of models to transform
      * @return A list of items that represent the requested models
@@ -223,6 +242,22 @@ public class JsonCollectionUtil {
     public static <T extends BaseModel>
     Stream<Item> requestedItemsFromListFunction(Class<T> t, BiFunction<Integer, Integer, List<T>> models) {
         return requestedItemsFromStreamFunction(t, (Integer off, Integer lim) -> models.apply(off, lim).stream());
+    }
+
+    /**
+     * Get a stream of JSON+Collection-Items, that contain the the exposed fields which are requested. Fields, offset,
+     *  limit and filter is extracted from request
+     * @param t Class of items
+     * @param models Function, that give a chunk (offset, limit, filter) of models to transform
+     * @param <T> Type of models to transform
+     * @return A list of items that represent the requested models
+     */
+    public static <T extends BaseModel>
+    Stream<Item> requestedItemsFromListFunction(Class<T> t, QuinFunction<Class<T>, Integer, Integer, Map<String,String[]>, String, List<T>> models) {
+        Map<String,String[]> filter = new HashMap<>();
+        String order = Controller.request().getQueryString(paramOrderBy);
+        return requestedItemsFromStreamFunction(t,
+                (Integer off, Integer lim) -> models.apply(t, off, lim, filter, order).stream());
     }
 
     /**
@@ -284,6 +319,11 @@ public class JsonCollectionUtil {
     public static <T extends BaseModel>
     Collection getRequestedCollection(Class<T> t, BiFunction<Integer, Integer, List<T>> models) {
         return getCollectionFromItems(t, requestedItemsFromListFunction(t, models));
+    }
+
+    public static <T extends BaseModel>
+    Collection getRequestedCollection(Class<T> t, QuinFunction<Class<T>, Integer, Integer, Map<String,String[]>, String, List<T>> models) {
+        return getCollectionFromItems(t, filteredRequestedItemsFromListFunction(t, models));
     }
 
     public static <T extends BaseModel>
