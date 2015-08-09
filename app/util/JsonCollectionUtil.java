@@ -337,6 +337,11 @@ public class JsonCollectionUtil {
     }
 
     public static <T extends BaseModel>
+    Collection getRequestedCollection(Class<T> t) {
+        return getRequestedCollection(t, BaseModel::someWhere);
+    }
+
+    public static <T extends BaseModel>
     Collection getErrorCollection(Class<T> t, String title, String code, String message) {
         String fields = Controller.request().getQueryString(paramFields);
         return Collection.create(
