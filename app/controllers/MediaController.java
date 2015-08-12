@@ -12,6 +12,7 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import models.Folder;
 import models.services.NotificationService;
 import org.apache.commons.io.FileUtils;
 
@@ -56,11 +57,11 @@ public class MediaController extends BaseController {
     	
     	Call ret = controllers.routes.Application.index();
     	if(media.belongsToGroup()){
-    		Group group = media.group;
+    		Group group = media.findGroup();
     		if(!Secured.deleteMedia(media)){
 				return redirect(controllers.routes.Application.index());
     		}
-    		ret = controllers.routes.GroupController.media(group.id);
+    		ret = controllers.routes.GroupController.media(group.id, 0L);
     	} 
     	
     	media.delete();
@@ -81,7 +82,7 @@ public class MediaController extends BaseController {
 				return redirect(controllers.routes.Application.index());
 			}
 			filename = createFileName(group.title);
-			ret = controllers.routes.GroupController.media(id);
+			ret = controllers.routes.GroupController.media(id, 0L);
 		} else {
 			return redirect(ret);
 		}
@@ -197,20 +198,21 @@ public class MediaController extends BaseController {
      * @return Result
      */
 	@Transactional
-    public static Result upload(String target, Long id) {
+    public static Result upload(String target, Long folderId) {
 	    final int maxTotalSize = Play.application().configuration().getInt("media.maxSize.total");
 	    final int maxFileSize = Play.application().configuration().getInt("media.maxSize.file");
 	    
 		Call ret = controllers.routes.Application.index();
 		Group group;
+		Folder folder = Folder.findById(folderId);
 
         // Where to put the media
 		if (target.equals(Media.GROUP)) {
-			group = Group.findById(id);
+			group = Group.findById(folder.findRoot(folder).group.id);
 			if (!Secured.uploadMedia(group)) {
 				return redirect(controllers.routes.Application.index());
 			}
-			ret = controllers.routes.GroupController.media(id);
+			ret = controllers.routes.GroupController.media(group.id, folderId);
 		} else {
 			return redirect(ret);
 		}
@@ -245,6 +247,7 @@ public class MediaController extends BaseController {
 				med.fileName = upload.getFilename();
 				med.file = upload.getFile();				
 				med.owner = Component.currentAccount();
+
 				
 				if (Media.byteAsMB(med.file.length()) > maxFileSize) {
 					flash("error", "Die Datei " + med.title + " ist größer als " + maxFileSize + " MB!");
@@ -254,7 +257,7 @@ public class MediaController extends BaseController {
 				String error = "Eine Datei mit dem Namen " + med.title + " existiert bereits";
 				if(target.equals(Media.GROUP)) {
                     med.temporarySender = Component.currentAccount();
-					med.group = group;
+					med.folder = folder;
 					if(med.existsInGroup(group)){
 						flash("error", error);
 						return redirect(ret);
@@ -269,7 +272,7 @@ public class MediaController extends BaseController {
 					m.create();
 
                     // create group notification, if a group exists
-                    if (m.group != null) {
+                    if (m.findGroup() != null) {
                         NotificationService.getInstance().createNotification(m, Media.MEDIA_NEW_MEDIA);
                     }
 				} catch (Exception e) {

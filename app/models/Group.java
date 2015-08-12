@@ -46,8 +46,10 @@ public class Group extends BaseNotifiable implements INotifiable {
 	public String token;
 
 	@OneToMany(mappedBy = "group")
-	@OrderBy("createdAt DESC")
-	public List<Media> media;
+	public List<Folder> folders;
+
+	@OneToOne
+	public Folder mediaFolder;
 	
 	public void setTitle(String title) {
 		this.title = title.trim();
@@ -74,6 +76,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 
 	public void createWithGroupAccount(Account account) {
 		this.owner = account;
+		this.mediaFolder = new Folder("_"+this.title, account, null, this, null);
 		this.create();
 		GroupAccount groupAccount = new GroupAccount(account, this,
 				LinkType.establish);
@@ -110,7 +113,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 		}
 
 		// delete media
-		for (Media media : this.media) {
+		for (Media media : this.mediaFolder.files) {
 			media.delete();
 		}
 		

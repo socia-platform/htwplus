@@ -1,4 +1,4 @@
-@(mediaList:List[Media],target:String,id:Long) 
+@(mediaList:List[Media],folderList: List[Folder], target:String,id:Long, groupId: Long)
 @import helper._
 @import models._
 
@@ -16,17 +16,32 @@
 	</thead>
     @form(action = routes.MediaController.multiView(target,id)) {
     <tbody id="mediaList" class="hp-optionsTable">
-		@for(m <- mediaList) {
-		<tr>
-			<td><input name="selection" value="@m.id" type="checkbox"></td>
-	        <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500" data-original-title="von @m.owner.name">@m.title</a></td>
-	        <td>@m.createdAt.format("dd.MM.yyyy")</td>
-	        <td>@{MediaController.bytesToString(m.size, false)}</td>
-	        <td class="hp-optionsMenu">
-                @views.html.Media.snippets.optionMenu(m)
-	        </td>
-	    </tr>
-		}
+        @if(!mediaList.isEmpty) {
+            @for(m <- mediaList) {
+            <tr>
+                <td><input name="selection" value="@m.id" type="checkbox"></td>
+                <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500" data-original-title="von @m.owner.name">@m.title</a></td>
+                <td>@m.createdAt.format("dd.MM.yyyy")</td>
+                <td>@{MediaController.bytesToString(m.size, false)}</td>
+                <td class="hp-optionsMenu">
+                    @views.html.Media.snippets.optionMenu(m)
+                </td>
+            </tr>
+            }
+        }
+        @if(!folderList.isEmpty) {
+            @for(folder <- folderList) {
+            <tr>
+                <td><input name="selection" value="@folder.id" type="checkbox"></td>
+                <td><a href="@routes.GroupController.media(groupId, folder.id)" rel="tooltip" data-delay="500" data-original-title="von ">@folder.name</a></td>
+                <td>@folder.createdAt.format("dd.MM.yyyy")</td>
+                <td>Ordner</td>
+                <td class="hp-optionsMenu">
+
+                </td>
+            </tr>
+            }
+        }
     </tbody>
     <tfoot>
         <tr>

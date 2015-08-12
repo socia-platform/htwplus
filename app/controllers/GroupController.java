@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.Collections;
 import java.util.List;
 
 import controllers.Navigation.Level;
@@ -25,6 +26,7 @@ import views.html.Group.snippets.streamRaw;
 public class GroupController extends BaseController {
 
 	static Form<Group> groupForm = Form.form(Group.class);
+	static Form<Folder> folderForm = Form.form(Folder.class);
 	static Form<Post> postForm = Form.form(Post.class);
 	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
 	static final int PAGE = 1;
@@ -77,9 +79,16 @@ public class GroupController extends BaseController {
 	}
 	
 	@Transactional(readOnly=true)
-	public static Result media(Long id) {
+	public static Result media(Long groupId, Long folderId) {
 		Form<Media> mediaForm = Form.form(Media.class);
-		Group group = Group.findById(id);
+		Group group = Group.findById(groupId);
+		Folder folder;
+
+		if(folderId != 0) {
+			folder = Folder.findById(folderId);
+		} else {
+			folder = group.mediaFolder;
+		}
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -90,8 +99,12 @@ public class GroupController extends BaseController {
 		}
 
         Navigation.set(Level.GROUPS, "Media", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
-        List<Media> mediaSet = group.media;
-        return ok(media.render(group, mediaForm, mediaSet));
+        List<Media> mediaSet = folder.files;
+		List<Folder> folderList = folder.folders;
+		List<Folder> navigationFolder = folder.findAncestors(folder);
+		Collections.reverse(navigationFolder);
+
+        return ok(media.render(group, mediaForm, mediaSet, folderList, folder, navigationFolder, folderForm));
 
 	}
 	
@@ -511,7 +524,7 @@ public class GroupController extends BaseController {
         }
 
 		Account account = Account.findById(accountId);
-		GroupAccount groupAccount = GroupAccount.find(account,group);
+		GroupAccount groupAccount = GroupAccount.find(account, group);
 		
 		if(groupAccount != null && Secured.acceptInvitation(groupAccount) ){
 			join(group.id);
@@ -530,7 +543,7 @@ public class GroupController extends BaseController {
         }
 
 		Account account = Account.findById(accountId);
-		GroupAccount groupAccount = GroupAccount.find(account,group);
+		GroupAccount groupAccount = GroupAccount.find(account, group);
 		
 		if(groupAccount != null && Secured.acceptInvitation(groupAccount) ){
 			groupAccount.delete();
@@ -538,5 +551,20 @@ public class GroupController extends BaseController {
 		
 		flash("success", "Einladung abgelehnt!");
 		return redirect(controllers.routes.GroupController.index());
+	}
+
+	public static Result createFolder(Long folderId) {
+		Folder parentFolder = Folder.findById(folderId);
+		Group group = parentFolder.findRoot(parentFolder).group;
+		Folder folder = null;
+
+		Form<Folder> filledForm = folderForm.bindFromRequest();
+		if(Secured.viewGroup(group)) {
+			Logger.debug("Create Group Folder...");
+			folder = new Folder(filledForm.data().get("name"), Component.currentAccount(), parentFolder, null, null);
+			folder.create();
+			Logger.debug("Group Folder -> created");
+		}
+		return redirect(routes.GroupController.media(group.id, folder.id));
 	}
 }

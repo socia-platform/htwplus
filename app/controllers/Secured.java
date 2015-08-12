@@ -549,7 +549,7 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in account is allowed to view media
 	 */
 	public static boolean viewMedia(Media media) {
-        return media != null && Secured.viewGroup(media.group);
+        return media != null && Secured.viewGroup(media.findGroup());
 	}
 
 	/**
@@ -560,7 +560,7 @@ public class Secured extends Security.Authenticator {
 	 */
 	public static boolean deleteMedia(Media media) {
 		Account current = Component.currentAccount();
-		Group group = media.group;
+		Group group = media.findGroup();
         
         return Secured.isAdmin() || Secured.isOwnerOfGroup(group, current) || media.owner.equals(current);
     }

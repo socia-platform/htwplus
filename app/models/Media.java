@@ -38,15 +38,15 @@ public class Media extends BaseNotifiable implements INotifiable {
 	
 	@Required
 	public Long size;
-	
-	@ManyToOne
-	public Group group;
-		
+
 	@ManyToOne
 	public Account owner;
 	
 	@Transient
 	public File file;
+
+	@ManyToOne
+	public Folder folder;
 	
 	public static String GROUP = "group";
 	
@@ -70,7 +70,7 @@ public class Media extends BaseNotifiable implements INotifiable {
     }
 	
 	public boolean existsInGroup(Group group) {
-		List<Media> media = group.media;
+		List<Media> media = group.mediaFolder.files;
 		for (Media m : media) {
 			if(m.title.equals(this.title)) {
 				return true;
@@ -161,8 +161,12 @@ public class Media extends BaseNotifiable implements INotifiable {
 	}
 	
 	public boolean belongsToGroup(){
-		if(this.group != null) return true;
+		if(this.findGroup() != null) return true;
 		return false;
+	}
+
+	public Group findGroup() {
+		return this.folder.findRoot(this.folder).group;
 	}
 
     @Override
@@ -173,11 +177,11 @@ public class Media extends BaseNotifiable implements INotifiable {
     @Override
     public List<Account> getRecipients() {
         // new media available in group, whole group must be notified
-        return GroupAccount.findAccountsByGroup(this.group, LinkType.establish);
+        return GroupAccount.findAccountsByGroup(this.findGroup(), LinkType.establish);
     }
 
     @Override
     public String getTargetUrl() {
-        return controllers.routes.GroupController.media(this.group.id).toString();
+        return controllers.routes.GroupController.media(this.findGroup().id, 0L).toString();
     }
 }
