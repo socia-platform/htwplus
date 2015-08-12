@@ -716,47 +716,6 @@ div.hp-notepad-content {
 
 }
 
-div.hp-sitenav {
-    padding: 10px;
-    box-sizing: content-box;
-    background-color: white;
-    -moz-box-sizing: content-box;
-    -webkit-box-sizing: content-box;
-    border-radius: 4px;
-    -moz-box-shadow: 0 0 3px #888;
-    -webkit-box-shadow: 0 0 3px #888;
-    box-shadow: 0 0 3px #888;
-    margin-bottom: 10px;
-}
-
-div.hp-sitenav hr {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-div.hp-sitenav .hp-sitenav-button {
-    margin: 2px 0px;
-}
-
-@media (min-width: 992px) {
-    #hp-site-navigation {
-        width: 220px;
-    }
-    div.hp-sitenav .hp-sitenav-button {
-        width: 98px;
-    }
-}
-
-@media (min-width: 1200px) {
-    #hp-site-navigation {
-        width: 270px;
-    }
-    div.hp-sitenav .hp-sitenav-button {
-        width: 120px;
-    }
-}
-
-
 div.addmargin {
     margin-top: 45px;
 }
@@ -1479,6 +1438,21 @@ div.hp-avatar-default-9 {
     min-height: 210px;
 }
 
+#hp-profile-header .links {
+    text-align: right;
+    padding-right: 10px;
+    padding-bottom: 15px;
+    font-size: 16px;
+}
+
+#hp-profile-header .links a {
+    text-align: center;
+    display: inline-block;
+    width: 30px;
+    margin-left: 10px;
+    border-bottom: 1px solid #999;
+}
+
 #hp-profile-header .hp-circle {
     width: 110px;
     margin-top: 30px;
@@ -1507,41 +1481,55 @@ div.hp-avatar-default-9 {
 #hp-profile-header .headline {
      border-bottom: 1px solid #ddd;
      padding-left: 190px;
-     padding-top: 50px;
+     padding-top: 10px;
      background-color: #f9f9f9;
- }
-
-#hp-profile-header .headline .dropdown {
-  position: relative;
-  display: inline;
 }
 
-#hp-profile-header .headline .dropdown .title {
-  text-transform: uppercase;
-      font-size: 20px;
-      font-family: initial;
+#hp-profile-header .headline .title {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
-
 
 
 #hp-profile-header .bottomline {
     text-align: right;
-    padding-bottom: 52px;
+    padding-bottom: 20px;
     padding-top: 5px;
     padding-right: 10px;
     padding-left: 190px;
+}
+
+#hp-profile-header .bottomline .hp-avatar-container {
+    padding: 10px 0px;
+}
+
+#hp-profile-header .bottomline .hp-avatar-container div {
+    display: inline-block;
 }
 
 #hp-profile-header .postForm {
     padding: 10px 40px;
 }
 
-#hp-profile-header .links {
-    text-align: right;
-    padding-right: 10px;
+#hp-profile-header .navigation {
+    text-align: center;
 }
 
-#hp-profile-header .links a {
-    background-color: whitesmoke;
-    border-radius: 0px;
+#hp-profile-header .navigation ul {
+    display: inline-block;
+}
+
+#hp-profile-header .navigation ul li a {
+    font-size: 14px;
+    font-weight: bold;
+    color: #999;
+    background-color: inherit;
+
+}
+
+#hp-profile-header .navigation ul li.active,
+#hp-profile-header .navigation li:hover,
+#hp-profile-header .navigation li:focus {
+    border-bottom: 2px solid #76b900;
 }

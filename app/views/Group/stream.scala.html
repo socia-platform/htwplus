@@ -1,143 +1,23 @@
-@(group: Group, posts: List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, memberList: List[Account])
+@(group: Group, posts: List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, avatarList: List[Account], memberCount: Integer)
 
 @import models.enums._
 
 @main("Gruppenstream") {
 
-@***
-    <div class="row">
-        <div class="col-md-9 col-lg-9" role="main">
-            <div class="hp-notepad-content addmargin">
-
-                    <!-- Start confirmDeleteGroupModal -->
-                <div id="confirmDeleteGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-                @views.html.Group.snippets.deleteGroupModal(group)
-                </div>
-                    <!-- End confirmDeleteGroupModal -->
-
-                    <!-- Start confirmLeaveGroupModal -->
-                <div id="confirmLeaveGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-                @views.html.Group.snippets.leaveGroupModal(group)
-                </div>
-                    <!-- End confirmDeleteGroupModal -->
-
-
-                @views.html.Group.snippets.navTabs(group)
-
-
-                <div class="clear">
-                    <h2 class="hp-truncate">
-                        @if(group.groupType.equals(GroupType.open)) {
-                            <span class="glyphicon glyphicon-globe"></span>
-                        }
-                        @if(group.groupType.equals(GroupType.close)) {
-                            <span class="glyphicon glyphicon-lock"></span>
-                        }
-                        @if(group.groupType.equals(GroupType.course)) {
-                            <span class="glyphicon glyphicon-briefcase"></span>
-                        }
-                        @group.title
-                    </h2>
-                    <br />
-                    <br />
-
-                    @views.html.snippets.postForm(group.id, models.Post.GROUP, postForm)
-
-                    @views.html.Group.snippets.streamRaw(group, posts, postForm, count, limit, currentPage)
-
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-lg-3" role="complementary">
-            <nav id="hp-site-navigation" class="hidden-xs hidden-sm affix">
-                <div class="hp-sitenav addmargin">
-
-                    @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
-                        <a href="@routes.GroupController.join(group.id)" role="button"
-                           class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip"
-                           data-original-title="Tritt der Gruppe bei" data-container="body">
-                            <span class="glyphicon glyphicon-ok"></span>
-                            <span class="hidden-xs"> Beitreten</span>
-                        </a>
-                    }
-                    <a href="@routes.GroupController.media(group.id)" role="button"
-                       class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip"
-                       data-original-title="Medien der Gruppe" data-container="body">
-                        <span class="glyphicon glyphicon-file"></span>
-                        <span class="hidden-xs"> Medien</span>
-                    </a>
-
-                    @if(Secured.editGroup(group)) {
-                        <a href="@routes.GroupController.edit(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip" data-original-title="Bearbeite die Gruppe" data-container="body">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                            <span class="hidden-xs"> Bearbeiten</span>
-                        </a>
-                    }
-                    @if(Secured.editGroup(group)) {
-                        <a href="@routes.GroupController.invite(group.id)" role="button" class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip" data-original-title="Lade deine Kontakte ein" data-container="body">
-                            <span class="glyphicon glyphicon-plus"></span> Einladen
-                        </a>
-                    }
-                    @if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
-                        <a href="#confirmLeaveGroup" role="button" class="hp-sitenav-button btn btn-default btn-sm" data-toggle="modal">
-                            <span class="glyphicon glyphicon-remove"></span>
-                            <span class="hidden-xs"> Gruppe verlassen</span>
-                        </a>
-                    }
-                    @if(Secured.deleteGroup(group)) {
-                        <a href="#confirmDeleteGroup" role="button" class="hp-sitenav-button btn btn-default btn-sm" rel="tooltip" data-toggle="modal" data-original-title="Lösche die Gruppe" data-container="body">
-                            <span class="glyphicon glyphicon-trash"></span>
-                            <span class="hidden-xs"> Löschen</span>
-                        </a>
-                    }
-                </div>
-                <div class="hp-sitenav">
-                    <b><span class="glyphicon glyphicon-info-sign"></span> Info</b>
-                    <hr>
-                    <dl>
-                        <dt>Gründer</dt>
-                        <dd>@views.html.snippets.userLink(group.owner)</dd>
-                    </dl>
-                    <dl>
-                        <dt>Beschreibung</dt>
-                        <dd>@group.description</dd>
-                    </dl>
-                    <dl>
-                        <dt>Erstellt am</dt>
-                        <dd>@group.createdAt.format("dd.MM.yyyy")</dd>
-                    </dl>
-                    @if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
-                        <dl>
-                            <dt>Token</dt>
-                            <dd>@group.token</dd>
-                        </dl>
-                    }
-                    <dl>
-                        <dt>Medien</dt>
-                        <dd><a href="@routes.GroupController.media(group.id)">@group.media.size() Datei(en)</a></dd>
-                    </dl>
-                    <dl>
-                        <dt>Mitglieder
-
-                        </dt>
-                        <dd>
-                        @for(user <- memberList) {
-                            <a class="pull-left hp-nohref hp-avatar-list" href="@routes.ProfileController.view(user.id)" rel="tooltip" data-original-title="@user.name" data-container="body">
-                            @if(user.hasAvatar){
-                                <img alt="avatar" src="@routes.ProfileController.getAvatar(user.id)" class="hp-avatar-small" />
-                            } else {
-                                <div class="hp-avatar-small hp-avatar-default-@user.avatar">@user.getInitials</div>
-                            }
-                            </a>
-                        }
-                            <div class="clearfix"></div>
-                        </dd>
-                    </dl>
-                </div>
-            </nav>
-        </div>
+@if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
+    <!-- Start confirmLeaveGroupModal -->
+    <div id="confirmLeaveGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        @views.html.Group.snippets.leaveGroupModal(group)
     </div>
-***@
+    <!-- End confirmDeleteGroupModal -->
+}
+@if(Secured.deleteGroup(group)) {
+    <!-- Start confirmDeleteGroupModal -->
+    <div id="confirmDeleteGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        @views.html.Group.snippets.deleteGroupModal(group)
+    </div>
+    <!-- End confirmDeleteGroupModal -->
+}
 
 <div class="row">
     <div class="col-md-12" role="main">
@@ -156,36 +36,54 @@
 
 
                 <div class="headline">
-                    <h2>@group.title -
-                        <div class="dropdown">
-                            <a class="title hp-nohref" data-toggle="dropdown" aria-expanded="false">
-                                @Navigation.getTitle() <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li>
-                                    <a href="@routes.GroupController.stream(group.id)" rel="tooltip" data-original-title="Newsstream der Gruppe" data-container="body">
-                                        <span class="glyphicon glyphicon-comment"></span> Newsstream
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="@routes.GroupController.media(group.id)" rel="tooltip" data-original-title="Medien der Gruppe" data-container="body">
-                                        <span class="glyphicon glyphicon-file"></span> Medien
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </h2>
+                    <div class="links">
+                        @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
+                        <a href="@routes.GroupController.join(group.id)" rel="tooltip" data-original-title="Tritt der Gruppe bei" data-container="body">
+                            <span class="glyphicon glyphicon-ok"></span>
+                        </a>
+                        }
+
+                        @if(Secured.editGroup(group)) {
+                        <a href="@routes.GroupController.edit(group.id)" rel="tooltip" data-original-title="Bearbeite die Gruppe" data-container="body">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                        }
+
+                        @if(Secured.editGroup(group)) {
+                        <a href="@routes.GroupController.invite(group.id)" rel="tooltip" data-original-title="Lade deine Kontakte ein" data-container="body">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                        }
+
+                        @if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
+                        <a href="#confirmLeaveGroup" data-toggle="modal" rel="tooltip" data-original-title="Verlasse die Gruppe" data-container="body">
+                            <span class="glyphicon glyphicon-log-out"></span>
+                        </a>
+                        }
+
+                        @if(Secured.deleteGroup(group)) {
+                        <a href="#confirmDeleteGroup" rel="tooltip" data-toggle="modal" data-original-title="Lösche die Gruppe" data-container="body">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                        }
+                    </div>
+                    <h2 class="title visible-md visible-lg">@group.title</h2>
+                    <h3 class="title visible-xs visible-sm">@group.title</h3>
                 </div>
+
                 <div class="bottomline">
                     <small>
-                        <b>#Gründer: </b>@views.html.snippets.userLink(group.owner)
-                        <b>#Medien: </b><a href="@routes.GroupController.media(group.id)">@group.media.size() Datei(en)</a>
+                        <span><b>Gründer: </b>@views.html.snippets.userLink(group.owner)</span>
+                        <span>| <b>Medien: </b><a href="@routes.GroupController.media(group.id)">@group.media.size() Datei(en)</a></span>
+                        @if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
+                        <span>| <b>Token: </b>@group.token</span>
+                        }
                         <br />
-                        <b>#Beschreibung: </b>@group.description
-                        <br />
-                        <br />
-                        @for(user <- memberList) {
-                        <a class="pull-right hp-nohref hp-avatar-list" href="@routes.ProfileController.view(user.id)" rel="tooltip" data-original-title="@user.name" data-container="body">
+                        <b>Beschreibung: </b>@group.description
+                    </small>
+                    <div class="hp-avatar-container">
+                        @for(user <- avatarList) {
+                        <a class="hp-nohref hp-avatar-list" href="@routes.ProfileController.view(user.id)" rel="tooltip" data-original-title="@user.name" data-container="body">
                             @if(user.hasAvatar){
                             <img alt="avatar" src="@routes.ProfileController.getAvatar(user.id)" class="hp-avatar-small" />
                             } else {
@@ -193,37 +91,19 @@
                             }
                         </a>
                         }
-                    </small>
+                    </div>
+                    @if(memberCount > 10) { <div><a href="#">... und @(memberCount-10) mehr</a></div> }
                 </div>
-                <div class="links">
 
-                    @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
-                    <a href="@routes.GroupController.join(group.id)" role="button"
-                       class="btn btn-default btn-xs" rel="tooltip"
-                       data-original-title="Tritt der Gruppe bei" data-container="body">
-                        <span class="glyphicon glyphicon-ok"></span> BEITRETEN
-                    </a>
-                    }
-                    @if(Secured.editGroup(group)) {
-                    <a href="@routes.GroupController.edit(group.id)" role="button" class="btn btn-default btn-xs" rel="tooltip" data-original-title="Bearbeite die Gruppe" data-container="body">
-                        <span class="glyphicon glyphicon-pencil"></span> BEARBEITEN
-                    </a>
-                    }
-                    @if(Secured.editGroup(group)) {
-                    <a href="@routes.GroupController.invite(group.id)" role="button" class="btn btn-default btn-xs" rel="tooltip" data-original-title="Lade deine Kontakte ein" data-container="body">
-                        <span class="glyphicon glyphicon-plus"></span> EINLADEN
-                    </a>
-                    }
-                    @if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
-                    <a href="#confirmLeaveGroup" role="button" class="btn btn-default btn-xs" data-toggle="modal">
-                        <span class="glyphicon glyphicon-remove"></span> VERLASSEN
-                    </a>
-                    }
-                    @if(Secured.deleteGroup(group)) {
-                    <a href="#confirmDeleteGroup" role="button" class="btn btn-default btn-xs" rel="tooltip" data-toggle="modal" data-original-title="Lösche die Gruppe" data-container="body">
-                        <span class="glyphicon glyphicon-trash"></span> LÖSCHEN
-                    </a>
-                    }
+                <div class="navigation">
+                    <ul class="nav nav-pills">
+                        <li role="presentation" class="active">
+                            <a href="@routes.GroupController.stream(group.id)">Newsstream</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="@routes.GroupController.media(group.id)">Medien</a>
+                        </li>
+                    </ul>
                 </div>
 
             </div>

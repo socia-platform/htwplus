@@ -63,12 +63,16 @@ public class GroupController extends BaseController {
 
         Navigation.set(Level.GROUPS, "Newsstream", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
         List<Post> posts = Post.getPostsForGroup(group, LIMIT, page);
-        List<Account> memberList = GroupAccount.findAccountsByGroup(group, LinkType.establish);
+        List<Account> avatarList = GroupAccount.findAccountsByGroup(group, LinkType.establish);
+		int memberCount = avatarList.size();
+		// show max. 10 user.
+		// too lazy to change all "findAccountByGroup" call with limit and offset :)
+		if(avatarList.size() >= 10) avatarList = avatarList.subList(0,10);
 
         if(raw) {
             return ok(streamRaw.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page));
         } else {
-            return ok(stream.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page, memberList));
+            return ok(stream.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page, avatarList, memberCount));
         }
 	}
 	
@@ -455,7 +459,7 @@ public class GroupController extends BaseController {
 		Account account = Account.findById(accountId);
 		GroupAccount groupAccount = GroupAccount.find(account,group);
 		
-		if(groupAccount != null && Secured.acceptInvitation(groupAccount) ){
+		if(groupAccount != null && Secured.acceptInvitation(groupAccount)) {
 			join(group.id);
 			
 		}
