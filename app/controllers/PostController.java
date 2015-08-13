@@ -21,7 +21,7 @@ public class PostController extends BaseController {
 	static final int PAGE = 1;
     static final String STREAM_FILTER = "all";
 	
-	public static Result view (Long id) {
+	public Result view (Long id) {
 		Post post = Post.findById(id);
 		
 		if(post == null){
@@ -55,7 +55,7 @@ public class PostController extends BaseController {
 	 * @return Result
 	 */
     @Transactional
-	public static Result addPost(Long anyId, String target) {
+	public Result addPost(Long anyId, String target) {
 		Account account = Component.currentAccount();
 		Form<Post> filledForm = postForm.bindFromRequest();
 		
@@ -122,7 +122,7 @@ public class PostController extends BaseController {
 	}
 	
 	@Transactional
-	public static Result addComment(long postId) {
+	public Result addComment(long postId) {
 		final Post parent = Post.findById(postId);
 		final Account account = Component.currentAccount();
 		
@@ -160,7 +160,7 @@ public class PostController extends BaseController {
 		}
 	}
 
-    public static Result getEditForm(Long postId) {
+    public Result getEditForm(Long postId) {
         Post post = Post.findById(postId);
         Account account = Component.currentAccount();
 
@@ -172,7 +172,7 @@ public class PostController extends BaseController {
     }
 
     @Transactional
-    public static Result updatePost(Long postId) {
+    public Result updatePost(Long postId) {
         Post post = Post.findById(postId);
         Account account = Component.currentAccount();
 
@@ -206,7 +206,7 @@ public class PostController extends BaseController {
 	
 	
 	@Transactional
-	public static Result getOlderComments(Long id, Integer current) {
+	public Result getOlderComments(Long id, Integer current) {
 		Post parent = Post.findById(id);
 		
 		if (!Secured.viewComments(parent)) {
@@ -227,7 +227,7 @@ public class PostController extends BaseController {
 	}
 	
 	@Transactional
-	public static Result deletePost(Long postId) {
+	public Result deletePost(Long postId) {
 		Post post = Post.findById(postId);
 		Account account = Component.currentAccount();
 		Call routesTo = null;
@@ -264,7 +264,7 @@ public class PostController extends BaseController {
 		return redirect(routesTo);
 	}
 
-    public static Result bookmarkPost(Long postId) {
+    public Result bookmarkPost(Long postId) {
         Account account = Component.currentAccount();
         Post post = Post.findById(postId);
         String returnStatement = "";

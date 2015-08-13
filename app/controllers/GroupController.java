@@ -28,7 +28,7 @@ public class GroupController extends BaseController {
 	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
 	static final int PAGE = 1;
 	
-	public static Result index() {
+	public Result index() {
 		Navigation.set(Level.GROUPS, "Übersicht");
 		Account account = Component.currentAccount();
 		List<GroupAccount> groupRequests = GroupAccount.findRequests(account);
@@ -38,7 +38,7 @@ public class GroupController extends BaseController {
 	}
 
     @Transactional(readOnly=true)
-    public static Result view(Long id) {
+    public Result view(Long id) {
         Group group = Group.findById(id);
         if (group == null) {
             Logger.error("No group found with id: " + id);
@@ -53,7 +53,7 @@ public class GroupController extends BaseController {
     }
 
 	@Transactional(readOnly=true)
-	public static Result stream(Long id, int page) {
+	public Result stream(Long id, int page) {
 		Group group = Group.findById(id);
 
         if(!Secured.viewGroup(group)){
@@ -68,7 +68,7 @@ public class GroupController extends BaseController {
 	}
 	
 	@Transactional(readOnly=true)
-	public static Result media(Long id) {
+	public Result media(Long id) {
 		Form<Media> mediaForm = Form.form(Media.class);
 		Group group = Group.findById(id);
 		
@@ -85,12 +85,12 @@ public class GroupController extends BaseController {
 		}
 	}
 	
-	public static Result create() {
+	public Result create() {
 		Navigation.set(Level.GROUPS, "Erstellen");
 		return ok(create.render(groupForm));
 	}
 
-	public static Result add() {	
+	public Result add() {
 		Navigation.set(Level.GROUPS, "Erstellen");
 		
 		// Get data from request
@@ -146,7 +146,7 @@ public class GroupController extends BaseController {
 	}
 
 	@Transactional
-	public static Result edit(Long id) {
+	public Result edit(Long id) {
 		Group group = Group.findById(id);
 		
 		
@@ -161,7 +161,7 @@ public class GroupController extends BaseController {
 	}
 	
 	@Transactional
-	public static Result update(Long groupId) {
+	public Result update(Long groupId) {
 		Group group = Group.findById(groupId);
 		Navigation.set(Level.GROUPS, "Bearbeiten", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
 		
@@ -205,7 +205,7 @@ public class GroupController extends BaseController {
 	}
 
     @Transactional
-	public static Result delete(Long id) {
+	public Result delete(Long id) {
 		Group group = Group.findById(id);
 		if (Secured.deleteGroup(group)) {
 			group.delete();
@@ -216,13 +216,13 @@ public class GroupController extends BaseController {
 		return redirect(controllers.routes.GroupController.index());
 	}
 	
-	public static Result token(Long groupId) {
+	public Result token(Long groupId) {
 		Group group = Group.findById(groupId);
 		Navigation.set(Level.GROUPS, "Token eingeben", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
 		return ok(token.render(group, groupForm));
 	}
 	
-	public static Result validateToken(Long groupId) {
+	public Result validateToken(Long groupId) {
 		Group group = Group.findById(groupId);
 		
 		if(Secured.isMemberOfGroup(group, Component.currentAccount())){
@@ -247,7 +247,7 @@ public class GroupController extends BaseController {
 	}
 
     @Transactional
-	public static Result join(long id) {
+	public Result join(long id) {
 		Account account = Component.currentAccount();
 		Group group = Group.findById(id);
 		GroupAccount groupAccount;
@@ -296,7 +296,7 @@ public class GroupController extends BaseController {
 		return redirect(controllers.routes.GroupController.index());
 	}
 		
-	public static Result removeMember(long groupId, long accountId){
+	public Result removeMember(long groupId, long accountId){
 		Account account = Account.findById(accountId);
 		Group group = Group.findById(groupId);
 		GroupAccount groupAccount = GroupAccount.find(account, group);
@@ -335,7 +335,7 @@ public class GroupController extends BaseController {
      * @return Result
      */
     @Transactional
-	public static Result acceptRequest(long groupId, long accountId){
+	public Result acceptRequest(long groupId, long accountId){
 		Account account = Account.findById(accountId);
 		Group group = Group.findById(groupId);
 
@@ -370,7 +370,7 @@ public class GroupController extends BaseController {
      * @return Result
      */
     @Transactional
-	public static Result declineRequest(long groupId, long accountId){
+	public Result declineRequest(long groupId, long accountId){
 		Account account = Account.findById(accountId);
 		Group group = Group.findById(groupId);
 
@@ -393,14 +393,14 @@ public class GroupController extends BaseController {
 	}
 
     @Transactional
-	public static Result invite(long groupId) {
+	public Result invite(long groupId) {
 		Group group = Group.findById(groupId);
 		Navigation.set(Level.GROUPS, "Freunde einladen", group.title, controllers.routes.GroupController.stream(group.id, PAGE));
 		return ok(invite.render(group, Friendship.friendsToInvite(Component.currentAccount(), group), GroupAccount.findAccountsByGroup(group, LinkType.invite)));
 	}
 
     @Transactional
-	public static Result inviteMember(long groupId) {
+	public Result inviteMember(long groupId) {
 		Group group = Group.findById(groupId);
 		Account currentUser = Component.currentAccount();
 		
@@ -445,7 +445,7 @@ public class GroupController extends BaseController {
 		return redirect(controllers.routes.GroupController.stream(groupId, PAGE));
 	}
 	
-	public static Result acceptInvitation(long groupId, long accountId){
+	public Result acceptInvitation(long groupId, long accountId){
 		Group group = Group.findById(groupId);
 		Account account = Account.findById(accountId);
 		GroupAccount groupAccount = GroupAccount.find(account,group);
@@ -458,7 +458,7 @@ public class GroupController extends BaseController {
 		return redirect(controllers.routes.GroupController.stream(groupId, PAGE));
 	}
 	
-	public static Result declineInvitation(long groupId, long accountId){
+	public Result declineInvitation(long groupId, long accountId){
 		Group group = Group.findById(groupId);
 		Account account = Account.findById(accountId);
 		GroupAccount groupAccount = GroupAccount.find(account,group);

@@ -12,9 +12,10 @@ import play.i18n.Messages;
 import play.libs.F;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import play.Configuration;
 /**
  * This class handles sending of emails, e.g. for notification mails.
  */
@@ -33,20 +34,20 @@ public class EmailService {
     /**
      * Private constructor for singleton instance
      */
-    private EmailService() { }
+    //private EmailService() { }
 
     /**
      * Returns the singleton instance.
      *
      * @return EmailHandler instance
      */
-    public static EmailService getInstance() {
-        if (EmailService.instance == null) {
-            EmailService.instance = new EmailService();
-        }
-
-        return EmailService.instance;
-    }
+//    public static EmailService getInstance() {
+//        if (EmailService.instance == null) {
+//            EmailService.instance = new EmailService();
+//        }
+//
+//        return EmailService.instance;
+//    }
 
     /**
      * Sends an email.
@@ -74,7 +75,6 @@ public class EmailService {
         } else if (mailHtml != null) {
             mail.setBodyHtml(mailHtml);
         }
-
         mailerClient.send(mail);
     }
 

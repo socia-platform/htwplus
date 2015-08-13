@@ -30,7 +30,7 @@ public class ProfileController extends BaseController {
 	static Form<Post> postForm = Form.form(Post.class);
 	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
 
-	public static Result me() {
+	public Result me() {
 		Navigation.set(Level.PROFILE,"Ich");
 		Account account = Component.currentAccount();
 		if (account == null) {
@@ -46,7 +46,7 @@ public class ProfileController extends BaseController {
 		}
 	}
 
-	public static Result view(final Long id) {
+	public Result view(final Long id) {
 		Account account = Account.findById(id);
 
 		if (account == null) {
@@ -65,7 +65,7 @@ public class ProfileController extends BaseController {
 	}
 
     @Transactional
-	public static Result stream(Long accountId, int page) {
+	public Result stream(Long accountId, int page) {
 		Account account = Account.findById(accountId);
 		Account currentUser = Component.currentAccount();
 		
@@ -92,7 +92,7 @@ public class ProfileController extends BaseController {
 		return redirect(controllers.routes.ProfileController.view(accountId));
 	}
 
-	public static Result editPassword(Long id) {
+	public Result editPassword(Long id) {
 		Account account = Account.findById(id);
 		
 		if (account == null) {
@@ -108,7 +108,7 @@ public class ProfileController extends BaseController {
 		return ok(editPassword.render(account, accountForm.fill(account)));
 	}
 
-	public static Result updatePassword(Long id) {
+	public Result updatePassword(Long id) {
 		// Get regarding Object
 		Account account = Account.findById(id);
 		if (account == null) {
@@ -174,7 +174,7 @@ public class ProfileController extends BaseController {
 		return redirect(controllers.routes.ProfileController.me());
 	}
 
-	public static Result edit(Long id) {
+	public Result edit(Long id) {
 		Account account = Account.findById(id);
 		if (account == null) {
 			flash("info", "Diese Person gibt es nicht.");
@@ -190,7 +190,7 @@ public class ProfileController extends BaseController {
 		return ok(edit.render(account, accountForm.fill(account)));
 	}
 
-	public static Result update(Long id) {
+	public Result update(Long id) {
 		// Get regarding Object
 		Account account = Account.findById(id);
 		if (account == null) {
@@ -275,7 +275,7 @@ public class ProfileController extends BaseController {
 		}
 	}
 
-    public static Result groups(Long id) {
+    public Result groups(Long id) {
         Account account = Account.findById(id);
 
         if(Secured.isFriend(account)) {
@@ -297,7 +297,7 @@ public class ProfileController extends BaseController {
 	 * @param id
 	 * @return
 	 */
-	public static Result createTempAvatar(Long id) {
+	public Result createTempAvatar(Long id) {
 
 		Account account = Account.findById(id);
 
@@ -337,7 +337,7 @@ public class ProfileController extends BaseController {
 	 * @param id
 	 * @return
 	 */
-	public static Result getTempAvatar(Long id) {
+	public Result getTempAvatar(Long id) {
 
 		ObjectNode result = Json.newObject();
 		Account account = Account.findById(id);
@@ -365,7 +365,7 @@ public class ProfileController extends BaseController {
 	 * @param id
 	 * @return
 	 */
-	public static Result createAvatar(long id) {
+	public Result createAvatar(long id) {
 		ObjectNode result = Json.newObject();
 		
 		Account account = Account.findById(id);
@@ -404,7 +404,7 @@ public class ProfileController extends BaseController {
 	 * @param size Size - Possible values: "small", "medium", "large"
 	 * @return
 	 */
-	public static Result getAvatar(long id, String size){
+	public Result getAvatar(long id, String size){
 		Account account = Account.findById(id);
 		if(account != null){
 			File avatar;

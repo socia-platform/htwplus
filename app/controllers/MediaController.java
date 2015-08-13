@@ -35,7 +35,7 @@ public class MediaController extends BaseController {
 	final static String tempPrefix = "htwplus_temp";
 	
     @Transactional(readOnly=true)	
-    public static Result view(Long id) {
+    public Result view(Long id) {
     	Media media = Media.findById(id);
     	if(Secured.viewMedia(media)) {
 			if (media == null) {
@@ -51,7 +51,7 @@ public class MediaController extends BaseController {
     }
     
     @Transactional
-    public static Result delete(Long id) {
+    public Result delete(Long id) {
     	Media media = Media.findById(id);
     	
     	Call ret = controllers.routes.Application.index();
@@ -69,7 +69,7 @@ public class MediaController extends BaseController {
     }	
     
     @Transactional(readOnly=true)	
-    public static Result multiView(String target, Long id) {
+    public Result multiView(String target, Long id) {
     	
 		Call ret = controllers.routes.Application.index();
 		Group group = null;
@@ -114,12 +114,12 @@ public class MediaController extends BaseController {
 		}
     }
     
-    private static String createFileName(String prefix) {
+    private String createFileName(String prefix) {
     	return prefix + "-" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".zip";
     }
     
     
-    private static File createZIP(List<Media> media, String fileName) throws IOException {
+    private File createZIP(List<Media> media, String fileName) throws IOException {
     	
        	//cleanUpTemp(); // JUST FOR DEVELOPMENT, DO NOT USE IN PRODUCTION
 	    String tmpPath = Play.application().configuration().getString("media.tempPath");
@@ -197,7 +197,7 @@ public class MediaController extends BaseController {
      * @return Result
      */
 	@Transactional
-    public static Result upload(String target, Long id) {
+    public Result upload(String target, Long id) {
 	    final int maxTotalSize = Play.application().configuration().getInt("media.maxSize.total");
 	    final int maxFileSize = Play.application().configuration().getInt("media.maxSize.file");
 	    

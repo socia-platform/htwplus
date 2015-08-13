@@ -17,7 +17,7 @@ import views.html.Friends.*;
 @Transactional
 public class FriendshipController extends BaseController {
 
-	public static Result index() {
+	public Result index() {
 		Navigation.set(Level.FRIENDS, "Übersicht");
 		Account currentUser = Component.currentAccount();
 		List<Account> friends = Friendship.findFriends(currentUser);
@@ -35,7 +35,7 @@ public class FriendshipController extends BaseController {
      * @param friendId ID of potential friend
      * @return SimpleResult redirect
      */
-	public static Result requestFriend(long friendId) {
+	public Result requestFriend(long friendId) {
 		Account currentUser = Component.currentAccount();
 		Account potentialFriend = Account.findById(friendId);
 		
@@ -52,7 +52,7 @@ public class FriendshipController extends BaseController {
 		
 	}
 
-	public static Result deleteFriend(long friendId) {
+	public Result deleteFriend(long friendId) {
 		Account currentUser = Component.currentAccount();
 		Account friend = Account.findById(friendId);
 		
@@ -81,7 +81,7 @@ public class FriendshipController extends BaseController {
      * @param friendId ID of friend
      * @return SimpleResult redirect
      */
-	public static Result acceptFriendRequest(long friendId) {
+	public Result acceptFriendRequest(long friendId) {
 		Account currentUser = Component.currentAccount();
 		Account potentialFriend = Account.findById(friendId);
 		
@@ -114,7 +114,7 @@ public class FriendshipController extends BaseController {
      * @param friendshipId ID of rejected friend
      * @return SimpleResult redirect
      */
-	public static Result declineFriendRequest(long friendshipId) {
+	public Result declineFriendRequest(long friendshipId) {
 		Friendship requestLink = Friendship.findById(friendshipId);
 		if (requestLink != null && requestLink.friend.equals(Component.currentAccount())) {
 			requestLink.linkType = LinkType.reject;
@@ -125,7 +125,7 @@ public class FriendshipController extends BaseController {
 		return redirect(controllers.routes.FriendshipController.index());
 	}
 
-	public static Result cancelFriendRequest(long friendshipId) {
+	public Result cancelFriendRequest(long friendshipId) {
 		Friendship friendship = Friendship.findById(friendshipId);
 		if (friendship != null && friendship.account.equals(Component.currentAccount())) {
 			friendship.delete();
@@ -136,7 +136,7 @@ public class FriendshipController extends BaseController {
 		return redirect(controllers.routes.FriendshipController.index());
 	}
 	
-	private static boolean hasLogicalErrors(Account currentUser, Account potentialFriend) {
+	private boolean hasLogicalErrors(Account currentUser, Account potentialFriend) {
 		if (potentialFriend.equals(currentUser)) {
 			flash("info","Du kannst nicht mit dir befreundet sein!");
 			return true;

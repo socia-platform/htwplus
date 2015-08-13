@@ -184,7 +184,8 @@ public class NotificationService {
                         new Runnable() {
                             // runs the Akka schedule
                             public void run() {
-                                EmailService.getInstance().sendNotificationEmail(notification);
+                                EmailService email =  new EmailService();
+                                email.sendNotificationEmail(notification);
                             }
                         },
                         Akka.system().dispatcher()

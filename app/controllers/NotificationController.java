@@ -57,7 +57,7 @@ public class NotificationController extends BaseController {
      * @return SimpleResult with redirection
      */
     @Transactional
-	public static Result forward(Long notificationId) {
+	public Result forward(Long notificationId) {
 		Notification notification = Notification.findById(notificationId);
 
 		if (notification == null) {
@@ -83,7 +83,7 @@ public class NotificationController extends BaseController {
      * @return Result
      */
     @Transactional(readOnly = true)
-    public static Result showAll(int page) {
+    public Result showAll(int page) {
         List<Notification> notifications = null;
         try {
             notifications = Notification.findByAccountIdForPage(Component.currentAccount().id, NotificationController.LIMIT, page);
@@ -135,7 +135,7 @@ public class NotificationController extends BaseController {
      * @return Result
      */
     @Transactional
-    public static Result readAll() {
+    public Result readAll() {
         Notification.markAllAsRead(Component.currentAccount());
         flash("success", Messages.get("notification.read_everything_ok"));
 

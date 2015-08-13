@@ -22,8 +22,8 @@ public class WebSocketController extends BaseController {
      * @return Web socket instance including JSON nodes
      */
     @Transactional(readOnly = true)
-    public static WebSocket<JsonNode> webSocket() {
-        final Account account = WebSocketController.getCurrentAccount();
+    public WebSocket<JsonNode> webSocket() {
+        final Account account = this.getCurrentAccount();
 
         // called when the WebSocket Handshake is done.
         return new WebSocket<JsonNode>() {
@@ -60,7 +60,7 @@ public class WebSocketController extends BaseController {
      *
      * @return Account of current user
      */
-    private static Account getCurrentAccount() {
+    private Account getCurrentAccount() {
         try {
             return JPA.withTransaction(new F.Function0<Account>() {
                 @Override

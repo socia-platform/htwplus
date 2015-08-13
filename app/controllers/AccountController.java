@@ -31,7 +31,7 @@ public class AccountController extends BaseController {
      *
      * @return Result
      */
-	public static Result authenticate() {
+	public Result authenticate() {
 		DynamicForm form = form().bindFromRequest();
 		String username = form.field("email").value();
 
@@ -53,7 +53,7 @@ public class AccountController extends BaseController {
      *
      * @return Result
      */
-	private static Result LdapAuthenticate(final String redirect) {
+	private Result LdapAuthenticate(final String redirect) {
 		Form<Login> form = form(Login.class).bindFromRequest();
 		String matriculationNumber = form.field("email").value();
 		String password = form.field("password").value();
@@ -108,7 +108,7 @@ public class AccountController extends BaseController {
 		return redirect(redirect);
 	}
 
-	private static Result defaultAuthenticate(final String redirect) {
+	private Result defaultAuthenticate(final String redirect) {
 		Form<Login> loginForm = form(Login.class).bindFromRequest();
 		if (loginForm.hasErrors()) {
 			flash("error", loginForm.globalError().message());
@@ -130,7 +130,7 @@ public class AccountController extends BaseController {
 	/**
 	 * Logout and clean the session.
 	 */
-	public static Result logout() {
+	public Result logout() {
 		session().clear();
 		flash("success", Messages.get("authenticate.logout"));
 

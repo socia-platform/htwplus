@@ -35,16 +35,16 @@ public class AdminController extends BaseController {
 	static Form<Account> accountForm = form(Account.class);
     static Form<Post> postForm = form(Post.class);
 
-	public static Result index(){
+	public Result index(){
 		return ok(index.render());
 	}
 
-	public static Result createAccountForm(){
+	public Result createAccountForm(){
 		return ok(createAccount.render(accountForm));
 	}
 
 	@Transactional
-	public static Result createAccount() {
+	public Result createAccount() {
 		Form<Account> filledForm = accountForm.bindFromRequest();
 		Logger.info(filledForm.errors().toString());
 
@@ -84,11 +84,11 @@ public class AdminController extends BaseController {
 
 	}
 
-    public static Result indexing() {
+    public Result indexing() {
         return ok(indexing.render());
     }
 
-    public static Result indexDelete() {
+    public Result indexDelete() {
         try {
             ElasticsearchService.deleteIndex();
             flash("info","index gelöscht");
@@ -101,7 +101,7 @@ public class AdminController extends BaseController {
         return ok(indexing.render());
     }
 
-    public static Result indexSettings() throws IOException {
+    public Result indexSettings() throws IOException {
         try {
             ElasticsearchService.createAnalyzer();
             ElasticsearchService.createMapping();
@@ -114,28 +114,28 @@ public class AdminController extends BaseController {
         return ok(indexing.render());
     }
 
-    public static Result indexAccounts() throws IOException {
+    public Result indexAccounts() throws IOException {
         long time = Account.indexAllAccounts();
         String out = "Alle Accounts indexiert ("+Long.toString(time)+"ms)";
         flash("info",out);
         return ok(indexing.render());
     }
 
-    public static Result indexGroups() throws IOException {
+    public Result indexGroups() throws IOException {
         long time = Group.indexAllGroups();
         String out = "Alle Gruppen indexiert ("+Long.toString(time)+"ms)";
         flash("info",out);
         return ok(indexing.render());
     }
 
-    public static Result indexPosts() throws IOException {
+    public Result indexPosts() throws IOException {
         long time = Post.indexAllPosts();
         String out = "Alle Posts indexiert ("+Long.toString(time)+"ms)";
         flash("info",out);
         return ok(indexing.render());
     }
 
-	public static Result viewMediaTemp() {
+	public Result viewMediaTemp() {
 		//https://issues.apache.org/jira/browse/IO-373
 		//String size = FileUtils.byteCountToDisplaySize(MediaController.sizeTemp());
 
@@ -144,13 +144,13 @@ public class AdminController extends BaseController {
 		return ok(mediaTemp.render(size));
 	}
 
-	public static Result cleanMediaTemp(){
+	public Result cleanMediaTemp(){
 		MediaController.cleanUpTemp();
 		flash("success", "Media Temp directory was cleaned.");
 		return viewMediaTemp();
 	}
 
-	public static Result listAccounts(){
+	public Result listAccounts(){
 		return ok(listAccounts.render(Account.all()));
 	}
 
@@ -160,7 +160,7 @@ public class AdminController extends BaseController {
      * @return Result
      */
     @Transactional
-    public static Result broadcastNotificationForm() {
+    public Result broadcastNotificationForm() {
         if (!Secured.isAdmin()) {
             return redirect(controllers.routes.Application.index());
         }
@@ -175,7 +175,8 @@ public class AdminController extends BaseController {
      *
      * @return Result
      */
-    public static Promise<Result> broadcastNotification() {
+    @Transactional
+    public Promise<Result> broadcastNotification() {
         Promise<Result> promiseResult = Promise.promise(
             new F.Function0<Result>() {
                 public Result apply() {
@@ -192,7 +193,7 @@ public class AdminController extends BaseController {
                     String broadcastMessage = form.data().get(Messages.get("admin.broadcast_notification")).trim();
                     if (broadcastMessage.equals("")) {
                         flash("error", Messages.get("admin.broadcast_notification.error.no_message"));
-                        return controllers.AdminController.broadcastNotificationForm();
+                        return broadcastNotificationForm();
                     }
 
                     broadcastPost.content = broadcastMessage;

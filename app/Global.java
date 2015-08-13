@@ -58,7 +58,8 @@ public class Global extends GlobalSettings {
             Duration.create(1, TimeUnit.HOURS),
             new Runnable() {
                 public void run() {
-                    EmailService.getInstance().sendDailyHourlyNotificationsEmails();
+                    EmailService email =  new EmailService();
+                    email.sendDailyHourlyNotificationsEmails();
                 }
             },
             Akka.system().dispatcher()

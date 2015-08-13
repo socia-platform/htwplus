@@ -37,7 +37,7 @@ public class Application extends BaseController {
 	static final int PAGE = 1;
 
 	
-	public static Result javascriptRoutes() {
+	public Result javascriptRoutes() {
 		response().setContentType("text/javascript");
 
 		return ok(
@@ -49,19 +49,19 @@ public class Application extends BaseController {
 	}
 
 	@Security.Authenticated(Secured.class)
-	public static Result index() {
+	public Result index() {
 		Navigation.set(Level.STREAM, "Alles");
 		Account currentAccount = Component.currentAccount();
 		return ok(stream.render(currentAccount,Post.getStream(currentAccount, LIMIT, PAGE),postForm,Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
 	}
 	
-	public static Result help() {
+	public Result help() {
 		Navigation.set(Level.HELP);
 		return ok(help.render());
 	}
 	
 	@Security.Authenticated(Secured.class)
-	public static Result stream(String filter, int page) {
+	public Result stream(String filter, int page) {
         switch (filter) {
             case "account":
                 Navigation.set(Level.STREAM, "Eigene Posts");
@@ -82,18 +82,18 @@ public class Application extends BaseController {
 		return ok(stream.render(currentAccount,Post.getFilteredStream(currentAccount, LIMIT, page, filter),postForm,Post.countStream(currentAccount, filter), LIMIT, page, filter));
 	}
 
-    public static Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
+    public Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
         SearchResponse response = ElasticsearchService.doSearch("searchSuggestions", query, "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
         return ok(response.toString());
     }
 
-    public static Result searchHome() {
+    public Result searchHome() {
         Navigation.set(Level.SEARCH);
         return ok(search.render());
     }
 	
 	@Security.Authenticated(Secured.class)
-	public static Result search(int page) throws ExecutionException, InterruptedException {
+	public Result search(int page) throws ExecutionException, InterruptedException {
         Navigation.set(Level.SEARCH);
         Account currentAccount = Component.currentAccount();
         String keyword = Form.form().bindFromRequest().field("keyword").value();
@@ -174,18 +174,18 @@ public class Application extends BaseController {
         return ok(views.html.searchresult.render(keyword, mode, page, LIMIT, resultList, response.getTookInMillis(), userCount+groupCount+postCount, userCount, groupCount, postCount));
 	}
 
-	public static Result error() {
+	public Result error() {
 		Navigation.set("404");
 		return ok(error.render());
 	}
 	
-	public static Result feedback() {
+	public Result feedback() {
 		Navigation.set("Feedback");
 		return ok(feedback.render(postForm));
 		
 	}
 	
-	public static Result addFeedback() {
+	public Result addFeedback() {
 		
 		Account account = Component.currentAccount();
 		Group group = Group.findByTitle("HTWplus Feedback");
@@ -210,7 +210,7 @@ public class Application extends BaseController {
 		return redirect(controllers.routes.Application.index());
 	}
 
-	public static Result defaultRoute(String path) {
+	public Result defaultRoute(String path) {
 		Logger.info(path+" nicht gefunden");
 		return redirect(controllers.routes.Application.index());
 	}
