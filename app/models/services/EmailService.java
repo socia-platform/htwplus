@@ -3,6 +3,8 @@ package models.services;
 import play.libs.mailer.Email;
 import play.libs.mailer.MailerClient;
 import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import models.Account;
 import models.Notification;
 import play.Logger;
@@ -19,35 +21,13 @@ import play.Configuration;
 /**
  * This class handles sending of emails, e.g. for notification mails.
  */
+@Singleton
 public class EmailService {
     static final String EMAIL_SENDER = Play.application().configuration().getString("htwplus.email.sender");
     static final String PLAIN_TEXT_TEMPLATE = "views.html.Emails.notificationsPlainText";
     static final String HTML_TEMPLATE = "views.html.Emails.notificationsHtml";
 
     @Inject MailerClient mailerClient;
-
-    /**
-     * Singleton instance
-     */
-    private static EmailService instance = null;
-
-    /**
-     * Private constructor for singleton instance
-     */
-    //private EmailService() { }
-
-    /**
-     * Returns the singleton instance.
-     *
-     * @return EmailHandler instance
-     */
-//    public static EmailService getInstance() {
-//        if (EmailService.instance == null) {
-//            EmailService.instance = new EmailService();
-//        }
-//
-//        return EmailService.instance;
-//    }
 
     /**
      * Sends an email.
@@ -136,6 +116,7 @@ public class EmailService {
             Logger.info("Start sending of daily email notifications...");
 
             // load map with recipients containing list of unread notifications and iterate over the map
+
             Map<Account, List<Notification>> notificationsRecipients = Notification.findUsersWithDailyHourlyEmailNotifications();
             for (Map.Entry<Account, List<Notification>> entry : notificationsRecipients.entrySet()) {
                 this.sendNotificationsEmail(entry.getValue(), entry.getKey());

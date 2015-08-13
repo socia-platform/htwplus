@@ -8,6 +8,7 @@ import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.EmailNotifications;
 import play.Logger;
+import play.Play;
 import play.db.jpa.JPA;
 import play.libs.Akka;
 import play.libs.F;
@@ -184,7 +185,7 @@ public class NotificationService {
                         new Runnable() {
                             // runs the Akka schedule
                             public void run() {
-                                EmailService email =  new EmailService();
+                                EmailService email = Play.application().injector().instanceOf(EmailService.class);
                                 email.sendNotificationEmail(notification);
                             }
                         },

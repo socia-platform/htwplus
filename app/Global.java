@@ -56,11 +56,9 @@ public class Global extends GlobalSettings {
         Akka.system().scheduler().schedule(
             Duration.create(nextExecutionInSeconds(getNextHour(), 0), TimeUnit.SECONDS),
             Duration.create(1, TimeUnit.HOURS),
-            new Runnable() {
-                public void run() {
-                    EmailService email =  new EmailService();
-                    email.sendDailyHourlyNotificationsEmails();
-                }
+            () -> {
+                EmailService email = Play.application().injector().instanceOf(EmailService.class);
+                email.sendDailyHourlyNotificationsEmails();
             },
             Akka.system().dispatcher()
         );
