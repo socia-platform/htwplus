@@ -63,16 +63,11 @@ public class GroupController extends BaseController {
 
         Navigation.set(Level.GROUPS, "Newsstream", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
         List<Post> posts = Post.getPostsForGroup(group, LIMIT, page);
-        List<Account> avatarList = GroupAccount.findAccountsByGroup(group, LinkType.establish);
-		int memberCount = avatarList.size();
-		// show max. 10 user.
-		// too lazy to change all "findAccountByGroup" call with limit and offset :)
-		if(avatarList.size() >= 10) avatarList = avatarList.subList(0,10);
 
         if(raw) {
             return ok(streamRaw.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page));
         } else {
-            return ok(stream.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page, avatarList, memberCount));
+            return ok(stream.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page));
         }
 	}
 	
@@ -89,7 +84,7 @@ public class GroupController extends BaseController {
 			return redirect(controllers.routes.GroupController.index());
 		} else {
 			Navigation.set(Level.GROUPS, "Media", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
-			List<Media> mediaSet = group.media; 
+			List<Media> mediaSet = group.media;
 			return ok(media.render(group, mediaForm, mediaSet));
 		}
 	}
@@ -404,7 +399,7 @@ public class GroupController extends BaseController {
     @Transactional
 	public static Result invite(long groupId) {
 		Group group = Group.findById(groupId);
-		Navigation.set(Level.GROUPS, "Freunde einladen", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
+		Navigation.set(Level.GROUPS, "Kontakte einladen", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
 		return ok(invite.render(group, Friendship.friendsToInvite(Component.currentAccount(), group), GroupAccount.findAccountsByGroup(group, LinkType.invite)));
 	}
 

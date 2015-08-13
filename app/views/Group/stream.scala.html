@@ -1,115 +1,10 @@
-@(group: Group, posts: List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, avatarList: List[Account], memberCount: Integer)
+@(group: Group, posts: List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer)
 
 @import models.enums._
 
 @main("Gruppenstream") {
 
-@if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
-    <!-- Start confirmLeaveGroupModal -->
-    <div id="confirmLeaveGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-        @views.html.Group.snippets.leaveGroupModal(group)
-    </div>
-    <!-- End confirmDeleteGroupModal -->
-}
-@if(Secured.deleteGroup(group)) {
-    <!-- Start confirmDeleteGroupModal -->
-    <div id="confirmDeleteGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-        @views.html.Group.snippets.deleteGroupModal(group)
-    </div>
-    <!-- End confirmDeleteGroupModal -->
-}
-
-<div class="row">
-    <div class="col-md-12" role="main">
-        <div class="addmargin">
-            <div id="hp-profile-header">
-
-                @if(group.groupType.equals(GroupType.open)) {
-                <span style="background-color: white" class="avatar glyphicon glyphicon-globe"></span>
-                }
-                @if(group.groupType.equals(GroupType.close)) {
-                <span style="background-color: white" class="avatar glyphicon glyphicon-lock"></span>
-                }
-                @if(group.groupType.equals(GroupType.course)) {
-                <span style="background-color: white" class="avatar glyphicon glyphicon-briefcase"></span>
-                }
-
-
-                <div class="headline">
-                    <div class="links">
-                        @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
-                        <a href="@routes.GroupController.join(group.id)" rel="tooltip" data-original-title="Tritt der Gruppe bei" data-container="body">
-                            <span class="glyphicon glyphicon-ok"></span>
-                        </a>
-                        }
-
-                        @if(Secured.editGroup(group)) {
-                        <a href="@routes.GroupController.edit(group.id)" rel="tooltip" data-original-title="Bearbeite die Gruppe" data-container="body">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                        </a>
-                        }
-
-                        @if(Secured.editGroup(group)) {
-                        <a href="@routes.GroupController.invite(group.id)" rel="tooltip" data-original-title="Lade deine Kontakte ein" data-container="body">
-                            <span class="glyphicon glyphicon-plus"></span>
-                        </a>
-                        }
-
-                        @if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
-                        <a href="#confirmLeaveGroup" data-toggle="modal" rel="tooltip" data-original-title="Verlasse die Gruppe" data-container="body">
-                            <span class="glyphicon glyphicon-log-out"></span>
-                        </a>
-                        }
-
-                        @if(Secured.deleteGroup(group)) {
-                        <a href="#confirmDeleteGroup" rel="tooltip" data-toggle="modal" data-original-title="Lösche die Gruppe" data-container="body">
-                            <span class="glyphicon glyphicon-trash"></span>
-                        </a>
-                        }
-                    </div>
-                    <h2 class="title visible-md visible-lg">@group.title</h2>
-                    <h3 class="title visible-xs visible-sm">@group.title</h3>
-                </div>
-
-                <div class="bottomline">
-                    <small>
-                        <span><b>Gründer: </b>@views.html.snippets.userLink(group.owner)</span>
-                        <span>| <b>Medien: </b><a href="@routes.GroupController.media(group.id)">@group.media.size() Datei(en)</a></span>
-                        @if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
-                        <span>| <b>Token: </b>@group.token</span>
-                        }
-                        <br />
-                        <b>Beschreibung: </b>@group.description
-                    </small>
-                    <div class="hp-avatar-container">
-                        @for(user <- avatarList) {
-                        <a class="hp-nohref hp-avatar-list" href="@routes.ProfileController.view(user.id)" rel="tooltip" data-original-title="@user.name" data-container="body">
-                            @if(user.hasAvatar){
-                            <img alt="avatar" src="@routes.ProfileController.getAvatar(user.id)" class="hp-avatar-small" />
-                            } else {
-                            <div class="hp-avatar-small hp-avatar-default-@user.avatar">@user.getInitials</div>
-                            }
-                        </a>
-                        }
-                    </div>
-                    @if(memberCount > 10) { <div><a href="#">... und @(memberCount-10) mehr</a></div> }
-                </div>
-
-                <div class="navigation">
-                    <ul class="nav nav-pills">
-                        <li role="presentation" class="active">
-                            <a href="@routes.GroupController.stream(group.id)">Newsstream</a>
-                        </li>
-                        <li role="presentation">
-                            <a href="@routes.GroupController.media(group.id)">Medien</a>
-                        </li>
-                    </ul>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
+@views.html.Group.snippets.header(group)
 
 <div class="row">
     <div class="col-md-12" role="main">
@@ -138,15 +33,13 @@
 
 <div class="row">
     <div class="col-md-12" role="main">
-
         <div class="row">
             @if(posts != null) {
-            @for(post <- posts) {
-            @views.html.snippets.postView2(post, postForm, models.Post.STREAM, 2)
-            }
+                @for(post <- posts) {
+                    @views.html.snippets.postView2(post, postForm, models.Post.STREAM, 2)
+                }
             }
         </div>
-
     </div>
 </div>
 }

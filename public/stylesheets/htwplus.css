@@ -702,7 +702,6 @@ input.hp-notification-hour {
 /*============================== Notepad ==============================*/
 
 div.hp-notepad-content {
-	min-height: 500px;
 	padding: 5px 30px 15px;
     margin-bottom: 15px;
 	box-sizing: content-box;
@@ -717,7 +716,7 @@ div.hp-notepad-content {
 }
 
 div.addmargin {
-    margin-top: 45px;
+    margin-top: 25px;
 }
 
 div.hp-notepad-content > *:last-child {
@@ -1439,18 +1438,19 @@ div.hp-avatar-default-9 {
 }
 
 #hp-profile-header .links {
-    text-align: right;
-    padding-right: 10px;
-    padding-bottom: 15px;
+    background-color: white;
     font-size: 16px;
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
 }
 
 #hp-profile-header .links a {
-    text-align: center;
     display: inline-block;
-    width: 30px;
-    margin-left: 10px;
-    border-bottom: 1px solid #999;
+    padding: 10px;
+}
+
+#hp-profile-header .links a.active > .glyphicon {
+    color: #76b900;
 }
 
 #hp-profile-header .hp-circle {
@@ -1481,7 +1481,6 @@ div.hp-avatar-default-9 {
 #hp-profile-header .headline {
      border-bottom: 1px solid #ddd;
      padding-left: 190px;
-     padding-top: 10px;
      background-color: #f9f9f9;
 }
 
@@ -1510,26 +1509,4 @@ div.hp-avatar-default-9 {
 
 #hp-profile-header .postForm {
     padding: 10px 40px;
-}
-
-#hp-profile-header .navigation {
-    text-align: center;
-}
-
-#hp-profile-header .navigation ul {
-    display: inline-block;
-}
-
-#hp-profile-header .navigation ul li a {
-    font-size: 14px;
-    font-weight: bold;
-    color: #999;
-    background-color: inherit;
-
-}
-
-#hp-profile-header .navigation ul li.active,
-#hp-profile-header .navigation li:hover,
-#hp-profile-header .navigation li:focus {
-    border-bottom: 2px solid #76b900;
 }
