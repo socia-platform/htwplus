@@ -3,36 +3,39 @@
 @import models.enums._
 
 @main("Gruppen") {
+
+<!-- Start infoModal -->
+@for(group <- approvedGroups ++ approvedCourses) {
+<div class="modal fade" id="infoModal@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    @views.html.Group.snippets.infoModal(group)
+</div>
+}
+<!-- Ende infoModal -->
+
+
+<!-- Start confirmDeleteGroupModal -->
+@for(group <- approvedGroups ++ approvedCourses) {
+<div class="modal fade" id="confirmDeleteGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    @views.html.Group.snippets.deleteGroupModal(group)
+</div>
+}
+<!-- End confirmDeleteGroupModal -->
+
+<!-- Start confirmLeaveGroupModal -->
+@for(group <- approvedGroups ++ approvedCourses) {
+<div class="modal fade" id="confirmLeaveGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    @views.html.Group.snippets.leaveGroupModal(group)
+</div>
+}
+
+<!-- End confirmDeleteGroupModal -->
     <div class="row">
         <div class="col-lg-12" role="main">
             <div class="hp-notepad-content addmargin">
+
+                @***
                 @views.html.Group.snippets.navTabsAdd()
-
-                    <!-- Start infoModal -->
-                @for(group <- approvedGroups ++ approvedCourses) {
-                    <div class="modal fade" id="infoModal@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-                    @views.html.Group.snippets.infoModal(group)
-                    </div>
-                }
-                    <!-- Ende infoModal -->
-
-
-                    <!-- Start confirmDeleteGroupModal -->
-                @for(group <- approvedGroups ++ approvedCourses) {
-                    <div class="modal fade" id="confirmDeleteGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-                    @views.html.Group.snippets.deleteGroupModal(group)
-                    </div>
-                }
-                    <!-- End confirmDeleteGroupModal -->
-
-                    <!-- Start confirmLeaveGroupModal -->
-                @for(group <- approvedGroups ++ approvedCourses) {
-                    <div class="modal fade" id="confirmLeaveGroup@group.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-                    @views.html.Group.snippets.leaveGroupModal(group)
-                    </div>
-                }
-                    <!-- End confirmDeleteGroupModal -->
-
+                ***@
 
                 @defining(Component.currentAccount()) { user =>
                     <h2>
@@ -100,13 +103,18 @@
                     <span rel="tooltip" data-original-title="Hier findest du alle Gruppen die du gegründet hast oder denen du beigetreten bist." data-delay="500" data-container="body">
 				Meine Kurse
                     </span>
+                    @if(Secured.createCourse()) {
+                        <a href="@routes.GroupController.add()" role="button" class="btn btn-default btn-xs" rel="tooltip" data-original-title="Erstelle einen neuen Kurs." data-container="body">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                    }
                 </h2>
 
 
                     @if(!approvedCourses.isEmpty){
                         @views.html.Group.snippets.listCourses(approvedCourses, user)
                     } else {
-                        <p><i>Du bist noch keinem Kurs beigetreten. Jetzt einen Kurs <b><a href="@routes.Application.search()">suchen</a></b>@if(user.role == AccountRole.TUTOR) { oder einfach einen <b><a href="@routes.GroupController.create()">gründen</a></b>}.</i></p>
+                        <p><i>Du bist noch keinem Kurs beigetreten. Jetzt einen Kurs <b><a href="/search?keyword=&mode=group">finden</a></b>@if(Secured.createCourse()) { oder einfach einen <b><a href="@routes.GroupController.create()">gründen</a></b>}.</i></p>
                     }
 
                 <hr />
@@ -116,12 +124,15 @@
                     <span rel="tooltip" data-original-title="Hier findest du alle Gruppen die du gegründet hast oder denen du beigetreten bist." data-delay="500" data-container="body">
 				Meine Gruppen
                     </span>
+                    <a href="@routes.GroupController.add()" role="button" class="btn btn-default btn-xs" rel="tooltip" data-original-title="Erstelle eine neue Gruppe." data-container="body">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </a>
                 </h2>
 
                     @if(!approvedGroups.isEmpty){
                         @views.html.Group.snippets.listGroups(approvedGroups, user)
                     } else {
-                        <p><i>Du bist noch keiner Gruppe beigetreten. Jetzt eine Gruppe <b><a href="@routes.Application.search()">suchen</a></b> oder einfach eine <b><a href="@routes.GroupController.create()">gründen</a></b>.</i></p>
+                        <p><i>Du bist noch keiner Gruppe beigetreten. Jetzt eine Gruppe <b><a href="/search?keyword=&mode=group">finden</a></b> oder einfach eine <b><a href="@routes.GroupController.create()">gründen</a></b>.</i></p>
                     }
                 }
             </div>

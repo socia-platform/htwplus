@@ -447,10 +447,6 @@ $('body').popover({
     selector: '[rel="popover"]'
 });
 
-$('.hp-focus-search').click(function() {
-    $('#hp-search').focus();
-});
-
 /*
  * SET OR REMOVE BOOKMARKS
  */

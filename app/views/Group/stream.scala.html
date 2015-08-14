@@ -22,7 +22,7 @@
                 </div>
                 <div class="col-md-11" role="complementary">
                     <div class="hp-post-create-area">
-                        @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
+                        @views.html.snippets.postForm(group.id, models.Post.GROUP, postForm)
                     </div>
                 </div>
                 }
@@ -36,7 +36,7 @@
         <div class="row">
             @if(posts != null) {
                 @for(post <- posts) {
-                    @views.html.snippets.postView2(post, postForm, models.Post.STREAM, 2)
+                    @views.html.snippets.postView2(post, postForm, models.Post.GROUP, 2)
                 }
             }
         </div>
