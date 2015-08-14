@@ -28,6 +28,34 @@
                     @if(post.belongsToAccount && currentUser == post.account && post.account != post.owner){&rarr;
                     @views.html.snippets.userLink(currentUser)}
 
+
+                    @if(Secured.isAllowedToDeletePost(post, currentUser)){
+                    <a href="#confirmModalDeletePost@post.id" class="hp-post-options hp-nohref" rel="tooltip"
+                       data-original-title="Post löschen" data-container="body" data-toggle="modal">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </a>
+                    }
+
+                    @defining(Secured.isPostBookmarkedByAccount(currentUser, post)) { bookmark =>
+                    <a href="#bookmark-@post.id" class="hp-post-options hp-post-bookmark-icon hp-nohref" rel="tooltip"
+                       data-original-title="Post @if(!bookmark) {merken} else {vergessen}" data-container="body" >
+                        @if(!bookmark) { <span class='glyphicon glyphicon-heart-empty'></span>} else { <span
+                            class='glyphicon glyphicon-heart'></span> }
+                    </a>
+                    }
+
+                    @if(Secured.isAllowedToEditPost(post, currentUser)) {
+                    @if(Secured.isPostStillEditable(post, currentUser)) {
+                    <a id="hp-editPost_@post.id" class="hp-post-edit hp-post-options hp-nohref" rel="tooltip" data-original-title="Post bearbeiten" data-container="body">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                    } else {
+                    <a class="hp-post-options hp-nohref disabled" rel="tooltip" data-original-title="Posts lassen sich nur @ConfigFactory.load().getInt("htwplus.post.editTimeLimit") Minuten nach Erstellung bearbeiten." data-container="body">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                    }
+                    }
+
                 </h4>
                 <small>@services.TemplateService.getDateColloquially(post.createdAt)</small>
             </div>
@@ -73,39 +101,6 @@
                 <div class="clear"></div>
                 <br/>
             </div>
-
-            <hr>
-
-            <div class="hp-post-footer">
-                @defining(Secured.isPostBookmarkedByAccount(currentUser, post)) { bookmark =>
-                    <a href="#bookmark-@post.id" class="hp-nohref btn btn-default btn-xs" role="button">
-                        @if(!bookmark) { <span class='glyphicon glyphicon-star-empty'></span><span> MERKEN</span> } else { <span
-                            class='glyphicon glyphicon-star'></span><span> VERGESSEN</span> }
-                    </a>
-                }
-                @if(Secured.isAllowedToEditPost(post, currentUser)) {
-                @if(Secured.isPostStillEditable(post, currentUser)) {
-                <a id="hp-editPost_@post.id" class="btn btn-default btn-xs" href="#" role="button">
-                    <span class="glyphicon glyphicon-pencil"></span><span> BEARBEITEN</span>
-                </a>
-                } else {
-                <a class="hp-post-edit btn btn-default btn-xs hp-nohref disabled" role="button" rel="tooltip"
-                   data-original-title="Posts lassen sich nur @ConfigFactory.load().getInt(" htwplus.post.editTimeLimit")
-                Minuten nach Erstellung bearbeiten.">
-                <span class="glyphicon glyphicon-pencil"></span><span> BEARBEITEN</span>
-                </a>
-                }
-                }
-                @if(Secured.isAllowedToDeletePost(post, currentUser)){
-                <a href="#confirmModalDeletePost@post.id" class="hp-nohref btn btn-default btn-xs" role="button"
-                   data-toggle="modal">
-                    <span class="glyphicon glyphicon-trash"></span><span> LÖSCHEN</span>
-                </a>
-                }
-            </div>
-
-
-            <div class="clear"></div>
         </div>
         }
     </div>

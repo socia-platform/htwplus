@@ -459,13 +459,13 @@ $('.hp-post-bookmark-icon').click(function(){
         type: "PUT",
         success: function(data){
             if(data === "setBookmark") {
-                $(icon).addClass('glyphicon-star');
-                $(icon).removeClass('glyphicon-star-empty');
+                $(icon).addClass('glyphicon-heart');
+                $(icon).removeClass('glyphicon-heart-empty');
                 $(context).attr("data-original-title", "Post vergessen").tooltip('fixTitle').tooltip('show');
             }
             if(data === "removeBookmark") {
-                $(icon).addClass('glyphicon-star-empty');
-                $(icon).removeClass('glyphicon-star');
+                $(icon).addClass('glyphicon-heart-empty');
+                $(icon).removeClass('glyphicon-heart');
                 $(context).attr("data-original-title", "Post merken").tooltip('fixTitle').tooltip('show');
             }
         }
