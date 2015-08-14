@@ -4,13 +4,15 @@
 @import models.enums._
 
 @main("Editieren") {
+
+@views.html.Profile.snippets.header(profile)
+
     <div class="row">
         <div class="col-lg-12" role="main">
             <div class="hp-notepad-content addmargin">
 
-                @views.html.Profile.snippets.navTabs(profile)
                 @views.html.Profile.snippets.deleteModal(profile, loginForm)
-                <h2>Profil bearbeiten</h2>
+
                 <br>
 
                 <div id="hp-avatar-upload">

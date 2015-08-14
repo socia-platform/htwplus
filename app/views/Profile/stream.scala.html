@@ -7,113 +7,25 @@
             <div class="hp-notepad-content addmargin">
                 @defining(Component.currentAccount()) { curUser =>
 
-                    <!-- confirmDeleteFriendModal -->
-                    <div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog">@views.html.Friends.snippets.deleteFriendModal(user)</div>
-                    <!-- Ende confirmDeleteFriendModal -->
+
 
     @views.html.Profile.snippets.navTabs(user)
 	<h2>@user.name's Newsstream</h2>
-	
+
 	@if(curUser.equals(user)) {
 	<h5>(Das sehen deine Freunde)</h5>
 	}
   	<br />
 }
 	@views.html.snippets.postForm(user.id, models.Post.PROFILE, postForm)
-		
+
 	@views.html.Profile.snippets.streamRaw(user, posts, postForm, count, limit, currentPage)
             </div>
         </div>
     </div>
 ***@
 
-<div class="row">
-    <div class="col-md-12" role="main">
-        <div class="addmargin">
-                <div id="hp-profile-header">
-
-                    @if(user.hasAvatar) {
-                    <img alt="avatar"
-                         src='@routes.ProfileController.getAvatar(user.id, "large")'
-                         class="avatar"/>
-                    } else {
-                    <div class="avatar hp-avatar-default-@user.avatar">@user.getInitials</div>
-                    }
-
-                        <div class="headline">
-                            <h2>@user.name -
-                                <div class="dropdown">
-                                    <a class="title hp-nohref" data-toggle="dropdown" aria-expanded="false">
-                                        @Navigation.getTitle() <span class="caret"></span>
-                                    </a>
-                                    <ul class="dropdown-menu" role="menu">
-                                        @if(Secured.isFriend(user) || Component.currentAccount() == user) {
-                                        @defining(if(Navigation.getTitle().equals("Newsstream")){"active"} else {"deactive"}) { status =>
-                                        <li>
-                                        <a href="@routes.ProfileController.stream(user.id)" data-placement="left" rel="tooltip" data-original-title="Dein öffentlicher Newsstream" data-container="body">
-                                            Newsstream
-                                        </a>
-                                        </li>
-                                        }
-                                        }
-                                        @defining(if(Navigation.getTitle().equals("Gruppen & Kurse")) {"active"} else {"deactive"}) { status =>
-                                        <li>
-                                        <a href="@routes.ProfileController.groups(user.id)" rel="tooltip" data-placement="left" data-original-title="Gruppen- und Kursübersicht" data-container="body">
-                                            Gruppen
-                                        </a>
-                                        </li>
-                                        }
-                                    </ul>
-                                </div>
-                            </h2>
-                        </div>
-                        <div class="bottomline">
-                            <small>
-                                <b>Email: </b>@if(user.email != null) {
-                                <a href="mailto:@user.email">@user.email</a>
-                                } else { <span>Keine Angabe</span> }
-                                |
-                                <b>Studiengang: </b>@if(user.studycourse != null) {
-                                <span>@user.studycourse.title @if(user.degree != null) { (@user.degree) }</span>
-                                } else {
-                                <span>Keine Angabe</span>
-                                }
-                                |
-                                <b>Semester: </b>@if(user.semester != null) {
-                                <span>@{user.semester + "."} Semester</span>
-                                } else {
-                                <span>Keine Angabe</span>
-                                }
-                                |
-                                <b>Rolle: </b><span>@user.role.getDisplayName()</span>
-                            </small>
-                        </div>
-                        <div class="links">
-                            @if(Secured.isFriend(user)) {
-
-                            <a href="#confirmDeleteFriend@user.id" class="hp-nohref btn btn-default btn-xs" role="button" data-toggle="modal">
-                                <span class="glyphicon glyphicon-trash"></span> FREUNDSCHAFT BEENDEN
-                            </a>
-
-                            } else {
-                            @if(Component.currentAccount() != user) {
-                            <a href="@routes.FriendshipController.requestFriend(user.id)"
-                               class="hp-nohref btn btn-default btn-xs"
-                               role="button"
-                               rel="tooltip"
-                               data-placement="left"
-                               data-original-title="Sende eine Freundschaftsanfrage"
-                               data-container="body">
-                                <span class="glyphicon glyphicon-plus"></span> FREUNDSCHAFTSANFRAGE SENDEN
-                            </a>
-                            }
-                            }
-                        </div>
-
-                </div>
-        </div>
-    </div>
-</div>
+@views.html.Profile.snippets.header(user)
 
 @if(posts.isEmpty()) {
 <div class="row">

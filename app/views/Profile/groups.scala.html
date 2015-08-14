@@ -60,96 +60,30 @@
     </div>
 ***@
 
+@views.html.Profile.snippets.header(account)
+
 <div class="row">
     <div class="col-md-12" role="main">
-        <div class="addmargin">
-            <div id="hp-profile-header">
+        <div class="hp-notepad-content addmargin">
+            <br />
 
-                @if(account.hasAvatar) {
-                <img alt="avatar"
-                     src='@routes.ProfileController.getAvatar(account.id, "large")'
-                     class="avatar"/>
-                } else {
-                <div class="avatar hp-avatar-default-@account.avatar">@account.getInitials</div>
-                }
+            @defining(Component.currentAccount()) { currentUser =>
+            @if(!approvedCourses.isEmpty){
+            @views.html.Group.snippets.listCourses(approvedCourses, currentUser)
+            } else {
+            <p><i>@account.name ist noch keinem Kurs beigetreten.</i></p>
+            }
 
-                <div class="headline">
-                    <h2>@account.name's
-                        <div class="dropdown">
-                            <a class="hp-nohref" data-toggle="dropdown" aria-expanded="false">
-                                @Navigation.getTitle() <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu" role="menu">
-                                @if(Secured.isFriend(account) || Component.currentAccount() == account) {
-                                @defining(if(Navigation.getTitle().equals("Newsstream")){"active"} else {"deactive"}) { status =>
-                                <li>
-                                    <a href="@routes.ProfileController.stream(account.id)" data-placement="left" rel="tooltip" data-original-title="Dein öffentlicher Newsstream" data-container="body">
-                                        Newsstream
-                                    </a>
-                                </li>
-                                }
-                                }
-                                @defining(if(Navigation.getTitle().equals("Gruppen & Kurse")) {"active"} else {"deactive"}) { status =>
-                                <li>
-                                    <a href="@routes.ProfileController.groups(account.id)" rel="tooltip" data-placement="left" data-original-title="Gruppen- und Kursübersicht" data-container="body">
-                                        Gruppen
-                                    </a>
-                                </li>
-                                }
-                            </ul>
-                        </div>
-                    </h2>
-                </div>
-                <div class="bottomline">
-                    <small>
-                        <b>#Email: </b><a href="mailto:@account.email">@account.email</a>
+            <br />
+            <hr />
+            <br />
 
-                        <b>#Studiengang: </b>@if(account.studycourse != null) {
-                        <span>@account.studycourse.title @if(account.degree != null) { (@account.degree) }</span>
-                        } else {
-                        <span>Keine Angabe</span>
-                        }
-
-                        <b>#Semester: </b>@if(account.semester != null) {
-                        <span>@{account.semester + "."} Semester</span>
-                        } else {
-                        <span>Keine Angabe</span>
-                        }
-
-                        <b>#Rolle: </b><span>@account.role.getDisplayName()</span>
-                    </small>
-                </div>
-                <div class="links">
-                    @if(Secured.isFriend(account)) {
-                    @defining(if(Navigation.getTitle().equals("Editieren")){"active"} else {"deactive"}) { status =>
-                    <a href="#confirmDeleteFriend@account.id" class="hp-nohref btn btn-default btn-xs" role="button" data-toggle="modal">
-                        <span class="glyphicon glyphicon-trash"></span> FREUNDSCHAFT BEENDEN
-                    </a>
-                    }
-                    }
-                </div>
-
-                <br />
-
-                @defining(Component.currentAccount()) { currentUser =>
-                @if(!approvedCourses.isEmpty){
-                @views.html.Group.snippets.listCourses(approvedCourses, currentUser)
-                } else {
-                <p><i>@account.name ist noch keinem Kurs beigetreten.</i></p>
-                }
-
-                <br />
-                <hr />
-                <br />
-
-                @if(!approvedGroups.isEmpty){
-                @views.html.Group.snippets.listGroups(approvedGroups, currentUser)
-                } else {
-                <p><i>@account.name ist noch keiner Gruppe beigetreten.</i></p>
-                }
-                }
-
-            </div>
+            @if(!approvedGroups.isEmpty){
+            @views.html.Group.snippets.listGroups(approvedGroups, currentUser)
+            } else {
+            <p><i>@account.name ist noch keiner Gruppe beigetreten.</i></p>
+            }
+            }
         </div>
     </div>
 </div>
