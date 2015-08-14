@@ -1288,11 +1288,6 @@ div.hp-avatar-default-9 {
     margin-right: 10px;
 }
 
-.group-result .glyphicon {
-    margin-left: 7px;
-    margin-right: 12px;
-}
-
 .searchresult-container {
     margin-top: 10px;
 }
@@ -1328,4 +1323,18 @@ div.hp-avatar-default-9 {
 
 #hp-deleteConfirmPassword {
     margin-bottom: 0px;
+}
+
+/*========= Search ==========*/
+
+.hp-searchnav {
+    margin: 5px 0px;
+}
+.hp-searchfacet-remove {
+    margin-top: 5px;
+    padding: 5px;
+    border: 1px solid #76B900;
+}
+.hp-searchfacet-remove a {
+    float: right;
 }

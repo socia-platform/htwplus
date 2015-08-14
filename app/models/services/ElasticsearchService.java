@@ -12,12 +12,17 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import play.Logger;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+import static org.elasticsearch.index.query.FilterBuilders.*;
 
 /**
  * Created by Iven on 22.12.2014.
@@ -121,6 +126,10 @@ public class ElasticsearchService {
                 .setSource(jsonBuilder()
                                 .startObject()
                                 .field("name", account.name)
+                                .field("studycourse", account.studycourse != null ? account.studycourse.title : "")
+                                .field("degree", account.degree != null ? account.degree : "")
+                                .field("semester", account.semester != null ? String.valueOf(account.semester) : "")
+                                .field("role", account.role != null ? account.role.getDisplayName() : "")
                                 .field("initial", account.getInitials())
                                 .field("avatar", account.avatar)
                                 .field("public", true)
@@ -143,7 +152,7 @@ public class ElasticsearchService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public static SearchResponse doSearch(String caller, String query, String filter, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
+    public static SearchResponse doSearch(String caller, String query, String filter, HashMap<String, String[]> facets, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
 
         QueryBuilder searchQuery;
 
@@ -162,10 +171,38 @@ public class ElasticsearchService {
         QueryBuilder completeQuery = QueryBuilders.boolQuery().must(searchQuery).should(scoringQuery);
 
         // Build viewableFilter to show authorized posts only
-        FilterBuilder viewableFilter = FilterBuilders.boolFilter().should(FilterBuilders.termFilter("viewable", currentAccountId),FilterBuilders.termFilter("public", true));
+        final BoolFilterBuilder boolFilterBuilder = FilterBuilders.boolFilter();
+
+        boolFilterBuilder.should(FilterBuilders.termFilter("viewable", currentAccountId),FilterBuilders.termFilter("public", true));
+
+        if (!filter.equals("all")) {
+            boolFilterBuilder.must(typeFilter(filter));
+        }
+
+        if(facets != null) {
+            if(facets.get("studycourse").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.studycourse", facets.get("studycourse")));
+            }
+
+            if(facets.get("degree").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.degree", facets.get("degree")));
+            }
+
+            if(facets.get("semester").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.semester", facets.get("semester")));
+            }
+
+            if(facets.get("role").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.role", facets.get("role")));
+            }
+
+            if(facets.get("grouptype").length != 0) {
+                boolFilterBuilder.must(termFilter("group.grouptype", facets.get("grouptype")));
+            }
+        }
 
         // Build filteredQuery to apply viewableFilter to completeQuery
-        QueryBuilder filteredQuery = QueryBuilders.filteredQuery(completeQuery, viewableFilter);
+        QueryBuilder filteredQuery = QueryBuilders.filteredQuery(completeQuery, boolFilterBuilder);
 
         // Build searchRequest which will be executed after fields to highlight are added.
         SearchRequestBuilder searchRequest = ElasticsearchService.getInstance().getClient().prepareSearch(ES_INDEX)
@@ -186,12 +223,29 @@ public class ElasticsearchService {
         // Add term aggregation for facet count
         searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("types").field("_type"));
 
-        // Apply PostFilter if request mode is not 'all'
-        if (!filter.equals("all")) {
-            FilterBuilder filterQuery = FilterBuilders.typeFilter(filter);
-            searchRequest.setPostFilter(filterQuery);
+        // Add user aggregations
+        if (filter.equals("user")) {
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("studycourse").field("user.studycourse"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("degree").field("user.degree"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("semester").field("user.semester"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("role").field("user.role"));
         }
 
+        // Add group aggregations
+        if (filter.equals("group")) {
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("grouptype").field("group.grouptype"));
+        }
+
+        // Apply PostFilter if request mode is not 'all'
+        final BoolFilterBuilder boolFilterBuilder2 = boolFilter();
+
+        if(boolFilterBuilder2.hasClauses()) {
+            searchRequest.setPostFilter(boolFilterBuilder2);
+        }
+
+
+
+        //Logger.info(searchRequest.toString());
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
 
