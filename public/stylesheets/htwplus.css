@@ -720,6 +720,19 @@ div.hp-notepad-content {
 
 }
 
+div.hp-sitenav {
+    padding: 10px;
+    box-sizing: content-box;
+    background-color: white;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    border-radius: 4px;
+    -moz-box-shadow: 0 0 3px #888;
+    -webkit-box-shadow: 0 0 3px #888;
+    box-shadow: 0 0 3px #888;
+    margin-bottom: 10px;
+}
+
 div.addmargin {
     margin-top: 25px;
 }
@@ -992,6 +1005,18 @@ table td .hp-avatar-small {
     display: inline-block;
 	line-height: 72px;
 	font-size: 36px;
+}
+
+/* created for post avatar. */
+@media (max-width: 1200px) {
+ .hp-avatar-medium-post {
+     width: 60px;
+     height: 60px;
+     border-radius: 5px;
+     display: inline-block;
+ 	line-height: 60px;
+ 	font-size: 28px;
+ }
 }
 
 .hp-avatar-list {
@@ -1375,6 +1400,11 @@ div.hp-avatar-default-9 {
     margin: 10px;
     font-size: 16px;
     float: right;
+}
+
+.hp-post-area .hp-post-header .hp-post-avatar {
+    float: left;
+    margin-right: 10px;
 }
 
 .hp-post-area hr {

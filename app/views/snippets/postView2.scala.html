@@ -6,9 +6,9 @@
 
 <div class="col-md-1" role="main">
     @if(post.owner.hasAvatar){
-    <img alt="avatar" src='@routes.ProfileController.getAvatar(post.owner.id, "medium")' class="hp-avatar-medium"/>
+    <img alt="avatar" src='@routes.ProfileController.getAvatar(post.owner.id, "medium")' class="hidden-xs hidden-sm hp-avatar-medium"/>
     } else {
-    <div class="hp-avatar-medium hp-avatar-default-@post.owner.avatar">@post.owner.getInitials</div>
+    <div class="hidden-xs hidden-sm hp-avatar-medium hp-avatar-default-@post.owner.avatar">@post.owner.getInitials</div>
     }
 </div>
 <div class="col-md-11" role="complementary">
@@ -19,6 +19,11 @@
 
         <div class="hp-post-area">
             <div class="hp-post-header">
+                @if(post.owner.hasAvatar){
+                    <img alt="avatar" src='@routes.ProfileController.getAvatar(post.owner.id, "small")' class="hp-post-avatar visible-xs visible-sm hp-avatar-small"/>
+                    } else {
+                    <div class="hp-post-avatar visible-xs visible-sm hp-avatar-small hp-avatar-default-@post.owner.avatar">@post.owner.getInitials</div>
+                    }
                 <h4>
                     @views.html.snippets.userLink(post.owner)
                     @if(post.belongsToGroup && currentView != "group"){schrieb in <a
