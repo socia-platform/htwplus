@@ -1009,7 +1009,7 @@ table td .hp-avatar-small {
 
 /* created for post avatar. */
 @media (max-width: 1200px) {
- .hp-avatar-medium-post {
+ .hp-avatar-medium {
      width: 60px;
      height: 60px;
      border-radius: 5px;
@@ -1512,10 +1512,24 @@ div.hp-avatar-default-9 {
     font-size: 60px;
     text-align: center;
 }
+@media(max-width: 992px) {
+#hp-profile-header .avatar {
+    border: 1px solid #ddd;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    position: absolute;
+    top: 13px;
+    left: 10px;
+    line-height: 70px;
+    font-size: 32px;
+    text-align: center;
+}
+}
 
 #hp-profile-header .headline {
      border-bottom: 1px solid #ddd;
-     padding-left: 190px;
+     padding-left: 10px;
      background-color: #f9f9f9;
 }
 
@@ -1523,6 +1537,13 @@ div.hp-avatar-default-9 {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    padding-left: 190px;
+}
+@media(max-width: 992px) {
+    #hp-profile-header .headline .title {
+        padding-left: 80px;
+    }
+
 }
 
 
@@ -1531,7 +1552,7 @@ div.hp-avatar-default-9 {
     padding-bottom: 20px;
     padding-top: 5px;
     padding-right: 10px;
-    padding-left: 190px;
+    padding-left: 10px;
 }
 
 #hp-profile-header .bottomline .hp-avatar-container {

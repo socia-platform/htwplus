@@ -45,14 +45,14 @@
                     @if(currentUser.hasAvatar){
                     <img alt="avatar"
                          src='@routes.ProfileController.getAvatar(currentUser.id, "medium")'
-                         class="hp-avatar-medium"/>
+                         class="hp-avatar-medium hidden-xs hidden-sm"/>
                     } else {
-                    <div class="hp-avatar-medium hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
+                    <div class="hidden-xs hidden-sm hp-avatar-medium hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
                     }
                 </div>
                 <div class="col-md-11" role="complementary">
                     <div class="hp-post-create-area">
-                        @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
+                        @views.html.snippets.postForm(user.id, models.Post.PROFILE, postForm)
                     </div>
                 </div>
                 }
