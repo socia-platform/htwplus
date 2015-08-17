@@ -1506,8 +1506,8 @@ div.hp-avatar-default-9 {
     height: 150px;
     border-radius: 50%;
     position: absolute;
-    top: 30px;
-    left: 30px;
+    top: 25px;
+    left: 25px;
     line-height: 140px;
     font-size: 60px;
     text-align: center;
@@ -1565,4 +1565,8 @@ div.hp-avatar-default-9 {
 
 #hp-profile-header .postForm {
     padding: 10px 40px;
+}
+
+.hp-group-view {
+    text-align: center;
 }

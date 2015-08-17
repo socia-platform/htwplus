@@ -50,7 +50,7 @@
                         @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
                         <a href="@routes.GroupController.join(group.id)" rel="tooltip"
                            data-original-title="Tritt der Gruppe bei" data-container="body">
-                            <span class="glyphicon glyphicon-ok"></span>
+                            <span class="glyphicon glyphicon-log-in"></span>
                         </a>
                         }
 
@@ -98,8 +98,10 @@
                         @if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
                         <span>| <b>Token: </b>@group.token</span>
                         }
+                        @if(!group.description.isEmpty()) {
                         <br/>
                         <b>Beschreibung: </b>@group.description
+                        }
                     </small>
                     <div class="hp-avatar-container">
                         @for(index <- 0 until group.groupAccounts.toSeq.sortBy(_.createdAt).size) {

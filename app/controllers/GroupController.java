@@ -86,7 +86,7 @@ public class GroupController extends BaseController {
             return redirect(controllers.routes.GroupController.index());
         }
 		if(!Secured.viewGroup(group)){
-			return redirect(controllers.routes.Application.index());
+			return redirect(controllers.routes.GroupController.view(id));
 		}
 		
 		if (group == null) {

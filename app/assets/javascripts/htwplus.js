@@ -227,7 +227,7 @@ $(document).ready(function () {
      * Auto-pagination with jQuery plugin (modified version of jquery.auto.pagination.js)
      */
     if($('a.nextPage').length > 0) { // only apply on pages with a nextPage link
-        $('.hp-newsstream-content').AutoPagination({
+        $('.hp-content-container').AutoPagination({
             nextPageSelector: 'a.nextPage',
             panelSelector: '.hp-pagination-container',
             loaderDivClass: 'ajax-loader',
@@ -315,7 +315,7 @@ $(document).ready(function () {
 				$(context).addClass('open');
 				$(context).removeClass('unloaded');
 			}
-			window.setTimeout(resizeRings(), 400);
+
 			return false;
 		});
 	});

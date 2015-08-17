@@ -122,6 +122,9 @@ group.invite_no_invite=Bitte mindestens eine Person einladen
 group.invite_invited=Einladungen verschickt!
 group.group_request_sent=Deine Anfrage wurde erfolgreich übermittelt!
 group.group_not_found=Gruppe wurde nicht gefunden!
+group.view.type.open=dieser Gruppe
+group.view.type.close=dieser Gruppe
+group.view.type.course=diesem Kurs
 media.group_new_media=Neues Medium <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>
 
 # --- admin control center
