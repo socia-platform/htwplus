@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
@@ -32,6 +33,7 @@ public class Group extends BaseNotifiable implements INotifiable {
     @Pattern(value="^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}/\\\\\\[\\]~-]+$")
 	public String title;
 
+	@Size(max = 255, message = "error.length")
 	public String description;
 
 	@OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
