@@ -227,7 +227,7 @@ $(document).ready(function () {
      * Auto-pagination with jQuery plugin (modified version of jquery.auto.pagination.js)
      */
     if($('a.nextPage').length > 0) { // only apply on pages with a nextPage link
-        $('.hp-notepad-content').AutoPagination({
+        $('.hp-newsstream-content').AutoPagination({
             nextPageSelector: 'a.nextPage',
             panelSelector: '.hp-pagination-container',
             loaderDivClass: 'ajax-loader',

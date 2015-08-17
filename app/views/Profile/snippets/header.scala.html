@@ -1,12 +1,13 @@
 @(user: Account)
-@defining(Component.currentAccount()) { curUser =>
-<!-- confirmDeleteFriendModal -->
-<div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog">@views.html.Friends.snippets.deleteFriendModal(user)</div>
-<!-- Ende confirmDeleteFriendModal -->
-}
 
 <div class="row">
     <div class="col-md-12" role="main">
+
+        @if(Secured.isFriend(user)) {
+            <!-- confirmDeleteFriendModal -->
+            <div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog">@views.html.Friends.snippets.deleteFriendModal(user)</div>
+        }
+
         <div class="addmargin">
             <div id="hp-profile-header">
 

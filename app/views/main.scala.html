@@ -23,35 +23,34 @@
             @views.html.snippets.navi()
             @views.html.snippets.breadcrumb()
         }
-		<div class="container">
-			@if(!flash.isEmpty()) {
-				<div class="row">
-					<div class="col-lg-12">
-						@if(flash.containsKey("success")) {
-							<div class="alert alert-success fade in">
-								<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
-								@flash.get("success")
-							</div>
-						}
-						@if(flash.containsKey("info")) {
-							<div class="alert alert-info fade in">
-								<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
-								@flash.get("info")
-							</div>
-						}
-						@if(flash.containsKey("error")) {
-							<div class="alert alert-danger fade in">
-								<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
-								@flash.get("error")
-							</div>
-						}
-					</div>
-				</div>
-			}
-		</div> <!-- /container -->
 
         <div id="hp-top" class="container">
-        @views.html.snippets.notepad(title) { @content }
+			@if(!flash.isEmpty()) {
+			<div class="row">
+				<div class="col-lg-12">
+					@if(flash.containsKey("success")) {
+					<div class="alert alert-success fade in">
+						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+						@flash.get("success")
+					</div>
+					}
+					@if(flash.containsKey("info")) {
+					<div class="alert alert-info fade in">
+						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+						@flash.get("info")
+					</div>
+					}
+					@if(flash.containsKey("error")) {
+					<div class="alert alert-danger fade in">
+						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+						@flash.get("error")
+					</div>
+					}
+				</div>
+			</div>
+			}
+
+        	@views.html.snippets.notepad(title) { @content }
         </div>
         
         <!-- 'Go to top' link -->
