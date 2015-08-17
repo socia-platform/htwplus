@@ -42,9 +42,32 @@
 
 <div class="row">
     <div class="col-md-10" role="main">
+        @if(posts.size != 0){
         <div class="row hp-content-container">
             @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage, filter)
         </div>
+        } else {
+        <div class="hp-content-placeholder addmargin">
+            <h2><i>Hier gibts leider noch nichts.</i></h2>
+            @if(filter.equals("account")) {
+            <h3><i>Wie wäre es mit deinem ersten Newsstream-Beitrag?</i></a></h3>
+            }
+            @if(filter.equals("group")) {
+            <h3><i>Wie wäre es mit neuen <a href="/search?keyword=&mode=group">Gruppen</a> oder <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a>?</i></h3>
+            }
+            @if(filter.equals("contact")) {
+            <h3><i>Wie wäre es mit neuen <a href="/search?keyword=&mode=user">Kontakten</a>?</i></a></h3>
+            }
+            @if(filter.equals("bookmark")) {
+            <h3><i>Wussest du, dass du dir wichtige Beiträge merken kannst?</i></h3>
+            }
+            @if(filter.equals("all")) {
+            <h3><i>Wie wäre es mit neuen neuen <a href="/search?keyword=&mode=user">Kontakten</a>, <a href="/search?keyword=&mode=group">Gruppen</a> oder <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a></i></h3>
+            <br />
+            <h4><i>Alternativ kannst du auch anfangen etwas auf deinen Stream zu schreiben.</i></h4>
+            }
+        </div>
+        }
     </div>
     <div class="col-md-2" role="complementary">
         <div class="hp-newsfeed-sitenav">

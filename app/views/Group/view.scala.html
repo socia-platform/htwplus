@@ -8,7 +8,7 @@
     @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
         <div class="row">
             <div class="col-lg-12" role="main">
-                <div class="hp-group-view addmargin">
+                <div class="hp-content-placeholder addmargin">
                     <h3><i>Du musst @Messages("group.view.type."+group.groupType.toString) <a href="@routes.GroupController.join(group.id)">beitreten</a>, um den Inhalt sehen zu können.</i></h3>
                 </div>
             </div>
