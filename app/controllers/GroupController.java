@@ -86,7 +86,7 @@ public class GroupController extends BaseController {
             return redirect(controllers.routes.GroupController.index());
         }
 		if(!Secured.viewGroup(group)){
-			return redirect(controllers.routes.Application.index());
+			return redirect(routes.GroupController.view(id));
 		}
 
         Navigation.set(Level.GROUPS, "Media", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
@@ -163,6 +163,11 @@ public class GroupController extends BaseController {
             flash("error", Messages.get("group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
+
+		// Check rights
+		if(!Secured.editGroup(group)) {
+			return redirect(controllers.routes.GroupController.view(id));
+		}
 
         Navigation.set(Level.GROUPS, "Bearbeiten", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
         Form<Group> groupForm = Form.form(Group.class).fill(group);
