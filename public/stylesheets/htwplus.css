@@ -1539,13 +1539,12 @@ div.hp-avatar-default-9 {
     overflow: hidden;
     padding-left: 190px;
 }
+
 @media(max-width: 992px) {
     #hp-profile-header .headline .title {
         padding-left: 80px;
     }
-
 }
-
 
 #hp-profile-header .bottomline {
     text-align: right;
@@ -1561,6 +1560,16 @@ div.hp-avatar-default-9 {
 
 #hp-profile-header .bottomline .hp-avatar-container div {
     display: inline-block;
+}
+
+#hp-profile-header .bottomline p {
+    padding-left: 190px;
+}
+
+@media(max-width: 992px) {
+    #hp-profile-header .bottomline p {
+        padding-left: 10px;
+    }
 }
 
 #hp-profile-header .postForm {
