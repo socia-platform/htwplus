@@ -15,6 +15,7 @@ import models.enums.GroupType;
 import models.enums.LinkType;
 
 import models.services.ElasticsearchService;
+import org.hibernate.annotations.Type;
 import play.data.validation.ValidationError;
 import play.data.validation.Constraints.Required;
 import play.data.validation.Constraints.Pattern;
@@ -31,9 +32,11 @@ public class Group extends BaseNotifiable implements INotifiable {
     @Required
 	@Column(unique = true)
     @Pattern(value="^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}/\\\\\\[\\]~-]+$")
+	@Size(max = 255, message = "error.length")
 	public String title;
 
-	@Size(max = 255, message = "error.length")
+	@Lob
+	@Type(type = "org.hibernate.type.TextType")
 	public String description;
 
 	@OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
