@@ -40,6 +40,7 @@ public class ProfileController extends BaseController {
 	static Form<Post> postForm = Form.form(Post.class);
     static Form<Login> loginForm = Form.form(Login.class);
 	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
+	static final int PAGE = 1;
 
 	public static Result me() {
 		Navigation.set(Level.PROFILE,"Ich");
@@ -64,8 +65,8 @@ public class ProfileController extends BaseController {
 			flash("info", "Diese Person gibt es nicht.");
 			return redirect(controllers.routes.Application.index());
 		} else {
-			if(Secured.isFriend(account)) {
-				Navigation.set(Level.FRIENDS, "Profil", account.name, controllers.routes.ProfileController.view(account.id));
+			if(Secured.isFriend(account) || Component.currentAccount().equals(account)) {
+				return redirect(routes.ProfileController.stream(account.id, PAGE, false));
 			} else {
 				Navigation.set(Level.USER, "Profil", account.name, controllers.routes.ProfileController.view(account.id));
 			}
@@ -303,7 +304,7 @@ public class ProfileController extends BaseController {
         if(Secured.isFriend(account)) {
             Navigation.set(Level.FRIENDS, "Gruppen & Kurse", account.name, controllers.routes.ProfileController.view(account.id));
         } else {
-            if(Secured.isMe(id)) {
+            if(Secured.isMe(account)) {
                 Navigation.set(Level.PROFILE, "Gruppen & Kurse");
             } else {
                 Navigation.set(Level.USER, "Gruppen & Kurse", account.name, controllers.routes.ProfileController.view(account.id));

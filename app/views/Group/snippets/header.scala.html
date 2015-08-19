@@ -98,10 +98,6 @@
                         @if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
                         <span>| <b>Token: </b>@group.token</span>
                         }
-                        @if(!group.description.isEmpty()) {
-                        <p><b>Beschreibung: </b>@group.description</p>
-                        }
-                    </small>
                     <div class="hp-avatar-container">
                         @for(index <- 0 until group.groupAccounts.toSeq.sortBy(_.createdAt).size) {
                             @if(index < 10){
@@ -118,6 +114,12 @@
                         }
                     </div>
                     @if(avatarList.size > 10) { <div><small><a href="#">... und @(avatarList.size-10) mehr</a></small></div> }
+                    @if(!group.description.isEmpty()) {
+                        <br /><br />
+                        <b>Beschreibung</b>
+                        <div class="text hp-white-space">@group.description</div>
+                    }
+                    </small>
                 </div>
             </div>
         </div>

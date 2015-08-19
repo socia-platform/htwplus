@@ -78,9 +78,9 @@ public class Secured extends Security.Authenticator {
      *
      * @return True, if currentUser.id is @param id
      */
-    public static boolean isMe(Long id) {
+    public static boolean isMe(Account account) {
         Account current = Component.currentAccount();
-        return current.equals(Account.findById(id));
+        return current.equals(account);
     }
 
 	/**

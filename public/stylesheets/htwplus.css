@@ -1579,3 +1579,17 @@ div.hp-avatar-default-9 {
 .hp-content-placeholder {
     text-align: center;
 }
+
+a.adjust{
+padding: 10px;
+    display: block;
+    font-weight: bold;
+    background: #eee;
+    color: #333;
+    border-radius: 12px;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    width: 80px;
+    text-align: center;
+    text-decoration: none;
+    }

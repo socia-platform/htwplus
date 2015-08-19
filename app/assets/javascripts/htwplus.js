@@ -433,6 +433,10 @@ $(document).ready(function () {
     ).on('typeahead:selected', function($e, searchResult){
         window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
     });
+
+
+
+
 });
 
 $(window).resize(function() {
@@ -473,3 +477,12 @@ $('.hp-post-bookmark-icon').click(function(){
 });
 
 truncateBreadcrumb();
+
+/*
+ * EXPAND PROFILE/GROUP TEXT
+ */
+$('#hp-profile-header .bottomline .text').readmore({
+    collapsedHeight: 106,
+    moreLink: '<a href="#">... mehr</a>',
+    lessLink: '<a href="#">schließen</a>'
+});
