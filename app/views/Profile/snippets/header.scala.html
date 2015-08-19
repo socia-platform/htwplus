@@ -54,23 +54,34 @@
                 </div>
                 <div class="bottomline">
                     <small>
-                        <b>Email: </b>@if(user.email != null) {
-                        <a href="mailto:@user.email">@user.email</a>
-                        } else { <span>Keine Angabe</span> }
-                        |
                         <b>Studiengang: </b>@if(user.studycourse != null) {
                         <span>@user.studycourse.title @if(user.degree != null) { (@user.degree) }</span>
                         } else {
-                        <span>Keine Angabe</span>
+                        <i>keine Angabe</i>
                         }
                         |
                         <b>Semester: </b>@if(user.semester != null) {
                         <span>@{user.semester + "."} Semester</span>
                         } else {
-                        <span>Keine Angabe</span>
+                        <i>keine Angabe</i>
                         }
                         |
                         <b>Rolle: </b><span>@user.role.getDisplayName()</span>
+                        <p>
+                        <b>Email: </b>@if(user.email != null) {
+                        <a href="mailto:@user.email">@user.email</a>
+                        } else { <i>keine Angabe</i> }
+                        |
+                        <b>Homepage: </b>@if(user.homepage != null) {
+                        <a href='@user.homepage'>@user.homepage</a>
+                        } else { <i>keine Angabe</i> }
+                        </p>
+                        @if(user.about != null) {
+                        <p>
+                            <b>Über mich: </b><span>@user.about</span>
+                        </p>
+                        }
+
                     </small>
                 </div>
             </div>
