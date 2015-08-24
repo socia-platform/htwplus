@@ -14,6 +14,7 @@
 				<th>Name</th>
 				<th>Client-Id</th>
 				<th>Callback-URI</th>
+				<th>Client-Secret</th>
 			</tr>
 		</thead>
 		<tbody class="hp-optionsTable">
@@ -29,6 +30,7 @@
 					<td>@client.clientName</td>
 					<td>@client.clientId</td>
 					<td>@client.callback.toString</td>
+					<td>@client.clientSecret.toString</td>
 					@*<td>@views.html.snippets.userLink(client)</td>*@
 				</tr>
 			}
