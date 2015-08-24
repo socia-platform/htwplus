@@ -22,6 +22,7 @@ public class Client extends BaseModel {
 
     public String clientId;
 
+    @ExposeField(name = "client_secret")
     public String clientSecret;
 
     @ExposeField(name = "callback_uri")
