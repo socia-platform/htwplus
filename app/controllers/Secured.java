@@ -29,7 +29,7 @@ public class Secured extends Security.Authenticator {
 		// see if user is logged in
         if (ctx.session().get("id") == null)
             return null;
- 
+
         // see if the session is expired
         String previousTick = ctx.session().get("userTime");
         if (previousTick != null && !previousTick.equals("")) {
@@ -42,7 +42,7 @@ public class Secured extends Security.Authenticator {
             	ctx.session().clear();
             	play.mvc.Controller.flash("info", Messages.get("error.sessionExpired"));
                 return null;
-            } 
+            }
         }
  
         // update time in session
@@ -60,10 +60,7 @@ public class Secured extends Security.Authenticator {
     public Result onUnauthorized(Context ctx) {
         // cookie outdated? save originURL to prevent redirect to index page after login
 
-		if (ctx.request().getQueryString("clientId") != null)
-			ctx.session().put("originURL", ctx.request().path() + "?clientId=" + ctx.request().getQueryString("clientId"));
-		else
-			ctx.session().put("originURL", ctx.request().path());
+		ctx.session().put("originURL", ctx.request().path());
 
 		return unauthorized(landingpage.render());
     }
