@@ -31,3 +31,4 @@ conf/META-INF/persistence.xml
 searchstuff
 htwplus
 node_modules
+conf/generated.keystore
