@@ -11,7 +11,7 @@ import javax.persistence.NoResultException;
  * Created by richard on 01.07.15.
  */
 @Entity
-public class UserGrant extends BaseModel {
+public class AuthorizationGrant extends BaseModel {
 
     @ManyToOne
     public Account user;
@@ -36,10 +36,10 @@ public class UserGrant extends BaseModel {
 
     }
 
-    public static UserGrant findByCode(String code) {
+    public static AuthorizationGrant findByCode(String code) {
         try{
-            return (UserGrant) JPA.em()
-                    .createQuery("from UserGrant a where a.code = :code")
+            return (AuthorizationGrant) JPA.em()
+                    .createQuery("from AuthorizationGrant a where a.code = :code")
                     .setParameter("code", code).getSingleResult();
         } catch (NoResultException exp) {
             return null;

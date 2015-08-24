@@ -7,7 +7,7 @@
 	<p>@clientName zugriff erlauben?</p>
 	<br>
 
-	<form method="POST" action="/api/oauth2/authorize">
+	<form method="POST" action="/api/oauth2/code">
 		<input name="clientId" value="@clientId" hidden>
 		<button class="btn btn-success" type="submit" name="accepted" value="true">Ja</button>
 		<button class="btn btn-danger" type="submit" name="accepted" value="false">Nein</button>

@@ -26,7 +26,7 @@ public class SecuredWithToken extends Security.Authenticator {
     @Override
     public String getUsername(Http.Context ctx) {
         DynamicForm form = Form.form().bindFromRequest();
-        Token token = Token.findByAccesToken(form.get("accessToken"));
+        Token token = Token.findByAccesToken(form.get("access_token"));
         if (token != null && !token.hasExpired())
             return token.user.name;
         else

@@ -122,6 +122,8 @@ POST        /api/oauth2/clients                        controllers.APIOAuthContr
 GET         /api/oauth2/authorize                      controllers.APIOAuthController.authorize()
 POST        /api/oauth2/authorize                      controllers.APIOAuthController.authorize()
 GET         /api/oauth2/token                          controllers.APIOAuthController.getToken()
+POST        /api/oauth2/token                          controllers.APIOAuthController.getToken()
+POST        /api/oauth2/code                           controllers.APIOAuthController.generateCode()
 
 # No route found? take this
 GET         /*path                                     controllers.Application.defaultRoute(path: String)
