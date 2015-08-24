@@ -31,6 +31,8 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 
 * Open the repository directory in shell
 * Execute `activator run` (`activator -jvm-debug 9999` for debug mode)
+* for HTTPS support during development also add the flag `-Dhttps.port=9443`, note that generating the certificate
+ take some time at first. Also, you might have to import this self-signed certificate to your tools, such as Postman.
 * Browse to http://localhost:9000/
 * Login as admin (user: admin@htwplus.de, password: 123456)
 
