@@ -103,12 +103,8 @@ public class APIOAuthController extends BaseController {
             Token token = new Token(client, Component.currentAccount(), null);
             token.user = grant.user;
             token.create();
-            ObjectNode result = Json.newObject();
-            result.put("access_token", token.accessToken);
-            result.put("token_type", "bearer");
-            result.put("expires_in", -1);
-            result.put("refresh_token", token.refreshToken);
-            String res = "access_token=" + token.accessToken + "&token_type=bearer";
+            String res = "access_token=" + token.accessToken + "&token_type=bearer" + "&refresh_token="
+                    + token.refreshToken + "&expires_in=-1";
             response().setContentType("application/x-www-form-urlencoded; charset=utf-8");
             return ok(res);
         } else
