@@ -1,6 +1,5 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.*;
 import models.enums.OAuth2ErrorCodes;
@@ -9,8 +8,6 @@ import play.data.Form;
 import play.libs.Json;
 import play.mvc.Security;
 import play.mvc.Result;
-import scala.util.parsing.json.JSONObject;
-import util.RequestTools;
 import views.html.OAuth2.authorizeClient;
 import views.html.OAuth2.editClients;
 
@@ -18,7 +15,6 @@ import javax.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -79,43 +75,52 @@ public class APIOAuthController extends BaseController {
         for (String s : requestData.data().keySet()) {
             session().put(s, requestData.data().get(s));
         }
-        String[] checkTerms = {"accepted", "response_type", "client_id"};
-        ArrayList<String> check = new ArrayList<>(Arrays.asList(checkTerms));
-        List<String> missing = RequestTools.getNull(check, session().keySet());
-        if (missing.size() == 0) {
-            if (requestData.get("accepted").equals("true")) {
-                if (session().get("response_type").equals("code")) {
-                    if (Client.findByClientId(session().get("client_id")) != null) {
-                        AuthorizationGrant grant = new AuthorizationGrant(Component.currentAccount(), Client.findByClientId(session().get("client_id")), new Long(60));
-                        grant.create();
-                        String red;
-                        if (session().get("redirect_uri") != null)
-                            red = session().get("redirect_uri");
-                        else
-                            red = (request().secure() ? "https://" : "http://") + grant.client.callback;
-                        red += "?code=" + grant.code;
-                        if (session().get("state") != null)
-                            red += "&state=" + session().get("state");
-                        return redirect(red);
-                    } else {
-                        return badRequest("Invalid client_id.");
-                    }
-                } else {
-                    return badRequest("Currently only serving response type 'code'.");
-                }
-            } else return errorResponse("access_denied", "end-user denied authorization");
-        } else {
-            StringBuilder missingFields = new StringBuilder();
-            for (String s : missing) {
-                missingFields.append(" " + s);
+        Map<String, String> errs = getAuthorizationRequestErrors(session());
+        if (errs.size() == 0) {
+            Client client = Client.findByClientId(session().get("client_id"));
+            String redURI = session().get("redirect_uri") != null ? session().get("redirect_uri") : client.callback.toString();
+            if (session().get("accepted").equals("true")) {
+                AuthorizationGrant grant = new AuthorizationGrant(Component.currentAccount(), client, new Long(60));
+                grant.create();
+                response().setContentType("application/x-www-form-urlencoded; charset=utf-8");
+                StringBuilder res = new StringBuilder()
+                        .append(redURI)
+                        .append("?code=")
+                        .append(grant.code)
+                        .append("&expires_in=")
+                        .append(grant.expiresIn());
+                return redirect(res.toString());
+            } else {
+                return errorResponse(OAuth2ErrorCodes.ACCESS_DENIED.getIdentifier(), "end-user denied authorization", redURI);
             }
-            return badRequest("You have to specify:" + missingFields.toString() + ".");
+        } else {
+            String redURI = null;
+            if (requestData.get("redirect_uri") != null) {
+                redURI = requestData.get("redirect_uri");
+            } else if (requestData.get("client_id") != null) {
+                Client client = Client.findByClientId(requestData.get("client_id"));
+                if (client != null) {
+                    redURI = client.callback.toString();
+                }
+            }
+            if (redURI != null) {
+                response().setContentType("application/x-www-form-urlencoded; charset=utf-8");
+                return errorResponse(OAuth2ErrorCodes.INVALID_REQUEST.getIdentifier(), "end-user denied authorization", redURI);
+            } else {
+                StringBuilder errorString = new StringBuilder();
+                for (String s : errs.keySet()) {
+                    errorString.append(s).append(": ").append(errs.get(s)).append("; ");
+                }
+                return badRequest(errorString.toString());
+            }
         }
     }
 
+
+
     public static Result getToken() {
         DynamicForm requestData = Form.form().bindFromRequest();
-        Map<String, String> errs = tokenRequestHasErrors(requestData.data());
+        Map<String, String> errs = getTokenRequestErrors(requestData.data());
         if (errs.size() == 0) {
             if (requestData.get("grant_type").equals("authorization_code")) {
                 AuthorizationGrant grant = AuthorizationGrant.findByCode(requestData.get("code"));
@@ -139,7 +144,26 @@ public class APIOAuthController extends BaseController {
         }
     }
 
-    private static Map<String, String> tokenRequestHasErrors(Map<String, String> requestData) {
+    private static Map<String, String> getAuthorizationRequestErrors(Map<String, String> requestData) {
+        HashMap<String, String> errs = new HashMap<>();
+        String[] terms = {"accepted", "response_type", "client_id"};
+        List<String> missing = util.RequestTools.getNull(Arrays.asList(terms), requestData);
+        if (missing.size() != 0) {
+            for (String s : missing) {
+                errs.put(s, "missing");
+            }
+        } else if (requestData.get("response_type").equals("code")) {
+            Client client = Client.findByClientId(requestData.get("client_id"));
+            if (client == null) {
+                errs.put("client_id", "invalid");
+            }
+        } else {
+            errs.put("response_type", "only serving code");
+        }
+        return errs;
+    }
+
+    private static Map<String, String> getTokenRequestErrors(Map<String, String> requestData) {
         HashMap<String, String> errs = new HashMap<>();
         String[] terms = {"grant_type", "client_id", "client_secret"};
         List<String> missing = util.RequestTools.getNull(Arrays.asList(terms), requestData);
@@ -171,9 +195,15 @@ public class APIOAuthController extends BaseController {
         return errs;
     }
 
-    private static Result errorResponse(String errorCode, String description) {
+    private static Result errorResponse(String errorCode, String description, String redirect) {
         response().setContentType("application/x-www-form-urlencoded; charset=utf-8");
-        return found("error=" + errorCode + "&error_description=" + description);
+        StringBuilder call = new StringBuilder()
+                .append(redirect)
+                .append("?error=")
+                .append(errorCode)
+                .append("&error_description")
+                .append(description);
+        return redirect(call.toString());
     }
 
     private static Result errorResponseJson(String errorCode, String description) {
