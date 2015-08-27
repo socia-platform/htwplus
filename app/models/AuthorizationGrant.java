@@ -6,6 +6,9 @@ import play.db.jpa.JPA;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.NoResultException;
+import java.time.Instant;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created by richard on 01.07.15.
@@ -21,6 +24,8 @@ public class AuthorizationGrant extends BaseModel {
 
     public String code;
 
+    public Date expires;
+
     @Override
     public void create() {
         JPA.em().persist(this);
@@ -33,7 +38,15 @@ public class AuthorizationGrant extends BaseModel {
 
     @Override
     public void delete() {
+    }
 
+    public AuthorizationGrant() {}
+
+    public AuthorizationGrant(Account user, Client client, long expiresIn) {
+        this.user = user;
+        this.client = client;
+        this.expires = new Date(Date.from(Instant.now()).getTime() + expiresIn * 1000);
+        code = UUID.randomUUID().toString();
     }
 
     public static AuthorizationGrant findByCode(String code) {
@@ -45,4 +58,19 @@ public class AuthorizationGrant extends BaseModel {
             return null;
         }
     }
+
+    public boolean hasExpired() {
+        if (expires != null)
+            return !expires.after(Date.from(Instant.now()));
+        else
+            return false;
+    }
+
+    public long expiresIn() {
+        if (!hasExpired()) {
+            return (expires.getTime() - Date.from(Instant.now()).getTime()) / 1000;
+        } else
+            return -1;
+    }
+
 }
