@@ -18,30 +18,25 @@ import java.util.UUID;
 @Entity
 public class Token extends BaseModel {
 
-    @ExposeField
     @ManyToOne
     public Client client;
 
-    @ExposeField
     @ManyToOne
     public Account user;
 
-    @ExposeField(name = "access_token")
     @Column(unique=true)
     public String accessToken;
 
-    @ExposeField(name = "refresh_token")
     public String refreshToken;
 
-    @ExposeField(name = "expiration_date")
     public Date expires;
 
     public Token() {}
 
-    public Token(Client client, Account user, Date expires) {
+    public Token(Client client, Account user, Long expiresIn) {
         this.client = client;
         this.user = user;
-        this.expires = expires;
+        this.expires = new Date((Date.from(Instant.now()).getTime() + expiresIn * 1000));
         accessToken = UUID.randomUUID().toString();
         refreshToken = UUID.randomUUID().toString();
     }
@@ -53,7 +48,7 @@ public class Token extends BaseModel {
 
     @Override
     public void update() {
-
+        JPA.em().merge(this);
     }
 
     @Override
@@ -71,10 +66,32 @@ public class Token extends BaseModel {
         }
     }
 
+    public static Token findByRefreshToken(String refreshToken) {
+        try{
+            return (Token) JPA.em()
+                    .createQuery("from Token a where a.refreshToken = :refreshToken")
+                    .setParameter("refreshToken", refreshToken).getSingleResult();
+        } catch (NoResultException exp) {
+            return null;
+        }
+    }
+
     public boolean hasExpired() {
         if (expires != null)
-            return expires.after(Date.from(Instant.now()));
+            return !expires.after(Date.from(Instant.now()));
         else
             return false;
+    }
+
+    public long expiresIn() {
+        if (!hasExpired()) {
+            return (expires.getTime() - Date.from(Instant.now()).getTime()) / 1000;
+        } else
+            return -1;
+    }
+
+    public Token refresh(Long expiresIn) {
+        expires = new Date((Date.from(Instant.now()).getTime() + expiresIn * 1000));
+        return this;
     }
 }
