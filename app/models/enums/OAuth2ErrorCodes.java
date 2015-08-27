@@ -23,8 +23,4 @@ public enum OAuth2ErrorCodes {
     public String getIdentifier() {
         return identifier;
     }
-
-    public String getAcceptHeaderMessage() {
-        return "Only accepting Accept header: " + CustomContentType.JSON_COLLECTION.getIdentifier();
-    }
 }
