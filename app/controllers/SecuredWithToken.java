@@ -19,20 +19,34 @@ import java.util.List;
 
 
 /**
- * Created by richard on 02.07.15.
+ * A standard authenticator to secure action with access tokens.
  */
 public class SecuredWithToken extends Security.Authenticator {
 
+    /**
+     * Tries to determine the user name of the current user by checking the access token.
+     * @param ctx the context
+     * @return the user name if it can be found, null otherwise
+     */
     @Override
     public String getUsername(Http.Context ctx) {
         DynamicForm form = Form.form().bindFromRequest();
         Token token = Token.findByAccesToken(form.get("access_token"));
-        if (token != null && !token.hasExpired())
+        if (token != null && !token.hasExpired()) {
+            ctx.session().put("token_user", (token.user.id).toString());
             return token.user.name;
+        }
         else
             return null;
     }
 
+    /**
+     * Creates a Collection+JSON with error, to inform the client that no valid access token was provided or redirects
+     * to landing page.
+     * @param ctx the context
+     * @return Collection+JSON with error if client accepts Collection+JSON, redirects to landing page with unauthorized
+     * status otherwise
+     */
     @Override
     public Result onUnauthorized(Http.Context ctx) {
         // token outdated? save originURL to prevent redirect to index page after login
