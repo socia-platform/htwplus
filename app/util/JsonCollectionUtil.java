@@ -70,7 +70,12 @@ public class JsonCollectionUtil {
                 .collect(Collectors.toList());
         if (!missingData.isEmpty()) {
             Error error = Error.create("Missing data", "422", "Missing data: " + String.join(", ", missingData));
-            validated = Collection.create(col.getHref().get(), col.getLinks(), col.getItems(), col.getQueries(), col.getTemplate().get(), error);
+            Collection.Builder builder = new Collection.Builder()
+                    .addItems(col.getItems())
+                    .addLinks(col.getLinks())
+                    .addQueries(col.getQueries())
+                    .withError(error);
+            validated = builder.build();
         } else {
             validated = col;
         }
@@ -360,14 +365,18 @@ public class JsonCollectionUtil {
     }
 
     public static <T extends BaseModel> Collection addTemplate(Class<T> t, Collection collection) {
-        return Collection.create(
-                collection.getHref().get(),
-                collection.getLinks(),
-                collection.getItems(),
-                collection.getQueries(),
-                getTemplate(t),
-                collection.getError().get()
-        );
+        Collection.Builder builder = new Collection.Builder()
+                .addItems(collection.getItems())
+                .addLinks(collection.getLinks())
+                .addQueries(collection.getQueries());
+        if (collection.getHref().isSome()) {
+            builder.withHref(collection.getHref().get());
+        }
+        if (collection.getError().isSome()) {
+            builder.withError(collection.getError().get());
+        }
+        builder.withTemplate(getTemplate(t));
+        return builder.build();
     }
 
     public static <T extends BaseModel> Template getTemplate(Class<T> t) {
