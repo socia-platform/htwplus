@@ -36,25 +36,25 @@ public class Post extends BaseNotifiable implements INotifiable {
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
     public static final String BROADCAST = "broadcast";                     // broadcast post from admin control center
 
-    @ExposeField(template = "The Content.")
+    @ExposeField(name = "content", template = "The Content.")
     @Required
     @Lob
     @Type(type = "org.hibernate.type.TextType")
 	public String content;
 
-    @ExposeField
+    @ExposeField(name = "parent_id")
 	@ManyToOne
 	public Post parent;
 
-    @ExposeField
+    @ExposeField(name = "group_id")
 	@ManyToOne
 	public Group group;
 
-    @ExposeField
+    @ExposeField(name = "account_id")
 	@ManyToOne
 	public Account account;
 
-    @ExposeField
+    @ExposeField(name = "owner_id")
 	@ManyToOne
 	public Account owner;
 
@@ -76,67 +76,20 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     public Post(Collection col) {
         Map<String, Property> data = col.getFirstItem().get().getDataAsMap();
-        owner = Account.findById(Long.parseLong(data.get("owner_id").getValue().get().asString()));
+        owner = Account.findById(data.get("owner_id").getValue().get().asNumber().longValue());
         content = data.get("content").getValue().get().asString();
-        String account_id = data.get("account_id").getValue().get().asString();
-        String parent_id = data.get("parent_id").getValue().get().asString();
-        String group_id = data.get("group_id").getValue().get().asString();
-        if (account_id != "")
-            account = Account.findById(Long.parseLong(account_id));
-        else if (group_id != "")
-            group = Group.findById(Long.parseLong(group_id));
-        if (parent_id != "")
-            parent = Post.findById(Long.parseLong(parent_id));
-    }
-
-    public static Collection validatePost(Collection col) {
-        Collection validated;
-        List<String> errors = new ArrayList<String>();
-        if (col != null) {
-            col = JsonCollectionUtil.checkForMissingItems(col, new Post());
-            if (!col.hasError()) {
-                Map<String, Property> data = col.getFirstItem().get().getDataAsMap();
-                String account_id = data.get("account_id").getValue().get().asString();
-                String owner_id = data.get("owner_id").getValue().get().asString();
-                String parent_id = data.get("parent_id").getValue().get().asString();
-                String group_id = data.get("group_id").getValue().get().asString();
-                if (owner_id != "") {
-                    if (Account.findById(Long.parseLong(owner_id)) == null)
-                        errors.add("Invalid owner id: account with id " + owner_id + " does not seem to exist.");
-                } else {
-                    errors.add("Invalid owner id: You have to specify an owner.");
-                }
-                if (account_id != "") {
-                    if (Account.findById(Long.parseLong(account_id)) == null)
-                        errors.add("Invalid target: account with id " + account_id + " does not seem to exist.");
-                }
-                if (parent_id != "") {
-                    if (Post.findById(Long.parseLong(parent_id)) == null)
-                        errors.add("Invalid target: post with id " + parent_id + " does not seem to exist.");
-                }
-                if (group_id != "") {
-                    if (Group.findById(Long.parseLong(group_id)) == null) {
-                        errors.add("Invalid target: group with id " + group_id + " does not seem to exist.");
-                    }
-                }
-                if (data.get("group_id").getValue().get().asString() != "" && data.get("account_id").getValue().get().asString() != "") {
-                    errors.add("Invalid target: You can either post to a group or an account. Not both.");
-                }
-                if (data.get("group_id").getValue().get().asString() == "" && data.get("account_id").getValue().get().asString() == "") {
-                    errors.add("Invalid target: You have to specify a target group_id or account_id.");
-                }
-                if (!errors.isEmpty()) {
-                    Error error = Error.create("Invalid post data", "422", "Errors: " + String.join(" ", errors));
-                    validated = Collection.create(col.getHref().get(), col.getLinks(), col.getItems(), col.getQueries(), col.getTemplate().get(), error);
-                } else
-                    validated = col;
-            } else
-                validated = col;
-        } else {
-            Collection withError = JsonCollectionUtil.getErrorCollection(Post.class, "Invalid Json+Collection", "422", "Non parsable Json+Collection, please check your syntax");
-            validated = JsonCollectionUtil.addTemplate(Post.class, withError);
+        if (data.get("account_id").hasValue()) {
+            long accountId = data.get("account_id").getValue().get().asNumber().longValue();
+            account = Account.findById(accountId);
         }
-        return validated;
+        if (data.get("parent_id").hasValue()) {
+            long parentId = data.get("parent_id").getValue().get().asNumber().longValue();
+            parent = Post.findById(parentId);
+        }
+        if (data.get("group_id").hasValue()) {
+            long groupId = data.get("group_id").getValue().get().asNumber().longValue();
+            group = Group.findById(groupId);
+        }
     }
 
 	public void create() {
