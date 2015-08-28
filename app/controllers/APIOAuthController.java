@@ -24,16 +24,14 @@ public class APIOAuthController extends BaseController {
 
     private static Form<Client> clientForm = Form.form(Client.class);
 
+    /**
+     * Lets the admin register a new application for OAuth2 authorization.
+     * @return ok, with view containing all registered applications; unauthorized if user is not admin
+     */
     @Security.Authenticated(Secured.class)
     @Transactional
     public static Result addClient() {
-        if (request().method().equals("GET")) {
-            if (Secured.isAdmin()) {
-                return ok(editClients.render(Client.findAll(), clientForm));
-            }
-            else
-                return unauthorized();
-        } else {
+        if (Secured.isAdmin()) {
             Form<Client> filledForm= clientForm.bindFromRequest();
             if (filledForm.data().get("clientName").isEmpty())
                 filledForm.reject("Bitte gib einen Namen an.");
@@ -53,8 +51,23 @@ public class APIOAuthController extends BaseController {
             }
             client.create();
             return ok(editClients.render(Client.findAll(), filledForm));
+        } else {
+            return unauthorized();
         }
     }
+
+    /**
+     * Shows application already registered for OAuth2 authorization
+     * @return ok, with view containinf all registered applications; unauthorized if user is not admin
+     */
+    @Security.Authenticated(Secured.class)
+    public  static Result showClients() {
+            if (Secured.isAdmin()) {
+                return ok(editClients.render(Client.findAll(), clientForm));
+            }
+            else
+                return unauthorized();
+        }
 
     @Security.Authenticated(SecuredAuthorization.class)
     public static Result authorize() {
@@ -68,6 +81,11 @@ public class APIOAuthController extends BaseController {
         else return badRequest();
     }
 
+    /**
+     * Generates authorization code and adds it to the redirect uri given in the request, encoded as
+     * "application/x-www-form-urlencoded; charset=utf-8".
+     * @return redirect to redirect uri with authorization code or any errors
+     */
     @Security.Authenticated(SecuredAuthorization.class)
     @Transactional
     public static Result generateCode() {
@@ -89,6 +107,9 @@ public class APIOAuthController extends BaseController {
                         .append(grant.code)
                         .append("&expires_in=")
                         .append(grant.expiresIn());
+                if (session().get("state") != null) {
+                    res.append("&state=").append(session().get("state"));
+                }
                 return redirect(res.toString());
             } else {
                 return errorResponse(OAuth2ErrorCodes.ACCESS_DENIED.getIdentifier(), "end-user denied authorization", redURI);
@@ -117,16 +138,23 @@ public class APIOAuthController extends BaseController {
     }
 
 
-
+    /**
+     * Generates access token or refreshes a given token.
+     * @return JSON containing the requested access token, the refreshed token or errors
+     */
     public static Result getToken() {
         DynamicForm requestData = Form.form().bindFromRequest();
         Map<String, String> errs = getTokenRequestErrors(requestData.data());
         if (errs.size() == 0) {
             if (requestData.get("grant_type").equals("authorization_code")) {
                 AuthorizationGrant grant = AuthorizationGrant.findByCode(requestData.get("code"));
-                Token token = new Token(grant.client, grant.user, new Long(3600));
-                token.create();
-                return tokenResponseJson(token);
+                if (!grant.hasExpired()) {
+                    Token token = new Token(grant.client, grant.user, new Long(3600));
+                    token.create();
+                    return tokenResponseJson(token);
+                } else {
+                    return errorResponseJson("invalid_grant", "code has exired");
+                }
             } else if (requestData.get("grant_type").equals("refresh_token")) {
                 Token token = Token.findByRefreshToken(requestData.get("refresh_token"));
                 token.refresh(new Long(3600));
@@ -144,6 +172,11 @@ public class APIOAuthController extends BaseController {
         }
     }
 
+    /**
+     * Checks the requests query string for missing parameters and consistency.
+     * @param requestData the requests query string as Map
+     * @return Map containing conflicting or missing parameters with error descriptions
+     */
     private static Map<String, String> getAuthorizationRequestErrors(Map<String, String> requestData) {
         HashMap<String, String> errs = new HashMap<>();
         String[] terms = {"accepted", "response_type", "client_id"};
@@ -163,6 +196,11 @@ public class APIOAuthController extends BaseController {
         return errs;
     }
 
+    /**
+     * Checks the requests query string for missing parameters and consistency.
+     * @param requestData the requests query string as Map
+     * @return Map containing conflicting or missing parameters with error descriptions
+     */
     private static Map<String, String> getTokenRequestErrors(Map<String, String> requestData) {
         HashMap<String, String> errs = new HashMap<>();
         String[] terms = {"grant_type", "client_id", "client_secret"};
@@ -195,6 +233,14 @@ public class APIOAuthController extends BaseController {
         return errs;
     }
 
+    /**
+     * Constructs and returns redirect to given URI with OAuth2 error code and description encoded as
+     * "application/x-www-form-urlencoded; charset=utf-8"
+     * @param errorCode the error code according to OAuth2 error code list
+     * @param description a description of the error
+     * @param redirect the redirect URI
+     * @return redirect to given uri with error code and description in query string
+     */
     private static Result errorResponse(String errorCode, String description, String redirect) {
         response().setContentType("application/x-www-form-urlencoded; charset=utf-8");
         StringBuilder call = new StringBuilder()
@@ -206,6 +252,12 @@ public class APIOAuthController extends BaseController {
         return redirect(call.toString());
     }
 
+    /**
+     * Constructs and returns JSON containing OAuth2 error code and description
+     * @param errorCode the OAuth2 error code
+     * @param description a description
+     * @return JSON response with error code and description
+     */
     private static Result errorResponseJson(String errorCode, String description) {
         ObjectNode json = Json.newObject()
                 .put("error", errorCode)
@@ -213,6 +265,11 @@ public class APIOAuthController extends BaseController {
         return badRequest(json);
     }
 
+    /**
+     * Constructs and returns JSON with given token.
+     * @param token the token
+     * @return JSON response with representation of the given token
+     */
     private static Result tokenResponseJson(Token token) {
         ObjectNode json = Json.newObject()
                 .put("access_token", token.accessToken)
