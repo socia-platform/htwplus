@@ -213,21 +213,22 @@ public class APIOAuthController extends BaseController {
             Client client = Client.findByClientId(requestData.get("client_id"));
             if (client.clientSecret.equals(requestData.get("client_secret"))) {
                 if (requestData.get("grant_type").equals("authorization_code")) {
-                    if (AuthorizationGrant.findByCode(requestData.get("code")) == null)
+                    if (AuthorizationGrant.findByCode(requestData.get("code")) == null) {
                         errs.put("code", "invalid");
                     } else if (AuthorizationGrant.findByCode(requestData.get("code")).client != client) {
-                    errs.put("client_id", "provided client_id does not fit authorization code");
+                        errs.put("client_id", "provided client_id does not fit authorization code");
                     }
                 } else if (requestData.get("grant_type").equals("refresh_token")) {
                     if (Token.findByRefreshToken(requestData.get("refresh_token")) == null) {
                         errs.put("refresh_token", "invalid");
                     } else if (Token.findByRefreshToken(requestData.get("refresh_token")).client != client) {
                         errs.put("client_id", "provided client_id does not fit refresh_token");
+                    } else {
+                        errs.put("grant_type", "invalid, only serving code and refresh_token");
+                    }
                 } else {
-                    errs.put("grant_type", "invalid, only serving code and refresh_token");
+                    errs.put("client_secret", "invalid");
                 }
-            } else {
-                errs.put("client_secret", "invalid");
             }
         }
         return errs;
