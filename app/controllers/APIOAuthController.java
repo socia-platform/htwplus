@@ -223,13 +223,15 @@ public class APIOAuthController extends BaseController {
                         errs.put("refresh_token", "invalid");
                     } else if (Token.findByRefreshToken(requestData.get("refresh_token")).client != client) {
                         errs.put("client_id", "provided client_id does not fit refresh_token");
-                    } else {
-                        errs.put("grant_type", "invalid, only serving code and refresh_token");
                     }
                 } else {
-                    errs.put("client_secret", "invalid");
+                    errs.put("grant_type", "invalid, currently only serving code and refresh_token");
                 }
+            } else {
+                errs.put("client_secret", "invalid");
             }
+        } else {
+            errs.put("client_id", "invalid");
         }
         return errs;
     }
