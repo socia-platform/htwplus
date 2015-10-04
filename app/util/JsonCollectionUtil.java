@@ -166,11 +166,11 @@ public class JsonCollectionUtil {
                 .collect(Collectors.toList());
         List<Property> properties = Stream.concat(Stream.concat(
                         fields.getOrDefault(BaseModelType.notExposed, new LinkedList<>()).stream()
-                                .map(f -> Property.value(f.first() + responseIdPostfix, getId((BaseModel) getValue(model, f.second())))),
+                                .map(f -> Property.value(f.first(), getId((BaseModel) getValue(model, f.second())))),
                         fields.getOrDefault(BaseModelType.none, new LinkedList<>()).stream()
                                 .map(f -> Property.value(f.first(), getValue(model, f.second())))),
                         fields.getOrDefault(BaseModelType.exposed, new LinkedList<>()).stream()
-                                .map(f -> Property.value(f.first() + "_id", getId((BaseModel)getValue(model, f.second())))))
+                                .map(f -> Property.value(f.first(), getId((BaseModel)getValue(model, f.second())))))
                         .collect(Collectors.toList());
         return Item.create(URI.create(baseUri + route), properties, links);
 //        return Item.create(URI.create(route), properties(model, fields.stream()).collect(Collectors.toList()));
