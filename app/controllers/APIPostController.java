@@ -86,7 +86,7 @@ public class APIPostController extends BaseController {
         if(request().getHeader("Accept").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
             response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
             Collection collection = JsonCollectionUtil.getRequestedCollection(Post.class, id, "Post");
-            collection = new Collection.Builder().addItems(collection.filterItems(new net.hamnaberg.funclite.Predicate<Item>() {
+            Collection filteredCollection = new Collection.Builder().addItems(collection.filterItems(new net.hamnaberg.funclite.Predicate<Item>() {
                 @Override
                 public boolean apply(Item item) {
                     long postId = item.getData().getDataAsMap().get("id").getValue().get().asNumber().longValue();
@@ -102,8 +102,14 @@ public class APIPostController extends BaseController {
                     }
                     return (post.owner.id == tokenUser);
                 }
-            })).build();
-            return ok(collection.toString());
+            })).withHref(collection.getHref().get())
+                    .withError(collection.getError().get())
+                    .withTemplate(collection.getTemplate().get())
+                    .addLinks(collection.getLinks())
+                    .addQueries(collection.getQueries())
+                    .build();
+
+            return ok(filteredCollection.toString());
         } else {
             return statusWithWarning(NOT_ACCEPTABLE, CustomContentType.JSON_COLLECTION.getAcceptHeaderMessage());
         }
