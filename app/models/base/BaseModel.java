@@ -28,12 +28,14 @@ public abstract class BaseModel {
      * Date of the creation time of this model.
      */
 	@Column(name = "created_at")
+	@ExposeField(name = "created_at")
 	public Date createdAt;
 
     /**
      * Date of the last modification of this model.
      */
 	@Column(name = "updated_at")
+	@ExposeField(name = "updated_at")
 	public Date updatedAt;
 
     /**
