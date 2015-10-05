@@ -17,6 +17,13 @@ import java.util.List;
 @Transactional
 @Security.Authenticated(SecuredWithToken.class)
 public class APIUserController extends BaseController {
+
+    /**
+     * Fetches the requested user(s) and returns Collection+JSON representation of the user(s).
+     * @param id the id of the requested use, -1 for all uses visible for the current user (determined by access token)
+     * @return ok with Collection+Json of requested user(s), bad request with received collection with errors or not acceptable
+     * if the client does not accept Collection+JSON
+     */
     public static Result get(final long id) {
         if (request().getHeader("Accept").contains(CustomContentType.JSON_COLLECTION.getIdentifier())) {
             response().setContentType(CustomContentType.JSON_COLLECTION.getIdentifier());
