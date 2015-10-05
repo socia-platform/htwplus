@@ -11,6 +11,9 @@ import play.mvc.Result;
 import play.mvc.Security;
 import util.JsonCollectionUtil;
 
+import java.util.LinkedList;
+import java.util.List;
+
 @Transactional
 @Security.Authenticated(SecuredWithToken.class)
 public class APIUserController extends BaseController {
@@ -24,9 +27,17 @@ public class APIUserController extends BaseController {
                     long tokenUser = Long.parseLong(session().get("token_user"));
                     Account tokenUserAccount = Account.findById(tokenUser);
                     boolean isFriend = false;
+                    List<Long> friendsOfTokenUser = new LinkedList<Long>();
                     for (Friendship f : tokenUserAccount.friends) {
-                        if (f.friend.id == item.getData().getDataAsMap().get("id").getValue().get().asNumber().longValue()) {
-                            isFriend = true;
+                        friendsOfTokenUser.add(f.friend.id);
+                    }
+                    long candidate = item.getData().getDataAsMap().get("id").getValue().get().asNumber().longValue();
+                    if (friendsOfTokenUser.contains(candidate)) {
+                        List<Long> candidates = new LinkedList<Long>();
+                        for (Friendship cf : Account.findById(candidate).friends) {
+                            if (cf.friend.id == tokenUser) {
+                                isFriend = true;
+                            }
                         }
                     }
                     return isFriend;
