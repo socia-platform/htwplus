@@ -76,19 +76,30 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     public Post(Collection col) {
         Map<String, Property> data = col.getFirstItem().get().getDataAsMap();
-        owner = Account.findById(data.get("owner_id").getValue().get().asNumber().longValue());
+        if (data.get("owner_id").hasValue()) {
+            if (data.get("owner_id").getValue().get().isNumeric()) {
+                long ownerId = data.get("owner_id").getValue().get().asNumber().longValue();
+                owner = Account.findById(ownerId);
+            }
+        }
         content = data.get("content").getValue().get().asString();
         if (data.get("account_id").hasValue()) {
-            long accountId = data.get("account_id").getValue().get().asNumber().longValue();
-            account = Account.findById(accountId);
+            if (data.get("account_id").getValue().get().isNumeric()) {
+                long accountId = data.get("account_id").getValue().get().asNumber().longValue();
+                account = Account.findById(accountId);
+            }
         }
         if (data.get("parent_id").hasValue()) {
-            long parentId = data.get("parent_id").getValue().get().asNumber().longValue();
-            parent = Post.findById(parentId);
+            if (data.get("parent_id").getValue().get().isNumeric()) {
+                long parentId = data.get("parent_id").getValue().get().asNumber().longValue();
+                parent = Post.findById(parentId);
+            }
         }
         if (data.get("group_id").hasValue()) {
-            long groupId = data.get("group_id").getValue().get().asNumber().longValue();
-            group = Group.findById(groupId);
+            if (data.get("group_id").getValue().get().isNumeric()) {
+                long groupId = data.get("group_id").getValue().get().asNumber().longValue();
+                group = Group.findById(groupId);
+            }
         }
     }
 
