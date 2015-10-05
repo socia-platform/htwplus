@@ -20,7 +20,7 @@ public class APIUserController extends BaseController {
 
     /**
      * Fetches the requested user(s) and returns Collection+JSON representation of the user(s).
-     * @param id the id of the requested use, -1 for all uses visible for the current user (determined by access token)
+     * @param id the id of the requested use, -1 for all uses visible for the current user (determined by access token and friendship status)
      * @return ok with Collection+Json of requested user(s), bad request with received collection with errors or not acceptable
      * if the client does not accept Collection+JSON
      */
