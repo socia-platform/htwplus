@@ -278,7 +278,8 @@ public class APIOAuthController extends BaseController {
                 .put("access_token", token.accessToken)
                 .put("token_type", "bearer")
                 .put("refresh_token", token.refreshToken)
-                .put("expires_in", token.expiresIn());
+                .put("expires_in", token.expiresIn())
+                .put("user_id", token.user.id);
         return ok(json);
     }
 
