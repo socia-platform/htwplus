@@ -58,6 +58,7 @@ public class Token extends BaseModel {
 
     public static Token findByAccesToken(String accessToken) {
         try{
+
             return (Token) JPA.em()
                     .createQuery("from Token a where a.accessToken = :accessToken")
                     .setParameter("accessToken", accessToken).getSingleResult();

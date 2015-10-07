@@ -53,9 +53,11 @@ public class APIUserController extends BaseController {
                     .withTemplate(collection.getTemplate().get())
                     .addLinks(collection.getLinks())
                     .addQueries(collection.getQueries());
-            filterdCollectionBuilder.addItem(JsonCollectionUtil
-                            .getRequestedCollection(Account.class, Long.parseLong(session().get("token_user")), "Account")
-                            .getFirstItem().get());
+            if (id == -1 || id == Long.parseLong(session().get("token_user"))) {
+                filterdCollectionBuilder.addItem(JsonCollectionUtil
+                        .getRequestedCollection(Account.class, Long.parseLong(session().get("token_user")), "Account")
+                        .getFirstItem().get());
+            }
             Collection filteredCollection = filterdCollectionBuilder.build();
             return ok(filteredCollection.toString());
         } else {
