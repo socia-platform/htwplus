@@ -9,7 +9,6 @@ db
 eclipse
 log
 logs
-modules
 precompiled
 project/project
 project/target
@@ -27,7 +26,6 @@ server.pid
 conf/application.conf
 public/media
 public/bower_components
-conf/META-INF/persistence.xml
 searchstuff
 htwplus
 node_modules

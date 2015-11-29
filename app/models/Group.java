@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.persistence.*;
 
 import models.base.BaseNotifiable;
@@ -26,6 +27,9 @@ public class Group extends BaseNotifiable implements INotifiable {
     public static final String GROUP_NEW_REQUEST = "group_new_request";
     public static final String GROUP_REQUEST_SUCCESS = "group_request_success";
     public static final String GROUP_REQUEST_DECLINE = "group_request_decline";
+
+	@Inject
+	public transient ElasticsearchService elasticsearchService;
 
     @Required
 	@Column(unique = true)
@@ -85,7 +89,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 	public void create() {
         JPA.em().persist(this);
         try {
-            ElasticsearchService.indexGroup(this);
+			elasticsearchService.indexGroup(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,7 +98,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 	@Override
 	public void update() {
         try {
-            ElasticsearchService.indexGroup(this);
+			elasticsearchService.indexGroup(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,7 +122,7 @@ public class Group extends BaseNotifiable implements INotifiable {
         Notification.deleteReferences(this);
 
         // Delete Elasticsearch document
-        ElasticsearchService.deleteGroup(this);
+		elasticsearchService.deleteGroup(this);
 
 		JPA.em().remove(this);
 	}
@@ -190,9 +194,9 @@ public class Group extends BaseNotifiable implements INotifiable {
         return controllers.routes.GroupController.index().toString();
     }
 
-    public static long indexAllGroups() throws IOException {
+    public long indexAllGroups() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Group group: all()) ElasticsearchService.indexGroup(group);
+        for (Group group: all()) elasticsearchService.indexGroup(group);
         return (System.currentTimeMillis() - start) / 100;
 
     }

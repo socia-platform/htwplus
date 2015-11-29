@@ -15,6 +15,8 @@ import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -23,7 +25,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 /**
  * Created by Iven on 22.12.2014.
  */
-public class ElasticsearchService {
+public class ElasticsearchService implements IElasticsearchService {
     private static ElasticsearchService instance = null;
     private static Client client = null;
     private static final String ES_SETTINGS = ConfigFactory.load().getString("elasticsearch.settings");
@@ -36,9 +38,17 @@ public class ElasticsearchService {
     private static final String ES_TYPE_POST = ConfigFactory.load().getString("elasticsearch.postType");
     private static final int ES_RESULT_SIZE = ConfigFactory.load().getInt("elasticsearch.search.limit");
 
-    private ElasticsearchService() {
-        client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
-
+    public ElasticsearchService() {
+        try {
+            client = TransportClient.builder().build()
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
+            //createAnalyzer();
+            //createMapping();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static ElasticsearchService getInstance() {
@@ -56,16 +66,16 @@ public class ElasticsearchService {
         client.close();
     }
 
-    public static void deleteIndex() {
+    public void deleteIndex() {
         getInstance().getClient().admin().indices().delete(new DeleteIndexRequest(ES_INDEX)).actionGet();
     }
-    public static void createAnalyzer() throws IOException {
+    public void createAnalyzer() throws IOException {
         getInstance().getClient().admin().indices().prepareCreate(ES_INDEX)
                 .setSettings(ES_SETTINGS)
                 .execute().actionGet();
     }
 
-    public static void createMapping() throws IOException {
+    public void createMapping() throws IOException {
         getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_USER)
                 .setSource(ES_USER_MAPPING)
                 .execute().actionGet();
@@ -79,7 +89,7 @@ public class ElasticsearchService {
                 .execute().actionGet();
     }
 
-    public static void indexPost(Post post) throws IOException {
+    public void indexPost(Post post) throws IOException {
         IndexResponse indexResponse = getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
@@ -92,7 +102,7 @@ public class ElasticsearchService {
                 .actionGet();
     }
 
-    public static void indexGroup(Group group) throws IOException {
+    public void indexGroup(Group group) throws IOException {
         IndexResponse indexResponse = getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
@@ -106,7 +116,7 @@ public class ElasticsearchService {
                 .actionGet();
     }
 
-    public static void indexAccount(Account account) throws IOException {
+    public void indexAccount(Account account) throws IOException {
         IndexResponse response = getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .setSource(jsonBuilder()
                                 .startObject()
@@ -134,7 +144,8 @@ public class ElasticsearchService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public static SearchResponse doSearch(String caller, String query, String filter, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
+    public SearchResponse doSearch(String caller, String query, String filter, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) {
+    /**
 
         QueryBuilder searchQuery;
 
@@ -154,6 +165,8 @@ public class ElasticsearchService {
 
         // Build viewableFilter to show authorized posts only
         FilterBuilder viewableFilter = FilterBuilders.boolFilter().should(FilterBuilders.termFilter("viewable", currentAccountId),FilterBuilders.termFilter("public", true));
+
+
 
         // Build filteredQuery to apply viewableFilter to completeQuery
         QueryBuilder filteredQuery = QueryBuilders.filteredQuery(completeQuery, viewableFilter);
@@ -187,21 +200,23 @@ public class ElasticsearchService {
         SearchResponse response = searchRequest.execute().get();
 
         return response;
+     */
+        return null;
     }
 
-    public static void deleteGroup(Group group) {
+    public void deleteGroup(Group group) {
         DeleteResponse response = client.prepareDelete(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .execute()
                 .actionGet();
     }
 
-    public static void deletePost(Post post) {
+    public void deletePost(Post post) {
         DeleteResponse response = client.prepareDelete(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .execute()
                 .actionGet();
     }
 
-    public static void deleteAccount(Account account) {
+    public void deleteAccount(Account account) {
         DeleteResponse response = client.prepareDelete(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .execute()
                 .actionGet();

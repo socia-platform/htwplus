@@ -7,6 +7,7 @@ import java.util.Set;
 
 import java.io.File;
 
+import javax.inject.Inject;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -37,6 +38,9 @@ import scala.Char;
 public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	private final static Logger.ALogger logger = Logger.of(Account.class);
+
+    @Inject
+    public transient ElasticsearchService elasticsearchService;
 
 	public String loginname;
 
@@ -100,7 +104,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		this.name = firstname+" "+lastname;
 		JPA.em().persist(this);
         try {
-            ElasticsearchService.indexAccount(this);
+			elasticsearchService.indexAccount(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -341,6 +345,9 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
         return JPA.em().createQuery("FROM Account").getResultList();
 	}
 
+    public List<Account> all2() {
+        return JPA.em().createQuery("FROM Account").getResultList();
+    }
 
     /**
      * Returns a list of account instances by an ID collection of Strings.
@@ -381,7 +388,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
      */
     public void indexAccount() {
         try {
-            ElasticsearchService.indexAccount(this);
+			elasticsearchService.indexAccount(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -390,9 +397,9 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
     /**
      * Index all accounts
      */
-    public static long indexAllAccounts() throws IOException {
+    public long indexAllAccounts() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Account account: all()) ElasticsearchService.indexAccount(account);
+        for (Account account: all2()) elasticsearchService.indexAccount(account);
         return (System.currentTimeMillis() - start) / 100;
 
     }

@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
   "org.apache.directory.api" % "api-all" % "1.0.0-M20",
   "commons-io" % "commons-io" % "2.4",
   "com.typesafe.play" %% "play-mailer" % "3.0.1",
-  "org.elasticsearch" % "elasticsearch" % "1.4.1",
+  "org.elasticsearch" % "elasticsearch" % "2.0.0",
   "eu.medsea.mimeutil" % "mime-util" % "2.1.3",
   "org.imgscalr" % "imgscalr-lib" % "4.2",
   "joda-time" % "joda-time" % "2.7",

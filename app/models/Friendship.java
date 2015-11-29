@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -23,7 +24,10 @@ public class Friendship extends BaseNotifiable implements INotifiable {
     public static final String FRIEND_REQUEST_DECLINE = "request_decline";
     public static final String FRIEND_NEW_REQUEST = "new_request";
     public static final int PAGE = 1;
-	
+
+	@Inject
+	public transient ElasticsearchService elasticsearchService;
+
 	@ManyToOne
 	@NotNull
 	public Account account;
@@ -61,7 +65,7 @@ public class Friendship extends BaseNotifiable implements INotifiable {
         // each account document contains information about their friends
         // if a user accepts a friendship -> (re)index this.account document
         try {
-            ElasticsearchService.indexAccount(this.account);
+            elasticsearchService.indexAccount(this.account);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,7 +80,7 @@ public class Friendship extends BaseNotifiable implements INotifiable {
         // each account document contains information about their friends
         // if a user deletes his friendship -> (re)index this.account document
         try {
-            ElasticsearchService.indexAccount(this.account);
+            elasticsearchService.indexAccount(this.account);
         } catch (IOException e) {
             e.printStackTrace();
         }

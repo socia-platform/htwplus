@@ -11,7 +11,6 @@ import models.services.NotificationService;
 
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.indices.IndexAlreadyExistsException;
-import org.elasticsearch.indices.IndexMissingException;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -24,6 +23,7 @@ import play.mvc.With;
 import views.html.Admin.*;
 import play.libs.F.Promise;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.*;
 
@@ -31,6 +31,12 @@ import java.util.*;
 // Action performs the authentication
 @With(AdminAction.class)
 public class AdminController extends BaseController {
+
+    @Inject
+    ElasticsearchService elasticsearchService;
+
+    @Inject
+    Account account;
 
 	static Form<Account> accountForm = form(Account.class);
     static Form<Post> postForm = form(Post.class);
@@ -90,11 +96,9 @@ public class AdminController extends BaseController {
 
     public Result indexDelete() {
         try {
-            ElasticsearchService.deleteIndex();
+            elasticsearchService.deleteIndex();
             flash("info","index gelöscht");
-        } catch(IndexMissingException ime) {
-            flash("error","index "+ime.getMessage());
-        } catch(NoNodeAvailableException nna) {
+        }  catch(NoNodeAvailableException nna) {
             flash("error",nna.getMessage());
         }
 
@@ -103,8 +107,8 @@ public class AdminController extends BaseController {
 
     public Result indexSettings() throws IOException {
         try {
-            ElasticsearchService.createAnalyzer();
-            ElasticsearchService.createMapping();
+            elasticsearchService.createAnalyzer();
+            elasticsearchService.createMapping();
             flash("success","Mapping und Anazyler erfolgreich erstellt!");
         } catch(NoNodeAvailableException nnae) {
             flash("error",nnae.getMessage());
@@ -115,23 +119,23 @@ public class AdminController extends BaseController {
     }
 
     public Result indexAccounts() throws IOException {
-        long time = Account.indexAllAccounts();
+        long time = account.indexAllAccounts();
         String out = "Alle Accounts indexiert ("+Long.toString(time)+"ms)";
         flash("info",out);
         return ok(indexing.render());
     }
 
     public Result indexGroups() throws IOException {
-        long time = Group.indexAllGroups();
+        /**long time = group.indexAllGroups();
         String out = "Alle Gruppen indexiert ("+Long.toString(time)+"ms)";
-        flash("info",out);
+        flash("info",out);*/
         return ok(indexing.render());
     }
 
     public Result indexPosts() throws IOException {
-        long time = Post.indexAllPosts();
+        /**long time = post.indexAllPosts();
         String out = "Alle Posts indexiert ("+Long.toString(time)+"ms)";
-        flash("info",out);
+        flash("info",out);*/
         return ok(indexing.render());
     }
 

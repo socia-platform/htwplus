@@ -1,5 +1,6 @@
 package models;
 
+import javax.inject.Inject;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -18,6 +19,9 @@ import play.libs.F;
 @Table(name = "group_account", uniqueConstraints = @UniqueConstraint(columnNames = {
 		"account_id", "group_id" }))
 public class GroupAccount extends BaseModel {
+
+	@Inject
+	public transient ElasticsearchService elasticsearchService;
 
 	@ManyToOne(optional = false)
 	public Group group;
@@ -50,7 +54,7 @@ public class GroupAccount extends BaseModel {
         // each group document contains information about their member
         // if a user create or join to this.group -> (re)index this.group document
         try {
-            ElasticsearchService.indexGroup(this.group);
+			elasticsearchService.indexGroup(this.group);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,9 +68,9 @@ public class GroupAccount extends BaseModel {
         // if a user gets access to this.group -> (re)index this.group document
         // and (re)index all containing post documents
         try {
-            ElasticsearchService.indexGroup(this.group);
+			elasticsearchService.indexGroup(this.group);
             for (Post post : Post.getPostsForGroup(this.group, 0, 0)) {
-                ElasticsearchService.indexPost(post);
+				elasticsearchService.indexPost(post);
             }
             ;
         } catch (IOException e) {
@@ -83,7 +87,7 @@ public class GroupAccount extends BaseModel {
         // each group document contains information about their member
         // if a user leaves this.group -> (re)index this.group document
         try {
-            ElasticsearchService.indexGroup(this.group);
+			elasticsearchService.indexGroup(this.group);
         } catch (IOException e) {
             e.printStackTrace();
         }

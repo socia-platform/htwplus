@@ -19,6 +19,7 @@ import views.html.*;
 import controllers.Navigation.Level;
 import org.elasticsearch.action.search.SearchResponse;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,6 +36,9 @@ public class Application extends BaseController {
 	static Form<Post> postForm = Form.form(Post.class);
 	static final int LIMIT = ConfigFactory.load().getInt("htwplus.post.limit");
 	static final int PAGE = 1;
+
+    @Inject
+    ElasticsearchService elasticsearchService;
 
 	
 	public Result javascriptRoutes() {
@@ -83,7 +87,7 @@ public class Application extends BaseController {
 	}
 
     public Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        SearchResponse response = ElasticsearchService.doSearch("searchSuggestions", query, "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
+        SearchResponse response = elasticsearchService.doSearch("searchSuggestions", query, "all", 1,  Component.currentAccount().id.toString(), asList("name","title"), asList("user.friends", "group.member"));
         return ok(response.toString());
     }
 
@@ -91,7 +95,7 @@ public class Application extends BaseController {
         Navigation.set(Level.SEARCH);
         return ok(search.render());
     }
-	
+
 	@Security.Authenticated(Secured.class)
 	public Result search(int page) throws ExecutionException, InterruptedException {
         Navigation.set(Level.SEARCH);
@@ -122,8 +126,9 @@ public class Application extends BaseController {
         long groupCount = 0;
         long postCount = 0;
 
+
         try {
-            response = ElasticsearchService.doSearch("search", keyword.toLowerCase(), mode, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
+            response = elasticsearchService.doSearch("search", keyword.toLowerCase(), mode, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
         } catch (NoNodeAvailableException nna) {
             flash("error", "Leider steht die Suche zur Zeit nicht zur Verfügung!");
             return ok(search.render());
@@ -158,7 +163,7 @@ public class Application extends BaseController {
         Terms terms = response.getAggregations().get("types");
         Collection<Terms.Bucket> buckets = terms.getBuckets();
         for (Terms.Bucket bucket : buckets) {
-            switch (bucket.getKey()) {
+            switch (bucket.getKey().toString()) {
                 case "user":
                     userCount = bucket.getDocCount();
                     break;

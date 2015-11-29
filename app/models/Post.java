@@ -3,6 +3,7 @@ package models;
 import java.io.IOException;
 import java.util.*;
 
+import javax.inject.Inject;
 import javax.persistence.*;
 
 import controllers.Component;
@@ -28,6 +29,9 @@ public class Post extends BaseNotifiable implements INotifiable {
     public static final String COMMENT_GROUP = "comment_group";             // comment on a group post
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
     public static final String BROADCAST = "broadcast";                     // broadcast post from admin control center
+
+    @Inject
+    public transient  ElasticsearchService elasticsearchService;
 
     @Required
     @Lob
@@ -64,7 +68,7 @@ public class Post extends BaseNotifiable implements INotifiable {
 		JPA.em().persist(this);
         try {
             if (!this.owner.role.equals(AccountRole.ADMIN))
-            ElasticsearchService.indexPost(this);
+                elasticsearchService.indexPost(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,7 +98,7 @@ public class Post extends BaseNotifiable implements INotifiable {
         Notification.deleteReferences(this);
 
         // Delete Elasticsearch document
-        ElasticsearchService.deletePost(this);
+        elasticsearchService.deletePost(this);
 
         JPA.em().remove(this);
 	}
@@ -453,9 +457,9 @@ public class Post extends BaseNotifiable implements INotifiable {
         return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
     }
 
-    public static long indexAllPosts() throws IOException {
+    public long indexAllPosts() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Post post: allWithoutAdmin()) ElasticsearchService.indexPost(post);
+        for (Post post: allWithoutAdmin()) elasticsearchService.indexPost(post);
         return (System.currentTimeMillis() - start) / 100;
 
     }

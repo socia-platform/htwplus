@@ -11,6 +11,8 @@ import models.Group;
 import models.Post;
 import models.enums.AccountRole;
 import models.enums.GroupType;
+import models.services.IElasticsearchService;
+import org.elasticsearch.bootstrap.Elasticsearch;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.joda.time.DateTime;
@@ -70,7 +72,8 @@ public class Global extends GlobalSettings {
     @Override
     public void onStop(Application app) {
         Logger.info("closing ES client...");
-        ElasticsearchService.getInstance().closeClient();
+        ElasticsearchService elasticsearchService = Play.application().injector().instanceOf(ElasticsearchService.class);
+        elasticsearchService.closeClient();
         Logger.info("ES client closed");
     }
 
@@ -186,18 +189,6 @@ public class Global extends GlobalSettings {
                         group.description = "Du hast Wünsche, Ideen, Anregungen, Kritik oder Probleme mit der Seite? Hier kannst du es loswerden!";
                         group.createWithGroupAccount(admin);
                     }
-
-                    // try creating elasticsearch analyzer and mapping
-                    try {
-                        ElasticsearchService.createAnalyzer();
-                        ElasticsearchService.createMapping();
-                    } catch(NoNodeAvailableException nnae) {
-                        Logger.error(nnae.getMessage());
-                    } catch(IndexAlreadyExistsException iaee) {
-                        Logger.info("index "+iaee.getMessage());
-                    }
-
-
 				}
 			});
 		}
