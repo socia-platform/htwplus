@@ -14,6 +14,7 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -25,6 +26,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 /**
  * Created by Iven on 22.12.2014.
  */
+@Singleton
 public class ElasticsearchService implements IElasticsearchService {
     private static ElasticsearchService instance = null;
     private static Client client = null;

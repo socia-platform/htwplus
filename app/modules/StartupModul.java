@@ -1,8 +1,11 @@
 package modules;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 import models.services.ElasticsearchService;
-import models.services.IElasticsearchService;
+import services.DatabaseService;
+import services.ElasticsearchInit;
+import services.PostgresInit;
 
 /**
  * Created by Iven on 28.11.2015.
@@ -10,7 +13,7 @@ import models.services.IElasticsearchService;
 public class StartupModul extends AbstractModule {
     @Override
     protected void configure() {
-
-         bind(IElasticsearchService.class).to(ElasticsearchService.class).asEagerSingleton();
+        bind(DatabaseService.class).annotatedWith(Names.named("postgres")).to(PostgresInit.class).asEagerSingleton();
+        bind(DatabaseService.class).annotatedWith(Names.named("elasticsearch")).to(ElasticsearchInit.class).asEagerSingleton();
     }
 }
