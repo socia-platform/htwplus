@@ -83,7 +83,7 @@ public class ElasticsearchResponse {
         Terms terms = this.elasticsearchResponse.getAggregations().get("types");
         Collection<Terms.Bucket> buckets = terms.getBuckets();
         for (Terms.Bucket bucket : buckets) {
-            switch (bucket.getKey()) {
+            switch (bucket.getKey().toString()) {
                 case "user":
                     lUserDocuments = bucket.getDocCount();
                     break;

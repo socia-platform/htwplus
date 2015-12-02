@@ -113,6 +113,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	public void create() {
 		this.name = firstname+" "+lastname;
 		JPA.em().persist(this);
+        Logger.info(this.toString());
         try {
 			elasticsearchService.indexAccount(this);
         } catch (IOException e) {

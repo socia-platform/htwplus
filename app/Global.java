@@ -3,14 +3,11 @@ import java.util.concurrent.TimeUnit;
 import models.services.ElasticsearchService;
 import models.services.EmailService;
 
-import controllers.Component;
 import controllers.MediaController;
 import controllers.routes;
 import models.Account;
 import models.Group;
 import models.Post;
-import models.enums.AccountRole;
-import models.enums.GroupType;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import play.Play;
@@ -60,12 +57,6 @@ public class Global extends GlobalSettings {
             },
             Akka.system().dispatcher()
         );
-
-        // trying to connect to Elasticsearch
-        ElasticsearchService.getInstance().getClient();
-
-		InitialData.insert(app);
-
 	}
 
     @Override
@@ -143,73 +134,5 @@ public class Global extends GlobalSettings {
 		}
 
 		return super.onError(rh, t);
-	}
-	
-	static class InitialData {
-		public static void insert(Application app) {
-			
-			final String adminGroupTitle = app.configuration().getString("htwplus.admin.group");
-			final String adminMail = app.configuration().getString("htwplus.admin.mail");
-			final String adminPassword = app.configuration().getString("htwplus.admin.pw");
-
-            final String dummyMail = app.configuration().getString("htwplus.dummy.mail");
-            final String dummyPassword = app.configuration().getString("htwplus.dummy.pw");
-            
-			// Do some inital db stuff
-			JPA.withTransaction(new play.libs.F.Callback0() {
-				@Override
-				public void invoke() throws Throwable {
-                    // create Admin account if none exists
-                    Account admin = Account.findByEmail(adminMail);
-                    if (admin == null) {
-                        admin = new Account();
-                        admin.email = adminMail;
-                        admin.firstname = "Admin";
-                        admin.lastname = "@HTWplus";
-                        admin.role = AccountRole.ADMIN;
-                        admin.avatar = "a1";
-                        admin.password = Component.md5(adminPassword);
-                        admin.create();
-                    }
-
-                    // create Dummy anonymous account, if it doesn't exist //
-                    Account dummy = Account.findByEmail(dummyMail);
-                    if (dummy == null) {
-                        dummy = new Account();
-                        dummy.email = dummyMail;
-                        dummy.firstname = "Gelöschter";
-                        dummy.lastname = "Account";
-                        dummy.role = AccountRole.DUMMY;
-                        dummy.avatar = "aDefault";
-                        dummy.password = Component.md5(dummyPassword);
-                        dummy.create();
-                    } else if(dummy.firstname.equals("Anonym")) {
-                        dummy.firstname = "Gelöschter";
-                        dummy.lastname = "Account";
-                        dummy.update();
-                    }
-
-                    // create Admin group if none exists
-                    Group group = Group.findByTitle(adminGroupTitle);
-                    if (group == null) {
-                        group = new Group();
-                        group.title = adminGroupTitle;
-                        group.groupType = GroupType.close;
-                        group.description = "for HTWplus Admins only";
-                        group.createWithGroupAccount(admin);
-                    }
-
-                    // create Feedback group if none exists
-                    Group feedbackGroup = Group.findByTitle("HTWplus Feedback");
-                    if (feedbackGroup == null) {
-                        group = new Group();
-                        group.title = "HTWplus Feedback";
-                        group.groupType = GroupType.open;
-                        group.description = "Du hast Wünsche, Ideen, Anregungen, Kritik oder Probleme mit der Seite? Hier kannst du es loswerden!";
-                        group.createWithGroupAccount(admin);
-                    }
-				}
-			});
-		}
 	}
 }

@@ -1,5 +1,6 @@
 package models.services;
 
+import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import models.*;
 import models.enums.LinkType;
@@ -26,18 +27,20 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
  */
 @Singleton
 public class ElasticsearchService implements IElasticsearchService {
-    private static ElasticsearchService instance = null;
-    private static Client client = null;
-    private static final String ES_SERVER = ConfigFactory.load().getString("elasticsearch.server");
-    private static final String ES_SETTINGS = ConfigFactory.load().getString("elasticsearch.settings");
-    private static final String ES_USER_MAPPING = ConfigFactory.load().getString("elasticsearch.userMapping");
-    private static final String ES_GROUP_MAPPING = ConfigFactory.load().getString("elasticsearch.groupMapping");
-    private static final String ES_POST_MAPPING = ConfigFactory.load().getString("elasticsearch.postMapping");
-    private static final String ES_INDEX = ConfigFactory.load().getString("elasticsearch.index");
-    private static final String ES_TYPE_USER = ConfigFactory.load().getString("elasticsearch.userType");
-    private static final String ES_TYPE_GROUP = ConfigFactory.load().getString("elasticsearch.groupType");
-    private static final String ES_TYPE_POST = ConfigFactory.load().getString("elasticsearch.postType");
-    private static final int ES_RESULT_SIZE = ConfigFactory.load().getInt("elasticsearch.search.limit");
+
+    private Client client = null;
+    private Config conf = ConfigFactory.load();
+
+    private final String ES_SERVER = conf.getString("elasticsearch.server");
+    private final String ES_SETTINGS = conf.getString("elasticsearch.settings");
+    private final String ES_USER_MAPPING = conf.getString("elasticsearch.userMapping");
+    private final String ES_GROUP_MAPPING = conf.getString("elasticsearch.groupMapping");
+    private final String ES_POST_MAPPING = conf.getString("elasticsearch.postMapping");
+    private final String ES_INDEX = conf.getString("elasticsearch.index");
+    private final String ES_TYPE_USER = conf.getString("elasticsearch.userType");
+    private final String ES_TYPE_GROUP = conf.getString("elasticsearch.groupType");
+    private final String ES_TYPE_POST = conf.getString("elasticsearch.postType");
+    private final int ES_RESULT_SIZE = conf.getInt("elasticsearch.search.limit");
 
     public ElasticsearchService() {
         try {
@@ -46,13 +49,6 @@ public class ElasticsearchService implements IElasticsearchService {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-    }
-
-    public static ElasticsearchService getInstance() {
-        if (instance == null) {
-            instance = new ElasticsearchService();
-        }
-        return instance;
     }
 
     public Client getClient() {
@@ -64,41 +60,41 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     public boolean isClientAvailable() {
-        if(((TransportClient) getInstance().getClient()).connectedNodes().size() == 0)
+        if(((TransportClient) client).connectedNodes().size() == 0)
             return false;
         return true;
     }
 
     public boolean isIndexExists() {
-        return getInstance().getClient().admin().indices().exists(new IndicesExistsRequest(ES_INDEX)).actionGet().isExists();
+        return client.admin().indices().exists(new IndicesExistsRequest(ES_INDEX)).actionGet().isExists();
     }
 
     public void deleteIndex() {
-        if(isClientAvailable()) getInstance().getClient().admin().indices().delete(new DeleteIndexRequest(ES_INDEX)).actionGet();
+        if(isClientAvailable()) client.admin().indices().delete(new DeleteIndexRequest(ES_INDEX)).actionGet();
     }
 
     public void createAnalyzer() {
-        if(isClientAvailable()) getInstance().getClient().admin().indices().prepareCreate(ES_INDEX)
+        if(isClientAvailable()) client.admin().indices().prepareCreate(ES_INDEX)
                 .setSettings(ES_SETTINGS)
                 .execute().actionGet();
     }
 
     public void createMapping() {
-        if(isClientAvailable()) getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_USER)
+        if(isClientAvailable()) client.admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_USER)
                 .setSource(ES_USER_MAPPING)
                 .execute().actionGet();
 
-        if(isClientAvailable()) getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_POST)
+        if(isClientAvailable()) client.admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_POST)
                 .setSource(ES_POST_MAPPING)
                 .execute().actionGet();
 
-        if(isClientAvailable()) getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_GROUP)
+        if(isClientAvailable()) client.admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_GROUP)
                 .setSource(ES_GROUP_MAPPING)
                 .execute().actionGet();
     }
 
     public void indexPost(Post post) throws IOException {
-        if(isClientAvailable()) getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_POST, post.id.toString())
+        if(isClientAvailable()) client.prepareIndex(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("content", post.content)
@@ -111,7 +107,7 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     public void indexGroup(Group group) throws IOException {
-        if(isClientAvailable()) getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
+        if(isClientAvailable()) client.prepareIndex(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("title", group.title)
@@ -125,7 +121,7 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     public void indexAccount(Account account) throws IOException {
-        if(isClientAvailable()) getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_USER, account.id.toString())
+        if(isClientAvailable()) client.prepareIndex(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .setSource(jsonBuilder()
                                 .startObject()
                                 .field("name", account.name)
@@ -212,7 +208,7 @@ public class ElasticsearchService implements IElasticsearchService {
         QueryBuilder filteredQuery = QueryBuilders.filteredQuery(completeQuery, boolFilterBuilder);
 
         // Build searchRequest which will be executed after fields to highlight are added.
-        SearchRequestBuilder searchRequest = ElasticsearchService.getInstance().getClient().prepareSearch(ES_INDEX)
+        SearchRequestBuilder searchRequest = ElasticsearchService.client.prepareSearch(ES_INDEX)
                 .setQuery(filteredQuery);
 
         // Add highlighting on all fields to search on
@@ -262,19 +258,19 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     public void deleteGroup(Group group) {
-        if(isClientAvailable()) getInstance().getClient().prepareDelete(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
+        if(isClientAvailable()) client.prepareDelete(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .execute()
                 .actionGet();
     }
 
     public void deletePost(Post post) {
-        if(isClientAvailable()) getInstance().getClient().prepareDelete(ES_INDEX, ES_TYPE_POST, post.id.toString())
+        if(isClientAvailable()) client.prepareDelete(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .execute()
                 .actionGet();
     }
 
     public void deleteAccount(Account account) {
-        if(isClientAvailable()) getInstance().getClient().prepareDelete(ES_INDEX, ES_TYPE_USER, account.id.toString())
+        if(isClientAvailable()) client.prepareDelete(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .execute()
                 .actionGet();
     }

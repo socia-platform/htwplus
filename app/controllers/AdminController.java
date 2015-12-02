@@ -89,7 +89,7 @@ public class AdminController extends BaseController {
 	}
 
     @Transactional
-    public static Result deleteAccount(Long accountId) {
+    public Result deleteAccount(Long accountId) {
         Account current = Account.findById(accountId);
 
         if(!Secured.deleteAccount(current)) {
@@ -209,6 +209,7 @@ public class AdminController extends BaseController {
         Promise<Result> promiseResult = Promise.promise(
             new F.Function0<Result>() {
                 public Result apply() {
+
                     if (!Secured.isAdmin()) {
                         return redirect(controllers.routes.Application.index());
                     }

@@ -14,6 +14,7 @@ import models.services.AvatarService;
 import play.Play;
 import play.data.Form;
 import play.db.jpa.JPA;
+import play.mvc.Call;
 import play.mvc.Http.MultipartFormData;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
@@ -108,9 +109,9 @@ public class ProfileController extends BaseController {
 		return redirect(controllers.routes.ProfileController.view(accountId));
 	}
 
-	public Result editPassword(Long id) {
+	public Result convert(Long id) {
 		Account account = Account.findById(id);
-		
+
 		if (account == null) {
 			flash("info", "Diese Person gibt es nicht.");
 			return redirect(controllers.routes.Application.index());
@@ -119,49 +120,49 @@ public class ProfileController extends BaseController {
 		if(!Secured.isAdmin()) {
 			return redirect(controllers.routes.Application.index());
 		}
-		
+
 		Navigation.set(Level.PROFILE, "Konvertieren");
 		return ok(convert.render(account, accountForm.fill(account)));
 	}
 
-	public Result updatePassword(Long id) {
+	public Result saveConvert(Long id) {
 		// Get regarding Object
 		Account account = Account.findById(id);
 		if (account == null) {
 			flash("info", "Diese Person gibt es nicht.");
 			return redirect(controllers.routes.Application.index());
 		}
-		
+
 		// Create error switch
 		Boolean error = false;
-		
+
 		// Check Access
 		if(!Secured.isAdmin()) {
 			return redirect(controllers.routes.Application.index());
 		}
-		
+
 		// Get data from request
 		Form<Account> filledForm = accountForm.bindFromRequest();
-		
-		
+
+
 		// Remove all unnecessary fields
 		filledForm.errors().remove("firstname");
 		filledForm.errors().remove("lastname");
 
 		// Store old and new password for validation
-        String email = filledForm.field("email").value();
+		String email = filledForm.field("email").value();
 		String password = filledForm.field("password").value();
 		String repeatPassword = filledForm.field("repeatPassword").value();
-		
+
 		// Perform JPA Validation
 		if(filledForm.hasErrors()) {
 			error = true;
 		}
 
-        if (email.isEmpty()) {
-            filledForm.reject("email", "Für einen lokalen Account ist eine EMail nötig!");
-            error = true;
-        }
+		if (email.isEmpty()) {
+			filledForm.reject("email", "Für einen lokalen Account ist eine EMail nötig!");
+			error = true;
+		}
 		if (password.length() < 6) {
 			filledForm.reject("password", "Das Passwort muss mindestens 6 Zeichen haben.");
 			error = true;
@@ -176,7 +177,7 @@ public class ProfileController extends BaseController {
 			return badRequest(convert.render(account, filledForm));
 		} else {
 			account.password = Component.md5(password);
-            account.email = email;
+			account.email = email;
 			account.update();
 			flash("success", "Account erfolgreich konvertiert.");
 		}
@@ -229,7 +230,7 @@ public class ProfileController extends BaseController {
 			filledForm.reject("email", "Diese Mail wird bereits verwendet!");
 			return badRequest(edit.render(account, filledForm, loginForm));
 		}
-		System.out.println(filledForm.errorsAsJson());
+
 		// Perform JPA Validation
 		if (filledForm.hasErrors()) {
 			return badRequest(edit.render(account, filledForm, loginForm));
@@ -314,7 +315,7 @@ public class ProfileController extends BaseController {
     }
 
     @Transactional
-    public static Result deleteProfile(Long accountId) {
+    public Result deleteProfile(Long accountId) {
         Account current = Account.findById(accountId);
 
         if(!Secured.deleteAccount(current)) {
@@ -337,9 +338,9 @@ public class ProfileController extends BaseController {
         current.delete();
 
         // override logout message
-        Result logoutResult = AccountController.logout();
+        Call logoutResult = controllers.routes.AccountController.logout();
         flash("success", Messages.get("profile.delete.success"));
-        return logoutResult;
+        return redirect(logoutResult);
     }
 
 	/**
