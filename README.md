@@ -1,4 +1,4 @@
-# HTWplus
+1# HTWplus
 
 HTWplus is a straightforward and lightweight social network. It offers essential social networking functionalities: Friendships, groups, a personal newsfeed and file sharing. It is built with the Play Framework 2, PostgreSQL and Elasticsearch.
 
