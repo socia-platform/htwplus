@@ -3,14 +3,12 @@ package controllers;
 import static play.data.Form.form;
 
 import models.Account;
-import models.Group;
 import models.Post;
 import models.enums.AccountRole;
 import models.services.ElasticsearchService;
 import models.services.NotificationService;
 
 import org.elasticsearch.client.transport.NoNodeAvailableException;
-import org.elasticsearch.indices.IndexAlreadyExistsException;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -90,6 +88,30 @@ public class AdminController extends BaseController {
 
 	}
 
+    @Transactional
+    public static Result deleteAccount(Long accountId) {
+        Account current = Account.findById(accountId);
+
+        if(!Secured.deleteAccount(current)) {
+            flash("error", Messages.get("profile.delete.nopermission"));
+            return redirect(controllers.routes.AdminController.listAccounts());
+        }
+
+        DynamicForm df = play.data.Form.form().bindFromRequest();
+        if(!df.get("confirmText").toLowerCase().equals("account wirklich löschen")) {
+            flash("error", Messages.get("admin.delete_account.wrongconfirm"));
+            return redirect(controllers.routes.AdminController.listAccounts());
+        }
+
+        // ACTUAL DELETION //
+        Logger.info("Deleting Account[#"+current.id+"]...");
+        current.delete();
+
+        // override logout message
+        flash("success", Messages.get("admin.delete_account.success"));
+        return redirect(routes.AdminController.listAccounts());
+    }
+
     public Result indexing() {
         return ok(indexing.render());
     }
@@ -106,15 +128,18 @@ public class AdminController extends BaseController {
     }
 
     public Result indexSettings() throws IOException {
-        try {
-            elasticsearchService.createAnalyzer();
-            elasticsearchService.createMapping();
-            flash("success","Mapping und Anazyler erfolgreich erstellt!");
-        } catch(NoNodeAvailableException nnae) {
-            flash("error",nnae.getMessage());
-        } catch(IndexAlreadyExistsException iaee) {
-            flash("error","index "+iaee.getMessage());
+        if (elasticsearchService.isClientAvailable()) {
+            if (!elasticsearchService.isIndexExists()) {
+                elasticsearchService.createAnalyzer();
+                elasticsearchService.createMapping();
+                flash("success","Mapping und Anazyler erfolgreich erstellt!");
+            } else {
+                flash("error","Index bereits vorhanden.");
+            }
+        } else {
+            flash("error", "Elasticsearch nicht erreichbar!");
         }
+
         return ok(indexing.render());
     }
 

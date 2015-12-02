@@ -127,6 +127,41 @@ public class AccountController extends BaseController {
 		}
 	}
 
+    /**
+     * Checks if the specified password is correct for the current used
+     *
+     * @param accountId the account which password should be checked
+     * @param password the password to check
+     * @return true, if the password is correct
+     */
+    public static boolean checkPassword(Long accountId, String password) {
+        Account account = Account.findById(accountId);
+
+        if(password == null || password.length() == 0) {
+            flash("error", Messages.get("Kein Passwort angegeben!"));
+            return false;
+        }
+
+        if(account.loginname == null || account.loginname.length() == 0) { // not an LDAP Account
+            Account auth = Account.authenticate(account.email, password);
+            if(auth == null || auth.id != account.id) {
+                flash("error", Messages.get("profile.delete.wrongpassword"));
+                return false;
+            } else {
+                return true;
+            }
+        } else { // LDAP Account
+            LdapService ldap = LdapService.getInstance();
+            try {
+                ldap.connect(account.loginname, password); // try logging in with the specified password
+                return true; // login successful
+            } catch (LdapService.LdapConnectorException e) {
+                flash("error", e.getMessage());
+                return false;
+            }
+        }
+    }
+
 	/**
 	 * Logout and clean the session.
 	 */

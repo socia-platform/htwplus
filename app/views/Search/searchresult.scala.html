@@ -1,0 +1,110 @@
+@(currentPage: Integer, searchLimit: Integer, response : models.services.ElasticsearchResponse)
+@import helper._
+@import models.enums._
+@main(response.keyword){
+
+    <div class="row">
+        <div class="col-sm-9" role="main">
+            <div class="hp-notepad-content addmargin">
+
+            @defining(Component.currentAccount()) { currentUser =>
+
+                <h3>@response.getDocumentCount @Html(Messages("search.headline", truncate(response.keyword,30)))</h3>
+            @ctx.args.put("searchKeyword", response.keyword)
+                <br />
+
+            @if(response.getDocumentCount != 0) {
+
+                @for(result <- response.resultList) {
+
+                    @result match {
+                        case account: Account => {
+                            @if(response.searchMode.equals("user") || response.searchMode.equals("all")) {
+                                <div class="well searchresult-container hp-pagination-container">
+                                    <div class="account-result media">
+                                        @views.html.snippets.userLinkAvatar(account)
+                                        <div class="media-body">
+                                            <div class="media-heading">
+                                            @views.html.snippets.userLink(account, "top")
+                                            </div>
+                                            <small>
+                                            @if(Friendship.alreadyFriendly(currentUser, account)) {
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                                <span> Ihr seid bereits befreundet.</span>
+                                            } else {
+                                                <span>Mit dieser Person bist du noch nicht befreundet.</span>
+                                            }
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        case group: Group => {
+                            @if(response.searchMode.equals("group") || response.searchMode.equals("all")) {
+                                <div class="well searchresult-container hp-pagination-container">
+                                    <div class="group-result media">
+                                        <div class="pull-left">
+                                        @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
+                                        @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
+                                        @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
+                                        </div>
+                                        <div class="media-body">
+                                            <div class="media-heading">
+                                                <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
+                                            </div>
+                                            <small>
+                                                <span class="glyphicon glyphicon-user"></span>
+                                                @views.html.snippets.userLink(group.owner)
+                                                <br />
+                                            </small>
+                                            <small>
+                                            @if(Secured.isMemberOfGroup(group, currentUser)) {
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                                <span> Du bist bereits Mitglied dieser Gruppe.</span>
+                                            }
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        case post: Post => {
+                            @if(response.searchMode.equals("post") || response.searchMode.equals("all")) {
+                                <div class="well searchresult-container hp-pagination-container">
+                                    <div class="post-result media">
+                                        @views.html.snippets.userLinkAvatar(post.owner)
+                                        <div class="media-body">
+                                            <div class="media-heading">
+                                                @views.html.snippets.userLink(post.owner)
+                                                @if(post.belongsToGroup){schrieb einen <a href="@routes.PostController.view(post.id)">Post</a> in <a href="@routes.GroupController.stream(post.group.id)">@truncate(post.group.title,50)</a>}
+                                                @if(post.belongsToPost){schrieb ein Kommentar zu einem <a href="@routes.PostController.view(post.parent.id)">Post</a>}
+                                                @if(post.belongsToAccount && currentUser != post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(post.account)}
+                                                @if(post.belongsToAccount && currentUser == post.account && post.account != post.owner){&rarr; @views.html.snippets.userLink(currentUser)}
+                                                <small>am @post.createdAt.format("dd.MM.yyyy HH:mm")</small>
+                                            </div>
+
+                                        </div>
+                                        <div class="hp-truncate hp-white-space" id="@post.id">@Html(post.searchContent)</div>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        case _ => { @result }
+                    }
+                }
+                @views.html.pagination(response.getDocumentCount.toInt, searchLimit, currentPage, Navigation.getUriWithoutPagination, "&", true)
+            }
+            }
+            </div>
+        </div>
+        @if(response.searchMode.equals("all")) { @views.html.Search.snippets.siteNavigation(response) }
+        @if(response.searchMode.equals("user")) { @views.html.Search.snippets.userSiteNavigation(response) }
+        @if(response.searchMode.equals("group")) { @views.html.Search.snippets.groupSiteNavigation(response) }
+        @if(response.searchMode.equals("post")) { @views.html.Search.snippets.postSiteNavigation(response) }
+    </div>
+
+}

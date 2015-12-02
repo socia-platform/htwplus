@@ -15,6 +15,7 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -55,7 +56,7 @@ public interface IElasticsearchService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    SearchResponse doSearch(String caller, String query, String filter, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields)  throws ExecutionException, InterruptedException;
+    SearchResponse doSearch(String caller, String query, String filter, HashMap<String, String[]> facets, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException;
 
     void deleteGroup(Group group);
 

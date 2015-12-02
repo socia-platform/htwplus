@@ -11,10 +11,6 @@ import models.Group;
 import models.Post;
 import models.enums.AccountRole;
 import models.enums.GroupType;
-import models.services.IElasticsearchService;
-import org.elasticsearch.bootstrap.Elasticsearch;
-import org.elasticsearch.client.transport.NoNodeAvailableException;
-import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import play.Play;
@@ -64,7 +60,10 @@ public class Global extends GlobalSettings {
             },
             Akka.system().dispatcher()
         );
-		
+
+        // trying to connect to Elasticsearch
+        ElasticsearchService.getInstance().getClient();
+
 		InitialData.insert(app);
 
 	}
@@ -152,7 +151,10 @@ public class Global extends GlobalSettings {
 			final String adminGroupTitle = app.configuration().getString("htwplus.admin.group");
 			final String adminMail = app.configuration().getString("htwplus.admin.mail");
 			final String adminPassword = app.configuration().getString("htwplus.admin.pw");
-			
+
+            final String dummyMail = app.configuration().getString("htwplus.dummy.mail");
+            final String dummyPassword = app.configuration().getString("htwplus.dummy.pw");
+            
 			// Do some inital db stuff
 			JPA.withTransaction(new play.libs.F.Callback0() {
 				@Override
@@ -168,6 +170,23 @@ public class Global extends GlobalSettings {
                         admin.avatar = "a1";
                         admin.password = Component.md5(adminPassword);
                         admin.create();
+                    }
+
+                    // create Dummy anonymous account, if it doesn't exist //
+                    Account dummy = Account.findByEmail(dummyMail);
+                    if (dummy == null) {
+                        dummy = new Account();
+                        dummy.email = dummyMail;
+                        dummy.firstname = "Gelöschter";
+                        dummy.lastname = "Account";
+                        dummy.role = AccountRole.DUMMY;
+                        dummy.avatar = "aDefault";
+                        dummy.password = Component.md5(dummyPassword);
+                        dummy.create();
+                    } else if(dummy.firstname.equals("Anonym")) {
+                        dummy.firstname = "Gelöschter";
+                        dummy.lastname = "Account";
+                        dummy.update();
                     }
 
                     // create Admin group if none exists

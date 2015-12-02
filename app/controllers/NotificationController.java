@@ -67,6 +67,7 @@ public class NotificationController extends BaseController {
 		}
 		
 		if (!Secured.hasAccessToNotification(notification)) {
+            flash("error", Messages.get("error.access_denied"));
 			return redirect(controllers.routes.Application.index());
 		}
 

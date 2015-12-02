@@ -1,28 +1,64 @@
 @(notifications: List[Notification], recipient: Account)
 @import helper._
-<html lang="de">
-<head>
-    <title>HTWplus | @Messages("notification.news")</title>
-</head>
-<body>
-<div class="container">
-    <div class="row">
-        @if(notifications.size > 1) {
-            <h1>@Html(Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size))</h1>
-        } else {
-            <h1>@Html(Messages("notification.email_notifications.single.intro_text", recipient.name))</h1>
-        }
-    </div>
-    @if(notifications != null) {
-        @for(notification <- notifications) {
-            <div class="row">
-                <div class="notification-date"@Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm")))</div>
-                <div class="hp-truncate hp-white-space" id="@notification.id">
-                    @Html(notification.rendered)
-                </div>
-            </div><br>
-        }
-    }
-</div>
-</body>
+@import com.typesafe.config.ConfigFactory
+
+@defining(ConfigFactory.load().getString("htwplus.base_url")) { baseURL=>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head> <!-- this stuff is most likely getting discarded, but anyways... -->
+        <title>@if(notifications.size > 1) {
+                @Html(Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size))
+            } else {
+                @Html(Messages("notification.email_notifications.single.intro_text", recipient.name))
+            }</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+    <body style="margin: 0; padding: 0;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td> <!-- OUTER CONTAINER -->
+            <table align="center" border="0" cellpadding="0" cellspacing="0" style="min-width: 450px; max-width:600px; border-collapse: collapse;"> <!-- INNER CONTAINER -->
+                <tr><td bgcolor="#76b900" align="center" colspan="2" style="font-size: 50px; font-weight: bold; color: white; line-height: 146px;">
+                    <a href="@baseURL@controllers.routes.Application.index()" style="color:white;text-decoration: none"><img alt="HTWplus" src="https://plus.f4.htw-berlin.de/assets/images/logos/logo-white.svg" width="227" height="146" style="display:block"></a>
+                </td></tr>
+
+                <tr align="left" style="text-align: left"><td colspan="2" style="padding: 15px 10px 5px 10px"><p>
+                    @if(notifications.size > 1) {
+                        @Html(Messages("notification.email_notifications.collected.intro_text", recipient.name, notifications.size))
+                    } else {
+                        @Html(Messages("notification.email_notifications.single.intro_text", recipient.name))
+                    }
+                </p></td></tr>
+
+                @if(notifications != null) {
+                    <tr><td colspan="2">
+                        @for(notification <- notifications) {
+                            <a style="text-decoration: none; color:inherit" href="@baseURL@controllers.routes.NotificationController.forward(notification.id)">
+                                <div style="border: 1px solid #888; margin: 5px 10px; padding: 10px 16px; border-radius: 3px">
+                                    <p style="margin: 0px 0px">
+                                        <b>@Html(notification.rendered)</b>
+                                    </p>
+                                    <p style="margin: 2px 0px 0px 0px">
+                                        <i>@Html(Messages("notification.date", notification.createdAt.format("dd.MM.YYYY"), notification.createdAt.format("HH:mm")))</i>
+                                    </p>
+                                </div>
+                            </a>
+                        }<br>
+                    </td></tr>
+                }
+
+                <tr height="60px"><td width="50%" align="center" bgcolor="#0076B9" style="color:white">
+                    <a href="@if(notifications.size > 1) {@baseURL@controllers.routes.NotificationController.showAll(1)} else { @baseURL@controllers.routes.NotificationController.forward(notifications(0).id)}" style="text-decoration: none; color:white">
+                        <div style="font-size: 20px;height:60px;line-height: 60px"><b>@Html(Messages("notification.email_notifications.visit"))</b></div>
+                    </a>
+                </td><td width="50%" align="center"  bgcolor="#B94300" style="color:white">
+                    <a href="@baseURL@controllers.routes.ProfileController.edit(recipient.id)" style="text-decoration: none; color:white">
+                        <div style="font-size: 20px;height:60px;line-height: 60px"><b>@Html(Messages("notification.email_notifications.edit_settings"))</b></div>
+                    </a>
+                </td></tr>
+            </table></td></tr>
+        </table><br>
+    </body>
 </html>
+
+}

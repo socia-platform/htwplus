@@ -457,6 +457,21 @@ public class Post extends BaseNotifiable implements INotifiable {
         return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
     }
 
+    /**
+     * Get all posts owned by a specific user
+     * @return
+     */
+    public static List<Post> listAllPostsOwnedBy(Long id) {
+        return JPA.em().createQuery("FROM Post p WHERE p.owner.id = " + id).getResultList();
+    }
+
+    /**
+     * get a list of posts posted on the wall of the specified account
+     */
+    public static List<Post> listAllPostsPostedOnAccount(Long id) {
+        return JPA.em().createQuery("FROM Post p WHERE p.account.id = " + id).getResultList();
+    }
+
     public long indexAllPosts() throws IOException {
         final long start = System.currentTimeMillis();
         for (Post post: allWithoutAdmin()) elasticsearchService.indexPost(post);

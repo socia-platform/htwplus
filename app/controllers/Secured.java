@@ -487,8 +487,24 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in account is allowed to edit account
 	 */
 	public static boolean editAccount(Account account) {
+        if(Secured.isAdmin())
+            return true;
 		return Component.currentAccount().equals(account);
 	}
+
+    /**
+     * Returns true, if the currently logged in account is allowed to delete a specific account.
+     *
+     * @param account the account to be deleted
+     * @return True, if logged in account is allowed to delete the specified account
+     */
+    public static boolean deleteAccount(Account account) {
+        if(Secured.isAdmin())
+            return true;
+
+        Account current = Component.currentAccount();
+        return current.equals(account);
+    }
 
 	/**
 	 * Returns true, if the currently logged in account is allowed to upload media into a specific group.

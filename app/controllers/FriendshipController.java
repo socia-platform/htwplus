@@ -4,6 +4,7 @@ import java.util.List;
 
 import controllers.Navigation.Level;
 import models.*;
+import models.enums.AccountRole;
 import models.enums.LinkType;
 import models.services.NotificationService;
 import play.db.jpa.JPA;
@@ -141,6 +142,11 @@ public class FriendshipController extends BaseController {
 			flash("info","Du kannst nicht mit dir befreundet sein!");
 			return true;
 		}
+
+        if (potentialFriend.role == AccountRole.DUMMY) {
+            flash("error", "Mit diesem Account kannst du nicht befreundet sein!");
+            return true;
+        }
 		
 		if (Friendship.findRequest(currentUser,potentialFriend) != null) {
 			flash("info","Deine Freundschaftsanfrage wurde bereits verschickt!");

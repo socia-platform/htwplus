@@ -1,8 +1,14 @@
 @(title: String)(content: Html)
 
 @main(title) {
-	<h1>@Messages("admin.admin_control_center")</h1>
-	<br />
-	@Admin.snippets.navigation()
-	@content
+    <div class="row">
+        <div class="col-lg-12" role="main">
+            <div class="hp-notepad-content addmargin">
+                <h1>@Messages("admin.admin_control_center")</h1>
+                <br />
+                @snippets.navigation()
+                @content
+            </div>
+        </div>
+    </div>
 }

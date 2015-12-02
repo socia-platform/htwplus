@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
@@ -36,6 +37,7 @@ public class Group extends BaseNotifiable implements INotifiable {
     @Pattern(value="^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}/\\\\\\[\\]~-]+$")
 	public String title;
 
+	@Size(max = 255, message = "error.length")
 	public String description;
 
 	@OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
@@ -149,6 +151,11 @@ public class Group extends BaseNotifiable implements INotifiable {
         return JPA.em().createQuery("FROM Group").getResultList();
 	}
 
+    @SuppressWarnings("unchecked")
+    public static List<Group> listAllGroupsOwnedBy(Long id) {
+        return JPA.em().createQuery("FROM Group g WHERE g.owner.id = "+id).getResultList();
+    }
+
     /**
      * Returns true, if an account is member of a group.
      *
@@ -188,7 +195,7 @@ public class Group extends BaseNotifiable implements INotifiable {
     @Override
     public String getTargetUrl() {
         if (this.type.equals(Group.GROUP_REQUEST_SUCCESS)) {
-            return controllers.routes.GroupController.stream(this.id, 1).toString();
+            return controllers.routes.GroupController.stream(this.id, 1, false).toString();
         }
 
         return controllers.routes.GroupController.index().toString();

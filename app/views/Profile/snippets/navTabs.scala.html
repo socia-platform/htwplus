@@ -1,5 +1,4 @@
 @(user: Account)
-@import helper._
 
 <ul class="nav nav-tabs hp-nav-tabs pull-right">
 	@if(Secured.isFriend(user) || Component.currentAccount() == user) {
@@ -47,16 +46,14 @@
         }
 	}
 	@if(Secured.isFriend(user)) {
-		@defining(if(Navigation.getTitle().equals("Editieren")){"active"} else {"deactive"}) { status =>
-			<li class="@status">
-                <a href="#confirmDeleteFriend@user.id" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Beende die Freundschaft" data-container="body" data-toggle="modal">
-                    <span class="glyphicon glyphicon-remove"></span>
-                    <span class="hidden-xs"> Entfernen</span>
-                </a>
-            </li>
-		}
+        <li>
+            <a href="#confirmDeleteFriend@user.id" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Beende die Freundschaft" data-container="body" data-toggle="modal">
+                <span class="glyphicon glyphicon-remove"></span>
+                <span class="hidden-xs"> Entfernen</span>
+            </a>
+        </li>
 	}
-	@if(Secured.isOwnerOfAccount(user.id)) {
+	@if(Secured.editAccount(user)) {
 		@defining(if(Navigation.getTitle().equals("Editieren")){"active"} else {"deactive"}) { status =>
 			<li class="@status">
                 <a href="@routes.ProfileController.edit(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Profil bearbeiten" data-container="body">

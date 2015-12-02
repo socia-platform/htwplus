@@ -1,91 +1,100 @@
 @defining(Component.currentAccount()) { user =>
+    <header>
+        <nav class="navbar navbar-default navbar-fixed-top hp-navbar">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand hp-navbar-brand" href="@routes.Application.index()">
+                        <div class="hp-logo">
 
-<nav id="hp-navbar" class="navbar navbar-default navbar-fixed-top" role="navigation">
-	<div class="hp-navbar-container">
-
-		<div class="navbar-header">
-			@defining(if(Navigation.getLevel() == Navigation.Level.STREAM){"active"} else {"deactive"}) { status =>
-				<a href="@Navigation.getLevelRoute(Navigation.Level.STREAM)">
-					<div class="hp-logo @status">
-						<img id="normal" src="@routes.Assets.at("images/logos/logo-white-small.svg")">
-						<img id="hover" src="@routes.Assets.at("images/logos/logo-gray-small.svg")">
-					</div>
-				</a>
-			}
-		</div>
-
-		<ul class="hp-nav nav navbar-nav">
-			<!-- Friends -->
-			@defining(if(Navigation.getLevel() == Navigation.Level.FRIENDS){"active"} else {"deactive"}) { status =>
-				<li class="@status">
-					<a href="@Navigation.getLevelRoute(Navigation.Level.FRIENDS)">
-                        <span class="glyphicon glyphicon-user"></span>
-                        <span class="hidden-xs"> @Navigation.getLevelTitle(Navigation.Level.FRIENDS)</span>
+                        </div>
                     </a>
-				</li>
-			}
+                </div>
 
-			<!-- Groups -->
-			@defining(if(Navigation.getLevel() == Navigation.Level.GROUPS){"active"} else {"deactive"}) { status =>
-				<li class="@status">
-					<a href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)">
-                        <span class="glyphicon glyphicon-list"></span>
-                        <span class="hidden-xs"> @Navigation.getLevelTitle(Navigation.Level.GROUPS)</span>
-                    </a>
-				</li>
-			}
+                <ul class="nav navbar-nav hp-navbar">
+                        <!-- Friends -->
+                    @defining(if(Navigation.getLevel() == Navigation.Level.FRIENDS) {
+                        "active"
+                    } else {
+                        "deactive"
+                    }) { status =>
+                        <li class="@status">
+                            <a href="@routes.FriendshipController.index()">
+                                <span class="glyphicon glyphicon-user"></span>
+                                <span class="hidden-xs"> @Navigation.getLevelTitle(Navigation.Level.FRIENDS)</span>
+                            </a>
+                        </li>
+                    }
 
-			<!-- Notifications -->
-			@controllers.NotificationController.getNotifications
+                        <!-- Groups -->
+                    @defining(if(Navigation.getLevel() == Navigation.Level.GROUPS) {
+                        "active"
+                    } else {
+                        "deactive"
+                    }) { status =>
+                        <li class="@status">
+                            <a href="@Navigation.getLevelRoute(Navigation.Level.GROUPS)">
+                                <span class="glyphicon glyphicon-list"></span>
+                                <span class="hidden-xs"> @Navigation.getLevelTitle(Navigation.Level.GROUPS)</span>
+                            </a>
+                        </li>
+                    }
 
-			<!-- Search -->
-			<li class="visible-xs-block dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span> <b class="caret"></b></a>
-				<ul class="hp-dropdown-search dropdown-menu">
-					<form class="hp-search-form navbar-form navbar-left" role="search" action="@routes.Application.search(1)" method="GET">
-						<div class="form-group">
-							<input type="text" class="form-control hp-easy-search" placeholder="Suche" id="searchQuery" type="text" name="keyword" >
-						</div>
-						<button type="submit"><span class="glyphicon glyphicon-search"></span></button>
-					</form>
-				</ul>
-			</li>
-		</ul>
+                        <!-- Notifications -->
+                    @controllers.NotificationController.getNotifications
 
-		<!-- Search -->
-		<form class="hidden-xs hp-search-form navbar-form navbar-left" role="search" action="@routes.Application.search(1)" method="GET">
-			<div class="form-group">
-				<input class="form-control hp-easy-search" rel="tooltip" data-placement="bottom" type="text" placeholder="Suche" value='@ctx.args.get("searchKeyword")' name="keyword">
-				<button type="submit"><span class="glyphicon glyphicon-search"></span></button>
-			</div>
-		</form>
+                        <!-- Search -->
+                    <li class="visible-xs-block dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-search"></span> <b class="caret"></b></a>
+                        <ul class="hp-dropdown-search dropdown-menu">
+                            <form class="hp-search-form navbar-form navbar-left" role="search" action="@routes.Application.search(1)" method="GET">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Suche" value='@ctx.args.get("searchKeyword")' name="keyword" >
+                                    <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+                                </div>
+                            </form>
+                        </ul>
+                    </li>
+                </ul>
 
-		<!-- User Menu -->
-		<ul class="nav navbar-nav navbar-right">
-			<li class="dropdown">
-				<a href="#" class="hp-nav-user dropdown-toggle" data-toggle="dropdown">
-					@if(user.hasAvatar){
-						<img alt="avatar" src="@routes.ProfileController.getAvatar(user.id)" class="hp-avatar-navi" />
-					} else {
-						<div class="hp-avatar-navi hp-avatar-default-@user.avatar">@user.getInitials</div>
-					}
-					<span class="visible-lg-inline-block">@user.name </span>
-					<b class="caret"></b>
-				</a>
-				<ul class="dropdown-menu">
-					@if(Secured.isAdmin()) {
-					<li><a href="@routes.AdminController.index()" style="color:red;">Control Center</a></li>
-					}
-					<li><a href="@routes.ProfileController.stream(user.id)">Mein öffentlicher Newsstream</a></li>
-					<li><a href="@Navigation.getLevelRoute(Navigation.Level.PROFILE)">Mein Profil ansehen</a></li>
-					<li><a href="@routes.ProfileController.edit(user.id)">Mein Profil bearbeiten</a></li>
-					<li class="divider"></li>
-					<li><a href="@routes.AccountController.logout">Logout</a></li>
-				</ul>
-			</li>
-		</ul>
+                    <!-- Search -->
+                <form class="hidden-xs hp-search-form navbar-form navbar-left" role="search" action="@routes.Application.search(1)" method="GET">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Suche" value='@ctx.args.get("searchKeyword")' name="keyword">
+                        <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+                    </div>
+                </form>
 
-	</div>
-</nav>
+                    <!-- User Menu -->
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="hp-nav-user dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                            @if(user.hasAvatar) {
+                                <img alt="avatar" src="@routes.ProfileController.getAvatar(user.id)" class="hp-avatar-navi" />
+                            } else {
+                                <div class="hp-avatar-navi hp-avatar-default-@user.avatar">@user.getInitials</div>
+                            }
+                            <span class="visible-lg-inline-block">@user.name </span>
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu hp-dropdown-menu" role="menu">
+                            @if(Secured.isAdmin()) {
+                                <li><a href="@routes.AdminController.index()" style="color: red">Control Center</a></li>
+                            }
+                            <li><a href="@routes.ProfileController.stream(user.id)">Mein öffentlicher Newsstream</a></li>
+                            <li><a href="@routes.ProfileController.me()">Mein Profil ansehen</a></li>
+                            <li><a href="@routes.ProfileController.edit(user.id)">Mein Profil bearbeiten</a></li>
+                            <li class="divider"></li>
+                            <li><a href="@routes.AccountController.logout">Logout</a></li>
+                            <li class="divider"></li>
+                            <li><a href="@routes.Application.imprint()">Impressum</a></li>
+                            <li><a href="@routes.Application.privacy()">Datenschutz</a></li>
+                            <li><a href="@routes.Application.feedback()">Feedback/Kontakt</a></li>
+                            <li><a href="@routes.Application.help()">Hilfe</a></li>
+                        </ul>
+                    </li>
+                </ul>
 
+            </div>
+        </nav>
+    </header>
 }

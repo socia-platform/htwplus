@@ -4,24 +4,22 @@ import com.typesafe.config.ConfigFactory;
 import models.*;
 import models.enums.LinkType;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.index.query.*;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
 
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+
 
 /**
  * Created by Iven on 22.12.2014.
@@ -30,6 +28,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 public class ElasticsearchService implements IElasticsearchService {
     private static ElasticsearchService instance = null;
     private static Client client = null;
+    private static final String ES_SERVER = ConfigFactory.load().getString("elasticsearch.server");
     private static final String ES_SETTINGS = ConfigFactory.load().getString("elasticsearch.settings");
     private static final String ES_USER_MAPPING = ConfigFactory.load().getString("elasticsearch.userMapping");
     private static final String ES_GROUP_MAPPING = ConfigFactory.load().getString("elasticsearch.groupMapping");
@@ -43,12 +42,8 @@ public class ElasticsearchService implements IElasticsearchService {
     public ElasticsearchService() {
         try {
             client = TransportClient.builder().build()
-                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
-            //createAnalyzer();
-            //createMapping();
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(ES_SERVER), 9300));
         } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -68,31 +63,42 @@ public class ElasticsearchService implements IElasticsearchService {
         client.close();
     }
 
-    public void deleteIndex() {
-        getInstance().getClient().admin().indices().delete(new DeleteIndexRequest(ES_INDEX)).actionGet();
+    public boolean isClientAvailable() {
+        if(((TransportClient) getInstance().getClient()).connectedNodes().size() == 0)
+            return false;
+        return true;
     }
-    public void createAnalyzer() throws IOException {
-        getInstance().getClient().admin().indices().prepareCreate(ES_INDEX)
+
+    public boolean isIndexExists() {
+        return getInstance().getClient().admin().indices().exists(new IndicesExistsRequest(ES_INDEX)).actionGet().isExists();
+    }
+
+    public void deleteIndex() {
+        if(isClientAvailable()) getInstance().getClient().admin().indices().delete(new DeleteIndexRequest(ES_INDEX)).actionGet();
+    }
+
+    public void createAnalyzer() {
+        if(isClientAvailable()) getInstance().getClient().admin().indices().prepareCreate(ES_INDEX)
                 .setSettings(ES_SETTINGS)
                 .execute().actionGet();
     }
 
-    public void createMapping() throws IOException {
-        getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_USER)
+    public void createMapping() {
+        if(isClientAvailable()) getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_USER)
                 .setSource(ES_USER_MAPPING)
                 .execute().actionGet();
 
-        getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_POST)
+        if(isClientAvailable()) getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_POST)
                 .setSource(ES_POST_MAPPING)
                 .execute().actionGet();
 
-        getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_GROUP)
+        if(isClientAvailable()) getInstance().getClient().admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_GROUP)
                 .setSource(ES_GROUP_MAPPING)
                 .execute().actionGet();
     }
 
     public void indexPost(Post post) throws IOException {
-        IndexResponse indexResponse = getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_POST, post.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("content", post.content)
@@ -105,7 +111,7 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     public void indexGroup(Group group) throws IOException {
-        IndexResponse indexResponse = getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("title", group.title)
@@ -119,16 +125,19 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     public void indexAccount(Account account) throws IOException {
-        IndexResponse response = getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_USER, account.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareIndex(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .setSource(jsonBuilder()
                                 .startObject()
                                 .field("name", account.name)
+                                .field("studycourse", account.studycourse != null ? account.studycourse.title : "")
+                                .field("degree", account.degree != null ? account.degree : "")
+                                .field("semester", account.semester != null ? String.valueOf(account.semester) : "")
+                                .field("role", account.role != null ? account.role.getDisplayName() : "")
                                 .field("initial", account.getInitials())
                                 .field("avatar", account.avatar)
                                 .field("public", true)
                                 .field("friends", Friendship.findFriendsId(account))
-                                .endObject()
-                )
+                                .endObject())
                 .execute()
                 .actionGet();
     }
@@ -146,9 +155,10 @@ public class ElasticsearchService implements IElasticsearchService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public SearchResponse doSearch(String caller, String query, String filter, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) {
-    /**
 
+    @Override
+    public SearchResponse doSearch(String caller, String query, String filter, HashMap<String, String[]> facets, int page, String currentAccountId, List<String> mustFields, List<String> scoringFields) throws ExecutionException, InterruptedException {
+    /**
         QueryBuilder searchQuery;
 
         if(query.isEmpty() || query == null) {
@@ -166,12 +176,40 @@ public class ElasticsearchService implements IElasticsearchService {
         QueryBuilder completeQuery = QueryBuilders.boolQuery().must(searchQuery).should(scoringQuery);
 
         // Build viewableFilter to show authorized posts only
-        FilterBuilder viewableFilter = FilterBuilders.boolFilter().should(FilterBuilders.termFilter("viewable", currentAccountId),FilterBuilders.termFilter("public", true));
+        final BoolFilterBuilder boolFilterBuilder = FilterBuilders.boolFilter();
+
+        boolFilterBuilder.should(FilterBuilders.termFilter("viewable", currentAccountId),FilterBuilders.termFilter("public", true));
+
+        if (!filter.equals("all")) {
+            boolFilterBuilder.must(typeFilter(filter));
+        }
+
+        if(facets != null) {
+            if(facets.get("studycourse").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.studycourse", facets.get("studycourse")));
+            }
+
+            if(facets.get("degree").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.degree", facets.get("degree")));
+            }
+
+            if(facets.get("semester").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.semester", facets.get("semester")));
+            }
+
+            if(facets.get("role").length != 0) {
+                boolFilterBuilder.must(termsFilter("user.role", facets.get("role")));
+            }
+
+            if(facets.get("grouptype").length != 0) {
+                boolFilterBuilder.must(termFilter("group.grouptype", facets.get("grouptype")));
+            }
+        }
 
 
 
         // Build filteredQuery to apply viewableFilter to completeQuery
-        QueryBuilder filteredQuery = QueryBuilders.filteredQuery(completeQuery, viewableFilter);
+        QueryBuilder filteredQuery = QueryBuilders.filteredQuery(completeQuery, boolFilterBuilder);
 
         // Build searchRequest which will be executed after fields to highlight are added.
         SearchRequestBuilder searchRequest = ElasticsearchService.getInstance().getClient().prepareSearch(ES_INDEX)
@@ -192,34 +230,51 @@ public class ElasticsearchService implements IElasticsearchService {
         // Add term aggregation for facet count
         searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("types").field("_type"));
 
-        // Apply PostFilter if request mode is not 'all'
-        if (!filter.equals("all")) {
-            FilterBuilder filterQuery = FilterBuilders.typeFilter(filter);
-            searchRequest.setPostFilter(filterQuery);
+        // Add user aggregations
+        if (filter.equals("user")) {
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("studycourse").field("user.studycourse"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("degree").field("user.degree"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("semester").field("user.semester"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("role").field("user.role"));
         }
 
+        // Add group aggregations
+        if (filter.equals("group")) {
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("grouptype").field("group.grouptype"));
+        }
+
+        // Apply PostFilter if request mode is not 'all'
+        final BoolFilterBuilder boolFilterBuilder2 = boolFilter();
+
+        if(boolFilterBuilder2.hasClauses()) {
+            searchRequest.setPostFilter(boolFilterBuilder2);
+        }
+
+
+
+        //Logger.info(searchRequest.toString());
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
 
         return response;
-     */
+      */
         return null;
     }
 
     public void deleteGroup(Group group) {
-        DeleteResponse response = client.prepareDelete(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareDelete(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .execute()
                 .actionGet();
     }
 
     public void deletePost(Post post) {
-        DeleteResponse response = client.prepareDelete(ES_INDEX, ES_TYPE_POST, post.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareDelete(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .execute()
                 .actionGet();
     }
 
     public void deleteAccount(Account account) {
-        DeleteResponse response = client.prepareDelete(ES_INDEX, ES_TYPE_USER, account.id.toString())
+        if(isClientAvailable()) getInstance().getClient().prepareDelete(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .execute()
                 .actionGet();
     }

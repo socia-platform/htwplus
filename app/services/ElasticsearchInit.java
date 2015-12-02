@@ -1,6 +1,7 @@
 package services;
 
 import models.services.ElasticsearchService;
+import play.Logger;
 import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
@@ -25,11 +26,19 @@ public class ElasticsearchInit implements DatabaseService {
 
     @Override
     public void initialization() {
-        try {
-            elasticsearchService.createAnalyzer();
-            elasticsearchService.createMapping();
-        } catch (IOException e) {
-            e.printStackTrace();
+        Logger.info("trying to connect to Elasticsearch");
+        if (elasticsearchService.isClientAvailable()) {
+            Logger.info("... success");
+            Logger.info("trying to create HTWPlus index and mapping");
+            if (!elasticsearchService.isIndexExists()) {
+                elasticsearchService.createAnalyzer();
+                elasticsearchService.createMapping();
+                Logger.info("... success");
+            } else {
+                Logger.info("... failed (it already exists?)");
+            }
+        } else {
+            Logger.info("... failed");
         }
     }
 

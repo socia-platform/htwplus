@@ -22,7 +22,10 @@ import models.services.AvatarService;
 import models.services.FileService;
 import models.base.ValidationException;
 
+import models.enums.LinkType;
 import models.services.ElasticsearchService;
+import org.hibernate.annotations.Type;
+import org.hibernate.validator.constraints.URL;
 import play.Logger;
 import play.data.validation.Constraints;
 import play.i18n.Messages;
@@ -31,6 +34,7 @@ import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import play.db.jpa.JPA;
 import controllers.Component;
+import play.db.jpa.Transactional;
 import play.libs.Json;
 import scala.Char;
 
@@ -61,10 +65,16 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 	
 	public String avatar;
 
-	@OneToMany(mappedBy = "account")
+	@Type(type = "org.hibernate.type.TextType")
+	public String about;
+
+	@URL(message = "error.homepage")
+	public String homepage;
+
+	@OneToMany(mappedBy = "account", orphanRemoval = true)
 	public Set<Friendship> friends;
 	
-	@OneToMany(mappedBy="account")
+	@OneToMany(mappedBy="account", orphanRemoval = true)
 	public Set<GroupAccount> groupMemberships;
 
 	public Date lastLogin;
@@ -118,8 +128,65 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	@Override
 	public void delete() {
-		// TODO Auto-generated method stub
-	}
+        Account dummy = Account.findByEmail(ConfigFactory.load().getString("htwplus.dummy.mail"));
+
+        if(dummy == null) {
+            Logger.error("Couldn't delete account because there is no Dummy Account! (mail="+ConfigFactory.load().getString("htwplus.dummy.mail")+")");
+            throw new RuntimeException("Couldn't delete account because there is no Dummy Account!");
+        }
+
+        // Anonymize Posts //
+        List<Post> owned = Post.listAllPostsOwnedBy(this.id);
+        for(Post post : owned) {
+            post.owner = dummy;
+            post.create(); // elastic search indexing
+            post.update();
+        }
+        List<Post> pinned = Post.listAllPostsPostedOnAccount(this.id);
+        for(Post post : pinned) {
+            post.account = dummy;
+            post.create(); // elastic search indexing
+            post.update();
+        }
+
+        // Anonymize created groups //
+        List<Group> groups = Group.listAllGroupsOwnedBy(this.id);
+        for(Group group : groups) {
+            if(GroupAccount.findAccountsByGroup(group, LinkType.establish).size() == 1) { // if the owner is the only member of the group
+                Logger.info("Group '" + group.title + "' is now empty, so it will be deleted!");
+                group.delete();
+            } else {
+                group.owner = dummy;
+                group.update();
+            }
+        }
+
+        // Delete Friendships //
+        List<Friendship> friendships = Friendship.listAllFriendships(this.id);
+        for(Friendship friendship : friendships) {
+            friendship.delete();
+        }
+
+        // Anonymize media //
+        List<Media> media = Media.listAllOwnedBy(this.id);
+        for(Media med : media) {
+            med.owner = dummy;
+            med.update();
+        }
+
+        // Delete incoming notifications //
+        Notification.deleteNotificationsForAccount(this.id);
+
+        // Delete outgoing notifications //
+        List<Notification> notifications = Notification.findBySenderId(this.id);
+        for(Notification not : notifications) {
+            not.delete();
+        }
+
+        elasticsearchService.deleteAccount(this);
+
+        JPA.em().remove(this);
+    }
 		
 	/**
      * Retrieve a User from email.
@@ -345,10 +412,6 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
         return JPA.em().createQuery("FROM Account").getResultList();
 	}
 
-    public List<Account> all2() {
-        return JPA.em().createQuery("FROM Account").getResultList();
-    }
-
     /**
      * Returns a list of account instances by an ID collection of Strings.
      *
@@ -399,7 +462,12 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
      */
     public long indexAllAccounts() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Account account: all2()) elasticsearchService.indexAccount(account);
+
+        for (Account account: all()) {
+            if(account.role != AccountRole.DUMMY)
+                elasticsearchService.indexAccount(account);
+        }
+
         return (System.currentTimeMillis() - start) / 100;
 
     }

@@ -26,6 +26,5 @@ server.pid
 conf/application.conf
 public/media
 public/bower_components
-searchstuff
 htwplus
 node_modules
