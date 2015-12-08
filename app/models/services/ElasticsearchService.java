@@ -1,3 +1,4 @@
+
 package models.services;
 
 import com.typesafe.config.Config;
@@ -10,6 +11,12 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import play.Logger;
+import play.api.inject.ApplicationLifecycle;
+import play.libs.F;
+import scala.Function0;
+import scala.concurrent.Future;
+import scala.runtime.BoxedUnit;
 
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -17,6 +24,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -56,7 +64,9 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     public void closeClient() {
+        Logger.info("closing ES client...");
         client.close();
+        Logger.info("ES client closed");
     }
 
     public boolean isClientAvailable() {

@@ -34,6 +34,9 @@ public class AdminController extends BaseController {
     ElasticsearchService elasticsearchService;
 
     @Inject
+    MediaController mediaController;
+
+    @Inject
     Account account;
 
 	static Form<Account> accountForm = form(Account.class);
@@ -174,7 +177,7 @@ public class AdminController extends BaseController {
 	}
 
 	public Result cleanMediaTemp(){
-		MediaController.cleanUpTemp();
+		mediaController.cleanUpTemp();
 		flash("success", "Media Temp directory was cleaned.");
 		return viewMediaTemp();
 	}

@@ -159,7 +159,7 @@ public class MediaController extends BaseController {
     /**
      * Cleans the temporary media directoy used for ZIP Downloads
      */
-    public static void cleanUpTemp() {
+    public void cleanUpTemp() {
 	    Logger.info("Cleaning the Tempory Media Directory");
 
 	    String tmpPath = Play.application().configuration().getString("media.tempPath");

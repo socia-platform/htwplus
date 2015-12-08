@@ -1,6 +1,8 @@
 package models.services;
 
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import play.libs.F;
 import play.libs.mailer.Email;
 import play.libs.mailer.MailerClient;
@@ -10,25 +12,29 @@ import javax.inject.Singleton;
 import models.Account;
 import models.Notification;
 import play.Logger;
-import play.Play;
 import play.db.jpa.JPA;
 import play.i18n.Messages;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import play.Configuration;
 /**
  * This class handles sending of emails, e.g. for notification mails.
  */
 @Singleton
 public class EmailService {
-    static final String EMAIL_SENDER = Play.application().configuration().getString("htwplus.email.sender");
-    static final String PLAIN_TEXT_TEMPLATE = "views.html.Emails.notificationsPlainText";
-    static final String HTML_TEMPLATE = "views.html.Emails.notificationsHtml";
+
+    private Config conf = ConfigFactory.load();
+    private final String EMAIL_SENDER = conf.getString("htwplus.email.sender");
+    private final String PLAIN_TEXT_TEMPLATE = "views.html.Emails.notificationsPlainText";
+    private final String HTML_TEMPLATE = "views.html.Emails.notificationsHtml";
 
     @Inject MailerClient mailerClient;
+    @Inject Email email;
+
+    public EmailService(){
+        Logger.info("init EmailService");
+    }
 
     /**
      * Sends an email.
@@ -39,24 +45,22 @@ public class EmailService {
      * @param mailHtml HTML content of the mail (allowed to be null)
      */
     public void sendEmail(String subject, String recipient, String mailPlainText, String mailHtml) {
-        Email mail = new Email();
-        //MailerAPI mail = play.Play.application().plugin(MailerPlugin.class).email();
-        mail.setSubject(subject);
-        mail.addTo(recipient);
-        mail.setFrom(EmailService.EMAIL_SENDER);
+        email.setSubject(subject);
+        email.addTo(recipient);
+        email.setFrom(EMAIL_SENDER);
 
         // send email either in plain text, HTML or both
         if (mailPlainText != null) {
             if (mailHtml != null) {
-                mail.setBodyHtml(mailHtml);
-                mail.setBodyText(mailPlainText);
+                email.setBodyHtml(mailHtml);
+                email.setBodyText(mailPlainText);
             } else {
-                mail.setBodyText(mailPlainText);
+                email.setBodyText(mailPlainText);
             }
         } else if (mailHtml != null) {
-            mail.setBodyHtml(mailHtml);
+            email.setBodyHtml(mailHtml);
         }
-        mailerClient.send(mail);
+        mailerClient.send(email);
     }
 
     /**
@@ -73,8 +77,8 @@ public class EmailService {
                         notifications.get(0).rendered.replaceAll("<[^>]*>", ""));
             // send the email
             this.sendEmail(subject, recipient.name + " <" + recipient.email + ">",
-                    TemplateService.getInstance().getRenderedTemplate(EmailService.PLAIN_TEXT_TEMPLATE, notifications, recipient),
-                    TemplateService.getInstance().getRenderedTemplate(EmailService.HTML_TEMPLATE, notifications, recipient)
+                    TemplateService.getInstance().getRenderedTemplate(PLAIN_TEXT_TEMPLATE, notifications, recipient),
+                    TemplateService.getInstance().getRenderedTemplate(HTML_TEMPLATE, notifications, recipient)
             );
 
             // mark notifications to be sent (JPA transaction required, as this is a async process)
