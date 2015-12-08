@@ -2,11 +2,9 @@ package services;
 
 import models.services.ElasticsearchService;
 import play.Logger;
-import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.IOException;
 
 /**
  * Created by Iven on 02.12.2015.
@@ -14,12 +12,10 @@ import java.io.IOException;
 @Singleton
 public class ElasticsearchInit implements DatabaseService {
 
-    private JPAApi jpaApi;
     private ElasticsearchService elasticsearchService;
 
     @Inject
-    public ElasticsearchInit(JPAApi jpaApi, ElasticsearchService elasticsearchService) {
-        this.jpaApi = jpaApi;
+    public ElasticsearchInit(ElasticsearchService elasticsearchService) {
         this.elasticsearchService = elasticsearchService;
         initialization();
     }

@@ -32,6 +32,9 @@ public class Group extends BaseNotifiable implements INotifiable {
 	@Inject
 	public transient ElasticsearchService elasticsearchService;
 
+	@Inject
+	public transient GroupAccount groupAccount;
+
     @Required
 	@Column(unique = true)
     @Pattern(value="^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}/\\\\\\[\\]~-]+$")
@@ -81,8 +84,9 @@ public class Group extends BaseNotifiable implements INotifiable {
 	public void createWithGroupAccount(Account account) {
 		this.owner = account;
 		this.create();
-		GroupAccount groupAccount = new GroupAccount(account, this,
-				LinkType.establish);
+		groupAccount.account = account;
+		groupAccount.group = this;
+		groupAccount.linkType = LinkType.establish.establish;
 		groupAccount.create();
 
 	}

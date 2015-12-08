@@ -63,30 +63,27 @@ public class PostgresInit implements DatabaseService {
                 dummyAccount.avatar = "aDefault";
                 dummyAccount.password = Component.md5(dummyPassword);
                 dummyAccount.create();
-            } else if(dummyAccount.firstname.equals("Anonym")) {
-                dummyAccount.firstname = "Gelöschter";
-                dummyAccount.lastname = "Account";
-                dummyAccount.update();
+            }
+
+            // create Admin group if none exists
+            if (Group.findByTitle(adminGroupTitle) == null) {
+                adminGroup.title = adminGroupTitle;
+                adminGroup.groupType = GroupType.close;
+                adminGroup.description = "for HTWplus Admins only";
+                adminGroup.createWithGroupAccount(adminAccount);
+            }
+
+            // create Feedback group if none exists
+            if (Group.findByTitle("HTWplus Feedback") == null) {
+                feedbackGroup.title = "HTWplus Feedback";
+                feedbackGroup.groupType = GroupType.open;
+                feedbackGroup.description = "Du hast Wünsche, Ideen, Anregungen, Kritik oder Probleme mit der Seite? Hier kannst du es loswerden!";
+                feedbackGroup.createWithGroupAccount(adminAccount);
             }
         });
 
-        /**
-         // create Admin group if none exists
-         if (Group.findByTitle(adminGroupTitle) == null) {
-         adminGroup.title = adminGroupTitle;
-         adminGroup.groupType = GroupType.close;
-         adminGroup.description = "for HTWplus Admins only";
-         adminGroup.createWithGroupAccount(adminAccount);
-         }
 
-         // create Feedback group if none exists
-         if (Group.findByTitle("HTWplus Feedback") == null) {
-         feedbackGroup = new Group();
-         feedbackGroup.title = "HTWplus Feedback";
-         feedbackGroup.groupType = GroupType.open;
-         feedbackGroup.description = "Du hast Wünsche, Ideen, Anregungen, Kritik oder Probleme mit der Seite? Hier kannst du es loswerden!";
-         feedbackGroup.createWithGroupAccount(adminAccount);
-         }
-         */
+
+
     }
 }

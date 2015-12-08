@@ -13,7 +13,7 @@ import services.PostgresInit;
 public class StartupModul extends AbstractModule {
     @Override
     protected void configure() {
-        bind(DatabaseService.class).annotatedWith(Names.named("postgres")).to(PostgresInit.class).asEagerSingleton();
         bind(DatabaseService.class).annotatedWith(Names.named("elasticsearch")).to(ElasticsearchInit.class).asEagerSingleton();
+        bind(DatabaseService.class).annotatedWith(Names.named("postgres")).to(PostgresInit.class).asEagerSingleton();
     }
 }
