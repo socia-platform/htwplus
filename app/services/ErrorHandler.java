@@ -28,6 +28,8 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
     @Inject
     Post post;
 
+    @Inject Account account;
+
     Configuration configuration;
 
     @Inject
@@ -40,7 +42,7 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
         group = group.findByTitle(configuration.getString("htwplus.admin.group"));
         if(group != null){
             post.content = "Request: "+request+"\nError: "+exception;
-            post.owner = Account.findByEmail(configuration.getString("htwplus.admin.mail"));
+            post.owner = account.findByEmail(configuration.getString("htwplus.admin.mail"));
             post.group = group;
             post.create();
         }

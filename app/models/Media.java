@@ -47,6 +47,9 @@ public class Media extends BaseNotifiable implements INotifiable {
 	
 	@Transient
 	public File file;
+
+	@Transient
+	public String sizeInByte;
 	
 	public static String GROUP = "group";
 	

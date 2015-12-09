@@ -12,13 +12,15 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.google.inject.Inject;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import models.services.NotificationService;
 import org.apache.commons.io.FileUtils;
 
 import models.Group;
 import models.Media;
 import play.Logger;
-import play.Play;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.mvc.Call;
@@ -30,9 +32,10 @@ import play.mvc.Security;
 
 @Security.Authenticated(Secured.class)
 public class MediaController extends BaseController {
-	
+
 	static Form<Media> mediaForm = Form.form(Media.class);
 	final static String tempPrefix = "htwplus_temp";
+	private Config conf = ConfigFactory.load();
 	
     @Transactional(readOnly=true)	
     public Result view(Long id) {
@@ -122,7 +125,7 @@ public class MediaController extends BaseController {
     private File createZIP(List<Media> media, String fileName) throws IOException {
     	
        	//cleanUpTemp(); // JUST FOR DEVELOPMENT, DO NOT USE IN PRODUCTION
-	    String tmpPath = Play.application().configuration().getString("media.tempPath");
+	    String tmpPath = conf.getString("media.tempPath");
     	File file = File.createTempFile(tempPrefix, ".tmp", new File(tmpPath));
     	
     	ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(file));
@@ -150,8 +153,8 @@ public class MediaController extends BaseController {
     /**
      * Size of temporary media directoy used for ZIP Downloads
      */
-    public static long sizeTemp() {
-	    String tmpPath = Play.application().configuration().getString("media.tempPath");
+    public long sizeTemp() {
+	    String tmpPath = conf.getString("media.tempPath");
 	    File dir = new File(tmpPath);
 	    return FileUtils.sizeOfDirectory(dir);
     }
@@ -162,7 +165,7 @@ public class MediaController extends BaseController {
     public void cleanUpTemp() {
 	    Logger.info("Cleaning the Tempory Media Directory");
 
-	    String tmpPath = Play.application().configuration().getString("media.tempPath");
+	    String tmpPath = conf.getString("media.tempPath");
 	    File dir = new File(tmpPath);
 	    Logger.info("Directory: " + dir.toString());
 	    File[] files = dir.listFiles();
@@ -198,8 +201,8 @@ public class MediaController extends BaseController {
      */
 	@Transactional
     public Result upload(String target, Long id) {
-	    final int maxTotalSize = Play.application().configuration().getInt("media.maxSize.total");
-	    final int maxFileSize = Play.application().configuration().getInt("media.maxSize.file");
+	    final int maxTotalSize = conf.getInt("media.maxSize.total");
+	    final int maxFileSize = conf.getInt("media.maxSize.file");
 	    
 		Call ret = controllers.routes.Application.index();
 		Group group;
@@ -284,7 +287,7 @@ public class MediaController extends BaseController {
 		}
     }
 	
-	public static String bytesToString(long bytes, boolean si) {
+	public String bytesToString(long bytes, boolean si) {
 		int unit = si ? 1000 : 1024;
 	    if (bytes < unit) return bytes + " B";
 	    int exp = (int) (Math.log(bytes) / Math.log(unit));

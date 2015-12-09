@@ -45,7 +45,7 @@ public class PostgresInit implements DatabaseService {
     @Override
     public void initialization() {
         jpaApi.withTransaction(() -> {
-            if (adminAccount.findByEmail(adminMail) == null) {
+            if (Account.findByEmail(adminMail) == null) {
                 adminAccount.email = adminMail;
                 adminAccount.firstname = "Admin";
                 adminAccount.lastname = "@HTWplus";
@@ -56,7 +56,7 @@ public class PostgresInit implements DatabaseService {
             }
 
             // create Dummy anonymous account, if it doesn't exist //
-            if (dummyAccount.findByEmail(dummyMail) == null) {
+            if (Account.findByEmail(dummyMail) == null) {
                 dummyAccount.email = dummyMail;
                 dummyAccount.firstname = "Gelöschter";
                 dummyAccount.lastname = "Account";

@@ -171,8 +171,8 @@ public class AdminController extends BaseController {
 		//https://issues.apache.org/jira/browse/IO-373
 		//String size = FileUtils.byteCountToDisplaySize(MediaController.sizeTemp());
 
-		long bytes = MediaController.sizeTemp();
-		String size = (bytes > 0) ? MediaController.bytesToString(bytes, false) : "keine Daten vorhanden";
+		long bytes = mediaController.sizeTemp();
+		String size = (bytes > 0) ? mediaController.bytesToString(bytes, false) : "keine Daten vorhanden";
 		return ok(mediaTemp.render(size));
 	}
 

@@ -24,6 +24,8 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += evolutions
 
+PlayKeys.externalizeResources := false
+
 routesGenerator := InjectedRoutesGenerator
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)

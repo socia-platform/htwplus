@@ -2,6 +2,7 @@ package controllers;
 
 import java.util.List;
 
+import com.google.inject.Inject;
 import controllers.Navigation.Level;
 import models.*;
 import models.enums.GroupType;
@@ -23,6 +24,9 @@ import views.html.Group.snippets.streamRaw;
 @Transactional
 @Security.Authenticated(Secured.class)
 public class GroupController extends BaseController {
+
+	@Inject
+	MediaController mediaController;
 
 	static Form<Group> groupForm = Form.form(Group.class);
 	static Form<Post> postForm = Form.form(Post.class);
@@ -91,6 +95,10 @@ public class GroupController extends BaseController {
 
         Navigation.set(Level.GROUPS, "Media", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
         List<Media> mediaSet = group.media;
+		// hacky, but prevents accessing MediaController from view. use dto instead
+		for (Media media : mediaSet) {
+			media.sizeInByte = mediaController.bytesToString(media.size, false);
+		}
         return ok(media.render(group, mediaForm, mediaSet));
 
 	}
