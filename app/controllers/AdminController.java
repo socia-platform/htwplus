@@ -39,75 +39,74 @@ public class AdminController extends BaseController {
     @Inject
     Account account;
 
-	static Form<Account> accountForm = form(Account.class);
+    static Form<Account> accountForm = form(Account.class);
     static Form<Post> postForm = form(Post.class);
 
-	public Result index(){
-		return ok(index.render());
-	}
+    public Result index() {
+        return ok(index.render());
+    }
 
-	public Result createAccountForm(){
-		return ok(createAccount.render(accountForm));
-	}
+    public Result createAccountForm() {
+        return ok(createAccount.render(accountForm));
+    }
 
-	@Transactional
-	public Result createAccount() {
-		Form<Account> filledForm = accountForm.bindFromRequest();
-		Logger.info(filledForm.errors().toString());
+    @Transactional
+    public Result createAccount() {
+        Form<Account> filledForm = accountForm.bindFromRequest();
+        Logger.info(filledForm.errors().toString());
 
-		filledForm.errors().remove("role");
+        filledForm.errors().remove("role");
 
-		if(filledForm.data().get("email").isEmpty()) {
-			filledForm.reject("email", "Bitte gib hier etwas ein!");
-		}
+        if (filledForm.data().get("email").isEmpty()) {
+            filledForm.reject("email", "Bitte gib hier etwas ein!");
+        }
 
-		if (!(Account.findByEmail(filledForm.data().get("email")) == null)) {
-			filledForm.reject("email", "Diese Email-Adresse wird bereits verwendet!");
-		}
+        if (!(Account.findByEmail(filledForm.data().get("email")) == null)) {
+            filledForm.reject("email", "Diese Email-Adresse wird bereits verwendet!");
+        }
 
-		if (!filledForm.data().get("password").equals(filledForm.data().get("repeatPassword"))) {
-			filledForm.reject("repeatPassword", "Passwörter stimmen nicht überein");
-		}
+        if (!filledForm.data().get("password").equals(filledForm.data().get("repeatPassword"))) {
+            filledForm.reject("repeatPassword", "Passwörter stimmen nicht überein");
+        }
 
-		if (filledForm.data().get("password").length() < 6) {
-			filledForm.reject("password", "Das Passwort muss mindestens 6 Zeichen haben.");
-		}
+        if (filledForm.data().get("password").length() < 6) {
+            filledForm.reject("password", "Das Passwort muss mindestens 6 Zeichen haben.");
+        }
 
-		if(filledForm.hasErrors()) {
-			return badRequest(createAccount.render(filledForm));
-		}
+        if (filledForm.hasErrors()) {
+            return badRequest(createAccount.render(filledForm));
+        }
 
-		Account a = new Account();
-		a.firstname = filledForm.data().get("firstname");
-		a.lastname = filledForm.data().get("lastname");
-		a.email = filledForm.data().get("email");
-		a.password = Component.md5(filledForm.data().get("password"));
-		a.avatar = "a1";
-		a.role = AccountRole.values()[Integer.parseInt(filledForm.data().get("role"))];
-		a.create();
+        account.firstname = filledForm.data().get("firstname");
+        account.lastname = filledForm.data().get("lastname");
+        account.email = filledForm.data().get("email");
+        account.password = Component.md5(filledForm.data().get("password"));
+        account.avatar = "a1";
+        account.role = AccountRole.values()[Integer.parseInt(filledForm.data().get("role"))];
+        account.create();
 
-		flash("success", "User angelegt");
-		return ok(createAccount.render(accountForm));
+        flash("success", "User angelegt");
+        return ok(createAccount.render(accountForm));
 
-	}
+    }
 
     @Transactional
     public Result deleteAccount(Long accountId) {
         Account current = Account.findById(accountId);
 
-        if(!Secured.deleteAccount(current)) {
+        if (!Secured.deleteAccount(current)) {
             flash("error", Messages.get("profile.delete.nopermission"));
             return redirect(controllers.routes.AdminController.listAccounts());
         }
 
         DynamicForm df = play.data.Form.form().bindFromRequest();
-        if(!df.get("confirmText").toLowerCase().equals("account wirklich löschen")) {
+        if (!df.get("confirmText").toLowerCase().equals("account wirklich löschen")) {
             flash("error", Messages.get("admin.delete_account.wrongconfirm"));
             return redirect(controllers.routes.AdminController.listAccounts());
         }
 
         // ACTUAL DELETION //
-        Logger.info("Deleting Account[#"+current.id+"]...");
+        Logger.info("Deleting Account[#" + current.id + "]...");
         current.delete();
 
         // override logout message
@@ -122,9 +121,9 @@ public class AdminController extends BaseController {
     public Result indexDelete() {
         try {
             elasticsearchService.deleteIndex();
-            flash("info","index gelöscht");
-        }  catch(NoNodeAvailableException nna) {
-            flash("error",nna.getMessage());
+            flash("info", "index gelöscht");
+        } catch (NoNodeAvailableException nna) {
+            flash("error", nna.getMessage());
         }
 
         return ok(indexing.render());
@@ -135,9 +134,9 @@ public class AdminController extends BaseController {
             if (!elasticsearchService.isIndexExists()) {
                 elasticsearchService.createAnalyzer();
                 elasticsearchService.createMapping();
-                flash("success","Mapping und Anazyler erfolgreich erstellt!");
+                flash("success", "Mapping und Anazyler erfolgreich erstellt!");
             } else {
-                flash("error","Index bereits vorhanden.");
+                flash("error", "Index bereits vorhanden.");
             }
         } else {
             flash("error", "Elasticsearch nicht erreichbar!");
@@ -148,43 +147,43 @@ public class AdminController extends BaseController {
 
     public Result indexAccounts() throws IOException {
         long time = account.indexAllAccounts();
-        String out = "Alle Accounts indexiert ("+Long.toString(time)+"ms)";
-        flash("info",out);
+        String out = "Alle Accounts indexiert (" + Long.toString(time) + "ms)";
+        flash("info", out);
         return ok(indexing.render());
     }
 
     public Result indexGroups() throws IOException {
         /**long time = group.indexAllGroups();
-        String out = "Alle Gruppen indexiert ("+Long.toString(time)+"ms)";
-        flash("info",out);*/
+         String out = "Alle Gruppen indexiert ("+Long.toString(time)+"ms)";
+         flash("info",out);*/
         return ok(indexing.render());
     }
 
     public Result indexPosts() throws IOException {
         /**long time = post.indexAllPosts();
-        String out = "Alle Posts indexiert ("+Long.toString(time)+"ms)";
-        flash("info",out);*/
+         String out = "Alle Posts indexiert ("+Long.toString(time)+"ms)";
+         flash("info",out);*/
         return ok(indexing.render());
     }
 
-	public Result viewMediaTemp() {
-		//https://issues.apache.org/jira/browse/IO-373
-		//String size = FileUtils.byteCountToDisplaySize(MediaController.sizeTemp());
+    public Result viewMediaTemp() {
+        //https://issues.apache.org/jira/browse/IO-373
+        //String size = FileUtils.byteCountToDisplaySize(MediaController.sizeTemp());
 
-		long bytes = mediaController.sizeTemp();
-		String size = (bytes > 0) ? mediaController.bytesToString(bytes, false) : "keine Daten vorhanden";
-		return ok(mediaTemp.render(size));
-	}
+        long bytes = mediaController.sizeTemp();
+        String size = (bytes > 0) ? mediaController.bytesToString(bytes, false) : "keine Daten vorhanden";
+        return ok(mediaTemp.render(size));
+    }
 
-	public Result cleanMediaTemp(){
-		mediaController.cleanUpTemp();
-		flash("success", "Media Temp directory was cleaned.");
-		return viewMediaTemp();
-	}
+    public Result cleanMediaTemp() {
+        mediaController.cleanUpTemp();
+        flash("success", "Media Temp directory was cleaned.");
+        return viewMediaTemp();
+    }
 
-	public Result listAccounts(){
-		return ok(listAccounts.render(Account.all()));
-	}
+    public Result listAccounts() {
+        return ok(listAccounts.render(Account.all()));
+    }
 
     /**
      * Returns the rendered form for broadcast posts.
@@ -210,58 +209,58 @@ public class AdminController extends BaseController {
     @Transactional
     public Promise<Result> broadcastNotification() {
         Promise<Result> promiseResult = Promise.promise(
-            new F.Function0<Result>() {
-                public Result apply() {
+                new F.Function0<Result>() {
+                    public Result apply() {
 
-                    if (!Secured.isAdmin()) {
-                        return redirect(controllers.routes.Application.index());
-                    }
+                        if (!Secured.isAdmin()) {
+                            return redirect(controllers.routes.Application.index());
+                        }
 
-                    DynamicForm form = Form.form().bindFromRequest();
-                    List<String> broadcastMemberList = new ArrayList<>();
-                    final Post broadcastPost = new Post();
-                    broadcastPost.owner = Component.currentAccount();
-                    broadcastPost.isBroadcastMessage = true;
+                        DynamicForm form = Form.form().bindFromRequest();
+                        List<String> broadcastMemberList = new ArrayList<>();
+                        final Post broadcastPost = new Post();
+                        broadcastPost.owner = Component.currentAccount();
+                        broadcastPost.isBroadcastMessage = true;
 
-                    String broadcastMessage = form.data().get(Messages.get("admin.broadcast_notification")).trim();
-                    if (broadcastMessage.equals("")) {
-                        flash("error", Messages.get("admin.broadcast_notification.error.no_message"));
-                        return broadcastNotificationForm();
-                    }
+                        String broadcastMessage = form.data().get(Messages.get("admin.broadcast_notification")).trim();
+                        if (broadcastMessage.equals("")) {
+                            flash("error", Messages.get("admin.broadcast_notification.error.no_message"));
+                            return broadcastNotificationForm();
+                        }
 
-                    broadcastPost.content = broadcastMessage;
+                        broadcastPost.content = broadcastMessage;
 
-                    // iterate over posted values to get recipient account IDs and post content, if at least one is clicked
-                    // otherwise take all accounts
-                    final List<Account> recipientList;
-                    if (form.data().size() > 1) {
-                        for (Map.Entry<String, String> entry : form.data().entrySet()) {
-                            if (entry.getKey().startsWith("account")) {
-                                broadcastMemberList.add(entry.getValue());
+                        // iterate over posted values to get recipient account IDs and post content, if at least one is clicked
+                        // otherwise take all accounts
+                        final List<Account> recipientList;
+                        if (form.data().size() > 1) {
+                            for (Map.Entry<String, String> entry : form.data().entrySet()) {
+                                if (entry.getKey().startsWith("account")) {
+                                    broadcastMemberList.add(entry.getValue());
+                                }
+                            }
+                            recipientList = Account.getAccountListByIdCollection(broadcastMemberList);
+                        } else {
+                            recipientList = Account.all();
+                        }
+
+
+                        // add recipients to broadcast post recipient list
+                        for (Account account : recipientList) {
+                            // add account ID if not the sender
+                            if (!broadcastPost.owner.id.equals(account.id)) {
+                                broadcastPost.addRecipient(account);
                             }
                         }
-                        recipientList = Account.getAccountListByIdCollection(broadcastMemberList);
-                    } else {
-                        recipientList = Account.all();
+
+                        broadcastPost.create();
+
+                        NotificationService.getInstance().createNotification(broadcastPost, Post.BROADCAST);
+
+                        flash("success", Messages.get("admin.broadcast_notification.success"));
+                        return ok(index.render());
                     }
-
-
-	                // add recipients to broadcast post recipient list
-	                for (Account account : recipientList) {
-	                    // add account ID if not the sender
-	                    if (!broadcastPost.owner.id.equals(account.id)) {
-	                        broadcastPost.addRecipient(account);
-	                    }
-	                }
-
-	                broadcastPost.create();
-
-                    NotificationService.getInstance().createNotification(broadcastPost, Post.BROADCAST);
-
-                    flash("success", Messages.get("admin.broadcast_notification.success"));
-                    return ok(index.render());
                 }
-            }
         );
 
         return promiseResult.map(

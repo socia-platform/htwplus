@@ -32,10 +32,6 @@ public class EmailService {
     @Inject MailerClient mailerClient;
     @Inject Email email;
 
-    public EmailService(){
-        Logger.info("init EmailService");
-    }
-
     /**
      * Sends an email.
      *
