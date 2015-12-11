@@ -6,7 +6,6 @@ import java.util.*;
 import javax.inject.Inject;
 import javax.persistence.*;
 
-import controllers.Component;
 import models.enums.AccountRole;
 import models.enums.GroupType;
 import models.enums.LinkType;
@@ -67,8 +66,13 @@ public class Post extends BaseNotifiable implements INotifiable {
 	public void create() {
 		JPA.em().persist(this);
         try {
-            if (!this.owner.role.equals(AccountRole.ADMIN))
+            if (!this.owner.role.equals(AccountRole.ADMIN)) {
+                // elasticsearchService could be null if this method is called from PostController (static form). needs to be refactored anyway
+                if (elasticsearchService == null) {
+                    elasticsearchService = ElasticsearchService.getInstance();
+                }
                 elasticsearchService.indexPost(this);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -483,9 +487,9 @@ public class Post extends BaseNotifiable implements INotifiable {
      * Collect all AccountIds, which are able to view this.post
      * @return List of AccountIds
      */
-    public List<Long> findAllowedToViewAccountIds(){
+    public Set<Long> findAllowedToViewAccountIds(){
 
-        List<Long> viewableIds = new ArrayList<>();
+        Set<Long> viewableIds = new HashSet<>();
 
         // everybody from post.group can see this post
         if(this.belongsToGroup()) {
