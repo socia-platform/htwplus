@@ -3,6 +3,7 @@ package controllers;
 import static play.data.Form.form;
 
 import models.Account;
+import models.Group;
 import models.Post;
 import models.enums.AccountRole;
 import models.services.ElasticsearchService;
@@ -38,6 +39,12 @@ public class AdminController extends BaseController {
 
     @Inject
     Account account;
+
+    @Inject
+    Group group;
+    
+    @Inject
+    Post post;
 
     static Form<Account> accountForm = form(Account.class);
     static Form<Post> postForm = form(Post.class);
@@ -153,16 +160,16 @@ public class AdminController extends BaseController {
     }
 
     public Result indexGroups() throws IOException {
-        /**long time = group.indexAllGroups();
-         String out = "Alle Gruppen indexiert ("+Long.toString(time)+"ms)";
-         flash("info",out);*/
+        long time = group.indexAllGroups();
+        String out = "Alle Gruppen indexiert (" + Long.toString(time) + "ms)";
+        flash("info", out);
         return ok(indexing.render());
     }
 
     public Result indexPosts() throws IOException {
-        /**long time = post.indexAllPosts();
-         String out = "Alle Posts indexiert ("+Long.toString(time)+"ms)";
-         flash("info",out);*/
+        long time = post.indexAllPosts();
+        String out = "Alle Posts indexiert (" + Long.toString(time) + "ms)";
+        flash("info", out);
         return ok(indexing.render());
     }
 

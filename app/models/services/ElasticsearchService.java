@@ -7,25 +7,16 @@ import models.*;
 import models.enums.LinkType;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.validate.query.QueryExplanation;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.common.xcontent.ToXContent;
-import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiTermQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import play.Logger;
-import play.api.inject.ApplicationLifecycle;
-import play.libs.F;
-import scala.Function0;
-import scala.concurrent.Future;
-import scala.runtime.BoxedUnit;
 
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -33,7 +24,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -194,35 +184,49 @@ public class ElasticsearchService implements IElasticsearchService {
         // Build scoringQuery by provided fields (shouldFields) to increase the scoring of a better matching hit
         QueryBuilder scoringQuery = QueryBuilders.multiMatchQuery(currentAccountId, scoringFields.toArray(new String[scoringFields.size()]));
 
-        // Build viewableFilter to show authorized posts only
+        // Build boolQuery to enable filter possibilities
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+
+        // Add should filter to show authorized posts only
         boolQuery.should(QueryBuilders.termQuery("viewable", currentAccountId)).should(QueryBuilders.termQuery("public", true));
 
-
+        // Add mode-filter to filter only for users/group or posts
         if (!filter.equals("all")) {
             boolQuery.must(QueryBuilders.typeQuery(filter));
         }
 
-
+        // Add facet-filter to filter for mode related stuff (eg. user -> students or group -> open)
         if (facets != null) {
             if (facets.get("studycourse").length != 0) {
-                boolQuery.must(QueryBuilders.termQuery("user.studycourse", facets.get("studycourse")));
+                for (String facet : facets.get("studycourse")) {
+                    boolQuery.must(QueryBuilders.termQuery("studycourse", facet));
+                }
             }
 
             if (facets.get("degree").length != 0) {
-                boolQuery.must(QueryBuilders.termQuery("user.degree", facets.get("degree")));
+                for (String facet : facets.get("degree")) {
+                    boolQuery.must(QueryBuilders.termQuery("degree", facet));
+                }
             }
 
             if (facets.get("semester").length != 0) {
-                boolQuery.must(QueryBuilders.termQuery("user.semester", facets.get("semester")));
+                for (String facet : facets.get("semester")) {
+                    boolQuery.must(QueryBuilders.termQuery("semester", facet));
+                }
+
             }
 
             if (facets.get("role").length != 0) {
-                boolQuery.must(QueryBuilders.termQuery("user.role", facets.get("role")));
+                for (String facet : facets.get("role")) {
+                    boolQuery.must(QueryBuilders.termQuery("role", facet));
+                }
+
             }
 
             if (facets.get("grouptype").length != 0) {
-                boolQuery.must(QueryBuilders.termQuery("group.grouptype", facets.get("grouptype")));
+                for (String facet : facets.get("grouptype")) {
+                    boolQuery.must(QueryBuilders.termQuery("grouptype", facet));
+                }
             }
         }
 
@@ -250,15 +254,15 @@ public class ElasticsearchService implements IElasticsearchService {
 
         // Add user aggregations
         if (filter.equals("user")) {
-            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("studycourse").field("user.studycourse"));
-            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("degree").field("user.degree"));
-            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("semester").field("user.semester"));
-            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("role").field("user.role"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("studycourse").field("studycourse"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("degree").field("degree"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("semester").field("semester"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("role").field("role"));
         }
 
         // Add group aggregations
         if (filter.equals("group")) {
-            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("grouptype").field("group.grouptype"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("grouptype").field("grouptype"));
         }
 
         // Apply PostFilter if request mode is not 'all'
@@ -268,10 +272,13 @@ public class ElasticsearchService implements IElasticsearchService {
          searchRequest.setPostFilter(boolFilterBuilder2);
          }*/
 
-        Logger.info(searchRequest.toString());
+        //Logger.info(searchRequest.toString());
+
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
-        Logger.info(response.toString());
+
+        //Logger.info(response.toString());
+
         return response;
     }
 
