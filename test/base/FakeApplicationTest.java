@@ -19,6 +19,7 @@ import play.mvc.Http;
 import play.test.FakeApplication;
 import play.test.Helpers;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 
@@ -28,6 +29,10 @@ import static org.mockito.Mockito.*;
  * You can extend your test classes from this class to provide a complete fake environment.
  */
 public abstract class FakeApplicationTest {
+
+    @Inject
+    GroupAccount groupAccount;
+
     /**
      * Mocks a HTTP request instance.
      */
@@ -286,7 +291,9 @@ public abstract class FakeApplicationTest {
             @Override
             public void invoke() throws Throwable {
                 if (!Group.isMember(group, account)) {
-                    GroupAccount testGroupAccount = new GroupAccount(account, group, LinkType.establish);
+                    groupAccount.account = account;
+                    groupAccount.group = group;
+                    groupAccount.linkType = LinkType.establish;
                     testGroupAccount.create();
                     group.update();
                 }

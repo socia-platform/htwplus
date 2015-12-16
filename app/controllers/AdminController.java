@@ -39,10 +39,8 @@ public class AdminController extends BaseController {
 
     @Inject
     Account account;
-
     @Inject
     Group group;
-    
     @Inject
     Post post;
 
