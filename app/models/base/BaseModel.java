@@ -32,7 +32,7 @@ public abstract class BaseModel {
      * Sets created and updated time on creation.
      */
 	@PrePersist
-	protected void createdAt() {
+	public void createdAt() {
 		this.createdAt = this.updatedAt = new Date();
 	}
 
@@ -40,24 +40,9 @@ public abstract class BaseModel {
      * Sets last update time.
      */
 	@PreUpdate
-	protected void updatedAt() {
+	public void updatedAt() {
 		this.updatedAt = new Date();
 	}
-
-    /**
-     * Creates this model.
-     */
-	public abstract void create();
-
-    /**
-     * Updates this model.
-     */
-	public abstract void update();
-
-    /**
-     * Deletes this model.
-     */
-	public abstract void delete();
 
     /**
      * Returns true, if given Object obj is equal to this model.

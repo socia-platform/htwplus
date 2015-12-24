@@ -29,9 +29,6 @@ public class Post extends BaseNotifiable implements INotifiable {
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
     public static final String BROADCAST = "broadcast";                     // broadcast post from admin control center
 
-    @Inject
-    public transient  ElasticsearchService elasticsearchService;
-
     @Required
     @Lob
     @Type(type = "org.hibernate.type.TextType")
@@ -62,21 +59,6 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     @Transient
     public String searchContent;
-		
-	public void create() {
-		JPA.em().persist(this);
-        try {
-            if (!this.owner.role.equals(AccountRole.ADMIN)) {
-                // elasticsearchService could be null if this method is called from PostController (static form). needs to be refactored anyway
-                if (elasticsearchService == null) {
-                    elasticsearchService = ElasticsearchService.getInstance();
-                }
-                elasticsearchService.indexPost(this);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public String validate() {
         if(this.content.trim().length() <= 0) {
@@ -85,28 +67,6 @@ public class Post extends BaseNotifiable implements INotifiable {
         return null;
     }
 
-	@Override
-	public void update() {
-		updatedAt();
-	}
-
-	@Override
-	public void delete() {
-		// delete all comments first
-        List<Post> comments = getCommentsForPost(this.id, 0, 0);
-
-        for (Post comment : comments) {
-            comment.delete();
-        }
-
-        Notification.deleteReferences(this);
-
-        // Delete Elasticsearch document
-        elasticsearchService.deletePost(this);
-
-        JPA.em().remove(this);
-	}
-	
 	protected static Query limit(Query query, int limit, int offset) {
 		query.setMaxResults(limit);
 		if (offset >= 0) {
@@ -133,18 +93,6 @@ public class Post extends BaseNotifiable implements INotifiable {
 	
 	public static int countPostsForGroup(final Group group) {
 		return ((Number)JPA.em().createQuery("SELECT COUNT(p) FROM Post p WHERE p.group.id = ?1").setParameter(1, group.id).getSingleResult()).intValue();
-	}
-	
-	
-	@SuppressWarnings("unchecked")
-	public static List<Post> getCommentsForPost(Long id, int limit, int offset) {
-		Query query = JPA.em()
-                .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
-                .setParameter(1, id);
-		
-		query = limit(query, limit, offset);
-		
-		return (List<Post>) query.getResultList();
 	}
 
     @SuppressWarnings("unchecked")
@@ -451,36 +399,6 @@ public class Post extends BaseNotifiable implements INotifiable {
         }
 
         return new Notification();
-    }
-
-    /**
-     * Get all posts except error posts (from Admin)
-     * @return
-     */
-    public static List<Post> allWithoutAdmin() {
-        return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
-    }
-
-    /**
-     * Get all posts owned by a specific user
-     * @return
-     */
-    public static List<Post> listAllPostsOwnedBy(Long id) {
-        return JPA.em().createQuery("FROM Post p WHERE p.owner.id = " + id).getResultList();
-    }
-
-    /**
-     * get a list of posts posted on the wall of the specified account
-     */
-    public static List<Post> listAllPostsPostedOnAccount(Long id) {
-        return JPA.em().createQuery("FROM Post p WHERE p.account.id = " + id).getResultList();
-    }
-
-    public long indexAllPosts() throws IOException {
-        final long start = System.currentTimeMillis();
-        for (Post post: allWithoutAdmin()) elasticsearchService.indexPost(post);
-        return (System.currentTimeMillis() - start) / 100;
-
     }
 
     /**

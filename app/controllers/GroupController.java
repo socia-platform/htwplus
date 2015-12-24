@@ -1,9 +1,9 @@
 package controllers;
 
-import java.util.List;
-
 import controllers.Navigation.Level;
-import daos.GroupDao;
+import managers.GroupAccountManager;
+import managers.GroupManager;
+import managers.MediaManager;
 import models.*;
 import models.enums.GroupType;
 import models.enums.LinkType;
@@ -20,6 +20,7 @@ import views.html.Group.*;
 import views.html.Group.snippets.streamRaw;
 
 import javax.inject.Inject;
+import java.util.List;
 
 
 @Transactional
@@ -27,13 +28,13 @@ import javax.inject.Inject;
 public class GroupController extends BaseController {
 
     @Inject
-    MediaController mediaController;
+    GroupManager groupManager;
 
     @Inject
-    GroupAccount groupAccount;
+    GroupAccountManager groupAccountManager;
 
     @Inject
-    GroupDao groupDao;
+    MediaManager mediaManager;
 
     static Form<Group> groupForm = Form.form(Group.class);
     static Form<Post> postForm = Form.form(Post.class);
@@ -43,15 +44,15 @@ public class GroupController extends BaseController {
     public Result index() {
         Navigation.set(Level.GROUPS, "Übersicht");
         Account account = Component.currentAccount();
-        List<GroupAccount> groupRequests = GroupAccount.findRequests(account);
-        List<Group> groupAccounts = GroupAccount.findGroupsEstablished(account);
-        List<Group> courseAccounts = GroupAccount.findCoursesEstablished(account);
+        List<GroupAccount> groupRequests = groupAccountManager.findRequests(account);
+        List<Group> groupAccounts = groupAccountManager.findGroupsEstablished(account);
+        List<Group> courseAccounts = groupAccountManager.findCoursesEstablished(account);
         return ok(index.render(groupAccounts, courseAccounts, groupRequests, groupForm));
     }
 
     @Transactional(readOnly = true)
     public Result view(Long id) {
-        Group group = Group.findById(id);
+        Group group = groupManager.findById(id);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -67,7 +68,7 @@ public class GroupController extends BaseController {
 
     @Transactional(readOnly = true)
     public Result stream(Long id, int page, boolean raw) {
-        Group group = Group.findById(id);
+        Group group = groupManager.findById(id);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -90,7 +91,7 @@ public class GroupController extends BaseController {
     @Transactional(readOnly = true)
     public Result media(Long id) {
         Form<Media> mediaForm = Form.form(Media.class);
-        Group group = Group.findById(id);
+        Group group = groupManager.findById(id);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -104,7 +105,7 @@ public class GroupController extends BaseController {
         List<Media> mediaSet = group.media;
         // hacky, but prevents accessing MediaController from view. use dto instead
         for (Media media : mediaSet) {
-            media.sizeInByte = mediaController.bytesToString(media.size, false);
+            media.sizeInByte = mediaManager.bytesToString(media.size, false);
         }
         return ok(media.render(group, mediaForm, mediaSet));
 
@@ -167,7 +168,7 @@ public class GroupController extends BaseController {
                     return ok(create.render(filledForm));
             }
 
-            groupDao.createWithGroupAccount(group);
+            groupManager.createWithGroupAccount(group);
             flash("success", successMsg + " erstellt!");
             return redirect(controllers.routes.GroupController.stream(group.id, PAGE, false));
         }
@@ -175,7 +176,7 @@ public class GroupController extends BaseController {
 
     @Transactional
     public Result edit(Long id) {
-        Group group = Group.findById(id);
+        Group group = groupManager.findById(id);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -196,7 +197,7 @@ public class GroupController extends BaseController {
 
     @Transactional
     public Result update(Long groupId) {
-        Group group = Group.findById(groupId);
+        Group group = groupManager.findById(groupId);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -241,7 +242,7 @@ public class GroupController extends BaseController {
                 return ok(edit.render(group, filledForm));
         }
         group.description = description;
-        group.update();
+        groupManager.update(group);
         flash("success", "'" + group.title + "' erfolgreich bearbeitet!");
         return redirect(controllers.routes.GroupController.stream(groupId, PAGE, false));
 
@@ -249,7 +250,7 @@ public class GroupController extends BaseController {
 
     @Transactional
     public Result delete(Long id) {
-        Group group = Group.findById(id);
+        Group group = groupManager.findById(id);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -257,7 +258,7 @@ public class GroupController extends BaseController {
         }
 
         if (Secured.deleteGroup(group)) {
-            group.delete();
+            groupManager.delete(group);
             flash("info", "'" + group.title + "' wurde erfolgreich gelöscht!");
         } else {
             flash("error", "Dazu hast du keine Berechtigung!");
@@ -266,7 +267,7 @@ public class GroupController extends BaseController {
     }
 
     public Result token(Long groupId) {
-        Group group = Group.findById(groupId);
+        Group group = groupManager.findById(groupId);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -278,7 +279,7 @@ public class GroupController extends BaseController {
     }
 
     public Result validateToken(Long groupId) {
-        Group group = Group.findById(groupId);
+        Group group = groupManager.findById(groupId);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -296,11 +297,7 @@ public class GroupController extends BaseController {
 
         if (enteredToken.equals(group.token)) {
             Account account = Component.currentAccount();
-
-            groupAccount.account = account;
-            groupAccount.group = group;
-            groupAccount.linkType = LinkType.establish;
-            groupAccount.create();
+            groupAccountManager.create(new GroupAccount(group, account, LinkType.establish));
             flash("success", "Kurs erfolgreich beigetreten!");
             return redirect(controllers.routes.GroupController.stream(groupId, PAGE, false));
         } else {
@@ -312,7 +309,7 @@ public class GroupController extends BaseController {
     @Transactional
     public Result join(long id) {
         Account account = Component.currentAccount();
-        Group group = Group.findById(id);
+        Group group = groupManager.findById(id);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -325,7 +322,7 @@ public class GroupController extends BaseController {
         }
 
         // is already requested?
-        groupAccount = GroupAccount.find(account, group);
+        GroupAccount groupAccount = groupAccountManager.find(account, group);
         if (groupAccount != null && groupAccount.linkType.equals(LinkType.request)) {
             flash("info", "Deine Beitrittsanfrage wurde bereits verschickt!");
             return redirect(controllers.routes.GroupController.index());
@@ -339,7 +336,7 @@ public class GroupController extends BaseController {
         // invitation?
         if (groupAccount != null && groupAccount.linkType.equals(LinkType.invite)) {
             groupAccount.linkType = LinkType.establish;
-            groupAccount.update();
+            groupAccountManager.update(groupAccount);
 
             flash("success", "'" + group.title + "' erfolgreich beigetreten!");
             return redirect(controllers.routes.GroupController.index());
@@ -347,14 +344,14 @@ public class GroupController extends BaseController {
             groupAccount.account = account;
             groupAccount.group = group;
             groupAccount.linkType = LinkType.establish;
-            groupAccount.create();
+            groupAccountManager.create(groupAccount);
             flash("success", "'" + group.title + "' erfolgreich beigetreten!");
             return redirect(controllers.routes.GroupController.stream(id, PAGE, false));
         } else if (group.groupType.equals(GroupType.close)) {
             groupAccount.account = account;
             groupAccount.group = group;
             groupAccount.linkType = LinkType.request;
-            groupAccount.create();
+            groupAccountManager.create(groupAccount);
             group.temporarySender = account;
             NotificationService.getInstance().createNotification(group, Group.GROUP_NEW_REQUEST);
             flash("success", Messages.get("group.group_request_sent"));
@@ -368,14 +365,14 @@ public class GroupController extends BaseController {
 
     public Result removeMember(long groupId, long accountId) {
         Account account = Account.findById(accountId);
-        Group group = Group.findById(groupId);
+        Group group = groupManager.findById(groupId);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
-        GroupAccount groupAccount = GroupAccount.find(account, group);
+        GroupAccount groupAccount = groupAccountManager.find(account, group);
 
         Call defaultRedirect = controllers.routes.GroupController.index();
 
@@ -384,7 +381,7 @@ public class GroupController extends BaseController {
         }
 
         if (groupAccount != null) {
-            groupAccount.delete();
+            groupAccountManager.delete(groupAccount);
             if (account.equals(Component.currentAccount())) {
                 flash("info", "Gruppe erfolgreich verlassen!");
             } else {
@@ -413,7 +410,7 @@ public class GroupController extends BaseController {
     @Transactional
     public Result acceptRequest(long groupId, long accountId) {
         Account account = Account.findById(accountId);
-        Group group = Group.findById(groupId);
+        Group group = groupManager.findById(groupId);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -421,10 +418,10 @@ public class GroupController extends BaseController {
         }
 
         if (account != null && Secured.isOwnerOfGroup(group, Component.currentAccount())) {
-            GroupAccount groupAccount = GroupAccount.find(account, group);
+            GroupAccount groupAccount = groupAccountManager.find(account, group);
             if (groupAccount != null) {
                 groupAccount.linkType = LinkType.establish;
-                groupAccount.update();
+                groupAccountManager.update(groupAccount);
             }
         } else {
             flash("error", Messages.get("group.group_not_found"));
@@ -448,7 +445,7 @@ public class GroupController extends BaseController {
     @Transactional
     public Result declineRequest(long groupId, long accountId) {
         Account account = Account.findById(accountId);
-        Group group = Group.findById(groupId);
+        Group group = groupManager.findById(groupId);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -456,7 +453,7 @@ public class GroupController extends BaseController {
         }
 
         if (account != null && Secured.isOwnerOfGroup(group, Component.currentAccount())) {
-            GroupAccount groupAccount = GroupAccount.find(account, group);
+            GroupAccount groupAccount = groupAccountManager.find(account, group);
             if (groupAccount != null) {
                 groupAccount.linkType = LinkType.reject;
             }
@@ -470,7 +467,7 @@ public class GroupController extends BaseController {
 
     @Transactional
     public Result invite(long groupId) {
-        Group group = Group.findById(groupId);
+        Group group = groupManager.findById(groupId);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -478,12 +475,12 @@ public class GroupController extends BaseController {
         }
 
         Navigation.set(Level.GROUPS, "Freunde einladen", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
-        return ok(invite.render(group, Friendship.friendsToInvite(Component.currentAccount(), group), GroupAccount.findAccountsByGroup(group, LinkType.invite)));
+        return ok(invite.render(group, Friendship.friendsToInvite(Component.currentAccount(), group), groupAccountManager.findAccountsByGroup(group, LinkType.invite)));
     }
 
     @Transactional
     public Result inviteMember(long groupId) {
-        Group group = Group.findById(groupId);
+        Group group = groupManager.findById(groupId);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -507,7 +504,7 @@ public class GroupController extends BaseController {
             for (String accountId : group.inviteList) {
                 try {
                     Account inviteAccount = Account.findById(Long.parseLong(accountId));
-                    GroupAccount groupAccount = GroupAccount.find(inviteAccount, group);
+                    GroupAccount groupAccount = groupAccountManager.find(inviteAccount, group);
 
                     // Create group account link to inviteAccount and add to notification recipient list
                     // if the inviteAccount is not already member, the sender and recipients are friends
@@ -516,7 +513,7 @@ public class GroupController extends BaseController {
                         groupAccount.account = inviteAccount;
                         groupAccount.group = group;
                         groupAccount.linkType = LinkType.invite;
-                        groupAccount.create();
+                        groupAccountManager.create(groupAccount);
 
                         // add inviteAccount to temporaryRecipients list for notifications later
                         group.addTemporaryRecipient(inviteAccount);
@@ -537,7 +534,7 @@ public class GroupController extends BaseController {
     }
 
     public Result acceptInvitation(long groupId, long accountId) {
-        Group group = Group.findById(groupId);
+        Group group = groupManager.findById(groupId);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -545,7 +542,7 @@ public class GroupController extends BaseController {
         }
 
         Account account = Account.findById(accountId);
-        GroupAccount groupAccount = GroupAccount.find(account, group);
+        GroupAccount groupAccount = groupAccountManager.find(account, group);
 
         if (groupAccount != null && Secured.acceptInvitation(groupAccount)) {
             join(group.id);
@@ -556,7 +553,7 @@ public class GroupController extends BaseController {
     }
 
     public Result declineInvitation(long groupId, long accountId) {
-        Group group = Group.findById(groupId);
+        Group group = groupManager.findById(groupId);
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -564,10 +561,10 @@ public class GroupController extends BaseController {
         }
 
         Account account = Account.findById(accountId);
-        GroupAccount groupAccount = GroupAccount.find(account, group);
+        GroupAccount groupAccount = groupAccountManager.find(account, group);
 
         if (groupAccount != null && Secured.acceptInvitation(groupAccount)) {
-            groupAccount.delete();
+            groupAccountManager.delete(groupAccount);
         }
 
         flash("success", "Einladung abgelehnt!");

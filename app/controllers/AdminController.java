@@ -1,14 +1,14 @@
 package controllers;
 
-import static play.data.Form.form;
-
+import managers.AccountManager;
+import managers.GroupManager;
+import managers.MediaManager;
+import managers.PostManager;
 import models.Account;
-import models.Group;
 import models.Post;
 import models.enums.AccountRole;
 import models.services.ElasticsearchService;
 import models.services.NotificationService;
-
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import play.Logger;
 import play.data.DynamicForm;
@@ -16,15 +16,19 @@ import play.data.Form;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.libs.F;
-import play.mvc.Security;
+import play.libs.F.Promise;
 import play.mvc.Result;
+import play.mvc.Security;
 import play.mvc.With;
 import views.html.Admin.*;
-import play.libs.F.Promise;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static play.data.Form.form;
 
 @Security.Authenticated(Secured.class)
 // Action performs the authentication
@@ -35,14 +39,17 @@ public class AdminController extends BaseController {
     ElasticsearchService elasticsearchService;
 
     @Inject
-    MediaController mediaController;
+    MediaManager mediaManager;
 
     @Inject
-    Account account;
+    GroupManager groupManager;
+
     @Inject
-    Group group;
+    PostManager postManager;
+
     @Inject
-    Post post;
+    AccountManager accountManager;
+
 
     static Form<Account> accountForm = form(Account.class);
     static Form<Post> postForm = form(Post.class);
@@ -81,14 +88,14 @@ public class AdminController extends BaseController {
         if (filledForm.hasErrors()) {
             return badRequest(createAccount.render(filledForm));
         }
-
+        Account account = new Account();
         account.firstname = filledForm.data().get("firstname");
         account.lastname = filledForm.data().get("lastname");
         account.email = filledForm.data().get("email");
         account.password = Component.md5(filledForm.data().get("password"));
         account.avatar = "a1";
         account.role = AccountRole.values()[Integer.parseInt(filledForm.data().get("role"))];
-        account.create();
+        accountManager.create(account);
 
         flash("success", "User angelegt");
         return ok(createAccount.render(accountForm));
@@ -112,7 +119,7 @@ public class AdminController extends BaseController {
 
         // ACTUAL DELETION //
         Logger.info("Deleting Account[#" + current.id + "]...");
-        current.delete();
+        accountManager.delete(current);
 
         // override logout message
         flash("success", Messages.get("admin.delete_account.success"));
@@ -151,21 +158,21 @@ public class AdminController extends BaseController {
     }
 
     public Result indexAccounts() throws IOException {
-        long time = account.indexAllAccounts();
+        long time = accountManager.indexAllAccounts();
         String out = "Alle Accounts indexiert (" + Long.toString(time) + "ms)";
         flash("info", out);
         return ok(indexing.render());
     }
 
     public Result indexGroups() throws IOException {
-        long time = group.indexAllGroups();
+        long time = groupManager.indexAllGroups();
         String out = "Alle Gruppen indexiert (" + Long.toString(time) + "ms)";
         flash("info", out);
         return ok(indexing.render());
     }
 
     public Result indexPosts() throws IOException {
-        long time = post.indexAllPosts();
+        long time = postManager.indexAllPosts();
         String out = "Alle Posts indexiert (" + Long.toString(time) + "ms)";
         flash("info", out);
         return ok(indexing.render());
@@ -175,19 +182,19 @@ public class AdminController extends BaseController {
         //https://issues.apache.org/jira/browse/IO-373
         //String size = FileUtils.byteCountToDisplaySize(MediaController.sizeTemp());
 
-        long bytes = mediaController.sizeTemp();
-        String size = (bytes > 0) ? mediaController.bytesToString(bytes, false) : "keine Daten vorhanden";
+        long bytes = mediaManager.sizeTemp();
+        String size = (bytes > 0) ? mediaManager.bytesToString(bytes, false) : "keine Daten vorhanden";
         return ok(mediaTemp.render(size));
     }
 
     public Result cleanMediaTemp() {
-        mediaController.cleanUpTemp();
+        mediaManager.cleanUpTemp();
         flash("success", "Media Temp directory was cleaned.");
         return viewMediaTemp();
     }
 
     public Result listAccounts() {
-        return ok(listAccounts.render(Account.all()));
+        return ok(listAccounts.render(accountManager.all()));
     }
 
     /**
@@ -200,8 +207,7 @@ public class AdminController extends BaseController {
         if (!Secured.isAdmin()) {
             return redirect(controllers.routes.Application.index());
         }
-
-        return ok(createBroadcastNotification.render(AdminController.postForm, Account.all()));
+        return ok(createBroadcastNotification.render(AdminController.postForm, accountManager.all()));
     }
 
     /**
@@ -246,7 +252,7 @@ public class AdminController extends BaseController {
                             }
                             recipientList = Account.getAccountListByIdCollection(broadcastMemberList);
                         } else {
-                            recipientList = Account.all();
+                            recipientList = accountManager.all();
                         }
 
 
@@ -258,7 +264,7 @@ public class AdminController extends BaseController {
                             }
                         }
 
-                        broadcastPost.create();
+                        postManager.create(broadcastPost);
 
                         NotificationService.getInstance().createNotification(broadcastPost, Post.BROADCAST);
 

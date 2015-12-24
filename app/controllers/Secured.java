@@ -1,12 +1,10 @@
 package controllers;
 
 
-import java.util.Date;
-
 import com.typesafe.config.ConfigFactory;
+import managers.GroupManager;
 import models.*;
 import models.enums.AccountRole;
-import play.Logger;
 import play.Play;
 import play.i18n.Messages;
 import play.mvc.Http.Context;
@@ -14,10 +12,17 @@ import play.mvc.Result;
 import play.mvc.Security;
 import views.html.landingpage;
 
+import javax.inject.Inject;
+import java.util.Date;
+
 /**
  * This class provides several authorization methods for security reasons.
  */
 public class Secured extends Security.Authenticator {
+
+	@Inject
+	GroupManager groupManager;
+
 	/**
 	 * Returns the ID of the currently logged in user.
 	 *
@@ -78,9 +83,9 @@ public class Secured extends Security.Authenticator {
      *
      * @return True, if currentUser.id is @param id
      */
-    public static boolean isMe(Long id) {
+    public static boolean isMe(Account account) {
         Account current = Component.currentAccount();
-        return current.equals(Account.findById(id));
+        return current.equals(account);
     }
 
 	/**
@@ -91,7 +96,7 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if account is member
 	 */
 	public static boolean isMemberOfGroup(Group group, Account account){
-		return Group.isMember(group, account);
+		return groupManager.isMember(group, account);
 	}
 
 	/**

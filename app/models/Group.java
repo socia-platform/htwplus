@@ -1,25 +1,16 @@
 package models;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.persistence.*;
-import javax.validation.constraints.Size;
-
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.GroupType;
-import models.enums.LinkType;
-
-import models.services.ElasticsearchService;
-import play.data.validation.ValidationError;
-import play.data.validation.Constraints.Required;
 import play.data.validation.Constraints.Pattern;
-import play.db.jpa.JPA;
+import play.data.validation.Constraints.Required;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "Group_")
@@ -28,12 +19,6 @@ public class Group extends BaseNotifiable implements INotifiable {
     public static final String GROUP_NEW_REQUEST = "group_new_request";
     public static final String GROUP_REQUEST_SUCCESS = "group_request_success";
     public static final String GROUP_REQUEST_DECLINE = "group_request_decline";
-
-	@Inject
-	public transient ElasticsearchService elasticsearchService;
-
-	@Inject
-	public transient GroupAccount groupAccount;
 
     @Required
 	@Column(unique = true)
@@ -68,6 +53,7 @@ public class Group extends BaseNotifiable implements INotifiable {
     @Transient
     public Collection<String> inviteList = null;
 
+	/**
 	public List<ValidationError> validate() {
 		List<ValidationError> errors = new ArrayList<>();
 		if (Group.findByTitle(this.title) != null) {
@@ -76,107 +62,10 @@ public class Group extends BaseNotifiable implements INotifiable {
 		}
 		return null;
 	}
-	
+	*/
+
 	public static boolean validateToken(String token) {
         return !(token.equals("") || token.length() < 4 || token.length() > 45);
-	}
-
-	public void createWithGroupAccount(Account account) {
-		this.owner = account;
-		this.create();
-		groupAccount.account = account;
-		groupAccount.group = this;
-		groupAccount.linkType = LinkType.establish;
-		groupAccount.create();
-
-	}
-
-	@Override
-	public void create() {
-        JPA.em().persist(this);
-        try {
-			elasticsearchService.indexGroup(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-	@Override
-	public void update() {
-        try {
-			elasticsearchService.indexGroup(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-		JPA.em().merge(this);
-	}
-
-	@Override
-	public void delete() {
-		// delete all Posts
-		List<Post> posts = Post.getPostsForGroup(this, 0, 0);
-		for (Post post : posts) {
-			post.delete();
-		}
-
-		// delete media
-		for (Media media : this.media) {
-			media.delete();
-		}
-		
-		// Delete Notifications
-        Notification.deleteReferences(this);
-
-        // Delete Elasticsearch document
-		elasticsearchService.deleteGroup(this);
-
-		JPA.em().remove(this);
-	}
-
-	public static Group findById(Long id) {
-		return JPA.em().find(Group.class, id);
-	}
-
-	public static Group findByTitle(String title) {
-		@SuppressWarnings("unchecked")
-		List<Group> groups = (List<Group>) JPA.em()
-				.createQuery("FROM Group g WHERE g.title = ?1")
-				.setParameter(1, title).getResultList();
-
-		if (groups.isEmpty()) {
-			return null;
-		} else {
-			return groups.get(0);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public static List<Group> all() {
-        return JPA.em().createQuery("FROM Group").getResultList();
-	}
-
-    @SuppressWarnings("unchecked")
-    public static List<Group> listAllGroupsOwnedBy(Long id) {
-        return JPA.em().createQuery("FROM Group g WHERE g.owner.id = "+id).getResultList();
-    }
-
-    /**
-     * Returns true, if an account is member of a group.
-     *
-     * @param group Group instance
-     * @param account Account instance
-     * @return True, if account is member of group
-     */
-	public static boolean isMember(Group group, Account account) {
-		@SuppressWarnings("unchecked")
-		List<GroupAccount> groupAccounts = (List<GroupAccount>) JPA
-				.em()
-				.createQuery(
-						"SELECT g FROM GroupAccount g WHERE g.account.id = ?1 and g.group.id = ?2 AND linkType = ?3")
-				.setParameter(1, account.id).setParameter(2, group.id)
-				.setParameter(3, LinkType.establish).getResultList();
-
-        return !groupAccounts.isEmpty();
 	}
 
     @Override
@@ -203,12 +92,5 @@ public class Group extends BaseNotifiable implements INotifiable {
         }
 
         return controllers.routes.GroupController.index().toString();
-    }
-
-    public long indexAllGroups() throws IOException {
-        final long start = System.currentTimeMillis();
-        for (Group group: all()) elasticsearchService.indexGroup(group);
-        return (System.currentTimeMillis() - start) / 100;
-
     }
 }

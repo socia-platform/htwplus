@@ -1,9 +1,12 @@
 package controllers;
 
-import java.util.List;
-
 import controllers.Navigation.Level;
-import models.*;
+import managers.GroupManager;
+import managers.PostManager;
+import models.Account;
+import models.Group;
+import models.Post;
+import models.PostBookmark;
 import models.services.NotificationService;
 import play.Play;
 import play.api.mvc.Call;
@@ -15,12 +18,16 @@ import play.mvc.Security;
 import views.html.Post.view;
 
 import javax.inject.Inject;
+import java.util.List;
 
 @Security.Authenticated(Secured.class)
 public class PostController extends BaseController {
 
     @Inject
-    Post post;
+    GroupManager groupManager;
+
+    @Inject
+    PostManager postManager;
 
     static Form<Post> postForm = Form.form(Post.class);
     static final int PAGE = 1;
@@ -65,15 +72,15 @@ public class PostController extends BaseController {
         Form<Post> filledForm = postForm.bindFromRequest();
 
         if (target.equals(Post.GROUP)) {
-            Group group = Group.findById(anyId);
+            Group group = groupManager.findById(anyId);
             if (Secured.isMemberOfGroup(group, account)) {
                 if (filledForm.hasErrors()) {
                     flash("error", Messages.get("post.try_with_content"));
                 } else {
-                    post = filledForm.get();
+                    Post post = filledForm.get();
                     post.owner = Component.currentAccount();
                     post.group = group;
-                    post.create();
+                    postManager.create(post);
                     NotificationService.getInstance().createNotification(post, Post.GROUP);
                 }
             } else {
@@ -89,10 +96,10 @@ public class PostController extends BaseController {
                 if (filledForm.hasErrors()) {
                     flash("error", Messages.get("post.try_with_content"));
                 } else {
-                    post = filledForm.get();
+                    Post post = filledForm.get();
                     post.account = profile;
                     post.owner = account;
-                    post.create();
+                    postManager.create(post);
                     if (!account.equals(profile)) {
                         NotificationService.getInstance().createNotification(post, Post.PROFILE);
                     }
@@ -111,10 +118,10 @@ public class PostController extends BaseController {
                 if (filledForm.hasErrors()) {
                     flash("error", Messages.get("post.try_with_content"));
                 } else {
-                    post = filledForm.get();
+                    Post post = filledForm.get();
                     post.account = profile;
                     post.owner = account;
-                    post.create();
+                    postManager.create(post);
                 }
                 return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE, false));
             }
@@ -142,9 +149,9 @@ public class PostController extends BaseController {
             final Post post = filledForm.get();
             post.owner = account;
             post.parent = parent;
-            post.create();
+            postManager.create(post);
             // update parent to move it to the top
-            parent.update();
+            postManager.update(parent);
 
             if (parent.belongsToGroup()) {
                 // this is a comment in a group post
@@ -190,9 +197,8 @@ public class PostController extends BaseController {
                 return badRequest();
             } else {
                 Post newPost = filledForm.get();
-                post.content = newPost.content;
-                post.create(); // updates elasticsearch stuff
-                post.update();
+                postManager.create(newPost); // updates elasticsearch stuff
+                postManager.update(newPost);
 
                 return ok(post.content);
             }
@@ -200,13 +206,13 @@ public class PostController extends BaseController {
     }
 
     @Transactional
-    public static List<Post> getComments(Long id, int limit) {
+    public List<Post> getComments(Long id, int limit) {
         //int max = Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
         int offset = 0;
         if (limit != 0) {
             offset = Post.countCommentsForPost(id) - limit;
         }
-        return Post.getCommentsForPost(id, limit, offset);
+        return postManager.getCommentsForPost(id, limit, offset);
     }
 
 
@@ -224,7 +230,7 @@ public class PostController extends BaseController {
         int limit = Post.countCommentsForPost(id) - Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
 
         List<Post> comments;
-        comments = Post.getCommentsForPost(id, limit, 0);
+        comments = postManager.getCommentsForPost(id, limit, 0);
         for (Post post : comments) {
             result = result.concat(views.html.snippets.postComment.render(post).toString());
         }
@@ -255,7 +261,7 @@ public class PostController extends BaseController {
                     routesTo = controllers.routes.Application.index();
                 }
             }
-            post.delete();
+            postManager.delete(post);
             flash("success", "Gelöscht!");
 
         } else {

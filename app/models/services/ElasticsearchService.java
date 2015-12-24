@@ -108,7 +108,13 @@ public class ElasticsearchService implements IElasticsearchService {
                 .execute().actionGet();
     }
 
-    public void indexPost(Post post) throws IOException {
+    public void index(Object model) throws IOException {
+        if (model instanceof Post) indexPost(((Post) model));
+        if (model instanceof Group) indexGroup(((Group) model));
+        if (model instanceof Account) indexAccount(((Account) model));
+    }
+
+    private void indexPost(Post post) throws IOException {
         if (isClientAvailable()) client.prepareIndex(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
@@ -121,7 +127,7 @@ public class ElasticsearchService implements IElasticsearchService {
                 .actionGet();
     }
 
-    public void indexGroup(Group group) throws IOException {
+    private void indexGroup(Group group) throws IOException {
         if (isClientAvailable()) client.prepareIndex(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
@@ -135,7 +141,7 @@ public class ElasticsearchService implements IElasticsearchService {
                 .actionGet();
     }
 
-    public void indexAccount(Account account) throws IOException {
+    private void indexAccount(Account account) throws IOException {
         if (isClientAvailable()) client.prepareIndex(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
@@ -282,19 +288,25 @@ public class ElasticsearchService implements IElasticsearchService {
         return response;
     }
 
-    public void deleteGroup(Group group) {
+    public void delete(Object model) {
+        if (model instanceof Post) deletePost(((Post) model));
+        if (model instanceof Group) deleteGroup(((Group) model));
+        if (model instanceof Account) deleteAccount(((Account) model));
+    }
+
+    private void deleteGroup(Group group) {
         if (isClientAvailable()) client.prepareDelete(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .execute()
                 .actionGet();
     }
 
-    public void deletePost(Post post) {
+    private void deletePost(Post post) {
         if (isClientAvailable()) client.prepareDelete(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .execute()
                 .actionGet();
     }
 
-    public void deleteAccount(Account account) {
+    private void deleteAccount(Account account) {
         if (isClientAvailable()) client.prepareDelete(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .execute()
                 .actionGet();
