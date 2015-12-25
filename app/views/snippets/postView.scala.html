@@ -47,7 +47,7 @@
 		<div class="hp-truncate hp-white-space" id="@post.id">@post.content</div>
 		<hr />
 		<div class="hp-comments" id="comments-@post.id">
-			@if(post.getCountComments() > Play.application().configuration().getInt("htwplus.comments.init") && commentLimit != Play.application().configuration().getInt("htwplus.comments.singlepost")) {
+			@if(managers.PostManager.getCountComments(post) > Play.application().configuration().getInt("htwplus.comments.init") && commentLimit != Play.application().configuration().getInt("htwplus.comments.singlepost")) {
 				<a href="#collapse-@post.id" class="olderComments unloaded">Alle Kommentare anzeigen...</a>
 				<div id="collapse-@post.id" class="collapse"></div>
 			}

@@ -2,11 +2,13 @@ package models.services;
 
 import akka.actor.ActorRef;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import managers.NotificationManager;
 import models.Account;
 import models.Notification;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.EmailNotifications;
+import play.DefaultApplication;
 import play.Logger;
 import play.Play;
 import play.db.jpa.JPA;
@@ -15,6 +17,7 @@ import play.libs.F;
 import play.libs.Json;
 import scala.concurrent.duration.Duration;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -22,6 +25,13 @@ import java.util.concurrent.TimeUnit;
  * This class handles the notification system.
  */
 public class NotificationService {
+
+    @Inject
+    NotificationManager notificationManager;
+
+    @Inject
+    DefaultApplication defaultApplication;
+
     /**
      * Singleton instance
      */
@@ -129,10 +139,10 @@ public class NotificationService {
 
                             // if no ID is set already, persist new instance, otherwise update given instance
                             if (notification.id == null) {
-                                notification.create();
+                                notificationManager.create(notification);
                                 Logger.info("Created new notification for user: " + recipient.id.toString());
                             } else {
-                                notification.update();
+                                notificationManager.update(notification);
                                 Logger.info("Updated notification (ID: " + notification.id.toString()
                                         + ") for user: " + recipient.id.toString()
                                 );
@@ -163,7 +173,7 @@ public class NotificationService {
                 ObjectNode node = WebSocketService.getInstance()
                         .successResponseTemplate(WebSocketService.WS_METHOD_RECEIVE_NOTIFICATION);
                 node.put("notification", notification.getAsJson());
-                node.put("unreadCount", Notification.countUnreadNotificationsForAccountId(notification.recipient.id));
+                node.put("unreadCount", NotificationManager.countUnreadNotificationsForAccountId(notification.recipient.id));
                 recipientActor.tell(Json.toJson(node), null);
             }
         }
@@ -185,7 +195,7 @@ public class NotificationService {
                         new Runnable() {
                             // runs the Akka schedule
                             public void run() {
-                                EmailService email = Play.application().injector().instanceOf(EmailService.class);
+                                EmailService email = defaultApplication.injector().instanceOf(EmailService.class);
                                 email.sendNotificationEmail(notification);
                             }
                         },

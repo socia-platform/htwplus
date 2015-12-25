@@ -97,7 +97,7 @@ public class FriendshipManager implements BaseManager {
      * @param potentialFriend Account instance
      * @return True, if both accounts are friends
      */
-    public boolean alreadyFriendly(Account me, Account potentialFriend) {
+    public static boolean alreadyFriendly(Account me, Account potentialFriend) {
         try {
             JPA.em().createQuery("SELECT fs FROM Friendship fs WHERE fs.account.id = ?1 and fs.friend.id = ?2 AND fs.linkType = ?3")
                     .setParameter(1, me.id).setParameter(2, potentialFriend.id).setParameter(3, LinkType.establish).getSingleResult();
@@ -134,7 +134,7 @@ public class FriendshipManager implements BaseManager {
                 .setParameter(1, accountId).getResultList();
     }
 
-    public List<Long> findFriendsId(final Account account){
+    public static List<Long> findFriendsId(final Account account){
         return (List<Long>) JPA.em().createQuery("SELECT fs.friend.id FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
                 .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList();
     }

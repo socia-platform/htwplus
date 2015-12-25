@@ -94,83 +94,7 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
 	public Boolean approved;
 
-    /**
-     * Returns an account by account ID.
-     *
-     * @param id Account ID
-     * @return Account instance
-     */
-	public static Account findById(Long id) {
-		return JPA.em().find(Account.class, id);
-	}
 
-    @SuppressWarnings("unchecked")
-	public static List<Account> findAll(){
-		return JPA.em().createQuery("SELECT a FROM Account a ORDER BY a.name").getResultList();
-	}
-
-	/**
-     * Retrieve a User from email.
-     */
-    public static Account findByEmail(String email) {
-    	if(email.isEmpty()) {
-    		return null;
-    	}
-    	try{
-	    	return (Account) JPA.em()
-					.createQuery("from Account a where a.email = :email")
-					.setParameter("email", email).getSingleResult();
-	    } catch (NoResultException exp) {
-	    	return null;
-		}
-    }
-    
-	/**
-     * Retrieve a User by loginname
-     */
-    public static Account findByLoginName(String loginName) {
-    	try{
-	    	return (Account) JPA.em()
-					.createQuery("from Account a where a.loginname = :loginname")
-					.setParameter("loginname", loginName).getSingleResult();
-	    } catch (NoResultException exp) {
-	    	return null;
-		}
-    }
-
-    /**
-     * Retrieve a User by loginname
-     */
-    public static Account findByName(String name) {
-        try{
-            return (Account) JPA.em()
-                    .createQuery("from Account a where a.name = :name")
-                    .setParameter("name", name).getSingleResult();
-        } catch (NoResultException exp) {
-            return null;
-        }
-    }
-
-    /**
-     * Authenticates a user by email and password.
-     * @param email of the user who wants to be authenticate
-     * @param password of the user should match to the email ;) 
-     * @return Returns the current account or Null
-     */
-	public static Account authenticate(String email, String password) {
-		Account currentAcc = null;
-		try {
-			final Account result = (Account) JPA.em()
-				.createQuery("from Account a where a.email = :email")
-				.setParameter("email", email).getSingleResult();
-			if (result != null && Component.md5(password).equals(result.password)) {
-				currentAcc = result;
-			}
-			return currentAcc;
-		} catch (NoResultException exp) {
-			return currentAcc;
-		}
-	}
 
 	static public String AVATAR_REALM = "avatar";
 	static public int AVATAR_MIN_SIZE = 250;
@@ -314,35 +238,6 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 		sb.append(Character.toUpperCase(this.lastname.charAt(0)));
 		return sb.toString();
 	}
-	
-	public static boolean isOwner(Long accountId, Account currentUser) {
-		Account a = JPA.em().find(Account.class, accountId);
-		if(a.equals(currentUser)){
-			return true;
-		} else { 
-			return false;
-		}
-	}
-
-    /**
-     * Returns a list of account instances by an ID collection of Strings.
-     *
-     * @param accountIds String array of account IDs
-     * @return List of accounts
-     */
-    public static List<Account> getAccountListByIdCollection(final List<String> accountIds) {
-    	StringBuilder joinedAccountIds = new StringBuilder();
-        for (int i = 0; i < accountIds.size(); i++) {
-            if (i > 0) {
-                joinedAccountIds.append(",");
-            }
-            joinedAccountIds.append(accountIds.get(i));
-        }
-
-        return JPA.em()
-                .createQuery("FROM Account a WHERE a.id IN (" +joinedAccountIds.toString() + ")", Account.class)
-                .getResultList();
-    }
 
     @Override
     public ObjectNode getAsJson() {

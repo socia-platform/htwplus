@@ -1,8 +1,12 @@
 
 package models.services;
 
+import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import managers.FriendshipManager;
+import managers.GroupAccountManager;
+import managers.PostManager;
 import models.*;
 import models.enums.LinkType;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -34,6 +38,9 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
  */
 @Singleton
 public class ElasticsearchService implements IElasticsearchService {
+
+    @Inject
+    PostManager postManger;
 
     private Client client = null;
     private static ElasticsearchService instance = null;
@@ -120,8 +127,8 @@ public class ElasticsearchService implements IElasticsearchService {
                         .startObject()
                         .field("content", post.content)
                         .field("owner", post.owner.id)
-                        .field("public", post.isPublic())
-                        .field("viewable", post.findAllowedToViewAccountIds())
+                        .field("public", postManger.isPublic(post))
+                        .field("viewable", postManger.findAllowedToViewAccountIds(post))
                         .endObject())
                 .execute()
                 .actionGet();
@@ -135,7 +142,7 @@ public class ElasticsearchService implements IElasticsearchService {
                         .field("grouptype", group.groupType)
                         .field("public", true)
                         .field("owner", group.owner.id)
-                        .field("member", GroupAccount.findAccountIdsByGroup(group, LinkType.establish))
+                        .field("member", GroupAccountManager.findAccountIdsByGroup(group, LinkType.establish))
                         .endObject())
                 .execute()
                 .actionGet();
@@ -153,7 +160,7 @@ public class ElasticsearchService implements IElasticsearchService {
                         .field("initial", account.getInitials())
                         .field("avatar", account.avatar)
                         .field("public", true)
-                        .field("friends", Friendship.findFriendsId(account))
+                        .field("friends", FriendshipManager.findFriendsId(account))
                         .endObject())
                 .execute()
                 .actionGet();

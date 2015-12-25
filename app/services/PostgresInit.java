@@ -3,6 +3,8 @@ package services;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import controllers.Component;
+import managers.AccountManager;
+import managers.GroupManager;
 import models.Account;
 import models.Group;
 import models.enums.AccountRole;
@@ -20,10 +22,8 @@ import javax.inject.Singleton;
 public class PostgresInit implements DatabaseService {
 
     private JPAApi jpaApi;
-    private Account adminAccount;
-    private Account dummyAccount;
-    private Group adminGroup;
-    private Group feedbackGroup;
+    AccountManager accountManager;
+    GroupManager groupManager;
 
     private final Config conf = ConfigFactory.load();
     private final String adminGroupTitle = conf.getString("htwplus.admin.group");
@@ -33,58 +33,59 @@ public class PostgresInit implements DatabaseService {
     private final String dummyPassword = conf.getString("htwplus.dummy.pw");
 
     @Inject
-    public PostgresInit(JPAApi jpaApi, Account adminAccount, Account dummyAccount, Group adminGroup, Group feedbackGroup) {
+    public PostgresInit(JPAApi jpaApi, AccountManager accountManager, GroupManager groupManager) {
         this.jpaApi = jpaApi;
-        this.adminAccount = adminAccount;
-        this.dummyAccount = dummyAccount;
-        this.adminGroup = adminGroup;
-        this.feedbackGroup = feedbackGroup;
+        this.accountManager = accountManager;
+        this.groupManager = groupManager;
         initialization();
     }
 
     @Override
     public void initialization() {
         jpaApi.withTransaction(() -> {
-            if (Account.findByEmail(adminMail) == null) {
+
+            // create admin account if none exists
+            Account adminAccount = accountManager.findByEmail(adminMail);
+            if (adminAccount == null) {
                 adminAccount.email = adminMail;
                 adminAccount.firstname = "Admin";
                 adminAccount.lastname = "@HTWplus";
                 adminAccount.role = AccountRole.ADMIN;
                 adminAccount.avatar = "a1";
                 adminAccount.password = Component.md5(adminPassword);
-                adminAccount.create();
+                accountManager.create(adminAccount);
             }
 
-            // create Dummy anonymous account, if it doesn't exist //
-            if (Account.findByEmail(dummyMail) == null) {
+            // create dummy account if none exists
+            if (accountManager.findByEmail(dummyMail) == null) {
+                Account dummyAccount = new Account();
                 dummyAccount.email = dummyMail;
                 dummyAccount.firstname = "Gelöschter";
                 dummyAccount.lastname = "Account";
                 dummyAccount.role = AccountRole.DUMMY;
                 dummyAccount.avatar = "aDefault";
                 dummyAccount.password = Component.md5(dummyPassword);
-                dummyAccount.create();
+                accountManager.create(dummyAccount);
             }
 
-            // create Admin group if none exists
-            if (Group.findByTitle(adminGroupTitle) == null) {
+            // create admin group if none exists
+            if (groupManager.findByTitle(adminGroupTitle) == null) {
+                Group adminGroup = new Group();
                 adminGroup.title = adminGroupTitle;
                 adminGroup.groupType = GroupType.close;
                 adminGroup.description = "for HTWplus Admins only";
-                adminGroup.createWithGroupAccount(adminAccount);
+                groupManager.createWithGroupAccount(adminGroup, adminAccount);
             }
 
-            // create Feedback group if none exists
-            if (Group.findByTitle("HTWplus Feedback") == null) {
+            // create feedback group if none exists
+            if (groupManager.findByTitle("HTWplus Feedback") == null) {
+                Group feedbackGroup = new Group();
                 feedbackGroup.title = "HTWplus Feedback";
                 feedbackGroup.groupType = GroupType.open;
                 feedbackGroup.description = "Du hast Wünsche, Ideen, Anregungen, Kritik oder Probleme mit der Seite? Hier kannst du es loswerden!";
-                feedbackGroup.createWithGroupAccount(adminAccount);
+                groupManager.createWithGroupAccount(feedbackGroup, adminAccount);
             }
         });
-
-
-
 
     }
 }

@@ -2,6 +2,7 @@ package controllers;
 
 import com.typesafe.config.ConfigFactory;
 import controllers.Navigation.Level;
+import managers.AccountManager;
 import managers.GroupManager;
 import managers.PostManager;
 import models.Account;
@@ -45,6 +46,8 @@ public class Application extends BaseController {
     @Inject
     PostManager postManager;
 
+    @Inject
+    AccountManager accountManager;
 
     public Result javascriptRoutes() {
         response().setContentType("text/javascript");
@@ -61,7 +64,7 @@ public class Application extends BaseController {
     public Result index() {
         Navigation.set(Level.STREAM, "Alles");
         Account currentAccount = Component.currentAccount();
-        return ok(stream.render(currentAccount, Post.getStream(currentAccount, LIMIT, PAGE), postForm, Post.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
+        return ok(stream.render(currentAccount, postManager.getStream(currentAccount, LIMIT, PAGE), postForm, postManager.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
     }
 
     public Result help() {
@@ -91,9 +94,9 @@ public class Application extends BaseController {
         Account currentAccount = Component.currentAccount();
 
         if (raw) {
-            return ok(streamRaw.render(Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
+            return ok(streamRaw.render(postManager.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, postManager.countStream(currentAccount, filter), LIMIT, page, filter));
         } else {
-            return ok(stream.render(currentAccount, Post.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, Post.countStream(currentAccount, filter), LIMIT, page, filter));
+            return ok(stream.render(currentAccount, postManager.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, postManager.countStream(currentAccount, filter), LIMIT, page, filter));
         }
     }
 
@@ -192,7 +195,7 @@ public class Application extends BaseController {
 
         // Guest case
         if (account == null) {
-            account = Account.findByEmail(play.Play.application().configuration().getString("htwplus.admin.mail"));
+            account = accountManager.findByEmail(play.Play.application().configuration().getString("htwplus.admin.mail"));
         }
 
         Form<Post> filledForm = postForm.bindFromRequest();

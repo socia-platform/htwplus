@@ -1,6 +1,7 @@
 package managers;
 
 import com.typesafe.config.ConfigFactory;
+import controllers.Component;
 import models.*;
 import models.enums.AccountRole;
 import models.enums.LinkType;
@@ -9,6 +10,7 @@ import play.Logger;
 import play.db.jpa.JPA;
 
 import javax.inject.Inject;
+import javax.persistence.NoResultException;
 import java.io.IOException;
 import java.util.List;
 
@@ -63,7 +65,7 @@ public class AccountManager implements BaseManager {
     public void delete(Object model) {
         Account account = (Account) model;
 
-        Account dummy = Account.findByEmail(ConfigFactory.load().getString("htwplus.dummy.mail"));
+        Account dummy = findByEmail(ConfigFactory.load().getString("htwplus.dummy.mail"));
 
         if (dummy == null) {
             Logger.error("Couldn't delete account because there is no Dummy Account! (mail=" + ConfigFactory.load().getString("htwplus.dummy.mail") + ")");
@@ -97,7 +99,7 @@ public class AccountManager implements BaseManager {
         }
 
         // Delete Friendships //
-        List<Friendship> friendships = Friendship.listAllFriendships(account.id);
+        List<Friendship> friendships = friendshipManager.listAllFriendships(account.id);
         for (Friendship friendship : friendships) {
             friendshipManager.delete(friendship);
         }
@@ -124,12 +126,119 @@ public class AccountManager implements BaseManager {
     }
 
     /**
+     * Returns an account by account ID.
+     *
+     * @param id Account ID
+     * @return Account instance
+     */
+    public Account findById(Long id) {
+        return JPA.em().find(Account.class, id);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Account> findAll(){
+        return JPA.em().createQuery("SELECT a FROM Account a ORDER BY a.name").getResultList();
+    }
+
+    /**
+     * Retrieve a User from email.
+     */
+    public Account findByEmail(String email) {
+        if(email.isEmpty()) {
+            return null;
+        }
+        try{
+            return (Account) JPA.em()
+                    .createQuery("from Account a where a.email = :email")
+                    .setParameter("email", email).getSingleResult();
+        } catch (NoResultException exp) {
+            return null;
+        }
+    }
+
+    /**
+     * Retrieve a User by loginname
+     */
+    public Account findByLoginName(String loginName) {
+        try{
+            return (Account) JPA.em()
+                    .createQuery("from Account a where a.loginname = :loginname")
+                    .setParameter("loginname", loginName).getSingleResult();
+        } catch (NoResultException exp) {
+            return null;
+        }
+    }
+
+    /**
+     * Retrieve a User by loginname
+     */
+    public Account findByName(String name) {
+        try{
+            return (Account) JPA.em()
+                    .createQuery("from Account a where a.name = :name")
+                    .setParameter("name", name).getSingleResult();
+        } catch (NoResultException exp) {
+            return null;
+        }
+    }
+
+    /**
+     * Authenticates a user by email and password.
+     * @param email of the user who wants to be authenticate
+     * @param password of the user should match to the email ;)
+     * @return Returns the current account or Null
+     */
+    public static Account authenticate(String email, String password) {
+        Account currentAcc = null;
+        try {
+            final Account result = (Account) JPA.em()
+                    .createQuery("from Account a where a.email = :email")
+                    .setParameter("email", email).getSingleResult();
+            if (result != null && Component.md5(password).equals(result.password)) {
+                currentAcc = result;
+            }
+            return currentAcc;
+        } catch (NoResultException exp) {
+            return currentAcc;
+        }
+    }
+
+    /**
      * Try to get all accounts...
      * @return List of accounts.
      */
     @SuppressWarnings("unchecked")
-    public static List<Account> all() {
+    public List<Account> all() {
         return JPA.em().createQuery("FROM Account").getResultList();
+    }
+
+    public static boolean isOwner(Long accountId, Account currentUser) {
+        Account a = JPA.em().find(Account.class, accountId);
+        if(a.equals(currentUser)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns a list of account instances by an ID collection of Strings.
+     *
+     * @param accountIds String array of account IDs
+     * @return List of accounts
+     */
+    public List<Account> getAccountListByIdCollection(final List<String> accountIds) {
+        StringBuilder joinedAccountIds = new StringBuilder();
+        for (int i = 0; i < accountIds.size(); i++) {
+            if (i > 0) {
+                joinedAccountIds.append(",");
+            }
+            joinedAccountIds.append(accountIds.get(i));
+        }
+
+        return JPA.em()
+                .createQuery("FROM Account a WHERE a.id IN (" + joinedAccountIds.toString() + ")", Account.class)
+                .getResultList();
     }
 
     /**

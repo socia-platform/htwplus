@@ -73,7 +73,7 @@ public class AdminController extends BaseController {
             filledForm.reject("email", "Bitte gib hier etwas ein!");
         }
 
-        if (!(Account.findByEmail(filledForm.data().get("email")) == null)) {
+        if (!(accountManager.findByEmail(filledForm.data().get("email")) == null)) {
             filledForm.reject("email", "Diese Email-Adresse wird bereits verwendet!");
         }
 
@@ -104,7 +104,7 @@ public class AdminController extends BaseController {
 
     @Transactional
     public Result deleteAccount(Long accountId) {
-        Account current = Account.findById(accountId);
+        Account current = accountManager.findById(accountId);
 
         if (!Secured.deleteAccount(current)) {
             flash("error", Messages.get("profile.delete.nopermission"));
@@ -250,7 +250,7 @@ public class AdminController extends BaseController {
                                     broadcastMemberList.add(entry.getValue());
                                 }
                             }
-                            recipientList = Account.getAccountListByIdCollection(broadcastMemberList);
+                            recipientList = accountManager.getAccountListByIdCollection(broadcastMemberList);
                         } else {
                             recipientList = accountManager.all();
                         }

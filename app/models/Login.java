@@ -1,5 +1,6 @@
 package models;
 
+import managers.AccountManager;
 import play.db.jpa.Transactional;
 
 public class Login {
@@ -10,7 +11,7 @@ public class Login {
 
 		@Transactional
 		public String validate() {
-			if (Account.authenticate(this.email, this.password) == null) {
+			if (AccountManager.authenticate(this.email, this.password) == null) {
 				return "Bitte melde dich mit deiner Matrikelnummer an.";
 			}
 			return null;

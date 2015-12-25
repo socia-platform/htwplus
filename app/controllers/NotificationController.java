@@ -39,7 +39,7 @@ public class NotificationController extends BaseController {
      * @return Html rendered instance
      */
     @Transactional(readOnly = true)
-	public Html getNotifications() {
+	public static Html getNotifications() {
 		Account account = Component.currentAccount();
 		
 		if (account == null) {
@@ -48,12 +48,12 @@ public class NotificationController extends BaseController {
 
         List<Notification> list = null;
         try {
-            list = notificationManager.findByAccountIdUnread(account.id);
+            list = NotificationManager.findByAccountIdUnread(account.id);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
         List<Integer> countedNotifications = NotificationController.countNotifications(list);
         return views.html.Notification.menuitem.render(list, countedNotifications.get(0),
-                notificationManager.countUnreadNotificationsForAccountId(account.id)
+                NotificationManager.countUnreadNotificationsForAccountId(account.id)
         );
 	}
 

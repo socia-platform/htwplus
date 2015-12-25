@@ -1,9 +1,7 @@
 package controllers;
 
 import controllers.Navigation.Level;
-import managers.GroupAccountManager;
-import managers.GroupManager;
-import managers.MediaManager;
+import managers.*;
 import models.*;
 import models.enums.GroupType;
 import models.enums.LinkType;
@@ -35,6 +33,15 @@ public class GroupController extends BaseController {
 
     @Inject
     MediaManager mediaManager;
+
+    @Inject
+    FriendshipManager friendshipManager;
+
+    @Inject
+    PostManager postManager;
+
+    @Inject
+    AccountManager accountManager;
 
     static Form<Group> groupForm = Form.form(Group.class);
     static Form<Post> postForm = Form.form(Post.class);
@@ -79,12 +86,12 @@ public class GroupController extends BaseController {
         }
 
         Navigation.set(Level.GROUPS, "Newsstream", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
-        List<Post> posts = Post.getPostsForGroup(group, LIMIT, page);
+        List<Post> posts = postManager.getPostsForGroup(group, LIMIT, page);
 
         if (raw) {
-            return ok(streamRaw.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page));
+            return ok(streamRaw.render(group, posts, postForm, postManager.countPostsForGroup(group), LIMIT, page));
         } else {
-            return ok(stream.render(group, posts, postForm, Post.countPostsForGroup(group), LIMIT, page));
+            return ok(stream.render(group, posts, postForm, postManager.countPostsForGroup(group), LIMIT, page));
         }
     }
 
@@ -168,7 +175,7 @@ public class GroupController extends BaseController {
                     return ok(create.render(filledForm));
             }
 
-            groupManager.createWithGroupAccount(group);
+            groupManager.createWithGroupAccount(group, Component.currentAccount());
             flash("success", successMsg + " erstellt!");
             return redirect(controllers.routes.GroupController.stream(group.id, PAGE, false));
         }
@@ -364,7 +371,7 @@ public class GroupController extends BaseController {
     }
 
     public Result removeMember(long groupId, long accountId) {
-        Account account = Account.findById(accountId);
+        Account account = accountManager.findById(accountId);
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
@@ -409,7 +416,7 @@ public class GroupController extends BaseController {
      */
     @Transactional
     public Result acceptRequest(long groupId, long accountId) {
-        Account account = Account.findById(accountId);
+        Account account = accountManager.findById(accountId);
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
@@ -444,7 +451,7 @@ public class GroupController extends BaseController {
      */
     @Transactional
     public Result declineRequest(long groupId, long accountId) {
-        Account account = Account.findById(accountId);
+        Account account = accountManager.findById(accountId);
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
@@ -475,7 +482,7 @@ public class GroupController extends BaseController {
         }
 
         Navigation.set(Level.GROUPS, "Freunde einladen", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
-        return ok(invite.render(group, Friendship.friendsToInvite(Component.currentAccount(), group), groupAccountManager.findAccountsByGroup(group, LinkType.invite)));
+        return ok(invite.render(group, friendshipManager.friendsToInvite(Component.currentAccount(), group), GroupAccountManager.findAccountsByGroup(group, LinkType.invite)));
     }
 
     @Transactional
@@ -503,13 +510,13 @@ public class GroupController extends BaseController {
             // create GroupAccount link for all invitations
             for (String accountId : group.inviteList) {
                 try {
-                    Account inviteAccount = Account.findById(Long.parseLong(accountId));
+                    Account inviteAccount = accountManager.findById(Long.parseLong(accountId));
                     GroupAccount groupAccount = groupAccountManager.find(inviteAccount, group);
 
                     // Create group account link to inviteAccount and add to notification recipient list
                     // if the inviteAccount is not already member, the sender and recipients are friends
                     // and the group account link is not already set up.
-                    if (!Secured.isMemberOfGroup(group, inviteAccount) && Friendship.alreadyFriendly(currentUser, inviteAccount) && groupAccount == null) {
+                    if (!Secured.isMemberOfGroup(group, inviteAccount) && FriendshipManager.alreadyFriendly(currentUser, inviteAccount) && groupAccount == null) {
                         groupAccount.account = inviteAccount;
                         groupAccount.group = group;
                         groupAccount.linkType = LinkType.invite;
@@ -541,7 +548,7 @@ public class GroupController extends BaseController {
             return redirect(controllers.routes.GroupController.index());
         }
 
-        Account account = Account.findById(accountId);
+        Account account = accountManager.findById(accountId);
         GroupAccount groupAccount = groupAccountManager.find(account, group);
 
         if (groupAccount != null && Secured.acceptInvitation(groupAccount)) {
@@ -560,7 +567,7 @@ public class GroupController extends BaseController {
             return redirect(controllers.routes.GroupController.index());
         }
 
-        Account account = Account.findById(accountId);
+        Account account = accountManager.findById(accountId);
         GroupAccount groupAccount = groupAccountManager.find(account, group);
 
         if (groupAccount != null && Secured.acceptInvitation(groupAccount)) {

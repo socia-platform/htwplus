@@ -3,6 +3,7 @@ package models.services;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import managers.NotificationManager;
 import play.libs.F;
 import play.libs.mailer.Email;
 import play.libs.mailer.MailerClient;
@@ -31,6 +32,7 @@ public class EmailService {
 
     @Inject MailerClient mailerClient;
     @Inject Email email;
+    @Inject NotificationManager notificationManager;
 
     /**
      * Sends an email.
@@ -83,7 +85,7 @@ public class EmailService {
                 public void invoke() throws Throwable {
                     for (Notification notification : notifications) {
                         notification.isSent = true;
-                        notification.update();
+                        notificationManager.update(notification);
                     }
                 }
             });
@@ -119,7 +121,7 @@ public class EmailService {
 
             // load map with recipients containing list of unread notifications and iterate over the map
 
-            Map<Account, List<Notification>> notificationsRecipients = Notification.findUsersWithDailyHourlyEmailNotifications();
+            Map<Account, List<Notification>> notificationsRecipients = notificationManager.findUsersWithDailyHourlyEmailNotifications();
             for (Map.Entry<Account, List<Notification>> entry : notificationsRecipients.entrySet()) {
                 this.sendNotificationsEmail(entry.getValue(), entry.getKey());
             }

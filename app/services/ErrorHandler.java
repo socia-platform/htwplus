@@ -1,6 +1,8 @@
 package services;
 
-import models.Account;
+import managers.AccountManager;
+import managers.GroupManager;
+import managers.PostManager;
 import models.Group;
 import models.Post;
 import play.Configuration;
@@ -23,12 +25,13 @@ import javax.inject.Provider;
 public class ErrorHandler extends DefaultHttpErrorHandler {
 
     @Inject
-    Group group;
+    GroupManager groupManager;
 
     @Inject
-    Post post;
+    PostManager postManager;
 
-    @Inject Account account;
+    @Inject
+    AccountManager accountManager;
 
     Configuration configuration;
 
@@ -39,12 +42,13 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
     }
 
     protected F.Promise<Result> onProdServerError(Http.RequestHeader request, UsefulException exception) {
-        group = group.findByTitle(configuration.getString("htwplus.admin.group"));
+        Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
         if(group != null){
+            Post post = new Post();
             post.content = "Request: "+request+"\nError: "+exception;
-            post.owner = account.findByEmail(configuration.getString("htwplus.admin.mail"));
+            post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
             post.group = group;
-            post.create();
+            postManager.create(post);
         }
 
         return F.Promise.<Result>pure(

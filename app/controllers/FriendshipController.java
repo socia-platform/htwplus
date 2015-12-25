@@ -1,6 +1,7 @@
 package controllers;
 
 import controllers.Navigation.Level;
+import managers.AccountManager;
 import managers.FriendshipManager;
 import models.Account;
 import models.Friendship;
@@ -22,14 +23,17 @@ public class FriendshipController extends BaseController {
     @Inject
     FriendshipManager friendshipManager;
 
+    @Inject
+    AccountManager accountManager;
+
     public Result index() {
         Navigation.set(Level.FRIENDS, "Übersicht");
         Account currentUser = Component.currentAccount();
-        List<Account> friends = Friendship.findFriends(currentUser);
+        List<Account> friends = friendshipManager.findFriends(currentUser);
 
         // find requests and add rejects to simplify view output
-        List<Friendship> requests = Friendship.findRequests(currentUser);
-        requests.addAll(Friendship.findRejects(currentUser));
+        List<Friendship> requests = friendshipManager.findRequests(currentUser);
+        requests.addAll(friendshipManager.findRejects(currentUser));
 
         return ok(index.render(friends, requests));
     }
@@ -42,7 +46,7 @@ public class FriendshipController extends BaseController {
      */
     public Result requestFriend(long friendId) {
         Account currentUser = Component.currentAccount();
-        Account potentialFriend = Account.findById(friendId);
+        Account potentialFriend = accountManager.findById(friendId);
 
         if (hasLogicalErrors(currentUser, potentialFriend)) {
             return redirect(controllers.routes.FriendshipController.index());
@@ -59,15 +63,15 @@ public class FriendshipController extends BaseController {
 
     public Result deleteFriend(long friendId) {
         Account currentUser = Component.currentAccount();
-        Account friend = Account.findById(friendId);
+        Account friend = accountManager.findById(friendId);
 
         if (friend == null) {
             flash("error", "Diesen User gibt es nicht!");
             return redirect(controllers.routes.FriendshipController.index());
         }
 
-        Friendship friendshipLink = Friendship.findFriendLink(currentUser, friend);
-        Friendship reverseLink = Friendship.findFriendLink(friend, currentUser);
+        Friendship friendshipLink = friendshipManager.findFriendLink(currentUser, friend);
+        Friendship reverseLink = friendshipManager.findFriendLink(friend, currentUser);
 
         if (friendshipLink == null || reverseLink == null) {
             flash("error", "Diese Freundschaft besteht nicht!");
@@ -88,11 +92,11 @@ public class FriendshipController extends BaseController {
      */
     public Result acceptFriendRequest(long friendId) {
         Account currentUser = Component.currentAccount();
-        Account potentialFriend = Account.findById(friendId);
+        Account potentialFriend = accountManager.findById(friendId);
 
         // establish connection based on three actions
         // first, check if currentAccount got an request
-        Friendship requestLink = Friendship.findRequest(potentialFriend, currentUser);
+        Friendship requestLink = friendshipManager.findRequest(potentialFriend, currentUser);
 
         if (requestLink == null) {
             flash("info", "Es gibt keine Freundschaftsanfrage von diesem User");
@@ -120,7 +124,7 @@ public class FriendshipController extends BaseController {
      * @return SimpleResult redirect
      */
     public Result declineFriendRequest(long friendshipId) {
-        Friendship requestLink = Friendship.findById(friendshipId);
+        Friendship requestLink = friendshipManager.findById(friendshipId);
         if (requestLink != null && requestLink.friend.equals(Component.currentAccount())) {
             requestLink.linkType = LinkType.reject;
             friendshipManager.update(requestLink);
@@ -131,7 +135,7 @@ public class FriendshipController extends BaseController {
     }
 
     public Result cancelFriendRequest(long friendshipId) {
-        Friendship friendship = Friendship.findById(friendshipId);
+        Friendship friendship = friendshipManager.findById(friendshipId);
         if (friendship != null && friendship.account.equals(Component.currentAccount())) {
             friendshipManager.delete(friendship);
         } else {
@@ -152,22 +156,22 @@ public class FriendshipController extends BaseController {
             return true;
         }
 
-        if (Friendship.findRequest(currentUser, potentialFriend) != null) {
+        if (friendshipManager.findRequest(currentUser, potentialFriend) != null) {
             flash("info", "Deine Freundschaftsanfrage wurde bereits verschickt!");
             return true;
         }
 
-        if (Friendship.findReverseRequest(currentUser, potentialFriend) != null) {
+        if (friendshipManager.findReverseRequest(currentUser, potentialFriend) != null) {
             flash("info", "Du hast bereits eine Freundschaftsanfrage von diesem User. Schau mal nach ;-)");
             return true;
         }
 
-        if (Friendship.alreadyFriendly(currentUser, potentialFriend)) {
+        if (friendshipManager.alreadyFriendly(currentUser, potentialFriend)) {
             flash("info", "Ihr seid bereits Freunde!");
             return true;
         }
 
-        if (Friendship.alreadyRejected(currentUser, potentialFriend)) {
+        if (friendshipManager.alreadyRejected(currentUser, potentialFriend)) {
             flash("info", "Deine Freundschaftsanfrage wurde bereits abgelehnt. "
                     + "Bestätige die Ablehnung und dann kannst du es noch einmal versuchen.");
             return true;

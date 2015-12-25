@@ -1,10 +1,11 @@
 package services;
 
-import controllers.MediaController;
+import akka.actor.ActorSystem;
+import managers.MediaManager;
 import models.services.EmailService;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-import play.api.Application;
+import play.DefaultApplication;
 import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
@@ -18,37 +19,37 @@ import java.util.concurrent.TimeUnit;
 public class ScheduleService {
 
     private EmailService emailService;
-    private Application app;
-    private MediaController mediaController;
+    private MediaManager mediaManager;
+    private ActorSystem system;
 
     @Inject
-    public ScheduleService(Application app) {
-        this.app = app;
+    public ScheduleService(DefaultApplication app) {
+        system = ActorSystem.create();
         this.emailService = app.injector().instanceOf(EmailService.class);
-        this.mediaController = app.injector().instanceOf(MediaController.class);
+        this.mediaManager = app.injector().instanceOf(MediaManager.class);
         schedule();
     }
 
     private void schedule() {
 
         // set the email schedule to next full hour clock for sending daily and hourly emails
-        app.actorSystem().scheduler().schedule(
+        system.scheduler().schedule(
                 Duration.create(nextExecutionInSeconds(getNextHour(), 0), TimeUnit.SECONDS),
                 Duration.create(1, TimeUnit.HOURS),
                 () -> {
                     emailService.sendDailyHourlyNotificationsEmails();
                 },
-                app.actorSystem().dispatcher()
+                system.dispatcher()
         );
 
         // Sets the schedule for cleaning the media temp directory
-        app.actorSystem().scheduler().schedule(
+        system.scheduler().schedule(
                 Duration.create(0, TimeUnit.MILLISECONDS),
                 Duration.create(30, TimeUnit.MINUTES),
                 () -> {
-                    mediaController.cleanUpTemp();
+                    mediaManager.cleanUpTemp();
                 },
-                app.actorSystem().dispatcher()
+                system.dispatcher()
         );
     }
 

@@ -25,6 +25,9 @@ public class GroupAccountManager implements BaseManager {
     @Inject
     NotificationManager notificationManager;
 
+    @Inject
+    PostManager postManager;
+
     @Override
     public void create(Object model) {
         JPA.em().persist(model);
@@ -48,10 +51,9 @@ public class GroupAccountManager implements BaseManager {
         // and (re)index all containing post documents
         try {
             elasticsearchService.index(groupAccount.group);
-            for (Post post : Post.getPostsForGroup(groupAccount.group, 0, 0)) {
+            for (Post post : postManager.getPostsForGroup(groupAccount.group, 0, 0)) {
                 elasticsearchService.index(post);
             }
-            ;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -173,7 +175,7 @@ public class GroupAccountManager implements BaseManager {
     /**
      * Retrieve Accounts from Group with given LinkType.
      */
-    public List<Account> findAccountsByGroup(final Group group, final LinkType type) {
+    public static List<Account> findAccountsByGroup(final Group group, final LinkType type) {
         @SuppressWarnings("unchecked")
         List<Account> accounts = (List<Account>) JPA
                 .em()
@@ -187,7 +189,7 @@ public class GroupAccountManager implements BaseManager {
     /**
      * Retrieve AccountsId from Group with given LinkType.
      */
-    public List<Long> findAccountIdsByGroup(final Group group, final LinkType type) {
+    public static List<Long> findAccountIdsByGroup(final Group group, final LinkType type) {
         @SuppressWarnings("unchecked")
         List<Long> accounts = (List<Long>) JPA
                 .em()

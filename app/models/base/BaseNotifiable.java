@@ -4,7 +4,6 @@ package models.base;
 import managers.GroupAccountManager;
 import models.Account;
 import models.Group;
-import models.GroupAccount;
 import models.Notification;
 import models.enums.LinkType;
 import models.services.TemplateService;

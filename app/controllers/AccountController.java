@@ -79,7 +79,7 @@ public class AccountController extends BaseController {
         }
 
         // try to find user in DB, set role if found (default STUDENT role)
-        Account account = Account.findByLoginName(matriculationNumber);
+        Account account = accountManager.findByLoginName(matriculationNumber);
         AccountRole role = AccountRole.STUDENT;
         if (ldap.getRole() != null) {
             role = ldap.getRole();
@@ -123,8 +123,8 @@ public class AccountController extends BaseController {
         } else {
             session().clear();
             session("email", loginForm.get().email);
-            session("id", Account.findByEmail(loginForm.get().email).id.toString());
-            session("firstname", Account.findByEmail(loginForm.get().email).firstname);
+            session("id", accountManager.findByEmail(loginForm.get().email).id.toString());
+            session("firstname", accountManager.findByEmail(loginForm.get().email).firstname);
             if (loginForm.get().rememberMe != null) {
                 session("rememberMe", "1");
             }
@@ -140,8 +140,8 @@ public class AccountController extends BaseController {
      * @param password  the password to check
      * @return true, if the password is correct
      */
-    public static boolean checkPassword(Long accountId, String password) {
-        Account account = Account.findById(accountId);
+    public boolean checkPassword(Long accountId, String password) {
+        Account account = accountManager.findById(accountId);
 
         if (password == null || password.length() == 0) {
             flash("error", Messages.get("Kein Passwort angegeben!"));
@@ -149,7 +149,7 @@ public class AccountController extends BaseController {
         }
 
         if (account.loginname == null || account.loginname.length() == 0) { // not an LDAP Account
-            Account auth = Account.authenticate(account.email, password);
+            Account auth = accountManager.authenticate(account.email, password);
             if (auth == null || auth.id != account.id) {
                 flash("error", Messages.get("profile.delete.wrongpassword"));
                 return false;

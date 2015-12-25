@@ -3,7 +3,9 @@ package controllers;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import controllers.Navigation.Level;
 import managers.AccountManager;
+import managers.FriendshipManager;
 import managers.GroupAccountManager;
+import managers.PostManager;
 import models.*;
 import models.base.FileOperationException;
 import models.base.ValidationException;
@@ -35,6 +37,12 @@ public class ProfileController extends BaseController {
     @Inject
     GroupAccountManager groupAccountManager;
 
+    @Inject
+    PostManager postManager;
+
+    @Inject
+    AccountController accountController;
+
     static Form<Account> accountForm = Form.form(Account.class);
     static Form<Post> postForm = Form.form(Post.class);
     static Form<Login> loginForm = Form.form(Login.class);
@@ -57,7 +65,7 @@ public class ProfileController extends BaseController {
     }
 
     public Result view(final Long id) {
-        Account account = Account.findById(id);
+        Account account = accountManager.findById(id);
 
         if (account == null || account.role == AccountRole.DUMMY) {
             flash("info", "Diese Person gibt es nicht.");
@@ -76,7 +84,7 @@ public class ProfileController extends BaseController {
 
     @Transactional
     public Result stream(Long accountId, int page, boolean raw) {
-        Account account = Account.findById(accountId);
+        Account account = accountManager.findById(accountId);
         Account currentUser = Component.currentAccount();
 
         if (account == null || account.role == AccountRole.DUMMY) {
@@ -92,14 +100,14 @@ public class ProfileController extends BaseController {
         }
 
         // case for friends and own profile
-        if (Friendship.alreadyFriendly(Component.currentAccount(), account)
+        if (FriendshipManager.alreadyFriendly(Component.currentAccount(), account)
                 || currentUser.equals(account) || Secured.isAdmin()) {
             if (raw) {
-                return ok(streamRaw.render(account, Post.getFriendStream(account, LIMIT, page),
-                        postForm, Post.countFriendStream(account), LIMIT, page));
+                return ok(streamRaw.render(account, postManager.getFriendStream(account, LIMIT, page),
+                        postForm, postManager.countFriendStream(account), LIMIT, page));
             } else {
-                return ok(stream.render(account, Post.getFriendStream(account, LIMIT, page),
-                        postForm, Post.countFriendStream(account), LIMIT, page));
+                return ok(stream.render(account, postManager.getFriendStream(account, LIMIT, page),
+                        postForm, postManager.countFriendStream(account), LIMIT, page));
             }
         }
         // case for visitors
@@ -108,7 +116,7 @@ public class ProfileController extends BaseController {
     }
 
     public Result convert(Long id) {
-        Account account = Account.findById(id);
+        Account account = accountManager.findById(id);
 
         if (account == null) {
             flash("info", "Diese Person gibt es nicht.");
@@ -125,7 +133,7 @@ public class ProfileController extends BaseController {
 
     public Result saveConvert(Long id) {
         // Get regarding Object
-        Account account = Account.findById(id);
+        Account account = accountManager.findById(id);
         if (account == null) {
             flash("info", "Diese Person gibt es nicht.");
             return redirect(controllers.routes.Application.index());
@@ -183,7 +191,7 @@ public class ProfileController extends BaseController {
     }
 
     public Result edit(Long id) {
-        Account account = Account.findById(id);
+        Account account = accountManager.findById(id);
         if (account == null) {
             flash("info", "Diese Person gibt es nicht.");
             return redirect(controllers.routes.Application.index());
@@ -200,7 +208,7 @@ public class ProfileController extends BaseController {
 
     public Result update(Long id) {
         // Get regarding Object
-        Account account = Account.findById(id);
+        Account account = accountManager.findById(id);
         if (account == null) {
             flash("info", "Diese Person gibt es nicht.");
             return redirect(controllers.routes.Application.index());
@@ -223,7 +231,7 @@ public class ProfileController extends BaseController {
         filledForm.errors().remove("lastname");
 
         // Custom Validations
-        Account exisitingAccount = Account.findByEmail(filledForm.field("email").value());
+        Account exisitingAccount = accountManager.findByEmail(filledForm.field("email").value());
         if (exisitingAccount != null && !exisitingAccount.equals(account)) {
             filledForm.reject("email", "Diese Mail wird bereits verwendet!");
             return badRequest(edit.render(account, filledForm, loginForm));
@@ -297,7 +305,7 @@ public class ProfileController extends BaseController {
     }
 
     public Result groups(Long id) {
-        Account account = Account.findById(id);
+        Account account = accountManager.findById(id);
 
         if (Secured.isFriend(account)) {
             Navigation.set(Level.FRIENDS, "Gruppen & Kurse", account.name, controllers.routes.ProfileController.view(account.id));
@@ -314,7 +322,7 @@ public class ProfileController extends BaseController {
 
     @Transactional
     public Result deleteProfile(Long accountId) {
-        Account current = Account.findById(accountId);
+        Account current = accountManager.findById(accountId);
 
         if (!Secured.deleteAccount(current)) {
             flash("error", Messages.get("profile.delete.nopermission"));
@@ -327,7 +335,7 @@ public class ProfileController extends BaseController {
         if (entered == null || entered.length() == 0) {
             flash("error", Messages.get("profile.delete.nopassword"));
             return redirect(controllers.routes.ProfileController.update(current.id));
-        } else if (!AccountController.checkPassword(accountId, entered)) {
+        } else if (!accountController.checkPassword(accountId, entered)) {
             return redirect(controllers.routes.ProfileController.update(current.id));
         }
 
@@ -336,9 +344,8 @@ public class ProfileController extends BaseController {
         accountManager.delete(current);
 
         // override logout message
-        Call logoutResult = controllers.routes.AccountController.logout();
         flash("success", Messages.get("profile.delete.success"));
-        return redirect(logoutResult);
+        return redirect(controllers.routes.AccountController.logout());
     }
 
     /**
@@ -349,7 +356,7 @@ public class ProfileController extends BaseController {
      */
     public Result createTempAvatar(Long id) {
 
-        Account account = Account.findById(id);
+        Account account = accountManager.findById(id);
 
         if (account == null) {
             return notFound();
@@ -377,7 +384,7 @@ public class ProfileController extends BaseController {
             return badRequest(result);
         }
 
-        result.put("success", controllers.routes.ProfileController.getTempAvatar(id).toString());
+        result.put("success", getTempAvatar(id).toString());
         return ok(result);
     }
 
@@ -390,7 +397,7 @@ public class ProfileController extends BaseController {
     public Result getTempAvatar(Long id) {
 
         ObjectNode result = Json.newObject();
-        Account account = Account.findById(id);
+        Account account = accountManager.findById(id);
 
         if (account == null) {
             return notFound();
@@ -418,7 +425,7 @@ public class ProfileController extends BaseController {
     public Result createAvatar(long id) {
         ObjectNode result = Json.newObject();
 
-        Account account = Account.findById(id);
+        Account account = accountManager.findById(id);
 
         if (account == null) {
             return notFound();
@@ -455,7 +462,7 @@ public class ProfileController extends BaseController {
      * @return
      */
     public Result getAvatar(long id, String size) {
-        Account account = Account.findById(id);
+        Account account = accountManager.findById(id);
         if (account != null) {
             File avatar;
             switch (size) {

@@ -2,7 +2,10 @@ package controllers;
 
 
 import com.typesafe.config.ConfigFactory;
+import managers.AccountManager;
+import managers.FriendshipManager;
 import managers.GroupManager;
+import managers.PostBookmarkManager;
 import models.*;
 import models.enums.AccountRole;
 import play.Play;
@@ -19,9 +22,6 @@ import java.util.Date;
  * This class provides several authorization methods for security reasons.
  */
 public class Secured extends Security.Authenticator {
-
-	@Inject
-	GroupManager groupManager;
 
 	/**
 	 * Returns the ID of the currently logged in user.
@@ -96,7 +96,7 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if account is member
 	 */
 	public static boolean isMemberOfGroup(Group group, Account account){
-		return groupManager.isMember(group, account);
+		return GroupManager.isMember(group, account);
 	}
 
 	/**
@@ -327,7 +327,7 @@ public class Secured extends Security.Authenticator {
         if (post == null) {
             return false;
         }
-        return PostBookmark.isPostBookmarkedByAccount(account, post);
+        return PostBookmarkManager.isPostBookmarkedByAccount(account, post);
     }
 
     /**
@@ -472,7 +472,7 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in user is owner of account
 	 */
 	public static boolean isOwnerOfAccount(final Long accountId) {
-		return Account.isOwner(accountId, Component.currentAccount());
+		return AccountManager.isOwner(accountId, Component.currentAccount());
 	}
 
 	/**
@@ -482,7 +482,7 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in account has friendship to account
 	 */
 	public static boolean isFriend(Account account) {
-		return Friendship.alreadyFriendly(Component.currentAccount(), account);
+		return FriendshipManager.alreadyFriendly(Component.currentAccount(), account);
 	}
 
 	/**

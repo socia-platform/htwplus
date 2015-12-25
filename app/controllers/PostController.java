@@ -1,7 +1,9 @@
 package controllers;
 
 import controllers.Navigation.Level;
+import managers.AccountManager;
 import managers.GroupManager;
+import managers.PostBookmarkManager;
 import managers.PostManager;
 import models.Account;
 import models.Group;
@@ -29,12 +31,18 @@ public class PostController extends BaseController {
     @Inject
     PostManager postManager;
 
+    @Inject
+    PostBookmarkManager postBookmarkManager;
+
+    @Inject
+    AccountManager accountManager;
+
     static Form<Post> postForm = Form.form(Post.class);
     static final int PAGE = 1;
     static final String STREAM_FILTER = "all";
 
     public Result view(Long id) {
-        Post post = Post.findById(id);
+        Post post = postManager.findById(id);
 
         if (post == null) {
             return redirect(controllers.routes.Application.error());
@@ -48,7 +56,7 @@ public class PostController extends BaseController {
             return redirect(controllers.routes.Application.index());
         }
 
-        if (post.belongsToGroup()) {
+        if (postManager.belongsToGroup(post)) {
             Navigation.set(Level.GROUPS, "Post", post.group.title, controllers.routes.GroupController.stream(post.group.id, PAGE, false));
         }
 
@@ -91,7 +99,7 @@ public class PostController extends BaseController {
         }
 
         if (target.equals(Post.PROFILE)) {
-            Account profile = Account.findById(anyId);
+            Account profile = accountManager.findById(anyId);
             if (Secured.isNotNull(profile) && (Secured.isFriend(profile) || profile.equals(account) || Secured.isAdmin())) {
                 if (filledForm.hasErrors()) {
                     flash("error", Messages.get("post.try_with_content"));
@@ -113,7 +121,7 @@ public class PostController extends BaseController {
         }
 
         if (target.equals(Post.STREAM)) {
-            Account profile = Account.findById(anyId);
+            Account profile = accountManager.findById(anyId);
             if (Secured.isNotNull(profile) && profile.equals(account)) {
                 if (filledForm.hasErrors()) {
                     flash("error", Messages.get("post.try_with_content"));
@@ -135,7 +143,7 @@ public class PostController extends BaseController {
 
     @Transactional
     public Result addComment(long postId) {
-        final Post parent = Post.findById(postId);
+        final Post parent = postManager.findById(postId);
         final Account account = Component.currentAccount();
 
         if (!Secured.addComment(parent)) {
@@ -153,12 +161,12 @@ public class PostController extends BaseController {
             // update parent to move it to the top
             postManager.update(parent);
 
-            if (parent.belongsToGroup()) {
+            if (postManager.belongsToGroup(parent)) {
                 // this is a comment in a group post
                 NotificationService.getInstance().createNotification(post, Post.COMMENT_GROUP);
             }
 
-            if (parent.belongsToAccount()) {
+            if (postManager.belongsToAccount(parent)) {
                 if (!account.equals(parent.owner) && !parent.account.equals(parent.owner)) {
                     // this is a comment on a news stream post from another person
                     NotificationService.getInstance().createNotification(post, Post.COMMENT_OWN_PROFILE);
@@ -173,7 +181,7 @@ public class PostController extends BaseController {
     }
 
     public Result getEditForm(Long postId) {
-        Post post = Post.findById(postId);
+        Post post = postManager.findById(postId);
         Account account = Component.currentAccount();
 
         if (!Secured.isPostStillEditable(post, account)) {
@@ -185,7 +193,7 @@ public class PostController extends BaseController {
 
     @Transactional
     public Result updatePost(Long postId) {
-        Post post = Post.findById(postId);
+        Post post = postManager.findById(postId);
         Account account = Component.currentAccount();
 
         if (!Secured.isPostStillEditableWithTolerance(post, account)) {
@@ -206,19 +214,19 @@ public class PostController extends BaseController {
     }
 
     @Transactional
-    public List<Post> getComments(Long id, int limit) {
+    public static List<Post> getComments(Long id, int limit) {
         //int max = Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
         int offset = 0;
         if (limit != 0) {
-            offset = Post.countCommentsForPost(id) - limit;
+            offset = PostManager.countCommentsForPost(id) - limit;
         }
-        return postManager.getCommentsForPost(id, limit, offset);
+        return PostManager.getCommentsForPost(id, limit, offset);
     }
 
 
     @Transactional
     public Result getOlderComments(Long id, Integer current) {
-        Post parent = Post.findById(id);
+        Post parent = postManager.findById(id);
 
         if (!Secured.viewComments(parent)) {
             return badRequest();
@@ -227,10 +235,10 @@ public class PostController extends BaseController {
         String result = "";
 
         // subtract already displayed comments
-        int limit = Post.countCommentsForPost(id) - Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
+        int limit = PostManager.countCommentsForPost(id) - Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
 
         List<Post> comments;
-        comments = postManager.getCommentsForPost(id, limit, 0);
+        comments = PostManager.getCommentsForPost(id, limit, 0);
         for (Post post : comments) {
             result = result.concat(views.html.snippets.postComment.render(post).toString());
         }
@@ -239,7 +247,7 @@ public class PostController extends BaseController {
 
     @Transactional
     public Result deletePost(Long postId) {
-        Post post = Post.findById(postId);
+        Post post = postManager.findById(postId);
         Account account = Component.currentAccount();
         Call routesTo = null;
 
@@ -277,16 +285,16 @@ public class PostController extends BaseController {
 
     public Result bookmarkPost(Long postId) {
         Account account = Component.currentAccount();
-        Post post = Post.findById(postId);
+        Post post = postManager.findById(postId);
         String returnStatement = "";
 
         if (Secured.viewPost(post)) {
-            PostBookmark possibleBookmark = PostBookmark.findByAccountAndPost(account, post);
+            PostBookmark possibleBookmark = postBookmarkManager.findByAccountAndPost(account, post);
             if (possibleBookmark == null) {
-                new PostBookmark(account, post).create();
+                postBookmarkManager.create(new PostBookmark(account, post));
                 returnStatement = "setBookmark";
             } else {
-                possibleBookmark.delete();
+                postBookmarkManager.delete(possibleBookmark);
                 returnStatement = "removeBookmark";
             }
         }

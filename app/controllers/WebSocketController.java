@@ -2,6 +2,7 @@ package controllers;
 
 import akka.actor.ActorRef;
 import com.fasterxml.jackson.databind.JsonNode;
+import managers.AccountManager;
 import models.Account;
 import models.services.WebSocketService;
 import play.Logger;
@@ -12,10 +13,16 @@ import play.mvc.Http;
 import play.mvc.Security;
 import play.mvc.WebSocket;
 
+import javax.inject.Inject;
+
 
 @Transactional
 @Security.Authenticated(Secured.class)
 public class WebSocketController extends BaseController {
+
+    @Inject
+    AccountManager accountManager;
+
     /**
      * Handles the web socket channel by invoking Akka actor.
      *
@@ -65,7 +72,7 @@ public class WebSocketController extends BaseController {
             return JPA.withTransaction(new F.Function0<Account>() {
                 @Override
                 public Account apply() throws Throwable {
-                    return Account.findById(Long.valueOf(Http.Context.current().session().get("id")));
+                    return accountManager.findById(Long.valueOf(Http.Context.current().session().get("id")));
                 }
             });
         } catch (Throwable throwable) {

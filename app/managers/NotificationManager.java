@@ -86,7 +86,7 @@ public class NotificationManager implements BaseManager {
      * @return List of notifications
      * @throws Throwable
      */
-    public List<Notification> findByAccountIdUnread(final Long accountId) throws Throwable {
+    public static List<Notification> findByAccountIdUnread(final Long accountId) throws Throwable {
         return JPA.em()
                 .createQuery("FROM Notification n WHERE n.recipient.id = :accountId AND n.isRead = false", Notification.class)
                 .setParameter("accountId", accountId)
@@ -147,7 +147,7 @@ public class NotificationManager implements BaseManager {
      * @return Notification instance
      * @throws NoResultException
      */
-    public Notification findByReferenceIdAndRecipientId(Long referenceId, Long recipientId) throws NoResultException {
+    public static Notification findByReferenceIdAndRecipientId(Long referenceId, Long recipientId) throws NoResultException {
         return JPA.em()
                 .createQuery("FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :recipientId", Notification.class)
                 .setParameter("referenceId", referenceId)
@@ -187,7 +187,7 @@ public class NotificationManager implements BaseManager {
      * @param accountId User account ID
      * @return Number of notifications
      */
-    public int countUnreadNotificationsForAccountId(final Long accountId) {
+    public static int countUnreadNotificationsForAccountId(final Long accountId) {
         return ((Number) JPA.em()
                 .createQuery("SELECT COUNT(n) FROM Notification n WHERE n.recipient.id = :accountId AND n.isRead = false")
                 .setParameter("accountId", accountId)

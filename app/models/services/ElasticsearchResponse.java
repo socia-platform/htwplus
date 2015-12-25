@@ -1,15 +1,18 @@
 package models.services;
 
+import managers.AccountManager;
+import managers.GroupManager;
+import managers.PostManager;
 import models.Account;
 import models.Group;
 import models.Post;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import play.Logger;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,6 +22,15 @@ import java.util.List;
  * Created by Iven on 16.07.2015.
  */
 public class ElasticsearchResponse {
+
+    @Inject
+    PostManager postManager;
+
+    @Inject
+    GroupManager groupManager;
+
+    @Inject
+    AccountManager accountManager;
 
     public SearchResponse elasticsearchResponse;
     public List<Object> resultList;
@@ -53,12 +65,12 @@ public class ElasticsearchResponse {
         for (SearchHit searchHit : elasticsearchResponse.getHits().getHits()) {
             switch (searchHit.type()) {
                 case "user":
-                    Account account = Account.findById(Long.parseLong(searchHit.getId()));
+                    Account account = accountManager.findById(Long.parseLong(searchHit.getId()));
                     if(account != null)
                         resultList.add(account);
                     break;
                 case "post":
-                    Post post = Post.findById(Long.parseLong(searchHit.getId()));
+                    Post post = postManager.findById(Long.parseLong(searchHit.getId()));
                     if(post != null) {
                         String searchContent = post.content;
                         if (!searchHit.getHighlightFields().isEmpty())
@@ -70,7 +82,7 @@ public class ElasticsearchResponse {
                     }
                     break;
                 case "group":
-                    Group group = Group.findById(Long.parseLong(searchHit.getId()));
+                    Group group = groupManager.findById(Long.parseLong(searchHit.getId()));
                     if(group != null)
                         resultList.add(group);
                     break;

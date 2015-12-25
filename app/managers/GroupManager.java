@@ -19,10 +19,7 @@ public class GroupManager implements BaseManager {
     ElasticsearchService elasticsearchService;
 
     @Inject
-    GroupAccountManager groupAccountDao;
-
-    @Inject
-    GroupAccount groupAccount;
+    GroupAccountManager groupAccountManager;
 
     @Inject
     PostManager postManager;
@@ -33,16 +30,11 @@ public class GroupManager implements BaseManager {
     @Inject
     NotificationManager notificationManager;
 
-    public void createWithGroupAccount(Group group) {
-        Account currentAccount = Component.currentAccount();
-
-        group.owner = currentAccount;
+    public void createWithGroupAccount(Group group, Account account) {
+        group.owner = account;
         this.create(group);
-
-        groupAccount.account = currentAccount;
-        groupAccount.group = group;
-        groupAccount.linkType = LinkType.establish;
-        groupAccountDao.create(groupAccount);
+        GroupAccount groupAccount = new GroupAccount(group, account, LinkType.establish);
+        groupAccountManager.create(groupAccount);
     }
 
     @Override
@@ -94,7 +86,6 @@ public class GroupManager implements BaseManager {
     }
 
     public Group findByTitle(String title) {
-
         List<Group> groups = (List<Group>) JPA.em()
                 .createQuery("FROM Group g WHERE g.title = ?1")
                 .setParameter(1, title).getResultList();
@@ -121,10 +112,8 @@ public class GroupManager implements BaseManager {
      * @param account Account instance
      * @return True, if account is member of group
      */
-    public boolean isMember(Group group, Account account) {
-
-        GroupAccount groupAccount = GroupAccount JPA
-                .em()
+    public static boolean isMember(Group group, Account account) {
+        List<GroupAccount> groupAccounts = (List<GroupAccount>) JPA.em()
                 .createQuery(
                         "SELECT g FROM GroupAccount g WHERE g.account.id = ?1 and g.group.id = ?2 AND linkType = ?3")
                 .setParameter(1, account.id).setParameter(2, group.id)
