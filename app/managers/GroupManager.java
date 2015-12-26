@@ -1,6 +1,5 @@
 package managers;
 
-import controllers.Component;
 import models.*;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
@@ -113,11 +112,13 @@ public class GroupManager implements BaseManager {
      * @return True, if account is member of group
      */
     public static boolean isMember(Group group, Account account) {
-        List<GroupAccount> groupAccounts = (List<GroupAccount>) JPA.em()
+        @SuppressWarnings("unchecked")
+        List<GroupAccount> groupAccounts = (List<GroupAccount>) JPA
+                .em()
                 .createQuery(
                         "SELECT g FROM GroupAccount g WHERE g.account.id = ?1 and g.group.id = ?2 AND linkType = ?3")
                 .setParameter(1, account.id).setParameter(2, group.id)
-                .setParameter(3, LinkType.establish).getSingleResult();
+                .setParameter(3, LinkType.establish).getResultList();
 
         return !groupAccounts.isEmpty();
     }

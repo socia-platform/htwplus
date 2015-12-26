@@ -21,31 +21,31 @@ public class Group extends BaseNotifiable implements INotifiable {
     public static final String GROUP_REQUEST_DECLINE = "group_request_decline";
 
     @Required
-	@Column(unique = true)
-    @Pattern(value="^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}/\\\\\\[\\]~-]+$")
-	public String title;
+    @Column(unique = true)
+    @Pattern(value = "^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}/\\\\\\[\\]~-]+$")
+    public String title;
 
-	@Size(max = 255, message = "error.length")
-	public String description;
+    @Size(max = 255, message = "error.length")
+    public String description;
 
-	@OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
-	public Set<GroupAccount> groupAccounts;
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    public Set<GroupAccount> groupAccounts;
 
-	@ManyToOne
-	public Account owner;
+    @ManyToOne
+    public Account owner;
 
-	@Enumerated(EnumType.STRING)
-	public GroupType groupType;
+    @Enumerated(EnumType.STRING)
+    public GroupType groupType;
 
-	public String token;
+    public String token;
 
-	@OneToMany(mappedBy = "group")
-	@OrderBy("createdAt DESC")
-	public List<Media> media;
-	
-	public void setTitle(String title) {
-		this.title = title.trim();
-	}
+    @OneToMany(mappedBy = "group")
+    @OrderBy("createdAt DESC")
+    public List<Media> media;
+
+    public void setTitle(String title) {
+        this.title = title.trim();
+    }
 
     /**
      * Possible invitation list
@@ -53,20 +53,20 @@ public class Group extends BaseNotifiable implements INotifiable {
     @Transient
     public Collection<String> inviteList = null;
 
-	/**
-	public List<ValidationError> validate() {
-		List<ValidationError> errors = new ArrayList<>();
-		if (Group.findByTitle(this.title) != null) {
-			errors.add(new ValidationError("title", "error.title"));
-			return errors;
-		}
-		return null;
-	}
-	*/
+    /**
+     * public List<ValidationError> validate() {
+     * List<ValidationError> errors = new ArrayList<>();
+     * if (Group.findByTitle(this.title) != null) {
+     * errors.add(new ValidationError("title", "error.title"));
+     * return errors;
+     * }
+     * return null;
+     * }
+     */
 
-	public static boolean validateToken(String token) {
+    public static boolean validateToken(String token) {
         return !(token.equals("") || token.length() < 4 || token.length() > 45);
-	}
+    }
 
     @Override
     public Account getSender() {

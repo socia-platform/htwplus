@@ -105,7 +105,7 @@ public class AccountManager implements BaseManager {
         }
 
         // Anonymize media //
-        List<Media> media = Media.listAllOwnedBy(account.id);
+        List<Media> media = mediaManager.listAllOwnedBy(account.id);
         for (Media med : media) {
             med.owner = dummy;
             mediaManager.update(med);

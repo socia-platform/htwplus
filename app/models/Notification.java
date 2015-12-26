@@ -76,16 +76,4 @@ public class Notification extends BaseModel implements IJsonNodeSerializable {
 
         return node;
     }
-
-    /**
-     * Marks all unread notifications as read for an account.
-     *
-     * @param account Account
-     */
-    public static void markAllAsRead(Account account) {
-        JPA.em()
-                .createQuery("UPDATE Notification n SET n.isRead = true WHERE n.recipient = :account AND n.isRead = false")
-                .setParameter("account", account)
-                .executeUpdate();
-    }
 }

@@ -21,6 +21,9 @@ public class GroupAccount extends BaseModel {
     @NotNull
     public LinkType linkType;
 
+    public GroupAccount() {
+    }
+
     public GroupAccount(final Group group, final Account account, final LinkType linkType) {
         this.group = group;
         this.account = account;

@@ -241,4 +241,17 @@ public class NotificationManager implements BaseManager {
 
         return accountMap;
     }
+
+
+    /**
+     * Marks all unread notifications as read for an account.
+     *
+     * @param account Account
+     */
+    public void markAllAsRead(Account account) {
+        JPA.em()
+                .createQuery("UPDATE Notification n SET n.isRead = true WHERE n.recipient = :account AND n.isRead = false")
+                .setParameter("account", account)
+                .executeUpdate();
+    }
 }

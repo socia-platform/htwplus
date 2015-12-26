@@ -2,10 +2,7 @@ package controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import controllers.Navigation.Level;
-import managers.AccountManager;
-import managers.FriendshipManager;
-import managers.GroupAccountManager;
-import managers.PostManager;
+import managers.*;
 import models.*;
 import models.base.FileOperationException;
 import models.base.ValidationException;
@@ -42,6 +39,9 @@ public class ProfileController extends BaseController {
 
     @Inject
     AccountController accountController;
+
+    @Inject
+    StudycourseManager studycourseManager;
 
     static Form<Account> accountForm = Form.form(Account.class);
     static Form<Post> postForm = Form.form(Post.class);
@@ -203,7 +203,7 @@ public class ProfileController extends BaseController {
         }
 
         Navigation.set(Level.PROFILE, "Editieren");
-        return ok(edit.render(account, accountForm.fill(account), loginForm));
+        return ok(edit.render(account, accountForm.fill(account), loginForm, studycourseManager.getAll()));
     }
 
     public Result update(Long id) {
@@ -234,12 +234,12 @@ public class ProfileController extends BaseController {
         Account exisitingAccount = accountManager.findByEmail(filledForm.field("email").value());
         if (exisitingAccount != null && !exisitingAccount.equals(account)) {
             filledForm.reject("email", "Diese Mail wird bereits verwendet!");
-            return badRequest(edit.render(account, filledForm, loginForm));
+            return badRequest(edit.render(account, filledForm, loginForm, studycourseManager.getAll()));
         }
 
         // Perform JPA Validation
         if (filledForm.hasErrors()) {
-            return badRequest(edit.render(account, filledForm, loginForm));
+            return badRequest(edit.render(account, filledForm, loginForm, studycourseManager.getAll()));
         } else {
 
             // Fill an and update the model manually
@@ -279,7 +279,7 @@ public class ProfileController extends BaseController {
             Long studycourseId = Long.parseLong(filledForm.field("studycourse").value());
             Studycourse studycourse;
             if (studycourseId != 0) {
-                studycourse = Studycourse.findById(studycourseId);
+                studycourse = studycourseManager.findById(studycourseId);
             } else {
                 studycourse = null;
             }

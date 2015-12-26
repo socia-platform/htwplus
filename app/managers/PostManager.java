@@ -3,7 +3,6 @@ package managers;
 import models.Account;
 import models.Group;
 import models.Post;
-import models.PostBookmark;
 import models.enums.AccountRole;
 import models.enums.GroupType;
 import models.enums.LinkType;
@@ -107,7 +106,7 @@ public class PostManager implements BaseManager {
     }
 
     public int countPostsForGroup(final Group group) {
-        return ((Number)JPA.em().createQuery("SELECT COUNT(p) FROM Post p WHERE p.group.id = ?1").setParameter(1, group.id).getSingleResult()).intValue();
+        return ((Number) JPA.em().createQuery("SELECT COUNT(p) FROM Post p WHERE p.group.id = ?1").setParameter(1, group.id).getSingleResult()).intValue();
     }
 
     @SuppressWarnings("unchecked")
@@ -125,12 +124,12 @@ public class PostManager implements BaseManager {
     }
 
     /**
-     * @param account - Account (usually: current user or a contact)
-     * @param groupList - a list containing all groups we want to search in (usually all groups from account)
+     * @param account     - Account (usually: current user or a contact)
+     * @param groupList   - a list containing all groups we want to search in (usually all groups from account)
      * @param accountList - a list containing all accounts we want to search in (usually contact from account)
      * @return List of Posts
      */
-    public static Query streamForAccount(String selectClause, Account account, List<Group> groupList, List<Account> accountList, List<Post> bookmarkList, String filter, String orderByClause){
+    public static Query streamForAccount(String selectClause, Account account, List<Group> groupList, List<Account> accountList, List<Post> bookmarkList, String filter, String orderByClause) {
 
         HashMap<String, String> streamClausesMap = new HashMap<>();
         List<String> streamClausesList = new ArrayList<>();
@@ -140,8 +139,7 @@ public class PostManager implements BaseManager {
         streamClausesMap.put("accountPosts", accountPosts);
 
 
-
-        if(groupList != null && groupList.size() != 0) {
+        if (groupList != null && groupList.size() != 0) {
             // find group posts from @account
             String accountGroupPosts = " (p.owner = (:account) AND p.group IN (:groupList)) ";
             streamClausesMap.put("accountGroupPosts", accountGroupPosts);
@@ -151,7 +149,7 @@ public class PostManager implements BaseManager {
             streamClausesMap.put("allGroupPosts", allGroupPosts);
         }
 
-        if(accountList != null && accountList.size() != 0) {
+        if (accountList != null && accountList.size() != 0) {
             // find posts from @account where @account posted on @accountList
             String accountContactPosts = " (p.owner = (:account) AND p.account IN (:accountList)) ";
             streamClausesMap.put("accountContactPosts", accountContactPosts);
@@ -165,7 +163,7 @@ public class PostManager implements BaseManager {
             streamClausesMap.put("contactPosts", contactPosts);
         }
 
-        if(bookmarkList != null && bookmarkList.size() != 0) {
+        if (bookmarkList != null && bookmarkList.size() != 0) {
             // find bookmarked posts from @account
             String bookmarkPosts = " (p IN (:bookmarkList)) ";
             streamClausesMap.put("bookmarkPosts", bookmarkPosts);
@@ -232,7 +230,7 @@ public class PostManager implements BaseManager {
     private static String assembleClauses(List<String> streamClausesList) {
         String assembledClauses = "";
         Iterator iterator = streamClausesList.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             assembledClauses += " OR " + iterator.next().toString();
         }
 
@@ -240,7 +238,7 @@ public class PostManager implements BaseManager {
     }
 
     public static int countCommentsForPost(final Long id) {
-        return ((Number)JPA.em().createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
+        return ((Number) JPA.em().createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
     }
 
     /**
@@ -288,7 +286,7 @@ public class PostManager implements BaseManager {
      * @param contact - Account (a friends account)
      * @return Number of Posts
      */
-    public int countFriendStream(Account contact){
+    public int countFriendStream(Account contact) {
         return countStreamForAccount(contact, groupAccountManager.findPublicEstablished(contact), friendshipManager.findFriends(contact), postBookmarkManager.findByAccount(contact), "visitor");
     }
 
@@ -296,29 +294,38 @@ public class PostManager implements BaseManager {
         return countCommentsForPost(post.id);
     }
 
-    public boolean belongsToGroup(Post post) { return post.group != null; }
+    public boolean belongsToGroup(Post post) {
+        return post.group != null;
+    }
 
-    public boolean belongsToAccount(Post post) { return post.account != null; }
+    public boolean belongsToAccount(Post post) {
+        return post.account != null;
+    }
 
-    public boolean belongsToPost(Post post) { return post.parent != null; }
+    public boolean belongsToPost(Post post) {
+        return post.parent != null;
+    }
 
-    public boolean isMine(Post post) { return post.account.equals(post.owner); }
+    public boolean isMine(Post post) {
+        return post.account.equals(post.owner);
+    }
 
     /**
      * Collect all AccountIds, which are able to view this.post
+     *
      * @return List of AccountIds
      */
-    public Set<Long> findAllowedToViewAccountIds(Post post){
+    public Set<Long> findAllowedToViewAccountIds(Post post) {
 
         Set<Long> viewableIds = new HashSet<>();
 
         // everybody from post.group can see this post
-        if(belongsToGroup(post)) {
+        if (belongsToGroup(post)) {
             viewableIds.addAll(GroupAccountManager.findAccountIdsByGroup(post.group, LinkType.establish));
         }
 
 
-        if(belongsToAccount(post)) {
+        if (belongsToAccount(post)) {
 
             // every friend from post.account can see this post
             viewableIds.addAll(FriendshipManager.findFriendsId(post.account));
@@ -327,25 +334,25 @@ public class PostManager implements BaseManager {
             viewableIds.add(post.account.id);
 
             // everybody can see his own post
-            if(isMine(post)) {
+            if (isMine(post)) {
                 viewableIds.add(post.owner.id);
             }
         }
 
         // multiple options if post is a comment
-        if(belongsToPost(post)) {
+        if (belongsToPost(post)) {
 
             // every member from post.parent.group can see this post
-            if(belongsToGroup(post.parent)) {
+            if (belongsToGroup(post.parent)) {
                 viewableIds.addAll(GroupAccountManager.findAccountIdsByGroup(post.parent.group, LinkType.establish));
             }
 
             // every friend from post.parent.account can see this post
-            if(belongsToAccount(post.parent)) {
+            if (belongsToAccount(post.parent)) {
                 viewableIds.addAll(FriendshipManager.findFriendsId(post.parent.account));
 
                 // everybody can see his own comment
-                if(isMine(post.parent)) {
+                if (isMine(post.parent)) {
                     viewableIds.add(post.owner.id);
                 }
             }
@@ -356,12 +363,12 @@ public class PostManager implements BaseManager {
     public boolean isPublic(Post post) {
 
         // post in public group
-        if(belongsToGroup(post)) {
+        if (belongsToGroup(post)) {
             return post.group.groupType.equals(GroupType.open);
         }
 
         // comment in public group
-        if(belongsToPost(post) && belongsToGroup(post.parent)) {
+        if (belongsToPost(post) && belongsToGroup(post.parent)) {
             return post.parent.group.groupType.equals(GroupType.open);
         }
         return false;
@@ -370,23 +377,27 @@ public class PostManager implements BaseManager {
 
     public long indexAllPosts() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Post post: allWithoutAdmin()) elasticsearchService.index(post);
+        for (Post post : allWithoutAdmin()) elasticsearchService.index(post);
         return (System.currentTimeMillis() - start) / 100;
 
     }
 
     /**
      * Get all posts except error posts (from Admin)
+     *
      * @return
      */
+    @SuppressWarnings("unchecked")
     public List<Post> allWithoutAdmin() {
         return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
     }
 
     /**
      * Get all posts owned by a specific user
+     *
      * @return
      */
+    @SuppressWarnings("unchecked")
     public List<Post> listAllPostsOwnedBy(Long id) {
         return JPA.em().createQuery("FROM Post p WHERE p.owner.id = " + id).getResultList();
     }
@@ -394,6 +405,7 @@ public class PostManager implements BaseManager {
     /**
      * get a list of posts posted on the wall of the specified account
      */
+    @SuppressWarnings("unchecked")
     public List<Post> listAllPostsPostedOnAccount(Long id) {
         return JPA.em().createQuery("FROM Post p WHERE p.account.id = " + id).getResultList();
     }

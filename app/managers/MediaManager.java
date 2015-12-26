@@ -2,6 +2,8 @@ package managers;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import models.Account;
+import models.Group;
 import models.Media;
 import org.apache.commons.io.FileUtils;
 import play.Logger;
@@ -13,6 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -58,9 +61,48 @@ public class MediaManager implements BaseManager {
             notificationManager.deleteReferences(media);
 
             deleteFile(media);
-            JPA.em().remove(this);
+            JPA.em().remove(media);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+
+    public Media findById(Long id) {
+        Media media = JPA.em().find(Media.class, id);
+        if (media == null) {
+            return null;
+        }
+        String path = Play.application().configuration().getString("media.path");
+        media.file = new File(path + "/" + media.url);
+        if (media.file.exists()) {
+            return media;
+        } else {
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Media> listAllOwnedBy(Long id) {
+        return JPA.em().createQuery("FROM Media m WHERE m.owner.id = " + id).getResultList();
+    }
+
+    public boolean existsInGroup(Media media, Group group) {
+        List<Media> mediaList = group.media;
+        for (Media m : mediaList) {
+            if (m.title.equals(media.title)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public boolean isOwner(Long mediaId, Account account) {
+        Media m = JPA.em().find(Media.class, mediaId);
+        if (m.owner.equals(account)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -145,5 +187,9 @@ public class MediaManager implements BaseManager {
         String tmpPath = conf.getString("media.tempPath");
         File dir = new File(tmpPath);
         return FileUtils.sizeOfDirectory(dir);
+    }
+
+    public int byteAsMB(long size) {
+        return (int) (size / 1024 / 1024);
     }
 }

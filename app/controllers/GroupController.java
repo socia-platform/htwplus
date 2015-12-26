@@ -66,7 +66,7 @@ public class GroupController extends BaseController {
             return redirect(controllers.routes.GroupController.index());
         }
         if (Secured.viewGroup(group)) {
-            return redirect(routes.GroupController.stream(group.id, PAGE, false));
+            return redirect(controllers.routes.GroupController.stream(group.id, PAGE, false));
         }
         Navigation.set(Level.GROUPS, "Info", group.title, controllers.routes.GroupController.view(group.id));
 
@@ -82,7 +82,7 @@ public class GroupController extends BaseController {
             return redirect(controllers.routes.GroupController.index());
         }
         if (!Secured.viewGroup(group)) {
-            return redirect(routes.GroupController.view(group.id));
+            return redirect(controllers.routes.GroupController.view(group.id));
         }
 
         Navigation.set(Level.GROUPS, "Newsstream", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
@@ -105,7 +105,7 @@ public class GroupController extends BaseController {
             return redirect(controllers.routes.GroupController.index());
         }
         if (!Secured.viewGroup(group)) {
-            return redirect(routes.GroupController.view(id));
+            return redirect(controllers.routes.GroupController.view(id));
         }
 
         Navigation.set(Level.GROUPS, "Media", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
@@ -528,7 +528,7 @@ public class GroupController extends BaseController {
                 } catch (Exception e) {
                     e.printStackTrace();
                     flash("error", "Etwas ist schief gelaufen.");
-                    return redirect(routes.GroupController.invite(groupId));
+                    return redirect(controllers.routes.GroupController.invite(groupId));
                 }
             }
 

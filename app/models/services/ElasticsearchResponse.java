@@ -47,8 +47,7 @@ public class ElasticsearchResponse {
     public HashMap roleMap = new HashMap<String, Long>();
     public HashMap grouptypeMap = new HashMap<String, Long>();
 
-
-    public ElasticsearchResponse(final SearchResponse response, final String keyword, final String mode) {
+    public void create(final SearchResponse response, final String keyword, final String mode) {
         this.keyword = keyword;
         this.searchMode = mode;
         this.elasticsearchResponse = response;

@@ -4,7 +4,6 @@ import managers.NotificationManager;
 import models.base.BaseModel;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
-import models.enums.GroupType;
 import org.hibernate.annotations.Type;
 import play.Logger;
 import play.data.validation.Constraints.Required;
@@ -15,9 +14,9 @@ import java.util.List;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
-	public static final String GROUP = "group";                             // post to group news stream
-	public static final String PROFILE = "profile";                         // post to own news stream
-	public static final String STREAM = "stream";                           // post to a foreign news stream
+    public static final String GROUP = "group";                             // post to group news stream
+    public static final String PROFILE = "profile";                         // post to own news stream
+    public static final String STREAM = "stream";                           // post to a foreign news stream
     public static final String COMMENT_PROFILE = "comment_profile";         // comment on a profile post
     public static final String COMMENT_GROUP = "comment_group";             // comment on a group post
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
@@ -26,19 +25,19 @@ public class Post extends BaseNotifiable implements INotifiable {
     @Required
     @Lob
     @Type(type = "org.hibernate.type.TextType")
-	public String content;
+    public String content;
 
-	@ManyToOne
-	public Post parent;
+    @ManyToOne
+    public Post parent;
 
-	@ManyToOne
-	public Group group;
+    @ManyToOne
+    public Group group;
 
-	@ManyToOne
-	public Account account;
+    @ManyToOne
+    public Account account;
 
-	@ManyToOne
-	public Account owner;
+    @ManyToOne
+    public Account owner;
 
     @Column(name = "is_broadcast", nullable = false, columnDefinition = "boolean default false")
     public boolean isBroadcastMessage;
@@ -46,8 +45,8 @@ public class Post extends BaseNotifiable implements INotifiable {
     @ManyToMany
     @JoinTable(
             name = "broadcast_account",
-            joinColumns = { @JoinColumn(name = "post_id", referencedColumnName = "id") },
-            inverseJoinColumns = { @JoinColumn(name = "account_id", referencedColumnName = "id") }
+            joinColumns = {@JoinColumn(name = "post_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "account_id", referencedColumnName = "id")}
     )
     public List<Account> broadcastPostRecipients;
 
@@ -55,7 +54,7 @@ public class Post extends BaseNotifiable implements INotifiable {
     public String searchContent;
 
     public String validate() {
-        if(this.content.trim().length() <= 0) {
+        if (this.content.trim().length() <= 0) {
             return "Empty post!";
         }
         return null;
@@ -165,7 +164,7 @@ public class Post extends BaseNotifiable implements INotifiable {
                 return NotificationManager.findByReferenceIdAndRecipientId(this.parent.id, recipient.id);
             } catch (NoResultException ex) {
                 Logger.error("Error while trying to fetch notification for Post ID: " + this.parent.id
-                        + ", Recipient ID: " + recipient.id + ": " + ex.getMessage()
+                                + ", Recipient ID: " + recipient.id + ": " + ex.getMessage()
                 );
             }
         }
@@ -173,9 +172,15 @@ public class Post extends BaseNotifiable implements INotifiable {
         return new Notification();
     }
 
-    public boolean belongsToAccount() { return this.account != null; }
+    public boolean belongsToAccount() {
+        return this.account != null;
+    }
 
-    public boolean belongsToGroup() { return this.group != null; }
+    public boolean belongsToGroup() {
+        return this.group != null;
+    }
 
-    public boolean belongsToPost() { return this.parent != null; }
+    public boolean belongsToPost() {
+        return this.parent != null;
+    }
 }

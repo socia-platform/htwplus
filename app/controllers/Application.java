@@ -41,6 +41,9 @@ public class Application extends BaseController {
     ElasticsearchService elasticsearchService;
 
     @Inject
+    ElasticsearchResponse elasticsearchResponse;
+
+    @Inject
     GroupManager groupManager;
 
     @Inject
@@ -154,7 +157,7 @@ public class Application extends BaseController {
 
         try {
             response = elasticsearchService.doSearch("search", keyword.toLowerCase(), mode, facets, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
-            searchResponse = new ElasticsearchResponse(response, keyword, mode);
+            elasticsearchResponse.create(response, keyword, mode);
         } catch (NoNodeAvailableException nna) {
             flash("error", "Leider steht die Suche zur Zeit nicht zur Verfügung!");
             return ok(views.html.Search.search.render());
@@ -163,7 +166,7 @@ public class Application extends BaseController {
         return ok(views.html.Search.searchresult.render(
                 page,
                 LIMIT,
-                searchResponse));
+                elasticsearchResponse));
     }
 
     /**

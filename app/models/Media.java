@@ -48,54 +48,6 @@ public class Media extends BaseNotifiable implements INotifiable {
 
     public static String GROUP = "group";
 
-    public static Media findById(Long id) {
-        Media media = JPA.em().find(Media.class, id);
-        if (media == null) {
-            return null;
-        }
-        String path = Play.application().configuration().getString("media.path");
-        media.file = new File(path + "/" + media.url);
-        if (media.file.exists()) {
-            return media;
-        } else {
-            return null;
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static List<Media> listAllOwnedBy(Long id) {
-        return JPA.em().createQuery("FROM Media m WHERE m.owner.id = " + id).getResultList();
-    }
-
-    public boolean existsInGroup(Group group) {
-        List<Media> media = group.media;
-        for (Media m : media) {
-            if (m.title.equals(this.title)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    public static boolean isOwner(Long mediaId, Account account) {
-        Media m = JPA.em().find(Media.class, mediaId);
-        if (m.owner.equals(account)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static int byteAsMB(long size) {
-        return (int) (size / 1024 / 1024);
-    }
-
-    public boolean belongsToGroup() {
-        if (this.group != null) return true;
-        return false;
-    }
-
     @Override
     public Account getSender() {
         return this.temporarySender;

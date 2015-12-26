@@ -205,8 +205,9 @@ public class PostController extends BaseController {
                 return badRequest();
             } else {
                 Post newPost = filledForm.get();
-                postManager.create(newPost); // updates elasticsearch stuff
-                postManager.update(newPost);
+                post.content = newPost.content;
+                postManager.create(post); // updates elasticsearch stuff
+                postManager.update(post);
 
                 return ok(post.content);
             }

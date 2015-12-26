@@ -1,23 +1,15 @@
 package models;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
-import models.services.ElasticsearchService;
-import play.db.jpa.JPA;
-
 import models.enums.LinkType;
-import play.libs.F;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
-@Table(uniqueConstraints=
+@Table(uniqueConstraints =
 @UniqueConstraint(columnNames = {"account_id", "friend_id"}))
 public class Friendship extends BaseNotifiable implements INotifiable {
     public static final String FRIEND_REQUEST_SUCCESS = "request_successful";
@@ -25,29 +17,26 @@ public class Friendship extends BaseNotifiable implements INotifiable {
     public static final String FRIEND_NEW_REQUEST = "new_request";
     public static final int PAGE = 1;
 
-	@Inject
-	public transient ElasticsearchService elasticsearchService;
+    @ManyToOne
+    @NotNull
+    public Account account;
 
-	@ManyToOne
-	@NotNull
-	public Account account;
-	
-	@ManyToOne
-	@NotNull
-	public Account friend;
+    @ManyToOne
+    @NotNull
+    public Account friend;
 
-	@Enumerated(EnumType.STRING)
-	@NotNull
-	public LinkType linkType;
-	
-	public Friendship() {
-	}
-	
-	public Friendship(Account account, Account friend, LinkType type) {
-		this.account = account;
-		this.friend = friend;
-		this.linkType = type;
-	}
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    public LinkType linkType;
+
+    public Friendship() {
+    }
+
+    public Friendship(Account account, Account friend, LinkType type) {
+        this.account = account;
+        this.friend = friend;
+        this.linkType = type;
+    }
 
     @Override
     public Account getSender() {

@@ -40,14 +40,13 @@ public class MediaController extends BaseController {
     @Inject
     GroupManager groupManager;
 
-
     static Form<Media> mediaForm = Form.form(Media.class);
     final static String tempPrefix = "htwplus_temp";
     private Config conf = ConfigFactory.load();
 
     @Transactional(readOnly = true)
     public Result view(Long id) {
-        Media media = Media.findById(id);
+        Media media = mediaManager.findById(id);
         if (Secured.viewMedia(media)) {
             if (media == null) {
                 return redirect(controllers.routes.Application.index());
@@ -63,10 +62,10 @@ public class MediaController extends BaseController {
 
     @Transactional
     public Result delete(Long id) {
-        Media media = Media.findById(id);
+        Media media = mediaManager.findById(id);
 
         Call ret = controllers.routes.Application.index();
-        if (media.belongsToGroup()) {
+        if (media.group != null) {
             Group group = media.group;
             if (!Secured.deleteMedia(media)) {
                 return redirect(controllers.routes.Application.index());
@@ -102,7 +101,7 @@ public class MediaController extends BaseController {
 
         if (selection != null) {
             for (String s : selection) {
-                Media media = Media.findById(Long.parseLong(s));
+                Media media = mediaManager.findById(Long.parseLong(s));
                 if (Secured.viewMedia(media)) {
                     mediaList.add(media);
                 } else {
@@ -186,7 +185,7 @@ public class MediaController extends BaseController {
         String[] contentLength = request().headers().get("Content-Length");
         if (contentLength != null) {
             int size = Integer.parseInt(contentLength[0]);
-            if (Media.byteAsMB(size) > maxTotalSize) {
+            if (mediaManager.byteAsMB(size) > maxTotalSize) {
                 flash("error", "Du darfst auf einmal nur " + maxTotalSize + " MB hochladen.");
                 return redirect(ret);
             }
@@ -213,7 +212,7 @@ public class MediaController extends BaseController {
                 med.file = upload.getFile();
                 med.owner = Component.currentAccount();
 
-                if (Media.byteAsMB(med.file.length()) > maxFileSize) {
+                if (mediaManager.byteAsMB(med.file.length()) > maxFileSize) {
                     flash("error", "Die Datei " + med.title + " ist größer als " + maxFileSize + " MB!");
                     return redirect(ret);
                 }
@@ -222,7 +221,7 @@ public class MediaController extends BaseController {
                 if (target.equals(Media.GROUP)) {
                     med.temporarySender = Component.currentAccount();
                     med.group = group;
-                    if (med.existsInGroup(group)) {
+                    if (mediaManager.existsInGroup(med, group)) {
                         flash("error", error);
                         return redirect(ret);
                     }

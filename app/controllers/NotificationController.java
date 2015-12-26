@@ -144,7 +144,7 @@ public class NotificationController extends BaseController {
      */
     @Transactional
     public Result readAll() {
-        Notification.markAllAsRead(Component.currentAccount());
+        notificationManager.markAllAsRead(Component.currentAccount());
         flash("success", Messages.get("notification.read_everything_ok"));
 
         return redirect(request().getHeader("referer"));
