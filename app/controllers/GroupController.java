@@ -517,10 +517,7 @@ public class GroupController extends BaseController {
                     // if the inviteAccount is not already member, the sender and recipients are friends
                     // and the group account link is not already set up.
                     if (!Secured.isMemberOfGroup(group, inviteAccount) && FriendshipManager.alreadyFriendly(currentUser, inviteAccount) && groupAccount == null) {
-                        groupAccount.account = inviteAccount;
-                        groupAccount.group = group;
-                        groupAccount.linkType = LinkType.invite;
-                        groupAccountManager.create(groupAccount);
+                        groupAccountManager.create(new GroupAccount(group, inviteAccount, LinkType.invite));
 
                         // add inviteAccount to temporaryRecipients list for notifications later
                         group.addTemporaryRecipient(inviteAccount);

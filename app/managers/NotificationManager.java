@@ -19,16 +19,18 @@ import java.util.Map;
 public class NotificationManager implements BaseManager {
     @Override
     public void create(Object object) {
-
+        JPA.em().persist(object);
     }
 
     @Override
     public void update(Object object) {
-
+        ((Notification) object).updatedAt();
+        JPA.em().merge(object);
     }
 
     @Override
     public void delete(Object object) {
+        JPA.em().remove(object);
 
     }
 
