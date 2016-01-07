@@ -37,9 +37,6 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
 
     private final static Logger.ALogger logger = Logger.of(Account.class);
 
-    @Inject
-    public transient ElasticsearchService elasticsearchService;
-
     public String loginname;
 
     public String name;

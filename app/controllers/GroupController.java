@@ -348,17 +348,11 @@ public class GroupController extends BaseController {
             flash("success", "'" + group.title + "' erfolgreich beigetreten!");
             return redirect(controllers.routes.GroupController.index());
         } else if (group.groupType.equals(GroupType.open)) {
-            groupAccount.account = account;
-            groupAccount.group = group;
-            groupAccount.linkType = LinkType.establish;
-            groupAccountManager.create(groupAccount);
+            groupAccountManager.create(new GroupAccount(group, account, LinkType.establish));
             flash("success", "'" + group.title + "' erfolgreich beigetreten!");
             return redirect(controllers.routes.GroupController.stream(id, PAGE, false));
         } else if (group.groupType.equals(GroupType.close)) {
-            groupAccount.account = account;
-            groupAccount.group = group;
-            groupAccount.linkType = LinkType.request;
-            groupAccountManager.create(groupAccount);
+            groupAccountManager.create(new GroupAccount(group, account, LinkType.request));
             group.temporarySender = account;
             NotificationService.getInstance().createNotification(group, Group.GROUP_NEW_REQUEST);
             flash("success", Messages.get("group.group_request_sent"));

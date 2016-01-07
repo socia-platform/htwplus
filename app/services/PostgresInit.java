@@ -9,7 +9,6 @@ import models.Account;
 import models.Group;
 import models.enums.AccountRole;
 import models.enums.GroupType;
-import models.services.EmailService;
 import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
