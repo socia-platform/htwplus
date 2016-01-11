@@ -152,8 +152,6 @@ public class Application extends BaseController {
         }
 
         SearchResponse response;
-        ElasticsearchResponse searchResponse;
-
 
         try {
             response = elasticsearchService.doSearch("search", keyword.toLowerCase(), mode, facets, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));

@@ -38,14 +38,14 @@ public class PostManager implements BaseManager {
     public void create(Object model) {
         Post post = (Post) model;
 
+        JPA.em().persist(post);
         try {
             if (!post.owner.role.equals(AccountRole.ADMIN)) {
-                elasticsearchService.index(this);
+                elasticsearchService.index(post);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        JPA.em().persist(post);
     }
 
     @Override

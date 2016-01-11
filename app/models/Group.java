@@ -1,13 +1,16 @@
 package models;
 
+import managers.GroupManager;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.GroupType;
 import play.data.validation.Constraints.Pattern;
 import play.data.validation.Constraints.Required;
+import play.data.validation.ValidationError;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -53,16 +56,15 @@ public class Group extends BaseNotifiable implements INotifiable {
     @Transient
     public Collection<String> inviteList = null;
 
-    /**
-     * public List<ValidationError> validate() {
-     * List<ValidationError> errors = new ArrayList<>();
-     * if (Group.findByTitle(this.title) != null) {
-     * errors.add(new ValidationError("title", "error.title"));
-     * return errors;
-     * }
-     * return null;
-     * }
-     */
+
+    public List<ValidationError> validate() {
+        List<ValidationError> errors = new ArrayList<>();
+        if (new GroupManager().findByTitle(this.title) != null) {
+            errors.add(new ValidationError("title", "error.title"));
+            return errors;
+        }
+        return null;
+    }
 
     public static boolean validateToken(String token) {
         return !(token.equals("") || token.length() < 4 || token.length() > 45);

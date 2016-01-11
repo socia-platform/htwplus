@@ -31,9 +31,8 @@ public class GroupManager implements BaseManager {
 
     public void createWithGroupAccount(Group group, Account account) {
         group.owner = account;
-        this.create(group);
-        GroupAccount groupAccount = new GroupAccount(group, account, LinkType.establish);
-        groupAccountManager.create(groupAccount);
+        create(group);
+        groupAccountManager.create(new GroupAccount(group, account, LinkType.establish));
     }
 
     @Override
