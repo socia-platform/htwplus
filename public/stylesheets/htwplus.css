@@ -713,10 +713,9 @@ div.hp-notepad-content {
     background-color: white;
 	-moz-box-sizing: content-box;
 	-webkit-box-sizing: content-box;
-    border-radius: 4px;
-    -moz-box-shadow: 0 0 3px #888;
-    -webkit-box-shadow: 0 0 3px #888;
-    box-shadow: 0 0 3px #888;
+    -moz-box-shadow: 0 0 1px #888;
+    -webkit-box-shadow: 0 0 1px #888;
+    box-shadow: 0 0 1px #888;
 
 }
 
@@ -726,10 +725,9 @@ div.hp-sitenav {
     background-color: white;
     -moz-box-sizing: content-box;
     -webkit-box-sizing: content-box;
-    border-radius: 4px;
-    -moz-box-shadow: 0 0 3px #888;
-    -webkit-box-shadow: 0 0 3px #888;
-    box-shadow: 0 0 3px #888;
+    -moz-box-shadow: 0 0 1px #888;
+    -webkit-box-shadow: 0 0 1px #888;
+    box-shadow: 0 0 1px #888;
     margin-bottom: 10px;
 }
 
@@ -836,7 +834,7 @@ div.hp-pagination {
 #hp-top-link.affix-top {
     position: absolute; /* allows it to "slide" up into view */
     bottom: -190px; /* negative of the offset - height of link element */
-    left: 10px; /* padding from the left side of the window */
+    right: 10px; /* padding from the right side of the window */
     z-index: 3; /* .form-control has z-index 2 */
 }
 #hp-top-link.affix {
@@ -1423,8 +1421,8 @@ div.hp-avatar-default-9 {
     background-color: white;
     -moz-box-sizing: content-box;
     -webkit-box-sizing: content-box;
-    -moz-box-shadow: 0 0 3px #888;
-    -webkit-box-shadow: 0 0 3px #888;
+    -moz-box-shadow: 0 0 11px #888;
+    -webkit-box-shadow: 0 0 1px #888;
     box-shadow: 0 0 1px #888;
     margin-bottom: 10px;
 }
@@ -1450,8 +1448,8 @@ div.hp-avatar-default-9 {
     background-color: white;
     -moz-box-sizing: content-box;
     -webkit-box-sizing: content-box;
-    -moz-box-shadow: 0 0 3px #888;
-    -webkit-box-shadow: 0 0 3px #888;
+    -moz-box-shadow: 0 0 1px #888;
+    -webkit-box-shadow: 0 0 1px #888;
     box-shadow: 0 0 1px #888;
     margin-bottom: 10px;
 }
