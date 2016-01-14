@@ -1,29 +1,22 @@
 package models;
 
-import java.io.IOException;
-import java.util.*;
-
-import javax.persistence.*;
-
-import controllers.Component;
-import models.enums.AccountRole;
-import models.enums.GroupType;
-import models.enums.LinkType;
-import models.services.ElasticsearchService;
+import managers.NotificationManager;
 import models.base.BaseModel;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
+import org.hibernate.annotations.Type;
 import play.Logger;
 import play.data.validation.Constraints.Required;
-import play.db.jpa.JPA;
 
-import org.hibernate.annotations.Type;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
-	public static final String GROUP = "group";                             // post to group news stream
-	public static final String PROFILE = "profile";                         // post to own news stream
-	public static final String STREAM = "stream";                           // post to a foreign news stream
+    public static final String GROUP = "group";                             // post to group news stream
+    public static final String PROFILE = "profile";                         // post to own news stream
+    public static final String STREAM = "stream";                           // post to a foreign news stream
     public static final String COMMENT_PROFILE = "comment_profile";         // comment on a profile post
     public static final String COMMENT_GROUP = "comment_group";             // comment on a group post
     public static final String COMMENT_OWN_PROFILE = "comment_profile_own"; // comment on own news stream
@@ -32,19 +25,19 @@ public class Post extends BaseNotifiable implements INotifiable {
     @Required
     @Lob
     @Type(type = "org.hibernate.type.TextType")
-	public String content;
+    public String content;
 
-	@ManyToOne
-	public Post parent;
+    @ManyToOne
+    public Post parent;
 
-	@ManyToOne
-	public Group group;
+    @ManyToOne
+    public Group group;
 
-	@ManyToOne
-	public Account account;
+    @ManyToOne
+    public Account account;
 
-	@ManyToOne
-	public Account owner;
+    @ManyToOne
+    public Account owner;
 
     @Column(name = "is_broadcast", nullable = false, columnDefinition = "boolean default false")
     public boolean isBroadcastMessage;
@@ -52,286 +45,20 @@ public class Post extends BaseNotifiable implements INotifiable {
     @ManyToMany
     @JoinTable(
             name = "broadcast_account",
-            joinColumns = { @JoinColumn(name = "post_id", referencedColumnName = "id") },
-            inverseJoinColumns = { @JoinColumn(name = "account_id", referencedColumnName = "id") }
+            joinColumns = {@JoinColumn(name = "post_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "account_id", referencedColumnName = "id")}
     )
     public List<Account> broadcastPostRecipients;
 
     @Transient
     public String searchContent;
-		
-	public void create() {
-		JPA.em().persist(this);
-        try {
-            if (!this.owner.role.equals(AccountRole.ADMIN))
-            ElasticsearchService.indexPost(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public String validate() {
-        if(this.content.trim().length() <= 0) {
+        if (this.content.trim().length() <= 0) {
             return "Empty post!";
         }
         return null;
     }
-
-	@Override
-	public void update() {
-		updatedAt();
-	}
-
-	@Override
-	public void delete() {
-		// delete all comments first
-        List<Post> comments = getCommentsForPost(this.id, 0, 0);
-
-        for (Post comment : comments) {
-            comment.delete();
-        }
-
-        Notification.deleteReferences(this);
-
-        // Delete Elasticsearch document
-        ElasticsearchService.deletePost(this);
-
-        JPA.em().remove(this);
-	}
-	
-	protected static Query limit(Query query, int limit, int offset) {
-		query.setMaxResults(limit);
-		if (offset >= 0) {
-			query.setFirstResult(offset);
-		}
-		return query;
-	}
-		
-	public static Post findById(Long id) {
-        return JPA.em().find(Post.class, id);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static List<Post> getPostsForGroup(final Group group, final int limit, final int page) {
-		Query query = JPA.em()
-                .createQuery("SELECT p FROM Post p WHERE p.group.id = ?1 ORDER BY p.createdAt DESC")
-                .setParameter(1, group.id);
-
-        int offset = (page * limit) - limit;
-        query = limit(query, limit, offset);
-
-        return query.getResultList();
-	}
-	
-	public static int countPostsForGroup(final Group group) {
-		return ((Number)JPA.em().createQuery("SELECT COUNT(p) FROM Post p WHERE p.group.id = ?1").setParameter(1, group.id).getSingleResult()).intValue();
-	}
-	
-	
-	@SuppressWarnings("unchecked")
-	public static List<Post> getCommentsForPost(Long id, int limit, int offset) {
-		Query query = JPA.em()
-                .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
-                .setParameter(1, id);
-		
-		query = limit(query, limit, offset);
-		
-		return (List<Post>) query.getResultList();
-	}
-
-    @SuppressWarnings("unchecked")
-	public static List<Post> findStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final List<Post> bookmarkList, final String filter, final int limit, final int offset) {
-        	Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, bookmarkList, filter, " ORDER BY p.updatedAt DESC");
-
-            // set limit and offset
-            query = limit(query, limit, offset);
-            return query.getResultList();
-	}
-
-	public static int countStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final List<Post> bookmarkList, final String filter) {
-		final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, bookmarkList, filter, "");
-        return ((Number) query.getSingleResult()).intValue();
-	}
-	
-	/**
-	 * @param account - Account (usually: current user or a contact)
-	 * @param groupList - a list containing all groups we want to search in (usually all groups from account)
-	 * @param accountList - a list containing all accounts we want to search in (usually contact from account)
-	 * @return List of Posts
-	 */
-	public static Query streamForAccount(String selectClause, Account account, List<Group> groupList, List<Account> accountList, List<Post> bookmarkList, String filter, String orderByClause){
-
-        HashMap<String, String> streamClausesMap = new HashMap<>();
-        List<String> streamClausesList = new ArrayList<>();
-
-        // find stream posts from @account
-        String accountPosts = " (p.owner = (:account) AND p.account = (:account)) ";
-        streamClausesMap.put("accountPosts", accountPosts);
-
-
-
-        if(groupList != null && groupList.size() != 0) {
-            // find group posts from @account
-            String accountGroupPosts = " (p.owner = (:account) AND p.group IN (:groupList)) ";
-            streamClausesMap.put("accountGroupPosts", accountGroupPosts);
-
-            // find posts from each group in @groupList
-            String allGroupPosts = " (p.group IN (:groupList)) ";
-            streamClausesMap.put("allGroupPosts", allGroupPosts);
-        }
-
-        if(accountList != null && accountList.size() != 0) {
-            // find posts from @account where @account posted on @accountList
-            String accountContactPosts = " (p.owner = (:account) AND p.account IN (:accountList)) ";
-            streamClausesMap.put("accountContactPosts", accountContactPosts);
-
-            // find posts from @accountList where @accountList posted on @account's feed
-            String contactToAccountPosts = " (p.owner IN (:accountList) AND p.account = (:account)) ";
-            streamClausesMap.put("contactToAccountPosts", contactToAccountPosts);
-
-            // find posts from @accountList which are posted on his/her own feed
-            String contactPosts = " (p.owner IN (:accountList) AND p.account = p.owner) ";
-            streamClausesMap.put("contactPosts", contactPosts);
-        }
-
-        if(bookmarkList != null && bookmarkList.size() != 0) {
-            // find bookmarked posts from @account
-            String bookmarkPosts = " (p IN (:bookmarkList)) ";
-            streamClausesMap.put("bookmarkPosts", bookmarkPosts);
-
-        }
-
-        switch (filter) {
-            case "group":
-                streamClausesList.add(streamClausesMap.get("allGroupPosts"));
-                break;
-            case "account":
-                streamClausesList.add(streamClausesMap.get("accountPosts"));
-                streamClausesList.add(streamClausesMap.get("accountContactPosts"));
-                streamClausesList.add(streamClausesMap.get("accountGroupPosts"));
-                break;
-            case "contact":
-                streamClausesList.add(streamClausesMap.get("contactToAccountPosts"));
-                streamClausesList.add(streamClausesMap.get("contactPosts"));
-                break;
-            case "visitor":
-                streamClausesList.add(streamClausesMap.get("accountGroupPosts"));
-                streamClausesList.add(streamClausesMap.get("contactToAccountPosts"));
-                streamClausesList.add(streamClausesMap.get("accountPosts"));
-                break;
-            case "bookmark":
-                streamClausesList.add(streamClausesMap.get("bookmarkPosts"));
-                break;
-
-            default:
-                streamClausesList.add(streamClausesMap.get("accountPosts"));
-                streamClausesList.add(streamClausesMap.get("accountGroupPosts"));
-                streamClausesList.add(streamClausesMap.get("allGroupPosts"));
-                streamClausesList.add(streamClausesMap.get("accountContactPosts"));
-                streamClausesList.add(streamClausesMap.get("contactToAccountPosts"));
-                streamClausesList.add(streamClausesMap.get("contactPosts"));
-                break;
-        }
-        // its possible that @streamClausesList contains null values. remove them.
-        streamClausesList.removeAll(Collections.singleton(null));
-
-
-        // assemble query.
-        // insert dummy where clause (1=2) for the unlikely event of empty @streamClausesList (e.g. new user with no groups or contact)
-        String completeQuery = selectClause + " FROM Post p WHERE 1=2 " + assembleClauses(streamClausesList) + orderByClause;
-		Query query = JPA.em().createQuery(completeQuery);
-
-        // check @completeQuery for parameter which are needed.
-        // () are necessary to distinguish between :account and :accountList
-        if (completeQuery.contains("(:account)"))
-            query.setParameter("account", account);
-
-        if (completeQuery.contains("(:groupList)"))
-            query.setParameter("groupList", groupList);
-
-        if (completeQuery.contains("(:accountList)"))
-            query.setParameter("accountList", accountList);
-
-        if (completeQuery.contains("(:bookmarkList)"))
-            query.setParameter("bookmarkList", bookmarkList);
-
-        return query;
-	}
-
-    private static String assembleClauses(List<String> streamClausesList) {
-        String assembledClauses = "";
-        Iterator iterator = streamClausesList.iterator();
-        while(iterator.hasNext()){
-            assembledClauses += " OR " + iterator.next().toString();
-        }
-
-        return assembledClauses;
-    }
-	
-	public static int countCommentsForPost(final Long id) {
-		return ((Number)JPA.em().createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
-    }
-	
-	public int getCountComments() {
-		return Post.countCommentsForPost(this.id);
-	}
-	
-	public boolean belongsToGroup() { return this.group != null; }
-		
-	public boolean belongsToAccount() { return this.account != null; }
-
-    public boolean belongsToPost() { return this.parent != null; }
-
-    public boolean isMine() { return this.account.equals(this.owner); }
-
-	/**
-	 * @param account Account (current user)
-	 * @return List of Posts
-	 */
-	public static List<Post> getStream(Account account, int limit, int page) {
-		// find friends and groups of given account
-		List<Account> friendList = Friendship.findFriends(account);
-		List<Group> groupList = GroupAccount.findEstablished(account);
-        List<Post> bookmarkList = PostBookmark.findByAccount(account);
-		
-		int offset = (page * limit) - limit;
-		return findStreamForAccount(account, groupList, friendList, bookmarkList, "all", limit, offset);
-	}
-
-    /**
-     * @param account Account (current user)
-     * @return List of Posts
-     */
-    public static List<Post> getFilteredStream(Account account, int limit, int page, String filter) {
-        int offset = (page * limit) - limit;
-        return findStreamForAccount(account, GroupAccount.findEstablished(account), Friendship.findFriends(account), PostBookmark.findByAccount(account), filter, limit, offset);
-    }
-	
-	
-	/**
-	 * @param account Account (current user)
-	 * @return Number of Posts
-	 */
-	public static int countStream(Account account, String filter) {
-        return countStreamForAccount(account, GroupAccount.findEstablished(account), Friendship.findFriends(account), PostBookmark.findByAccount(account), filter);
-    }
-
-	/**
-	 * @param contact - Account
-	 * @return List of Posts
-	 */
-	public static List<Post> getFriendStream(Account contact, int limit, int page) {
-		int offset = (page * limit) - limit;
-		return findStreamForAccount(contact, GroupAccount.findPublicEstablished(contact), Friendship.findFriends(contact), PostBookmark.findByAccount(contact), "visitor", limit, offset);
-	}
-
-	/**
-	 * @param contact - Account (a friends account)
-	 * @return Number of Posts
-	 */
-	public static int countFriendStream(Account contact){
-		return countStreamForAccount(contact, GroupAccount.findPublicEstablished(contact), Friendship.findFriends(contact), PostBookmark.findByAccount(contact),  "visitor");
-	}
 
 
     @Override
@@ -434,10 +161,10 @@ public class Post extends BaseNotifiable implements INotifiable {
     public Notification getNotification(Account recipient) {
         if (this.parent != null) {
             try {
-                return Notification.findByReferenceIdAndRecipientId(this.parent.id, recipient.id);
+                return NotificationManager.findByReferenceIdAndRecipientId(this.parent.id, recipient.id);
             } catch (NoResultException ex) {
                 Logger.error("Error while trying to fetch notification for Post ID: " + this.parent.id
-                        + ", Recipient ID: " + recipient.id + ": " + ex.getMessage()
+                                + ", Recipient ID: " + recipient.id + ": " + ex.getMessage()
                 );
             }
         }
@@ -445,96 +172,15 @@ public class Post extends BaseNotifiable implements INotifiable {
         return new Notification();
     }
 
-    /**
-     * Get all posts except error posts (from Admin)
-     * @return
-     */
-    public static List<Post> allWithoutAdmin() {
-        return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
+    public boolean belongsToAccount() {
+        return this.account != null;
     }
 
-    /**
-     * Get all posts owned by a specific user
-     * @return
-     */
-    public static List<Post> listAllPostsOwnedBy(Long id) {
-        return JPA.em().createQuery("FROM Post p WHERE p.owner.id = " + id).getResultList();
+    public boolean belongsToGroup() {
+        return this.group != null;
     }
 
-    /**
-     * get a list of posts posted on the wall of the specified account
-     */
-    public static List<Post> listAllPostsPostedOnAccount(Long id) {
-        return JPA.em().createQuery("FROM Post p WHERE p.account.id = " + id).getResultList();
-    }
-
-    public static long indexAllPosts() throws IOException {
-        final long start = System.currentTimeMillis();
-        for (Post post: allWithoutAdmin()) ElasticsearchService.indexPost(post);
-        return (System.currentTimeMillis() - start) / 100;
-
-    }
-
-    /**
-     * Collect all AccountIds, which are able to view this.post
-     * @return List of AccountIds
-     */
-    public List<Long> findAllowedToViewAccountIds(){
-
-        List<Long> viewableIds = new ArrayList<>();
-
-        // everybody from post.group can see this post
-        if(this.belongsToGroup()) {
-            viewableIds.addAll(GroupAccount.findAccountIdsByGroup(this.group, LinkType.establish));
-        }
-
-
-        if(this.belongsToAccount()) {
-
-            // every friend from post.account can see this post
-            viewableIds.addAll(Friendship.findFriendsId(this.account));
-
-            // the owner of this.account can see this post
-            viewableIds.add(this.account.id);
-
-            // everybody can see his own post
-            if(this.isMine()) {
-                viewableIds.add(this.owner.id);
-            }
-        }
-
-        // multiple options if post is a comment
-        if(this.belongsToPost()) {
-
-            // every member from post.parent.group can see this post
-            if(this.parent.belongsToGroup()) {
-                viewableIds.addAll(GroupAccount.findAccountIdsByGroup(this.parent.group, LinkType.establish));
-            }
-
-            // every friend from post.parent.account can see this post
-            if(this.parent.belongsToAccount()) {
-                viewableIds.addAll(Friendship.findFriendsId(this.parent.account));
-
-                // everybody can see his own comment
-                if(this.parent.isMine()) {
-                    viewableIds.add(this.owner.id);
-                }
-            }
-        }
-        return viewableIds;
-    }
-
-    public boolean isPublic() {
-
-        // post in public group
-        if(this.belongsToGroup()) {
-            return this.group.groupType.equals(GroupType.open);
-        }
-
-        // comment in public group
-        if(this.belongsToPost() && this.parent.belongsToGroup()) {
-            return this.parent.group.groupType.equals(GroupType.open);
-        }
-        return false;
+    public boolean belongsToPost() {
+        return this.parent != null;
     }
 }

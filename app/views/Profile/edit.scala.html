@@ -1,4 +1,4 @@
-@(profile: Account, profileForm: Form[Account], loginForm: Form[Login])
+@(profile: Account, profileForm: Form[Account], loginForm: Form[Login], studycourses: List[Studycourse])
 @import helper._
 @import models._
 
@@ -89,7 +89,7 @@
                         } else {
                         <option value="0">Keine Angabe</option>
                         }
-                        @for(studycourse <- Studycourse.getAll()){
+                        @for(studycourse <- studycourses){
                         <option value="@studycourse.id" @if(profile.studycourse !=null &&
                                 profile.studycourse.equals(studycourse)){selected="selected" }>@studycourse.title
                         </option>

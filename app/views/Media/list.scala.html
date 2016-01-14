@@ -21,7 +21,7 @@
 			<td><input name="selection" value="@m.id" type="checkbox"></td>
 	        <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500" data-original-title="von @m.owner.name">@m.title</a></td>
 	        <td>@m.createdAt.format("dd.MM.yyyy")</td>
-	        <td>@{MediaController.bytesToString(m.size, false)}</td>
+	        <td>@m.sizeInByte</td>
 	        <td class="hp-optionsMenu">
                 @views.html.Media.snippets.optionMenu(m)
 	        </td>

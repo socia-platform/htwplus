@@ -1,49 +1,38 @@
 package models.services;
 
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import managers.NotificationManager;
+import play.libs.F;
+import play.libs.mailer.Email;
+import play.libs.mailer.MailerClient;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import models.Account;
 import models.Notification;
 import play.Logger;
-import play.Play;
 import play.db.jpa.JPA;
 import play.i18n.Messages;
-import play.libs.F;
-import play.libs.mailer.Email;
-import play.libs.mailer.MailerPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 /**
  * This class handles sending of emails, e.g. for notification mails.
  */
+@Singleton
 public class EmailService {
-    static final String EMAIL_SENDER = Play.application().configuration().getString("htwplus.email.sender");
-    static final String PLAIN_TEXT_TEMPLATE = "views.html.Emails.notificationsPlainText";
-    static final String HTML_TEMPLATE = "views.html.Emails.notificationsHtml";
 
-    /**
-     * Singleton instance
-     */
-    private static EmailService instance = null;
+    private Config conf = ConfigFactory.load();
+    private final String EMAIL_SENDER = conf.getString("htwplus.email.sender");
+    private final String PLAIN_TEXT_TEMPLATE = "views.html.Emails.notificationsPlainText";
+    private final String HTML_TEMPLATE = "views.html.Emails.notificationsHtml";
 
-    /**
-     * Private constructor for singleton instance
-     */
-    private EmailService() { }
-
-    /**
-     * Returns the singleton instance.
-     *
-     * @return EmailHandler instance
-     */
-    public static EmailService getInstance() {
-        if (EmailService.instance == null) {
-            EmailService.instance = new EmailService();
-        }
-
-        return EmailService.instance;
-    }
+    @Inject MailerClient mailerClient;
+    @Inject Email email;
+    @Inject NotificationManager notificationManager;
 
     /**
      * Sends an email.
@@ -54,19 +43,22 @@ public class EmailService {
      * @param mailHtml HTML content of the mail (allowed to be null)
      */
     public void sendEmail(String subject, String recipient, String mailPlainText, String mailHtml) {
-        Email mail = new Email();
-        mail.setSubject(subject);
-        mail.setFrom(EmailService.EMAIL_SENDER);
-        mail.addTo(recipient);
+        email.setSubject(subject);
+        email.addTo(recipient);
+        email.setFrom(EMAIL_SENDER);
 
         // send email either in plain text, HTML or both
         if (mailPlainText != null) {
-            mail.setBodyText(mailPlainText);
+            if (mailHtml != null) {
+                email.setBodyHtml(mailHtml);
+                email.setBodyText(mailPlainText);
+            } else {
+                email.setBodyText(mailPlainText);
+            }
+        } else if (mailHtml != null) {
+            email.setBodyHtml(mailHtml);
         }
-        if (mailHtml != null) {
-            mail.setBodyHtml(mailHtml);
-        }
-        MailerPlugin.send(mail);
+        mailerClient.send(email);
     }
 
     /**
@@ -83,8 +75,8 @@ public class EmailService {
                         notifications.get(0).rendered.replaceAll("<[^>]*>", ""));
             // send the email
             this.sendEmail(subject, recipient.name + " <" + recipient.email + ">",
-                    TemplateService.getInstance().getRenderedTemplate(EmailService.PLAIN_TEXT_TEMPLATE, notifications, recipient),
-                    TemplateService.getInstance().getRenderedTemplate(EmailService.HTML_TEMPLATE, notifications, recipient)
+                    TemplateService.getInstance().getRenderedTemplate(PLAIN_TEXT_TEMPLATE, notifications, recipient),
+                    TemplateService.getInstance().getRenderedTemplate(HTML_TEMPLATE, notifications, recipient)
             );
 
             // mark notifications to be sent (JPA transaction required, as this is a async process)
@@ -93,7 +85,7 @@ public class EmailService {
                 public void invoke() throws Throwable {
                     for (Notification notification : notifications) {
                         notification.isSent = true;
-                        notification.update();
+                        notificationManager.update(notification);
                     }
                 }
             });
@@ -128,7 +120,8 @@ public class EmailService {
             Logger.info("Start sending of daily email notifications...");
 
             // load map with recipients containing list of unread notifications and iterate over the map
-            Map<Account, List<Notification>> notificationsRecipients = Notification.findUsersWithDailyHourlyEmailNotifications();
+
+            Map<Account, List<Notification>> notificationsRecipients = notificationManager.findUsersWithDailyHourlyEmailNotifications();
             for (Map.Entry<Account, List<Notification>> entry : notificationsRecipients.entrySet()) {
                 this.sendNotificationsEmail(entry.getValue(), entry.getKey());
             }

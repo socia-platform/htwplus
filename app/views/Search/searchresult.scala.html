@@ -28,7 +28,7 @@
                                             @views.html.snippets.userLink(account, "top")
                                             </div>
                                             <small>
-                                            @if(Friendship.alreadyFriendly(currentUser, account)) {
+                                            @if(managers.FriendshipManager.alreadyFriendly(currentUser, account)) {
                                                 <span class="glyphicon glyphicon-ok"></span>
                                                 <span> Ihr seid bereits befreundet.</span>
                                             } else {

@@ -1,15 +1,19 @@
 package models.services;
 
+import managers.AccountManager;
+import managers.GroupManager;
+import managers.PostManager;
 import models.Account;
 import models.Group;
 import models.Post;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import play.Logger;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,9 +22,19 @@ import java.util.List;
 /**
  * Created by Iven on 16.07.2015.
  */
+@Singleton
 public class ElasticsearchResponse {
 
-    public SearchResponse elasticsearchResponse;
+    @Inject
+    PostManager postManager;
+
+    @Inject
+    GroupManager groupManager;
+
+    @Inject
+    AccountManager accountManager;
+
+    SearchResponse elasticsearchResponse;
     public List<Object> resultList;
     public String keyword;
     public String searchMode;
@@ -29,14 +43,13 @@ public class ElasticsearchResponse {
     public long lGroupDocuments;
     public long lPostDocuments;
 
-    public HashMap studycoursesMap = new HashMap<String, Long>();
-    public HashMap degreeMap = new HashMap<String, Long>();
-    public HashMap semesterMap = new HashMap<String, Long>();
-    public HashMap roleMap = new HashMap<String, Long>();
-    public HashMap grouptypeMap = new HashMap<String, Long>();
+    public HashMap studycoursesMap;
+    public HashMap degreeMap;
+    public HashMap semesterMap;
+    public HashMap roleMap;
+    public HashMap grouptypeMap;
 
-
-    public ElasticsearchResponse(final SearchResponse response, final String keyword, final String mode) {
+    public void create(final SearchResponse response, final String keyword, final String mode) {
         this.keyword = keyword;
         this.searchMode = mode;
         this.elasticsearchResponse = response;
@@ -53,13 +66,13 @@ public class ElasticsearchResponse {
         for (SearchHit searchHit : elasticsearchResponse.getHits().getHits()) {
             switch (searchHit.type()) {
                 case "user":
-                    Account account = Account.findById(Long.parseLong(searchHit.getId()));
-                    if(account != null)
+                    Account account = accountManager.findById(Long.parseLong(searchHit.getId()));
+                    if (account != null)
                         resultList.add(account);
                     break;
                 case "post":
-                    Post post = Post.findById(Long.parseLong(searchHit.getId()));
-                    if(post != null) {
+                    Post post = postManager.findById(Long.parseLong(searchHit.getId()));
+                    if (post != null) {
                         String searchContent = post.content;
                         if (!searchHit.getHighlightFields().isEmpty())
                             searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
@@ -70,20 +83,32 @@ public class ElasticsearchResponse {
                     }
                     break;
                 case "group":
-                    Group group = Group.findById(Long.parseLong(searchHit.getId()));
-                    if(group != null)
+                    Group group = groupManager.findById(Long.parseLong(searchHit.getId()));
+                    if (group != null)
                         resultList.add(group);
                     break;
-                default: Logger.info("no matching case for ID: " + searchHit.getId());
+                default:
+                    Logger.info("no matching case for ID: " + searchHit.getId());
             }
         }
     }
 
     private void aggregationStuff() {
+        lUserDocuments = new Long(0L);
+        lGroupDocuments = new Long(0L);
+        lPostDocuments = new Long(0L);
+
+        studycoursesMap = new HashMap<String, Long>();
+        degreeMap = new HashMap<String, Long>();
+        semesterMap = new HashMap<String, Long>();
+        roleMap = new HashMap<String, Long>();
+        grouptypeMap = new HashMap<String, Long>();
+
         Terms terms = this.elasticsearchResponse.getAggregations().get("types");
+
         Collection<Terms.Bucket> buckets = terms.getBuckets();
         for (Terms.Bucket bucket : buckets) {
-            switch (bucket.getKey()) {
+            switch (bucket.getKey().toString()) {
                 case "user":
                     lUserDocuments = bucket.getDocCount();
                     break;
@@ -130,9 +155,6 @@ public class ElasticsearchResponse {
     }
 
     public long getDocumentCount() {
-        return this.lUserDocuments + this.lGroupDocuments + this.lPostDocuments;
+        return lUserDocuments + lGroupDocuments + lPostDocuments;
     }
-
-
-
 }
