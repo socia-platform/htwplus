@@ -60,7 +60,7 @@ $('.hp-optionsMenu>div').on('shown.bs.dropdown', function() {
     var menu = $(this).find('ul.dropdown-menu');
     var row = $(this).parents('tr');
     // hacky: 45 belongs to div.hp-notepad-content.addmargin    
-    var top = 45 + row.offset().top + row.height() - $('.hp-notepad-content').offset().top;
+    var top = row.offset().top - $('.hp-notepad-content').offset().top;
     menu.css('top', top + 'px');
 });
 
