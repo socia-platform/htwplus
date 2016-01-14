@@ -754,6 +754,11 @@ div.hp-feed-filter {
     margin-bottom: 7px;
 }
 
+div.hp-feed-filter ul.dropdown-menu{
+    right: 0;
+    left: inherit;
+}
+
 div#hp-footer {
 	margin: 5px 44px 0 69px;
 }

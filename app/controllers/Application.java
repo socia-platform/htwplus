@@ -89,7 +89,7 @@ public class Application extends BaseController {
                 Navigation.set(Level.STREAM, "Kontakte");
                 break;
             case "bookmark":
-                Navigation.set(Level.STREAM, "Favoriten");
+                Navigation.set(Level.STREAM, "Gemerkte Posts");
                 break;
             default:
                 Navigation.set(Level.STREAM, "Alles");
