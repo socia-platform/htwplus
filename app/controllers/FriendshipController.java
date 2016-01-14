@@ -74,7 +74,7 @@ public class FriendshipController extends BaseController {
         Friendship reverseLink = friendshipManager.findFriendLink(friend, currentUser);
 
         if (friendshipLink == null || reverseLink == null) {
-            flash("error", "Diese Freundschaft besteht nicht!");
+            flash("error", "Diese Kontaktverbindung besteht nicht!");
         } else {
             friendshipManager.delete(friendshipLink);
             friendshipManager.delete(reverseLink);
@@ -99,7 +99,7 @@ public class FriendshipController extends BaseController {
         Friendship requestLink = friendshipManager.findRequest(potentialFriend, currentUser);
 
         if (requestLink == null) {
-            flash("info", "Es gibt keine Freundschaftsanfrage von diesem User");
+            flash("info", "Es gibt keine Kontaktanfrage von diesem Benutzer");
             return redirect(controllers.routes.FriendshipController.index());
         } else {
             // if so: set LinkType from request to friend
@@ -111,7 +111,7 @@ public class FriendshipController extends BaseController {
             friendshipManager.create(friendship);
             NotificationService.getInstance().createNotification(friendship, Friendship.FRIEND_REQUEST_SUCCESS);
 
-            flash("success", "Freundschaft erfolgreich hergestellt!");
+            flash("success", "Kontakt erfolgreich hergestellt!");
         }
 
         return redirect(controllers.routes.FriendshipController.index());
@@ -139,7 +139,7 @@ public class FriendshipController extends BaseController {
         if (friendship != null && friendship.account.equals(Component.currentAccount())) {
             friendshipManager.delete(friendship);
         } else {
-            flash("error", "Diese Freundschaftsanfrage gibt es nicht!");
+            flash("error", "Diese Kontaktanfrage gibt es nicht!");
         }
 
         return redirect(controllers.routes.FriendshipController.index());
@@ -147,32 +147,32 @@ public class FriendshipController extends BaseController {
 
     private boolean hasLogicalErrors(Account currentUser, Account potentialFriend) {
         if (potentialFriend.equals(currentUser)) {
-            flash("info", "Du kannst nicht mit dir befreundet sein!");
+            flash("info", "Du kannst nicht mit dir selbst in Kontakt stehen!");
             return true;
         }
 
         if (potentialFriend.role == AccountRole.DUMMY) {
-            flash("error", "Mit diesem Account kannst du nicht befreundet sein!");
+            flash("error", "Mit diesem Account kannst du nicht in Kontakt stehen!");
             return true;
         }
 
         if (friendshipManager.findRequest(currentUser, potentialFriend) != null) {
-            flash("info", "Deine Freundschaftsanfrage wurde bereits verschickt!");
+            flash("info", "Deine Kontaktanfrage wurde bereits verschickt!");
             return true;
         }
 
         if (friendshipManager.findReverseRequest(currentUser, potentialFriend) != null) {
-            flash("info", "Du hast bereits eine Freundschaftsanfrage von diesem User. Schau mal nach ;-)");
+            flash("info", "Du hast bereits eine Kontaktanfrage von diesem User. Schau mal nach ;-)");
             return true;
         }
 
         if (friendshipManager.alreadyFriendly(currentUser, potentialFriend)) {
-            flash("info", "Ihr seid bereits Freunde!");
+            flash("info", "Ihr steht bereits in Kontakt!");
             return true;
         }
 
         if (friendshipManager.alreadyRejected(currentUser, potentialFriend)) {
-            flash("info", "Deine Freundschaftsanfrage wurde bereits abgelehnt. "
+            flash("info", "Deine Kontaktanfrage wurde bereits abgelehnt. "
                     + "Bestätige die Ablehnung und dann kannst du es noch einmal versuchen.");
             return true;
         }

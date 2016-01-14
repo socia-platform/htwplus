@@ -112,7 +112,7 @@ public class ProfileController extends BaseController {
             }
         }
         // case for visitors
-        flash("info", "Du kannst nur den Stream deiner Freunde betrachten!");
+        flash("info", "Du kannst nur den Stream deiner Kontakte betrachten!");
         return redirect(controllers.routes.ProfileController.view(accountId));
     }
 

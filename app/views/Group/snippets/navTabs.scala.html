@@ -23,10 +23,10 @@
             </a>
         </li>
     }
-    @defining(if(Navigation.getTitle().equals("Freunde einladen")){"active"} else {"deactive"}) { status =>
+    @defining(if(Navigation.getTitle().equals("Kontakte einladen")){"active"} else {"deactive"}) { status =>
         @if(Secured.editGroup(group)) {
             <li class="@status">
-                <a href="@routes.GroupController.invite(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Lade Freunde in die Gruppe ein" data-container="body">
+                <a href="@routes.GroupController.invite(group.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Lade Kontakte in die Gruppe ein" data-container="body">
                     <span class="glyphicon glyphicon-plus"></span>
                     <span class="hidden-xs"> Einladung</span>
                 </a>

@@ -50,7 +50,7 @@ landingpage.features=Die Funktionen
 landingpage.features.login.title=Nutze deinen HTW-Account
 landingpage.features.login.description=Die Anmeldung erfolgt unkompliziert mit deinem HTW-Account.
 landingpage.features.friends.title=Vernetze dich mit deinen Kommilitonen
-landingpage.features.friends.description=Pflege dein Hochschul-Netzwerk, indem du Kommilitonen und Dozenten deiner persönlichen Liste von Freunden hinzufügst.
+landingpage.features.friends.description=Pflege dein Hochschul-Netzwerk, indem du Kommilitonen und Dozenten deiner persönlichen Kontaktliste hinzufügst.
 landingpage.features.groups.title=Vorlesungen, Übungen und Studienprojekte organisieren
 landingpage.features.groups.description=Erstelle Gruppen, um dein Studium gemeinsam mit deinen Kommilitonen zu organisieren oder trete bestehenden Gruppen bei.
 landingpage.features.courses.title=Kommuniziere mit deinen Dozenten und Professoren
@@ -58,9 +58,9 @@ landingpage.features.courses.description=Tausche dich mit deinen Dozenten aus, i
 landingpage.features.filemgmt.title=Lehrmaterialen abrufen und Dateien austauschen
 landingpage.features.filemgmt.description=Nutze das Medienmanagement in Gruppen und Kursen, um Vorlesungsmaterialen, Notizen und Dokumente zu verwalten.
 landingpage.features.newsstream.title=Immer auf dem neusten Stand
-landingpage.features.newsstream.description=Dein persönlicher Newsstream hält dich immer auf dem Laufenden. Alle Posts und Kommentare deiner Gruppen, Kurse und Freunde werden hier zusammengefasst.
+landingpage.features.newsstream.description=Dein persönlicher Newsstream hält dich immer auf dem Laufenden. Alle Posts und Kommentare deiner Gruppen, Kurse und von Kontakten werden hier zusammengefasst.
 landingpage.features.notifications.title=Keine Neuigkeiten verpassen
-landingpage.features.notifications.description=Ob neue Posts, Kommentare, Freundschaftsanfragen oder Gruppeneinladungen - du wirst über alles informiert. Auf Wunsch auch per Email.
+landingpage.features.notifications.description=Ob neue Posts, Kommentare, Kontaktanfragen oder Gruppeneinladungen - du wirst über alles informiert. Auf Wunsch auch per Email.
 
 # --- Main page
 mainpage.backtotop=Nach oben
@@ -98,7 +98,7 @@ notification.obsolete_notification=Diese Nachricht existiert leider nicht mehr
 # --- base model messages
 post.try_with_content=Jo, fast. Probiere es noch einmal mit Inhalt ;-)
 post.join_group_first=Bitte tritt der Gruppe erst bei.
-post.post_on_stream_only=Du kannst nur Freunden auf den Stream schreiben!
+post.post_on_stream_only=Du kannst nur deinen Kontakten auf den Stream schreiben!
 post.profile_new_post=Neuer Post <span class="hp-bold">{0}</span> von <span class="hp-bold">{1}</span> auf deinem Newsstream
 post.group_new_post=Neues auf dem Newsstream der Gruppe <span class="hp-bold">{0}</span>
 post.comment_profile=Neues zum Post <span class="hp-bold">{0}</span> auf deinem Newsstream
@@ -110,9 +110,9 @@ post.date_colloquially_yesterday=Gestern um {0} Uhr
 post.date_colloquially_day_before_yesterday=Vorgestern um {0} Uhr
 post.date_colloquially_days=Vor {0} Tagen um {1} Uhr
 post.date_colloquially_date=Am {0} um {1} Uhr
-friendship.new_request=Neue Freundschaftsanfrage von <span class="hp-bold">{0}</span>
-friendship.request_decline=<span class="hp-bold">{0}</span> hat deine Freundschaftsanfrage abgelehnt
-friendship.request_successful=<span class="hp-bold">{0}</span> hat deine Freundschaftsanfrage angenommen
+friendship.new_request=Neue Kontaktanfrage von <span class="hp-bold">{0}</span>
+friendship.request_decline=<span class="hp-bold">{0}</span> hat deine Kontaktanfrage abgelehnt
+friendship.request_successful=<span class="hp-bold">{0}</span> hat deine Kontaktanfrage angenommen
 group.group_invitation=Du wurdest von {0} in die Gruppe <span class="hp-bold">{1}</span> eingeladen
 group.course_invitation=Du wurdest von {0} in den Kurs <span class="hp-bold">{1}</span> eingeladen
 group.group_new_request=Neue Anfrage für die Gruppe <span class="hp-bold">{0}</span>
