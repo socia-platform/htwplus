@@ -22,6 +22,79 @@ function autolinkUrls() {
 	});
 }
 
+function linkOlderComments() {
+    /*
+	 * SHOW OLDER COMMENTS
+	 */
+	$('.olderComments').each(function(){
+		var id = $(this).attr('href').split('-')[1];
+		var context = this;
+		$(this).click(function(){
+			if($(context).hasClass('open')){
+				$("#collapse-"+id).collapse('toggle');
+				$(context).html("Ältere Kommentare anzeigen...");
+				$(context).removeClass('open');
+				$(context).addClass('closed');
+			}
+			else if($(context).hasClass('closed')){
+				$("#collapse-"+id).collapse('toggle');
+				$(context).html("Ältere Kommentare ausblenden...");
+				$(context).removeClass('closed');
+				$(context).addClass('open');
+			}
+			else if($(context).hasClass('unloaded')){
+				var currentComments = $('#comments-' + id + ' > .media').length;
+				$(context).html("Ältere Kommentare ausblenden...");
+				$.ajax({
+					url: "/post/olderComments?id=" + id + "&current=" + currentComments,
+					type: "GET",
+					success: function(data){
+						$("#collapse-"+id).html(data);
+						$("#collapse-"+id).collapse('toggle');
+					}
+				});
+				$(context).addClass('open');
+				$(context).removeClass('unloaded');
+			}
+
+			return false;
+		});
+	});
+}
+
+function linkAddComments() {
+	/*
+	 * ADD COMMENTS
+	 */
+    $('.hp-comment-form').each(function () {
+        var context = $(this);
+        $(".commentSubmit", this).click(function () {
+            if (context.serializeArray()[0].value.trim() === "") {
+                $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
+                    $(this).animate({opacity: 1}, 100);
+                    $(this).focus();
+                }).focus();
+            } else {
+                $.ajax({
+                    url: context.attr('action'),
+                    type: "POST",
+                    data: context.serialize(),
+                    success: function (data) {
+                        context.before(data);
+                        context[0].reset();
+                    }, error: function () {
+                        $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
+                            $(this).animate({opacity: 1}, 100);
+                            $(this).focus();
+                        });
+                    }
+                });
+            }
+            return false;
+        });
+    });
+}
+
 function truncateBreadcrumb() {
 	var lastBreadcrumb = $("#hp-navbar-breadcrumb .breadcrumb > li:last-child");
 	var index = 3;	// first breadcrumb item which is hidden
@@ -220,6 +293,8 @@ $(document).ready(function () {
 		complete:function(){
 			$(".loading").hide();
 			autolinkUrls();
+			linkOlderComments();
+			linkAddComments();
 		}
 	});
 
@@ -251,74 +326,9 @@ $(document).ready(function () {
         });
     }
 
-	/*
-	 * ADD COMMENTS
-	 */
-    $('.hp-comment-form').each(function () {
-        var context = $(this);
-        $(".commentSubmit", this).click(function () {
-            if (context.serializeArray()[0].value.trim() === "") {
-                $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
-                    $(this).animate({opacity: 1}, 100);
-                    $(this).focus();
-                }).focus();
-            } else {
-                $.ajax({
-                    url: context.attr('action'),
-                    type: "POST",
-                    data: context.serialize(),
-                    success: function (data) {
-                        context.before(data);
-                        context[0].reset();
-                    }, error: function () {
-                        $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
-                            $(this).animate({opacity: 1}, 100);
-                            $(this).focus();
-                        });
-                    }
-                });
-            }
-            return false;
-        });
-    });
+    linkAddComments();
 
-	/*
-	 * SHOW OLDER COMMENTS
-	 */
-	$('.olderComments').each(function(){
-		var id = $(this).attr('href').split('-')[1];
-		var context = this;
-		$(this).click(function(){
-			if($(context).hasClass('open')){
-				$("#collapse-"+id).collapse('toggle');
-				$(context).html("Ältere Kommentare anzeigen...");
-				$(context).removeClass('open');
-				$(context).addClass('closed');
-			}
-			else if($(context).hasClass('closed')){
-				$("#collapse-"+id).collapse('toggle');
-				$(context).html("Ältere Kommentare ausblenden...");
-				$(context).removeClass('closed');
-				$(context).addClass('open');
-			}
-			else if($(context).hasClass('unloaded')){
-				var currentComments = $('#comments-' + id + ' > .media').length;
-				$(context).html("Ältere Kommentare ausblenden...");
-				$.ajax({
-					url: "/post/olderComments?id=" + id + "&current=" + currentComments,
-					type: "GET",
-					success: function(data){
-						$("#collapse-"+id).html(data);
-						$("#collapse-"+id).collapse('toggle');
-					}
-				});
-				$(context).addClass('open');
-				$(context).removeClass('unloaded');
-			}
-
-			return false;
-		});
-	});
+	linkOlderComments();
 
     autolinkUrls();
 
@@ -454,25 +464,25 @@ $('body').popover({
 /*
  * SET OR REMOVE BOOKMARKS
  */
-$('.hp-post-bookmark-icon').click(function(){
+$('.hp-pagination-container').on('click', 'a.hp-post-bookmark-icon', function() {
     var id = $(this).attr('href').split('-')[1];
     var context = this;
     var icon = this.children[0];
     $.ajax({
-        url: "/post/"+id + "/bookmark",
-        type: "PUT",
-        success: function(data){
-            if(data === "setBookmark") {
-                $(icon).addClass('glyphicon-heart');
-                $(icon).removeClass('glyphicon-heart-empty');
-                $(context).attr("data-original-title", "Post vergessen").tooltip('fixTitle').tooltip('show');
-            }
-            if(data === "removeBookmark") {
-                $(icon).addClass('glyphicon-heart-empty');
-                $(icon).removeClass('glyphicon-heart');
-                $(context).attr("data-original-title", "Post merken").tooltip('fixTitle').tooltip('show');
-            }
-        }
+     url: "/post/"+id + "/bookmark",
+     type: "PUT",
+     success: function(data){
+         if(data === "setBookmark") {
+             $(icon).addClass('glyphicon-heart');
+             $(icon).removeClass('glyphicon-heart-empty');
+             $(context).attr("data-original-title", "Post vergessen").tooltip('fixTitle').tooltip('show');
+         }
+         if(data === "removeBookmark") {
+             $(icon).addClass('glyphicon-heart-empty');
+             $(icon).removeClass('glyphicon-heart');
+             $(context).attr("data-original-title", "Post merken").tooltip('fixTitle').tooltip('show');
+         }
+     }
     });
 });
 
