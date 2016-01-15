@@ -1,4 +1,5 @@
 @(user: Account)
+@import models.enums.AccountRole;
 
 <div class="row">
     <div class="col-md-12" role="main">
@@ -49,39 +50,29 @@
                         }
                     </div>
                     <div class="clearfix"></div>
-                    <h2 class="title visible-md visible-lg">@user.name</h2>
-                    <h3 class="title visible-xs visible-sm">@user.name</h3>
+                    <h2 class="title visible-md visible-lg">@user.name @if(user.role != AccountRole.STUDENT && user.role != null) {<small>(@user.role.getDisplayName())</small>}</h2>
+                    <h3 class="title visible-xs visible-sm">@user.name @if(user.role != AccountRole.STUDENT && user.role != null) {<small>(@user.role.getDisplayName())</small>}</h3>
                 </div>
                 <div class="bottomline">
                     <small>
-                        <b>Studiengang: </b>@if(user.studycourse != null) {
-                        <span>@user.studycourse.title @if(user.degree != null) { (@user.degree) }</span>
-                        } else {
-                        <i>keine Angabe</i>
-                        }
-                        |
-                        <b>Semester: </b>@if(user.semester != null) {
-                        <span>@{user.semester + "."} Semester</span>
-                        } else {
-                        <i>keine Angabe</i>
-                        }
-                        |
-                        <b>Rolle: </b><span>@user.role.getDisplayName()</span>
-                        <p>
-                        <b>Email: </b>@if(user.email != null) {
-                        <a href="mailto:@user.email">@user.email</a>
+                        <span class="glyphicon glyphicon-education"></span>
+                        @if(user.studycourse != null) {
+                        <a href="/search?keyword=&mode=user&studycourse=@user.studycourse.title">@user.studycourse.title @if(user.degree != null) {(@user.degree)}</a>
                         } else { <i>keine Angabe</i> }
                         |
-                        <b>Homepage: </b>@if(user.homepage != null) {
-                        <a href='@user.homepage'>@user.homepage</a>
-                        } else { <i>keine Angabe</i> }
-                        </p>
+                        <span class="glyphicon glyphicon-envelope"></span>@if(user.email != null) {
+                            <a href="mailto:@user.email">@user.email</a>
+                            } else { <i>keine Angabe</i> }
+                        |
+                            <span class="glyphicon glyphicon-home"></span>@if(user.homepage != null) {
+                            <a href='@user.homepage'>@user.homepage</a>
+                            } else { <i>keine Angabe</i> }
+
                         @if(user.about != null) {
                         <br /><br />
                         <b>Über mich: </b>
                         <div class="text hp-white-space">@user.about</div>
                         }
-
                     </small>
                 </div>
             </div>

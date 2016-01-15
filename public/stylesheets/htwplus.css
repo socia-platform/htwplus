@@ -1469,10 +1469,8 @@ div.hp-avatar-default-9 {
 
 #hp-profile-header {
     position: relative;
-    border: 1px solid #ddd;
     padding: 0;
     margin-bottom: 20px;
-    min-height: 210px;
 }
 
 #hp-profile-header .links {
@@ -1531,7 +1529,7 @@ div.hp-avatar-default-9 {
 }
 
 #hp-profile-header .headline {
-     border-bottom: 1px solid #ddd;
+     border: 1px solid #ddd;
      padding-left: 10px;
      background-color: #f9f9f9;
 }
@@ -1541,6 +1539,10 @@ div.hp-avatar-default-9 {
     white-space: nowrap;
     overflow: hidden;
     padding-left: 190px;
+}
+
+#hp-profile-header .headline .title small {
+    font-size: 50%;
 }
 
 @media(max-width: 992px) {
@@ -1554,7 +1556,11 @@ div.hp-avatar-default-9 {
     padding-bottom: 20px;
     padding-top: 5px;
     padding-right: 10px;
-    padding-left: 10px;
+    padding-left: 175px;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    min-height: 104px;
 }
 
 #hp-profile-header .bottomline .hp-avatar-container {
@@ -1565,13 +1571,10 @@ div.hp-avatar-default-9 {
     display: inline-block;
 }
 
-#hp-profile-header .bottomline p {
-    padding-left: 190px;
-}
-
 @media(max-width: 992px) {
-    #hp-profile-header .bottomline p {
-        padding-left: 10px;
+    #hp-profile-header .bottomline {
+         padding-left: 10px;
+         min-height: inherit;
     }
 }
 
