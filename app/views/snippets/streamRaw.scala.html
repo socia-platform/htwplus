@@ -1,10 +1,9 @@
 @(posts: List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String)
-
-@import play._
+@import com.typesafe.config.ConfigFactory
 
 @if(posts != null) {
     @for(post <- posts) {
-        @views.html.snippets.postView2(post, postForm, models.Post.STREAM, Play.application().configuration().getInt("htwplus.comments.init"))
+        @views.html.snippets.postView(post, postForm, models.Post.STREAM, ConfigFactory.load().getInt("htwplus.comments.init"))
     }
 }
 

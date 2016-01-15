@@ -1,11 +1,10 @@
 @(post: Post, postForm: Form[Post])
-@import models.enums._
-@import play._
+@import com.typesafe.config.ConfigFactory
 
 @main("Post") {
     <div class="row">
         <div class="addmargin">
-                @views.html.snippets.postView2(post, postForm, models.Post.PROFILE, Play.application().configuration().getInt("htwplus.comments.singlepost"))
+                @views.html.snippets.postView(post, postForm, models.Post.PROFILE, ConfigFactory.load().getInt("htwplus.comments.singlepost"))
         </div>
     </div>
 }
