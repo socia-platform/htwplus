@@ -4,7 +4,7 @@
 @main(response.keyword){
 
     <div class="row">
-        <div class="col-sm-9" role="main">
+        <div class="col-sm-9 min-height" role="main">
             <div class="hp-notepad-content hp-pagination-container addmargin">
 
             @defining(Component.currentAccount()) { currentUser =>
@@ -55,16 +55,23 @@
                                                 <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
                                             </div>
                                             <small>
-                                                <span class="glyphicon glyphicon-user"></span>
-                                                @views.html.snippets.userLink(group.owner)
+                                                @if(!group.description.equals("")) {
+                                                <span>@group.description</span>
+                                                } else { <span><i>keine Beschreibung</i></span> }
                                                 <br />
                                             </small>
                                             <small>
-                                            @if(Secured.isMemberOfGroup(group, currentUser)) {
+                                                @if(Secured.isMemberOfGroup(group, currentUser)) {
                                                 <span class="glyphicon glyphicon-ok"></span>
                                                 <span> Du bist bereits Mitglied dieser Gruppe.</span>
-                                            }
+                                                <br />
+                                                }
                                             </small>
+                                            <small>
+                                                <span class="glyphicon glyphicon-user"></span>
+                                                @views.html.snippets.userLink(group.owner)
+                                            </small>
+
                                         </div>
                                     </div>
                                 </div>

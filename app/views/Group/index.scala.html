@@ -114,7 +114,7 @@
                     @if(!approvedCourses.isEmpty){
                         @views.html.Group.snippets.listCourses(approvedCourses, user)
                     } else {
-                        <p><i>Du bist noch keinem Kurs beigetreten. Jetzt einen Kurs <b><a href="/search?keyword=&mode=group">finden</a></b>@if(Secured.createCourse()) { oder einfach einen <b><a href="@routes.GroupController.create()">gründen</a></b>}.</i></p>
+                        <p><i>Du bist noch keinem Kurs beigetreten. Jetzt einen Kurs <b><a href="/search?keyword=&mode=group&grouptype=course">finden</a></b>@if(Secured.createCourse()) { oder einfach einen <b><a href="@routes.GroupController.create()">gründen</a></b>}.</i></p>
                     }
 
                 <hr />

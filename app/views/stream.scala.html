@@ -66,23 +66,26 @@
         </div>
         } else {
         <div class="hp-content-placeholder addmargin">
-            <h2><i>Hier gibts leider noch nichts.</i></h2>
+            <h2><i>Hier gibt es leider noch nichts zu sehen.</i></h2>
+            <hr>
             @if(filter.equals("account")) {
-            <h3><i>Wie wäre es mit deinem ersten Newsstream-Beitrag?</i></a></h3>
+            <h4><i>Wie wäre es mit deinem ersten Newsstream-Beitrag?</i></a></h4>
             }
             @if(filter.equals("group")) {
-            <h3><i>Wie wäre es mit neuen <a href="/search?keyword=&mode=group">Gruppen</a> oder <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a>?</i></h3>
+            <h4><i>Trete jetzt ein paar <a href="/search?keyword=&mode=group">Gruppen</a> oder <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a> bei!</i></h4>
             }
             @if(filter.equals("contact")) {
-            <h3><i>Wie wäre es mit neuen <a href="/search?keyword=&mode=user">Kontakten</a>?</i></a></h3>
+            <h4><i>Eventuell kennst du bereits ein paar <a href="/search?keyword=&mode=user">Personen</a>, mit denen du dich verbinden kannst?</i></a></h4>
             }
             @if(filter.equals("bookmark")) {
-            <h3><i>Wussest du, dass du dir wichtige Beiträge merken kannst?</i></h3>
+            <h4><i>Wussest du, dass du dir wichtige Beiträge merken kannst?</i></h4>
+            <br />
+            <h5><i>Klicke hierzu einfach auf das <span class="glyphicon glyphicon-heart-empty"></span>-Symobol neben jedem Post.</i></h5>
             }
             @if(filter.equals("all")) {
-            <h3><i>Wie wäre es mit neuen neuen <a href="/search?keyword=&mode=user">Kontakten</a>, <a href="/search?keyword=&mode=group">Gruppen</a> oder <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a></i></h3>
+            <h4><i>Wie wäre es mit neuen <a href="/search?keyword=&mode=user">Kontakten</a>, <a href="/search?keyword=&mode=group">Gruppen</a> oder <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a>?</i></h4>
             <br />
-            <h4><i>Alternativ kannst du auch anfangen etwas auf deinen Stream zu schreiben.</i></h4>
+            <h5><i>Alternativ kannst du auch anfangen etwas auf deinen Stream zu schreiben.</i></h5>
             }
         </div>
         }

@@ -1586,8 +1586,8 @@ div.hp-avatar-default-9 {
     text-align: center;
 }
 
-a.adjust{
-padding: 10px;
+a.adjust {
+    padding: 10px;
     display: block;
     font-weight: bold;
     background: #eee;
@@ -1598,4 +1598,10 @@ padding: 10px;
     width: 80px;
     text-align: center;
     text-decoration: none;
-    }
+}
+
+/*==== if content area is to short and site-nav starts floating around ==*/
+.min-height {
+    min-height: 500px;
+}
+
