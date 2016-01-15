@@ -3,7 +3,7 @@
 @import play._
 @import com.typesafe.config.ConfigFactory
 
-<div class="hp-pagination-container">
+<div class="hp-pagination-element">
     <div class="col-md-1" role="main">
         @if(post.owner.hasAvatar){
         <img alt="avatar" src='@routes.ProfileController.getAvatar(post.owner.id, "medium")' class="hidden-xs hidden-sm hp-avatar-medium"/>

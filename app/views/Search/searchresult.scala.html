@@ -5,7 +5,7 @@
 
     <div class="row">
         <div class="col-sm-9" role="main">
-            <div class="hp-notepad-content hp-content-container addmargin">
+            <div class="hp-notepad-content hp-pagination-container addmargin">
 
             @defining(Component.currentAccount()) { currentUser =>
 
@@ -20,7 +20,7 @@
                     @result match {
                         case account: Account => {
                             @if(response.searchMode.equals("user") || response.searchMode.equals("all")) {
-                                <div class="well searchresult-container hp-pagination-container">
+                                <div class="well searchresult-container hp-pagination-element">
                                     <div class="account-result media">
                                         @views.html.snippets.userLinkAvatar(account)
                                         <div class="media-body">
@@ -43,7 +43,7 @@
 
                         case group: Group => {
                             @if(response.searchMode.equals("group") || response.searchMode.equals("all")) {
-                                <div class="well searchresult-container hp-pagination-container">
+                                <div class="well searchresult-container hp-pagination-element">
                                     <div class="group-result media">
                                         <div class="pull-left">
                                         @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
@@ -73,7 +73,7 @@
 
                         case post: Post => {
                             @if(response.searchMode.equals("post") || response.searchMode.equals("all")) {
-                                <div class="well searchresult-container hp-pagination-container">
+                                <div class="well searchresult-container hp-pagination-element">
                                     <div class="post-result media">
                                         @views.html.snippets.userLinkAvatar(post.owner)
                                         <div class="media-body">
