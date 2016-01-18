@@ -46,6 +46,7 @@ public class PostgresInit implements DatabaseService {
             // create admin account if none exists
             Account adminAccount = accountManager.findByEmail(adminMail);
             if (adminAccount == null) {
+                adminAccount = new Account();
                 adminAccount.email = adminMail;
                 adminAccount.firstname = "Admin";
                 adminAccount.lastname = "@HTWplus";
