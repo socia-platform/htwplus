@@ -1023,7 +1023,8 @@ table td .hp-avatar-small {
 }
 
 .hp-avatar-list {
-    margin: 5px 5px 0px 0px;
+    display: inline-block;
+    margin: 0px 0px 5px 5px;
 }
 
 div[class*="hp-avatar-default-"] {
@@ -1563,11 +1564,12 @@ div.hp-avatar-default-9 {
     min-height: 104px;
 }
 
-#hp-profile-header .bottomline .hp-avatar-container {
+#hp-profile-header .bottomline .hp-avatar-wrapper {
     padding: 10px 0px;
 }
 
-#hp-profile-header .bottomline .hp-avatar-container div {
+#hp-profile-header .bottomline .hp-avatar-container {
+    max-width: 400px;
     display: inline-block;
 }
 

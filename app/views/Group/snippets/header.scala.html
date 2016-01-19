@@ -91,35 +91,39 @@
                 </div>
 
                 <div class="bottomline">
-                    <small>
+                    <div><small>
                         <span><b>Gründer: </b>@views.html.snippets.userLink(group.owner)</span>
                         <span>| <b>Medien: </b><a href="@routes.GroupController.media(group.id)">@group.media.size()
                             Datei(en)</a></span>
                         @if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
                         <span>| <b>Token: </b>@group.token</span>
-                        }
-                    <div class="hp-avatar-container">
-                        @for(index <- 0 until group.groupAccounts.toSeq.sortBy(_.createdAt).size) {
-                            @if(index < 10){
-                                <a class="hp-nohref hp-avatar-list" href="@routes.ProfileController.view(avatarList.get(index).account.id)" rel="tooltip"
-                                   data-original-title="@avatarList.get(index).account.name" data-container="body">
-                                    @if(avatarList.get(index).account.hasAvatar){
-                                    <img alt="avatar" src="@routes.ProfileController.getAvatar(avatarList.get(index).account.id)"
+                        }</small>
+                    </div>
+
+                    <div class="hp-avatar-wrapper">
+                        <div clasS="hp-avatar-container">
+                        @for((item, index) <- group.groupAccounts.toSeq.sortBy(_.createdAt).zipWithIndex) {
+                                <a class="hp-nohref hp-avatar-list" href="@routes.ProfileController.view(item.account.id)" rel="tooltip"
+                                   data-original-title="@item.account.name" data-container="body">
+                                    @if(item.account.hasAvatar){
+                                    <img alt="avatar" src="@routes.ProfileController.getAvatar(item.account.id)"
                                          class="hp-avatar-small"/>
                                     } else {
-                                    <div class="hp-avatar-small hp-avatar-default-@avatarList.get(index).account.avatar">@avatarList.get(index).account.getInitials</div>
+                                    <div class="hp-avatar-small hp-avatar-default-@item.account.avatar">@item.account.getInitials</div>
                                     }
                                 </a>
-                            }
+
                         }
+                        </div>
                     </div>
-                    @if(avatarList.size > 10) { <div><small><a href="#">... und @(avatarList.size-10) mehr</a></small></div> }
+
+                    <div><small>
                     @if(!group.description.isEmpty()) {
                         <br /><br />
                         <b>Beschreibung</b>
                         <div class="text hp-white-space">@group.description</div>
-                    }
-                    </small>
+                    }</small>
+                    </div>
                 </div>
             </div>
         </div>
