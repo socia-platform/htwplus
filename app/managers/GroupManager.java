@@ -76,7 +76,7 @@ public class GroupManager implements BaseManager {
         // Delete Elasticsearch document
         elasticsearchService.delete(group);
 
-        JPA.em().remove(this);
+        JPA.em().remove(group);
     }
 
     public Group findById(Long id) {
