@@ -66,37 +66,39 @@
         </div>
         } else {
         <div class="hp-content-placeholder addmargin">
-            <h2><i>Hier gibt es leider noch nichts zu sehen.</i></h2>
-            <hr>
             @if(filter.equals("account")) {
-            <h4><i>Wie wäre es mit deinem ersten Newsstream-Beitrag?</i></a></h4>
+            <h4>Du hast noch keinen Beitrag geschrieben.</h4>
+            <h4>Wie wäre es mit einem ersten Newsstream-Eintrag?</h4>
             }
             @if(filter.equals("group")) {
-            <h4><i>Trete jetzt ein paar <a href="/search?keyword=&mode=group">Gruppen</a> oder <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a> bei!</i></h4>
+            <h4>Noch kein Beitrag aus Gruppen oder Kursen.</h4>
+            <h4>Trete jetzt ein paar <a href="/search?keyword=&mode=group">Gruppen</a> oder <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a> bei!</h4>
             }
             @if(filter.equals("contact")) {
-            <h4><i>Eventuell kennst du bereits ein paar <a href="/search?keyword=&mode=user">Personen</a>, mit denen du dich verbinden kannst?</i></a></h4>
+            <h4>Noch kein Beitrag von deinen Kontakten.</h4>
+            <h4>Möchtest du <a href="/search?keyword=&mode=user">Personen suchen</a> mit denen du dich verbinden kannst?</a></h4>
             }
             @if(filter.equals("bookmark")) {
-            <h4><i>Wussest du, dass du dir wichtige Beiträge merken kannst?</i></h4>
-            <br />
-            <h5><i>Klicke hierzu einfach auf das <span class="glyphicon glyphicon-heart-empty"></span>-Symobol neben jedem Post.</i></h5>
+            <h4>Wussest du, dass du dir wichtige Beiträge merken kannst?</h4>
+            <h4>Klicke hierzu einfach auf das <span class="glyphicon glyphicon-heart-empty"></span>-Symobol neben jedem Post.</h4>
             }
             @if(filter.equals("all")) {
-            <h4><i>Wie wäre es mit neuen <a href="/search?keyword=&mode=user">Kontakten</a>, <a href="/search?keyword=&mode=group">Gruppen</a> oder <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a>?</i></h4>
-            <br />
-            <h5><i>Alternativ kannst du auch anfangen etwas auf deinen Stream zu schreiben.</i></h5>
+            <h2><b>Hallo @currentUser.firstname, willkommen auf HTWplus!</b></h2>
+            <hr>
+            <h4>Hier gibt es leider noch nicht viel zu sehen.</h4>
+            <h4>Dein Newsfeed lebt von Beiträgen aus <a href="/search?keyword=&mode=group">Gruppen</a>, <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a> oder <a href="/search?keyword=&mode=user">Kontakten</a>.</h4>
+            <h4>Über die <a href="/search?keyword=">Suche</a> findest du sicherlich ganz schnell ein paar neue Verbindungen!</h4>
             }
         </div>
         }
     </div>
     <div class="col-md-2 visible-md visible-lg" role="complementary">
         <div class="hp-newsfeed-sitenav">
-            <a href='@routes.Application.index()' class='@if(filter.equals("all")) {active}'>Alles</a>
-            <a href='@routes.Application.stream("account")' class='@if(filter.equals("account")) {active}'>Eigene Posts</a>
-            <a href='@routes.Application.stream("bookmark")' class='@if(filter.equals("bookmark")) {active}'>Gemerkte Posts</a>
-            <a href='@routes.Application.stream("group")' class='@if(filter.equals("group")) {active}'>Gruppen</a>
-            <a href='@routes.Application.stream("contact")' class='@if(filter.equals("contact")) {active}'>Kontakte</a>
+            <a href='@routes.Application.index()' title="Alle Beiträge" class='@if(filter.equals("all")) {active}'>Alles</a>
+            <a href='@routes.Application.stream("account")' title="Deine Beiträge" class='@if(filter.equals("account")) {active}'>Eigene Posts</a>
+            <a href='@routes.Application.stream("bookmark")' title="Von dir gemerkte Beiträge" class='@if(filter.equals("bookmark")) {active}'>Gemerkte Posts</a>
+            <a href='@routes.Application.stream("group")' title="Beiträge aus Gruppen" class='@if(filter.equals("group")) {active}'>Gruppen</a>
+            <a href='@routes.Application.stream("contact")' title="Beiträge von deinen Kontakten" class='@if(filter.equals("contact")) {active}'>Kontakte</a>
         </div>
     </div>
 </div>
