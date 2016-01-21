@@ -1604,6 +1604,6 @@ a.adjust {
 
 /*==== if content area is to short and site-nav starts floating around ==*/
 .min-height {
-    min-height: 500px;
+    min-height: 600px;
 }
 

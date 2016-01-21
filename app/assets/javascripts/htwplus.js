@@ -488,7 +488,7 @@ truncateBreadcrumb();
  * EXPAND PROFILE/GROUP TEXT
  */
 $('#hp-profile-header .bottomline .text').readmore({
-    collapsedHeight: 106,
+    collapsedHeight: 47,
     moreLink: '<a href="#">... mehr</a>',
     lessLink: '<a href="#">schließen</a>'
 });

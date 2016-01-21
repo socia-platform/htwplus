@@ -29,11 +29,7 @@
 				@if(Secured.isOwnerOfGroup(course, user)) {
 					<a href="@routes.GroupController.stream(course.id)"><b>@course.title</b></a>
 				} else {
-					@if(Secured.viewGroup(course)) {
-						<a href="@routes.GroupController.stream(course.id)">@course.title</a>
-					} else {
-						<a class="no-drop" rel="tooltip" data-original-title="Du musst dem Kurs erst beitreten" data-container="body">@course.title</a>
-					}
+					<a href="@routes.GroupController.stream(course.id)">@course.title</a>
 				}
 			</td>
 			<td>

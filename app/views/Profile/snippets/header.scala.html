@@ -57,7 +57,7 @@
                     <small>
                         <span class="glyphicon glyphicon-education"></span>
                         @if(user.studycourse != null) {
-                        <a href="/search?keyword=&mode=user&studycourse=@user.studycourse.title">@user.studycourse.title @if(user.degree != null) {(@user.degree)}</a>
+                        <a href="/search?keyword=&mode=user&studycourse=@helper.urlEncode(user.studycourse.title)">@user.studycourse.title @if(user.degree != null) {(@user.degree)}</a>
                         } else { <i>keine Angabe</i> }
                         |
                         <span class="glyphicon glyphicon-envelope"></span>@if(user.email != null) {

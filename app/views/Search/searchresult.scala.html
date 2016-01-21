@@ -53,27 +53,26 @@
                                         <div class="media-body">
                                             <div class="media-heading">
                                                 <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
+                                                <small>
+                                                @if(Secured.isMemberOfGroup(group, currentUser)) {
+                                                <span class="glyphicon glyphicon-ok" title="Du bist bereits Mitglied dieser Gruppe"></span>
+                                                }
+                                                </small>
                                             </div>
                                             <small>
+                                                <b>Beschreibung:</b>
                                                 @if(!group.description.equals("")) {
                                                 <span>@group.description</span>
-                                                } else { <span><i>keine Beschreibung</i></span> }
+                                                } else { <i>keine Beschreibung</i> }
                                                 <br />
-                                            </small>
-                                            <small>
-                                                @if(Secured.isMemberOfGroup(group, currentUser)) {
-                                                <span class="glyphicon glyphicon-ok"></span>
-                                                <span> Du bist bereits Mitglied dieser Gruppe.</span>
-                                                <br />
-                                                }
-                                            </small>
-                                            <small>
-                                                <span class="glyphicon glyphicon-user"></span>
+
+                                                <b>Gründer:</b>
                                                 @views.html.snippets.userLink(group.owner)
                                                 <br />
-                                            </small>
-                                            <small>
-                                                <span>@group.groupAccounts.size Mitglieder</span>
+
+                                                <b>Mitglieder:</b>
+                                                <span>@group.groupAccounts.size</span>
+
                                             </small>
                                         </div>
                                     </div>
