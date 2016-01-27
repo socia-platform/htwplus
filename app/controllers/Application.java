@@ -16,6 +16,7 @@ import play.Logger;
 import play.Routes;
 import play.data.Form;
 import play.db.jpa.Transactional;
+import play.i18n.Messages;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.*;
@@ -115,7 +116,6 @@ public class Application extends BaseController {
 
     @Security.Authenticated(Secured.class)
     public Result search(int page) throws ExecutionException, InterruptedException {
-        Navigation.set(Level.SEARCH);
 
         Account currentAccount = Component.currentAccount();
         String keyword = Form.form().bindFromRequest().field("keyword").value();
@@ -125,8 +125,6 @@ public class Application extends BaseController {
         String semesterParam = Form.form().bindFromRequest().field("semester").value();
         String roleParam = Form.form().bindFromRequest().field("role").value();
         String grouptypeParam = Form.form().bindFromRequest().field("grouptype").value();
-
-        Navigation.set(Level.SEARCH, "\"" + keyword + "\"");
 
         HashMap<String, String[]> facets = new HashMap<>();
         facets.put("studycourse", buildUserFacetList(studycourseParam));
@@ -161,22 +159,16 @@ public class Application extends BaseController {
             return ok(views.html.Search.search.render());
         }
 
+        Navigation.set(Level.SEARCH, elasticsearchResponse.getDocumentCount() + " Ergebnisse zu \""+ keyword +"\"");
+        if (!mode.isEmpty() && !mode.equals("all")) {
+            Navigation.set(Level.SEARCH, elasticsearchResponse.getDocumentCount() + " Ergebnisse zu \""+ keyword +"\"", Messages.get("search."+mode), null);
+        }
+
         return ok(views.html.Search.searchresult.render(
                 page,
                 LIMIT,
                 elasticsearchResponse));
     }
-
-    /**
-     * searchResponse.resultList,
-     * searchResponse.response.getTookInMillis(),
-     * searchResponse.getDocumentCount(),
-     * searchResponse.lUserDocuments,
-     * searchResponse.lGroupDocuments,
-     * searchResponse.lPostDocuments
-     *
-     * @return
-     */
 
     public Result error() {
         Navigation.set("404");
@@ -186,7 +178,6 @@ public class Application extends BaseController {
     public Result feedback() {
         Navigation.set("Feedback");
         return ok(feedback.render(postForm));
-
     }
 
     public Result addFeedback() {

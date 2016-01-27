@@ -8,10 +8,8 @@
             <div class="hp-notepad-content hp-pagination-container addmargin">
 
             @defining(Component.currentAccount()) { currentUser =>
-
-                <h3>@response.getDocumentCount @Html(Messages("search.headline", truncate(response.keyword,30)))</h3>
+            <br />
             @ctx.args.put("searchKeyword", response.keyword)
-                <br />
 
             @if(response.getDocumentCount != 0) {
 

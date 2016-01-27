@@ -6,15 +6,15 @@
         <hr>
         <div class="hp-searchnav">
             <span class="glyphicon glyphicon-user"></span>
-            <a class="@if(response.lUserDocuments == 0) {disabled}" href='/search?keyword=@response.keyword&mode=user'>Personen </a><small>(@response.lUserDocuments)</small>
+            <a class="@if(response.lUserDocuments == 0) {disabled}" href='/search?keyword=@response.keyword&mode=user'>@Messages("search.user")</a><small> (@response.lUserDocuments)</small>
         </div>
         <div class="hp-searchnav">
             <span class="glyphicon glyphicon-list"></span>
-            <a class="@if(response.lGroupDocuments == 0) {disabled}" href='/search?keyword=@response.keyword&mode=group'>Gruppen und Kurse </a><small>(@response.lGroupDocuments)</small>
+            <a class="@if(response.lGroupDocuments == 0) {disabled}" href='/search?keyword=@response.keyword&mode=group'>@Messages("search.group")</a><small> (@response.lGroupDocuments)</small>
         </div>
         <div class="hp-searchnav">
             <span class="glyphicon glyphicon-comment"></span>
-            <a class="@if(response.lPostDocuments == 0) {disabled}" href='/search?keyword=@response.keyword&mode=post'>Post und Kommentare </a><small>(@response.lPostDocuments)</small>
+            <a class="@if(response.lPostDocuments == 0) {disabled}" href='/search?keyword=@response.keyword&mode=post'>@Messages("search.post")</a><small> (@response.lPostDocuments)</small>
         </div>
     </div>
 </div>

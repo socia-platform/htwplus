@@ -16,7 +16,7 @@
                 <li><a href="@Navigation.getParentCall()">@truncate(Navigation.getParentTitle(),30)</a></li>
             }
             @if(Navigation.getTitle() != null){
-                <li>@truncate(Navigation.getTitle(),30)</li>
+                <li>@Navigation.getTitle()</li>
             }
         </ol>
     </div>
