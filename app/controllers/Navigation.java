@@ -23,6 +23,7 @@ public class Navigation {
 		callMapping.put(Level.HELP, controllers.routes.Application.help());
 		callMapping.put(Level.ADMIN, controllers.routes.AdminController.index());
         callMapping.put(Level.NOTIFICATIONS, controllers.routes.NotificationController.showAll(1));
+        callMapping.put(Level.SEARCH, controllers.routes.Application.search(1));
 	}
 	
 	private static Map<Level,String> titleMapping = new HashMap<Navigation.Level, String>();
@@ -65,6 +66,16 @@ public class Navigation {
 		ctx.args.put(parentTitleIdent, parentTitle);
 		ctx.args.put(parentCallIdent, parentCall);
 	}
+
+    public static String getUriWithoutPagination() {
+        String currentURI = Context.current().request().uri();
+        String returnURI = currentURI;
+
+        // will remove &page=X&raw=true/false from currentURI
+        if(currentURI.contains("&page=")) returnURI = currentURI.substring(0, currentURI.indexOf("&page="));
+
+        return returnURI;
+    }
 	
 	public static Level getLevel() {
 		return (Level)Context.current().args.get(levelIdent);

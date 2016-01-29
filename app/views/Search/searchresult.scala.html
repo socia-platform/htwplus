@@ -1,46 +1,34 @@
-@(keyword: String, searchMode: String, currentPage: Int, searchLimit: Int, searchResults: List[Object], searchDuration: Long, searchHits: Long, searchUserHits: Long, searchGroupHits: Long, searchPostHits: Long)
+@(currentPage: Integer, searchLimit: Integer, response : models.services.ElasticsearchResponse)
 @import helper._
-@import play._
 @import models.enums._
-@import java.math.BigInteger; var paginationSearchHits=0;
-@main(keyword){
+@main(response.keyword){
+
     <div class="row">
-        <div class="col-lg-12" role="main">
+        <div class="col-sm-9" role="main">
             <div class="hp-notepad-content addmargin">
 
             @defining(Component.currentAccount()) { currentUser =>
 
-                <h2>@searchHits @Html(Messages("search.headline", truncate(keyword,30)))</h2>
-            @ctx.args.put("searchKeyword", keyword)
+                <h3>@response.getDocumentCount @Html(Messages("search.headline", truncate(response.keyword,30)))</h3>
+            @ctx.args.put("searchKeyword", response.keyword)
                 <br />
 
-            @if(searchHits != 0) {
+            @if(response.getDocumentCount != 0) {
 
-                @if(searchMode.equals("all")){ @{paginationSearchHits = searchHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
-                <a class="@if(searchHits == 0) {disabled}" href='/search?keyword=@keyword&mode=all'>Alles (@searchHits)</a><span> | </span>
-                @if(searchMode.equals("user")){ @{paginationSearchHits = searchUserHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
-                <a class="@if(searchUserHits == 0) {disabled}" href='/search?keyword=@keyword&mode=user'>Personen (@searchUserHits)</a><span> | </span>
-                @if(searchMode.equals("group")){ @{paginationSearchHits = searchGroupHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
-                <a class="@if(searchGroupHits == 0) {disabled}" href='/search?keyword=@keyword&mode=group'>Gruppen und Kurse (@searchGroupHits)</a><span> | </span>
-                @if(searchMode.equals("post")){ @{paginationSearchHits = searchPostHits.toInt} <span class="glyphicon glyphicon-chevron-right"></span> }
-                <a class="@if(searchPostHits == 0) {disabled}" href='/search?keyword=@keyword&mode=post'>Post und Kommentare (@searchPostHits)</a>
-                <br/>
-                <br />
-
-                @for(result <- searchResults) {
+                @for(result <- response.resultList) {
 
                     @result match {
                         case account: Account => {
-                            @if(searchMode.equals("user") || searchMode.equals("all")) {
+                            @if(response.searchMode.equals("user") || response.searchMode.equals("all")) {
                                 <div class="well searchresult-container hp-pagination-container">
                                     <div class="account-result media">
                                         @views.html.snippets.userLinkAvatar(account)
                                         <div class="media-body">
                                             <div class="media-heading">
-                                            @views.html.snippets.userLink(account)
+                                            @views.html.snippets.userLink(account, "top")
                                             </div>
                                             <small>
-                                            @if(Friendship.alreadyFriendly(currentUser, account)) {
+                                            @if(managers.FriendshipManager.alreadyFriendly(currentUser, account)) {
                                                 <span class="glyphicon glyphicon-ok"></span>
                                                 <span> Ihr seid bereits befreundet.</span>
                                             } else {
@@ -54,21 +42,37 @@
                         }
 
                         case group: Group => {
-                            @if(searchMode.equals("group") || searchMode.equals("all")) {
+                            @if(response.searchMode.equals("group") || response.searchMode.equals("all")) {
                                 <div class="well searchresult-container hp-pagination-container">
-                                    <div class="group-result">
+                                    <div class="group-result media">
+                                        <div class="pull-left">
                                         @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
                                         @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
                                         @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
-                                        <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
-                                        @if(Secured.isMemberOfGroup(group, currentUser)) { <span class="glyphicon glyphicon-ok"></span> }
+                                        </div>
+                                        <div class="media-body">
+                                            <div class="media-heading">
+                                                <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
+                                            </div>
+                                            <small>
+                                                <span class="glyphicon glyphicon-user"></span>
+                                                @views.html.snippets.userLink(group.owner)
+                                                <br />
+                                            </small>
+                                            <small>
+                                            @if(Secured.isMemberOfGroup(group, currentUser)) {
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                                <span> Du bist bereits Mitglied dieser Gruppe.</span>
+                                            }
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
                             }
                         }
 
                         case post: Post => {
-                            @if(searchMode.equals("post") || searchMode.equals("all")) {
+                            @if(response.searchMode.equals("post") || response.searchMode.equals("all")) {
                                 <div class="well searchresult-container hp-pagination-container">
                                     <div class="post-result media">
                                         @views.html.snippets.userLinkAvatar(post.owner)
@@ -92,10 +96,15 @@
                         case _ => { @result }
                     }
                 }
-    @views.html.pagination(paginationSearchHits, searchLimit, currentPage, "/search?keyword="+keyword+"&mode="+searchMode+"", "&")
-    }
-}
-</div>
-</div>
-</div>
+                @views.html.pagination(response.getDocumentCount.toInt, searchLimit, currentPage, Navigation.getUriWithoutPagination, "&", true)
+            }
+            }
+            </div>
+        </div>
+        @if(response.searchMode.equals("all")) { @views.html.Search.snippets.siteNavigation(response) }
+        @if(response.searchMode.equals("user")) { @views.html.Search.snippets.userSiteNavigation(response) }
+        @if(response.searchMode.equals("group")) { @views.html.Search.snippets.groupSiteNavigation(response) }
+        @if(response.searchMode.equals("post")) { @views.html.Search.snippets.postSiteNavigation(response) }
+    </div>
+
 }

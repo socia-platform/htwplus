@@ -17,6 +17,8 @@ format.real=Real
 error.invalid=Invalid value
 error.required=Bitte gib hier etwas ein!
 error.title=Dieser Name ist bereits vergeben!
+error.length=Die Beschreibung darf nicht länger als 255 Zeichen sein!
+error.homepage=Bitte wähle eine gültige URL ( http://... )
 error.number=Numeric value expected
 error.real=Real number value expected
 error.real.precision=Real number value with no more than {0} digit(s) including {1} decimal(s) expected
@@ -139,6 +141,9 @@ admin.delete_account.wrongconfirm=Wenn du den Account löschen willst, gib zur B
 
 # --- search
 search.headline=Suchergebnisse für <b>{0}</b>
+search.group.grouptype.open=Offen
+search.group.grouptype.close=Geschlossen
+search.group.grouptype.course=Kurs
 
 # --- Profile Editing
 profile.delete.nopassword=Wenn du deinen Account löschen willst, gib dein Passwort zur Bestätigung ein!

@@ -4,8 +4,9 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import managers.AccountManager;
+import managers.FriendshipManager;
 import models.Account;
-import models.Friendship;
 import models.actors.WebSocketActor;
 import play.Logger;
 import play.db.jpa.JPA;
@@ -14,8 +15,11 @@ import play.libs.F;
 import play.libs.Json;
 import play.mvc.WebSocket;
 
+import javax.inject.Inject;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * WebSocket service that is handling all active WebSocket actors.
@@ -28,6 +32,9 @@ public class WebSocketService {
     public static final String WS_METHOD_RECEIVE_PING = "Ping";
     public static final String WS_RESPONSE_OK = "OK";
     public static final String WS_RESPONSE_ERROR = "ERROR";
+
+    @Inject
+    AccountManager accountManager;
 
     /**
      * Singleton instance
@@ -211,7 +218,7 @@ public class WebSocketService {
             return JPA.withTransaction(new F.Function0<Account>() {
                 @Override
                 public Account apply() throws Throwable {
-                    return Account.findById(accountId);
+                    return accountManager.findById(accountId);
                 }
             });
         } catch (Throwable throwable) {
@@ -232,7 +239,7 @@ public class WebSocketService {
             return JPA.withTransaction(new F.Function0<Boolean>() {
                 @Override
                 public Boolean apply() throws Throwable {
-                    return Friendship.alreadyFriendly(a, b);
+                    return FriendshipManager.alreadyFriendly(a, b);
                 }
             });
         } catch (Throwable throwable) {
