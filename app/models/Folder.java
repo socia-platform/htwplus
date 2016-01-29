@@ -37,25 +37,6 @@ public class Folder extends BaseModel {
     @Transient
     List<Folder> folderList = new ArrayList<>();
 
-    public static Folder findById(long id) {
-        return JPA.em().find(Folder.class, id);
-    }
-
-    @Override
-    public void create() {
-        JPA.em().persist(this);
-    }
-
-    @Override
-    public void update() {
-        JPA.em().merge(this);
-    }
-
-    @Override
-    public void delete() {
-        JPA.em().remove(this);
-    }
-
     public Folder() {}
 
     public Folder(String name, Account owner, Folder parent, Group group, Account account) {
@@ -64,7 +45,6 @@ public class Folder extends BaseModel {
         this.parent = parent;
         this.group = group;
         this.account = account;
-        create();
     }
 
     public Folder findRoot(Folder folder) {

@@ -30,7 +30,7 @@
         @if(!folderList.isEmpty) {
             @for(folder <- folderList) {
             <tr>
-                <td><input name="selection" value="@folder.id" type="checkbox"></td>
+                <td><span class="glyphicon glyphicon-folder-close"></span></td>
                 <td><a href="@routes.GroupController.media(groupId, folder.id)" rel="tooltip" data-delay="500" data-original-title="von ">@folder.name</a></td>
                 <td>@folder.createdAt.format("dd.MM.yyyy")</td>
                 <td>Ordner</td>

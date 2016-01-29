@@ -47,6 +47,9 @@ public class GroupController extends BaseController {
     @Inject
     AccountManager accountManager;
 
+    @Inject
+    FolderManager folderManager;
+
     static Form<Group> groupForm = Form.form(Group.class);
     static Form<Folder> folderForm = Form.form(Folder.class);
     static Form<Post> postForm = Form.form(Post.class);
@@ -107,7 +110,7 @@ public class GroupController extends BaseController {
         Folder folder;
 
         if(folderId != 0) {
-            folder = Folder.findById(folderId);
+            folder = folderManager.findById(folderId);
         } else {
             folder = group.mediaFolder;
         }
@@ -585,7 +588,7 @@ public class GroupController extends BaseController {
     }
 
     public Result createFolder(Long folderId) {
-        Folder parentFolder = Folder.findById(folderId);
+        Folder parentFolder = folderManager.findById(folderId);
         Group group = parentFolder.findRoot(parentFolder).group;
         Folder folder = null;
 
@@ -593,7 +596,7 @@ public class GroupController extends BaseController {
         if(Secured.viewGroup(group)) {
             Logger.debug("Create Group Folder...");
             folder = new Folder(filledForm.data().get("name"), Component.currentAccount(), parentFolder, null, null);
-            folder.create();
+            folderManager.create(folder);
             Logger.debug("Group Folder -> created");
         }
         return redirect(routes.GroupController.media(group.id, folder.id));

@@ -29,8 +29,13 @@ public class GroupManager implements BaseManager {
     @Inject
     NotificationManager notificationManager;
 
+    @Inject
+    FolderManager folderManager;
+
     public void createWithGroupAccount(Group group, Account account) {
         group.owner = account;
+        group.mediaFolder = new Folder("_"+group.title, account, null, group, null);
+        folderManager.create(group.mediaFolder);
         create(group);
         groupAccountManager.create(new GroupAccount(group, account, LinkType.establish));
     }
@@ -66,7 +71,7 @@ public class GroupManager implements BaseManager {
         }
 
         // delete media
-        for (Media media : group.media) {
+        for (Media media : group.mediaFolder.files) {
             mediaManager.delete(media);
         }
 
