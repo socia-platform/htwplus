@@ -59,6 +59,11 @@ public class AccountManager implements BaseManager {
 
         account.name = account.firstname + " " + account.lastname;
         JPA.em().merge(account);
+        try {
+            elasticsearchService.index(account);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
