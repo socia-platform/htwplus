@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import play.Logger;
 import play.Play;
 import play.db.jpa.JPA;
+import java.nio.file.Files;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -127,7 +128,7 @@ public class MediaManager implements BaseManager {
             throw new Exception("File exists already");
         }
         newFile.getParentFile().mkdirs();
-        media.file.renameTo(newFile);
+        Files.move(media.file.toPath(), newFile.toPath());
         if (!newFile.exists()) {
             throw new Exception("Could not upload file");
         }
