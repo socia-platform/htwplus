@@ -26,7 +26,7 @@ POST        /group/create                              controllers.GroupControll
 GET         /group/create                              controllers.GroupController.create()
 GET         /group/:id                                 controllers.GroupController.view(id:Long)
 GET         /group/:id/stream                          controllers.GroupController.stream(id:Long, page: Int ?= 1, raw: Boolean ?= false)
-GET         /group/:id/media                           controllers.GroupController.media(id:Long)
+GET         /group/:id/media                           controllers.GroupController.media(id:Long, folderId: Long ?= 0)
 GET         /group/:id/edit                            controllers.GroupController.edit(id:Long)
 POST        /group/:id/update                          controllers.GroupController.update(id:Long)
 GET         /group/:id/delete                          controllers.GroupController.delete(id:Long)
@@ -40,6 +40,7 @@ POST        /group/:id/invite                          controllers.GroupControll
 GET         /group/:id/acceptInvite/:accountId         controllers.GroupController.acceptInvitation(id:Long, accountId: Long)
 GET         /group/:id/declineInvite/:accountId        controllers.GroupController.declineInvitation(id:Long, accountId: Long)
 POST        /group/:id/validate                        controllers.GroupController.validateToken(id:Long)
+POST        /group/:id/folder                          controllers.GroupController.createFolder(id:Long)
 
 #Post and Comments
 GET         /post/olderComments                        controllers.PostController.getOlderComments(id:Long,current:Integer)
@@ -78,7 +79,7 @@ GET         /friend/:friendshipId/cancel               controllers.FriendshipCon
 
 
 # Media
-POST        /media/:target/upload/:id                  controllers.MediaController.upload(target:String,id:Long)
+POST        /media/:target/upload/:folderId            controllers.MediaController.upload(target:String,folderId:Long)
 POST        /media/multiple/:target/:id                controllers.MediaController.multiView(target:String,id:Long)
 GET         /media/:id                                 controllers.MediaController.view(id:Long)
 GET         /media/:id/delete                          controllers.MediaController.delete(id:Long)

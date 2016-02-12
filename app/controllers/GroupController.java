@@ -1,11 +1,15 @@
 package controllers;
 
+import java.util.Collections;
+import java.util.List;
+
 import controllers.Navigation.Level;
 import managers.*;
 import models.*;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.NotificationService;
+import play.Logger;
 import play.Play;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -43,7 +47,11 @@ public class GroupController extends BaseController {
     @Inject
     AccountManager accountManager;
 
+    @Inject
+    FolderManager folderManager;
+
     static Form<Group> groupForm = Form.form(Group.class);
+    static Form<Folder> folderForm = Form.form(Folder.class);
     static Form<Post> postForm = Form.form(Post.class);
     static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
     static final int PAGE = 1;
@@ -96,9 +104,16 @@ public class GroupController extends BaseController {
     }
 
     @Transactional(readOnly = true)
-    public Result media(Long id) {
+    public Result media(Long id, Long folderId) {
         Form<Media> mediaForm = Form.form(Media.class);
         Group group = groupManager.findById(id);
+        Folder folder;
+
+        if(folderId != 0) {
+            folder = folderManager.findById(folderId);
+        } else {
+            folder = group.mediaFolder;
+        }
 
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
@@ -109,12 +124,15 @@ public class GroupController extends BaseController {
         }
 
         Navigation.set(Level.GROUPS, "Media", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
-        List<Media> mediaSet = group.media;
+        List<Media> mediaSet = folder.files;
+        List<Folder> folderList = folder.folders;
+        List<Folder> navigationFolder = folder.findAncestors(folder);
+        Collections.reverse(navigationFolder);
         // hacky, but prevents accessing MediaController from view. use dto instead
         for (Media media : mediaSet) {
             media.sizeInByte = mediaManager.bytesToString(media.size, false);
         }
-        return ok(media.render(group, mediaForm, mediaSet));
+        return ok(media.render(group, mediaForm, mediaSet, folderList, folder, navigationFolder, folderForm));
 
     }
 
@@ -567,5 +585,20 @@ public class GroupController extends BaseController {
 
         flash("success", "Einladung abgelehnt!");
         return redirect(controllers.routes.GroupController.index());
+    }
+
+    public Result createFolder(Long folderId) {
+        Folder parentFolder = folderManager.findById(folderId);
+        Group group = parentFolder.findRoot(parentFolder).group;
+        Folder folder = null;
+
+        Form<Folder> filledForm = folderForm.bindFromRequest();
+        if(Secured.viewGroup(group)) {
+            Logger.debug("Create Group Folder...");
+            folder = new Folder(filledForm.data().get("name"), Component.currentAccount(), parentFolder, null, null);
+            folderManager.create(folder);
+            Logger.debug("Group Folder -> created");
+        }
+        return redirect(routes.GroupController.media(group.id, folder.id));
     }
 }

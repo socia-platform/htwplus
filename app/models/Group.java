@@ -46,6 +46,12 @@ public class Group extends BaseNotifiable implements INotifiable {
     @OrderBy("createdAt DESC")
     public List<Media> media;
 
+    @OneToMany(mappedBy = "group")
+    public List<Folder> folders;
+
+    @OneToOne
+    public Folder mediaFolder;
+
     public void setTitle(String title) {
         this.title = title.trim();
     }

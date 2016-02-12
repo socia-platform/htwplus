@@ -87,7 +87,7 @@ public class MediaManager implements BaseManager {
     }
 
     public boolean existsInGroup(Media media, Group group) {
-        List<Media> mediaList = group.media;
+        List<Media> mediaList = group.mediaFolder.files;
         for (Media m : mediaList) {
             if (m.title.equals(media.title)) {
                 return true;

@@ -1,9 +1,27 @@
 package controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import managers.FolderManager;
+import models.Folder;
+import models.services.NotificationService;
+import org.apache.commons.io.FileUtils;
+
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import managers.GroupManager;
 import managers.MediaManager;
+
 import models.Group;
 import models.Media;
 import models.services.NotificationService;
@@ -19,17 +37,7 @@ import play.mvc.Result;
 import play.mvc.Security;
 
 import javax.inject.Inject;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.zip.Deflater;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+
 
 @Security.Authenticated(Secured.class)
 public class MediaController extends BaseController {
@@ -39,6 +47,9 @@ public class MediaController extends BaseController {
 
     @Inject
     GroupManager groupManager;
+
+    @Inject
+    FolderManager folderManager;
 
     static Form<Media> mediaForm = Form.form(Media.class);
     final static String tempPrefix = "htwplus_temp";
@@ -70,7 +81,7 @@ public class MediaController extends BaseController {
             if (!Secured.deleteMedia(media)) {
                 return redirect(controllers.routes.Application.index());
             }
-            ret = controllers.routes.GroupController.media(group.id);
+            ret = controllers.routes.GroupController.media(group.id, 0L);
         }
 
         mediaManager.delete(media);
@@ -91,7 +102,7 @@ public class MediaController extends BaseController {
                 return redirect(controllers.routes.Application.index());
             }
             filename = createFileName(group.title);
-            ret = controllers.routes.GroupController.media(id);
+            ret = controllers.routes.GroupController.media(id, 0L);
         } else {
             return redirect(ret);
         }
@@ -159,24 +170,24 @@ public class MediaController extends BaseController {
      * New file is uploaded.
      *
      * @param target Target of the file (e.g. "group")
-     * @param id     ID of the target (e.g. group ID)
      * @return Result
      */
     @Transactional
-    public Result upload(String target, Long id) {
+    public Result upload(String target, Long folderId) {
         final int maxTotalSize = conf.getInt("media.maxSize.total");
         final int maxFileSize = conf.getInt("media.maxSize.file");
 
         Call ret = controllers.routes.Application.index();
         Group group;
+        Folder folder = folderManager.findById(folderId);
 
         // Where to put the media
         if (target.equals(Media.GROUP)) {
-            group = groupManager.findById(id);
+            group = groupManager.findById(folder.findRoot(folder).group.id);
             if (!Secured.uploadMedia(group)) {
                 return redirect(controllers.routes.Application.index());
             }
-            ret = controllers.routes.GroupController.media(id);
+            ret = controllers.routes.GroupController.media(group.id, folderId);
         } else {
             return redirect(ret);
         }
@@ -219,8 +230,8 @@ public class MediaController extends BaseController {
 
                 String error = "Eine Datei mit dem Namen " + med.title + " existiert bereits";
                 if (target.equals(Media.GROUP)) {
+                    med.folder = folder;
                     med.temporarySender = Component.currentAccount();
-                    med.group = group;
                     if (mediaManager.existsInGroup(med, group)) {
                         flash("error", error);
                         return redirect(ret);

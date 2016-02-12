@@ -43,10 +43,17 @@ public class Media extends BaseNotifiable implements INotifiable {
     @Transient
     public File file;
 
+	@ManyToOne
+	public Folder folder;
+
     @Transient
     public String sizeInByte;
 
     public static String GROUP = "group";
+
+	public Group findGroup() {
+		return this.folder.findRoot(this.folder).group;
+	}
 
     @Override
     public Account getSender() {
@@ -61,6 +68,6 @@ public class Media extends BaseNotifiable implements INotifiable {
 
     @Override
     public String getTargetUrl() {
-        return controllers.routes.GroupController.media(this.group.id).toString();
+        return controllers.routes.GroupController.media(this.findGroup().id, 0L).toString();
     }
 }

@@ -1,4 +1,4 @@
-@(mediaList:List[Media],target:String,id:Long) 
+@(mediaList:List[Media],folderList: List[Folder], target:String,id:Long, groupId: Long)
 @import helper._
 @import models._
 
@@ -27,6 +27,19 @@
 	        </td>
 	    </tr>
 		}
+        @if(!folderList.isEmpty) {
+            @for(folder <- folderList) {
+            <tr>
+                <td><span class="glyphicon glyphicon-folder-close"></span></td>
+                <td><a href="@routes.GroupController.media(groupId, folder.id)" rel="tooltip" data-delay="500" data-original-title="von ">@folder.name</a></td>
+                <td>@folder.createdAt.format("dd.MM.yyyy")</td>
+                <td>Ordner</td>
+                <td class="hp-optionsMenu">
+
+                </td>
+            </tr>
+            }
+        }
     </tbody>
     <tfoot>
         <tr>
