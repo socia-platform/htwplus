@@ -570,6 +570,18 @@ public class Secured extends Security.Authenticator {
         return Secured.isAdmin() || Secured.isOwnerOfGroup(group, current) || media.owner.equals(current);
     }
 
+	/**
+	 * Returns true, if the currently logged in account is allowed to delete a folder from its associated group.
+	 *
+	 * @param folder Folder to be deleted
+	 * @return True, if logged in account is allowed to delete media
+	 */
+	public static boolean deleteFolder(Folder folder) {
+		Account current = Component.currentAccount();
+
+		return Secured.isAdmin() || folder.owner.equals(current);
+	}
+
     /**
      * Returns true, if the current user has access to a notification.
      *

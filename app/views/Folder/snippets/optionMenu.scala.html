@@ -1,0 +1,27 @@
+@(folder: Folder)
+@import helper._
+@import models._
+
+<!-- Start confirmDeleteMediaModal -->
+<div class="modal fade" id="confirmDeleteFolder@folder.id" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    @views.html.Folder.snippets.deleteFolderModal(folder)
+</div>
+<!-- End confirmDeleteMediaModal -->
+
+<div class="dropdown">
+    <a class="dropdown-toggle" id="dropdownMenu" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-chevron-down"></span>
+    </a>
+
+    <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
+
+
+
+        <li><a href="#confirmDeleteFolder@folder.id" data-toggle="modal">
+            <span class="glyphicon glyphicon-trash"></span><br>Löschen
+        </a></li>
+
+
+
+    </ul>
+</div>
