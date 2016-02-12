@@ -84,6 +84,9 @@ POST        /media/multiple/:target/:id                controllers.MediaControll
 GET         /media/:id                                 controllers.MediaController.view(id:Long)
 GET         /media/:id/delete                          controllers.MediaController.delete(id:Long)
 
+# Folder
+GET         /folder/:folderId/remove                   controllers.GroupController.deleteFolder(folderId:Long)
+
 #Notification
 GET         /notification                              controllers.NotificationController.showAll(page: Integer ?= 1)
 GET         /notification/readAll                      controllers.NotificationController.readAll()

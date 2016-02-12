@@ -589,10 +589,17 @@ public class GroupController extends BaseController {
 
     public Result createFolder(Long folderId) {
         Folder parentFolder = folderManager.findById(folderId);
-        Group group = parentFolder.findRoot(parentFolder).group;
+        Group group = folderManager.findRoot(parentFolder).group;
         Folder folder = null;
 
         Form<Folder> filledForm = folderForm.bindFromRequest();
+
+        if(filledForm.hasErrors()) {
+            if(filledForm.data().get("name").equals("")) {
+                flash("error", "Bitte einen Ordnernamen angeben.");
+                return redirect(routes.GroupController.media(group.id, folderId));
+            }
+        }
         if(Secured.viewGroup(group)) {
             Logger.debug("Create Group Folder...");
             folder = new Folder(filledForm.data().get("name"), Component.currentAccount(), parentFolder, null, null);
@@ -600,5 +607,22 @@ public class GroupController extends BaseController {
             Logger.debug("Group Folder -> created");
         }
         return redirect(routes.GroupController.media(group.id, folder.id));
+    }
+
+    public Result deleteFolder(Long folderId) {
+        Folder folder = folderManager.findById(folderId);
+        Long groupId = folderManager.findRoot(folder).group.id;
+
+        Call defaultRedirect = controllers.routes.GroupController.media(groupId, folderId);
+
+        if(folder != null && Secured.deleteFolder(folder)) {
+            if(folder.parent == null) {
+                defaultRedirect = routes.GroupController.view(groupId);
+            } else {
+                defaultRedirect = routes.GroupController.media(groupId, folder.parent.id);
+            }
+            folderManager.delete(folder);
+        }
+        return redirect(defaultRedirect);
     }
 }

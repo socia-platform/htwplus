@@ -44,4 +44,9 @@ public class FolderManager implements BaseManager {
         }
         JPA.em().remove(folder);
     }
+
+    public Folder findRoot(Folder folder) {
+        if(folder.parent == null) return folder;
+        return findRoot(folder.parent);
+    }
 }

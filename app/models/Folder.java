@@ -12,7 +12,6 @@ import java.util.List;
 public class Folder extends BaseModel {
 
     @Constraints.Required
-    @Column(unique = true)
     public String name;
 
     @Constraints.Required

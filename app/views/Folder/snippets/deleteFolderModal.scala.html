@@ -1,0 +1,16 @@
+@(folder: Folder)
+<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h4 class="modal-title" id="confirmModalLabel">Ordner löschen</h4>
+		</div>
+		<div class="modal-body">
+			Möchtest du den Ordner <b>@folder.name</b> wirklich löschen?
+		</div>
+		<div class="modal-footer">
+			<a type="button"  class="btn btn-warning" href="@routes.GroupController.deleteFolder(folder.id)">Ja</a>
+			<button type="button" class="btn btn-default" data-dismiss="modal">Nein</button>
+		</div>
+	</div>
+</div>
