@@ -9,6 +9,7 @@ import eu.medsea.mimeutil.MimeUtil;
 import eu.medsea.mimeutil.MimeType;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.api.libs.MimeTypes;
+import java.io.IOException;
 
 import java.io.File;
 import java.io.IOException;
@@ -197,9 +198,11 @@ public class FileService {
         }
 
         newFile.getParentFile().mkdirs();
-        boolean result = this.file.renameTo(newFile);
 
-        if(!result) {
+        try {
+            java.nio.file.Files.move(this.file.toPath(), newFile.toPath());
+        }
+        catch (IOException e) {
             throw new PlayException(
                     "File Error",
                     "The file could not be stored");
