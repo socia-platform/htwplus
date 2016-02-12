@@ -13,7 +13,7 @@
 	} else {
 		@if(Component.currentAccount() != user) {
 			<li>
-                <a href="@routes.FriendshipController.requestFriend(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Sende eine Freundschaftsanfrage" data-container="body">
+                <a href="@routes.FriendshipController.requestFriend(user.id)" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Sende eine Kontaktanfrage" data-container="body">
                     <span class="glyphicon glyphicon-plus"></span>
                     <span class="hidden-xs"> Hinzufügen</span>
                 </a>
@@ -47,7 +47,7 @@
 	}
 	@if(Secured.isFriend(user)) {
         <li>
-            <a href="#confirmDeleteFriend@user.id" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Beende die Freundschaft" data-container="body" data-toggle="modal">
+            <a href="#confirmDeleteFriend@user.id" role="button" class="btn btn-default active" rel="tooltip" data-original-title="Beende den Kontakt" data-container="body" data-toggle="modal">
                 <span class="glyphicon glyphicon-remove"></span>
                 <span class="hidden-xs"> Entfernen</span>
             </a>

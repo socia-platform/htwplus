@@ -3,52 +3,15 @@
 @import models.enums.LinkType
 
 @main("Gruppenübersicht") {
-    <div class="row">
-        <div class="col-lg-12" role="main">
-            <div class="hp-notepad-content addmargin">
+    @views.html.Group.snippets.header(group)
 
-                <h2 class="hp-truncate">
-                    @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
-                    @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
-                    @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
-                    @group.title
-                </h2>
-                <br />
-
-                <dl>
-                    <dt>Gründer</dt>
-                    <dd>@views.html.snippets.userLink(group.owner)</dd>
-                </dl>
-                <dl>
-                    <dt>Erstellt am</dt>
-                    <dd>@group.createdAt.format("dd.MM.yyyy")</dd>
-                </dl>
-
-                @if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
-                    <dl>
-                        <dt>Token</dt>
-                        <dd>@group.token</dd>
-                    </dl>
-                }
-
-                <dl>
-                    <dt>Beschreibung</dt>
-                    <dd>@group.description</dd>
-                </dl>
-                <dl>
-                    <dt>Mitglieder</dt>
-                    @defining(managers.GroupAccountManager.findAccountsByGroup(group, LinkType.establish)) { accounts =>
-                        @for(account <- accounts) {
-                            <dd> @views.html.snippets.userLink(account)</dd>
-                        }
-                    }
-                </dl>
-                <dl>
-                    <a href="@routes.GroupController.join(group.id)">
-                        <span class="glyphicon glyphicon-envelope"></span> Beitrittsanfrage
-                    </a>
-                </dl>
+    @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
+        <div class="row">
+            <div class="col-lg-12" role="main">
+                <div class="hp-content-placeholder addmargin">
+                    <h3><i>Du musst @Messages("group.view.type."+group.groupType.toString) <a href="@routes.GroupController.join(group.id)">beitreten</a>, um den Inhalt sehen zu können.</i></h3>
+                </div>
             </div>
         </div>
-    </div>
+    }
 }

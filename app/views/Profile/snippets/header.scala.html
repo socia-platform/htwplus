@@ -1,0 +1,81 @@
+@(user: Account)
+@import models.enums.AccountRole;
+
+<div class="row">
+    <div class="col-md-12" role="main">
+
+        @if(Secured.isFriend(user)) {
+            <!-- confirmDeleteFriendModal -->
+            <div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog">@views.html.Friends.snippets.deleteFriendModal(user)</div>
+        }
+
+        <div class="addmargin">
+            <div id="hp-profile-header">
+
+                @if(user.hasAvatar) {
+                <img alt="avatar"
+                     src='@routes.ProfileController.getAvatar(user.id, "large")'
+                     class="avatar"/>
+                } else {
+                <div class="avatar hp-avatar-default-@user.avatar">@user.getInitials</div>
+                }
+
+                <div class="headline">
+                    <div class="links pull-right">
+                        @if(Secured.isFriend(user) || Component.currentAccount() == user) {
+                        <a href="@routes.ProfileController.stream(user.id)" class='@if(Navigation.getTitle().equals("Newsstream")){active}' rel="tooltip" data-original-title="@user.firstname's Newsstream" data-container="body">
+                            <span class="glyphicon glyphicon-comment"></span>
+                        </a>
+                        } else {
+                        @if(Component.currentAccount() != user) {
+                        <a href="@routes.FriendshipController.requestFriend(user.id)" rel="tooltip" data-original-title="@user.firstname eine Kontaktanfrage schicken" data-container="body">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                        }
+                        }
+
+                        <a href="@routes.ProfileController.groups(user.id)" class='@if(Navigation.getTitle().equals("Gruppen & Kurse")){active}' rel="tooltip" data-original-title="@user.firstname's Gruppen und Kurse" data-container="body">
+                            <span class="glyphicon glyphicon-th-list"></span>
+                        </a>
+
+                        @if(Secured.isFriend(user)) {
+                        <a href="#confirmDeleteFriend@user.id" rel="tooltip" data-original-title="Kontakt zu @user.firstname beenden" data-container="body" data-toggle="modal">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                        }
+                        @if(Secured.isOwnerOfAccount(user.id)) {
+                        <a href="@routes.ProfileController.edit(user.id)" class='@if(Navigation.getTitle().equals("Editieren")){active}' rel="tooltip" data-original-title="Profil bearbeiten" data-container="body">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                        }
+                    </div>
+                    <div class="clearfix"></div>
+                    <h2 class="title visible-md visible-lg">@user.name @if(user.role != AccountRole.STUDENT && user.role != null) {<small>(@user.role.getDisplayName())</small>}</h2>
+                    <h3 class="title visible-xs visible-sm">@user.name @if(user.role != AccountRole.STUDENT && user.role != null) {<small>(@user.role.getDisplayName())</small>}</h3>
+                </div>
+                <div class="bottomline">
+                    <small>
+                        <span class="glyphicon glyphicon-education"></span>
+                        @if(user.studycourse != null) {
+                        <a href="/search?keyword=&mode=user&studycourse=@helper.urlEncode(user.studycourse.title)">@user.studycourse.title @if(user.degree != null) {(@user.degree)}</a>
+                        } else { <i>keine Angabe</i> }
+                        |
+                        <span class="glyphicon glyphicon-envelope"></span>@if(user.email != null) {
+                            <a href="mailto:@user.email">@user.email</a>
+                            } else { <i>keine Angabe</i> }
+                        |
+                            <span class="glyphicon glyphicon-home"></span>@if(user.homepage != null) {
+                            <a href='@user.homepage'>@user.homepage</a>
+                            } else { <i>keine Angabe</i> }
+
+                        @if(user.about != null) {
+                        <br /><br />
+                        <b>Über mich: </b>
+                        <div class="text hp-white-space">@user.about</div>
+                        }
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

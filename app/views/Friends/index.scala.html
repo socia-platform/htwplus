@@ -1,11 +1,11 @@
 @(friends: List[Account], requests: List[Friendship])
 @import helper._
 
-@main("Freunde") {
+@main("Kontakte") {
     <div class="row">
         <div class="col-lg-12" role="main">
             <div class="hp-notepad-content addmargin">
-                <h2><span rel="tooltip" data-original-title="Hier findest du den aktuellen Status deiner Freundschafts-Anfragen." data-delay="500">
+                <h2><span rel="tooltip" data-original-title="Hier findest du den aktuellen Status deiner Kontaktanfragen." data-delay="500">
                     Offene Anfragen</span>
                 </h2>
 
@@ -58,7 +58,7 @@
                 <br />
 
                 <h2>
-                    <span rel="tooltip" data-original-title="Hier findest du alle Personen, mit denen du befreundet bist." data-delay="500">Meine Freunde</span>
+                    <span rel="tooltip" data-original-title="Hier findest du alle Personen, mit denen du in Kontakt stehst." data-delay="500">Meine Kontakte</span>
                 </h2>
 
                 @if(!friends.isEmpty) {
@@ -67,7 +67,7 @@
                     @views.html.snippets.listAccounts(friends)
 
                 } else {
-                    <p><i>Du hast noch keine Freunde. Jetzt Freunde <b><a class="hp-focus-search">suchen</a></b>.</i></p>
+                    <p><i>Du hast noch keine Kontakte. Jetzt Personen <b><a href="/search?keyword=&mode=user">suchen</a></b>.</i></p>
                 }
             </div>
         </div>

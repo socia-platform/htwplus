@@ -4,14 +4,12 @@
 @main(response.keyword){
 
     <div class="row">
-        <div class="col-sm-9" role="main">
-            <div class="hp-notepad-content addmargin">
+        <div class="col-sm-9 min-height" role="main">
+            <div class="hp-notepad-content hp-pagination-container addmargin">
 
             @defining(Component.currentAccount()) { currentUser =>
-
-                <h3>@response.getDocumentCount @Html(Messages("search.headline", truncate(response.keyword,30)))</h3>
+            <br />
             @ctx.args.put("searchKeyword", response.keyword)
-                <br />
 
             @if(response.getDocumentCount != 0) {
 
@@ -20,7 +18,7 @@
                     @result match {
                         case account: Account => {
                             @if(response.searchMode.equals("user") || response.searchMode.equals("all")) {
-                                <div class="well searchresult-container hp-pagination-container">
+                                <div class="well searchresult-container hp-pagination-element">
                                     <div class="account-result media">
                                         @views.html.snippets.userLinkAvatar(account)
                                         <div class="media-body">
@@ -30,9 +28,9 @@
                                             <small>
                                             @if(managers.FriendshipManager.alreadyFriendly(currentUser, account)) {
                                                 <span class="glyphicon glyphicon-ok"></span>
-                                                <span> Ihr seid bereits befreundet.</span>
+                                                <span> Ihr steht  bereits in Kontakt.</span>
                                             } else {
-                                                <span>Mit dieser Person bist du noch nicht befreundet.</span>
+                                                <span>Mit dieser Person stehst du noch nicht in Kontakt.</span>
                                             }
                                             </small>
                                         </div>
@@ -43,7 +41,7 @@
 
                         case group: Group => {
                             @if(response.searchMode.equals("group") || response.searchMode.equals("all")) {
-                                <div class="well searchresult-container hp-pagination-container">
+                                <div class="well searchresult-container hp-pagination-element">
                                     <div class="group-result media">
                                         <div class="pull-left">
                                         @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
@@ -53,17 +51,26 @@
                                         <div class="media-body">
                                             <div class="media-heading">
                                                 <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
+                                                <small>
+                                                @if(Secured.isMemberOfGroup(group, currentUser)) {
+                                                <span class="glyphicon glyphicon-ok" title="Du bist bereits Mitglied dieser Gruppe"></span>
+                                                }
+                                                </small>
                                             </div>
                                             <small>
-                                                <span class="glyphicon glyphicon-user"></span>
+                                                <b>Beschreibung:</b>
+                                                @if(!group.description.equals("")) {
+                                                <span>@group.description</span>
+                                                } else { <i>keine Beschreibung</i> }
+                                                <br />
+
+                                                <b>Gründer:</b>
                                                 @views.html.snippets.userLink(group.owner)
                                                 <br />
-                                            </small>
-                                            <small>
-                                            @if(Secured.isMemberOfGroup(group, currentUser)) {
-                                                <span class="glyphicon glyphicon-ok"></span>
-                                                <span> Du bist bereits Mitglied dieser Gruppe.</span>
-                                            }
+
+                                                <b>Mitglieder:</b>
+                                                <span>@group.groupAccounts.size</span>
+
                                             </small>
                                         </div>
                                     </div>
@@ -73,7 +80,7 @@
 
                         case post: Post => {
                             @if(response.searchMode.equals("post") || response.searchMode.equals("all")) {
-                                <div class="well searchresult-container hp-pagination-container">
+                                <div class="well searchresult-container hp-pagination-element">
                                     <div class="post-result media">
                                         @views.html.snippets.userLinkAvatar(post.owner)
                                         <div class="media-body">

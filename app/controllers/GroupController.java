@@ -493,7 +493,7 @@ public class GroupController extends BaseController {
             return redirect(controllers.routes.GroupController.index());
         }
 
-        Navigation.set(Level.GROUPS, "Freunde einladen", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
+        Navigation.set(Level.GROUPS, "Kontakte einladen", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
         return ok(invite.render(group, friendshipManager.friendsToInvite(Component.currentAccount(), group), GroupAccountManager.findAccountsByGroup(group, LinkType.invite)));
     }
 

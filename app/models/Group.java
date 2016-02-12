@@ -4,6 +4,12 @@ import managers.GroupManager;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.GroupType;
+import models.enums.LinkType;
+
+import models.services.ElasticsearchService;
+import org.hibernate.annotations.Type;
+import play.data.validation.ValidationError;
+import play.data.validation.Constraints.Required;
 import play.data.validation.Constraints.Pattern;
 import play.data.validation.Constraints.Required;
 import play.data.validation.ValidationError;
@@ -24,12 +30,14 @@ public class Group extends BaseNotifiable implements INotifiable {
     public static final String GROUP_REQUEST_DECLINE = "group_request_decline";
 
     @Required
-    @Column(unique = true)
-    @Pattern(value = "^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}/\\\\\\[\\]~-]+$")
-    public String title;
+	@Column(unique = true)
+    @Pattern(value="^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}/\\\\\\[\\]~-]+$")
+	@Size(max = 255, message = "error.length")
+	public String title;
 
-    @Size(max = 255, message = "error.length")
-    public String description;
+	@Lob
+	@Type(type = "org.hibernate.type.TextType")
+	public String description;
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     public Set<GroupAccount> groupAccounts;

@@ -30,11 +30,7 @@
 				@if(Secured.isOwnerOfGroup(group, user)) {
 					<a href="@routes.GroupController.stream(group.id)"><b>@group.title</b></a>
 				} else {
-					@if(Secured.viewGroup(group)) {
-						<a href="@routes.GroupController.stream(group.id)">@group.title</a>
-					} else {
-						<a class="no-drop" rel="tooltip" data-original-title="Du musst der Gruppe erst beitreten" data-container="body">@group.title</a>
-					}
+					<a href="@routes.GroupController.stream(group.id)">@group.title</a>
 				}
 			</td>
 			<td>

@@ -46,7 +46,8 @@ public class ProfileController extends BaseController {
     static Form<Account> accountForm = Form.form(Account.class);
     static Form<Post> postForm = Form.form(Post.class);
     static Form<Login> loginForm = Form.form(Login.class);
-    static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
+	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
+	static final int PAGE = 1;
 
     public Result me() {
         Navigation.set(Level.PROFILE, "Ich");
@@ -67,20 +68,20 @@ public class ProfileController extends BaseController {
     public Result view(final Long id) {
         Account account = accountManager.findById(id);
 
-        if (account == null || account.role == AccountRole.DUMMY) {
-            flash("info", "Diese Person gibt es nicht.");
-            return redirect(controllers.routes.Application.index());
-        } else {
-            if (Secured.isFriend(account)) {
-                Navigation.set(Level.FRIENDS, "Profil", account.name, controllers.routes.ProfileController.view(account.id));
-            } else {
-                Navigation.set(Level.USER, "Profil", account.name, controllers.routes.ProfileController.view(account.id));
-            }
-
-            return ok(index.render(account, postForm));
-            // return ok(index.render(account));
-        }
-    }
+		if (account == null || account.role == AccountRole.DUMMY) {
+			flash("info", "Diese Person gibt es nicht.");
+			return redirect(controllers.routes.Application.index());
+		} else {
+			if(Secured.isFriend(account) || Component.currentAccount().equals(account)) {
+				return redirect(routes.ProfileController.stream(account.id, PAGE, false));
+			} else {
+				Navigation.set(Level.USER, "Profil", account.name, controllers.routes.ProfileController.view(account.id));
+			}
+	
+			return ok(index.render(account, postForm));
+			// return ok(index.render(account));
+		}
+	}
 
     @Transactional
     public Result stream(Long accountId, int page, boolean raw) {
@@ -111,7 +112,7 @@ public class ProfileController extends BaseController {
             }
         }
         // case for visitors
-        flash("info", "Du kannst nur den Stream deiner Freunde betrachten!");
+        flash("info", "Du kannst nur den Stream deiner Kontakte betrachten!");
         return redirect(controllers.routes.ProfileController.view(accountId));
     }
 

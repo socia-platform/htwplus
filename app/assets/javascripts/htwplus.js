@@ -22,6 +22,79 @@ function autolinkUrls() {
 	});
 }
 
+function linkOlderComments() {
+    /*
+	 * SHOW OLDER COMMENTS
+	 */
+	$('.olderComments').each(function(){
+		var id = $(this).attr('href').split('-')[1];
+		var context = this;
+		$(this).click(function(){
+			if($(context).hasClass('open')){
+				$("#collapse-"+id).collapse('toggle');
+				$(context).html("Ältere Kommentare anzeigen...");
+				$(context).removeClass('open');
+				$(context).addClass('closed');
+			}
+			else if($(context).hasClass('closed')){
+				$("#collapse-"+id).collapse('toggle');
+				$(context).html("Ältere Kommentare ausblenden...");
+				$(context).removeClass('closed');
+				$(context).addClass('open');
+			}
+			else if($(context).hasClass('unloaded')){
+				var currentComments = $('#comments-' + id + ' > .media').length;
+				$(context).html("Ältere Kommentare ausblenden...");
+				$.ajax({
+					url: "/post/olderComments?id=" + id + "&current=" + currentComments,
+					type: "GET",
+					success: function(data){
+						$("#collapse-"+id).html(data);
+						$("#collapse-"+id).collapse('toggle');
+					}
+				});
+				$(context).addClass('open');
+				$(context).removeClass('unloaded');
+			}
+
+			return false;
+		});
+	});
+}
+
+function linkAddComments() {
+	/*
+	 * ADD COMMENTS
+	 */
+    $('.hp-comment-form').each(function () {
+        var context = $(this);
+        $(".commentSubmit", this).click(function () {
+            if (context.serializeArray()[0].value.trim() === "") {
+                $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
+                    $(this).animate({opacity: 1}, 100);
+                    $(this).focus();
+                }).focus();
+            } else {
+                $.ajax({
+                    url: context.attr('action'),
+                    type: "POST",
+                    data: context.serialize(),
+                    success: function (data) {
+                        context.before(data);
+                        context[0].reset();
+                    }, error: function () {
+                        $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
+                            $(this).animate({opacity: 1}, 100);
+                            $(this).focus();
+                        });
+                    }
+                });
+            }
+            return false;
+        });
+    });
+}
+
 function truncateBreadcrumb() {
 	var lastBreadcrumb = $("#hp-navbar-breadcrumb .breadcrumb > li:last-child");
 	var index = 3;	// first breadcrumb item which is hidden
@@ -60,7 +133,7 @@ $('.hp-optionsMenu>div').on('shown.bs.dropdown', function() {
     var menu = $(this).find('ul.dropdown-menu');
     var row = $(this).parents('tr');
     // hacky: 45 belongs to div.hp-notepad-content.addmargin    
-    var top = 45 + row.offset().top + row.height() - $('.hp-notepad-content').offset().top;
+    var top = row.offset().top - $('.hp-notepad-content').offset().top;
     menu.css('top', top + 'px');
 });
 
@@ -220,6 +293,8 @@ $(document).ready(function () {
 		complete:function(){
 			$(".loading").hide();
 			autolinkUrls();
+			linkOlderComments();
+			linkAddComments();
 		}
 	});
 
@@ -227,9 +302,9 @@ $(document).ready(function () {
      * Auto-pagination with jQuery plugin (modified version of jquery.auto.pagination.js)
      */
     if($('a.nextPage').length > 0) { // only apply on pages with a nextPage link
-        $('.hp-notepad-content').AutoPagination({
+        $('.hp-pagination-container').AutoPagination({
             nextPageSelector: 'a.nextPage',
-            panelSelector: '.hp-pagination-container',
+            panelSelector: '.hp-pagination-element',
             loaderDivClass: 'ajax-loader',
             loaderDivStyle: 'text-align:center;margin-top:20px;font-weight:bold;',
             loaderImage: 'assets/images/loading.gif',
@@ -251,74 +326,9 @@ $(document).ready(function () {
         });
     }
 
-	/*
-	 * ADD COMMENTS
-	 */
-    $('.hp-comment-form').each(function () {
-        var context = $(this);
-        $(".commentSubmit", this).click(function () {
-            if (context.serializeArray()[0].value.trim() === "") {
-                $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
-                    $(this).animate({opacity: 1}, 100);
-                    $(this).focus();
-                }).focus();
-            } else {
-                $.ajax({
-                    url: context.attr('action'),
-                    type: "POST",
-                    data: context.serialize(),
-                    success: function (data) {
-                        context.before(data);
-                        context[0].reset();
-                    }, error: function () {
-                        $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
-                            $(this).animate({opacity: 1}, 100);
-                            $(this).focus();
-                        });
-                    }
-                });
-            }
-            return false;
-        });
-    });
+    linkAddComments();
 
-	/*
-	 * SHOW OLDER COMMENTS
-	 */
-	$('.olderComments').each(function(){
-		var id = $(this).attr('href').split('-')[1];
-		var context = this;
-		$(this).click(function(){
-			if($(context).hasClass('open')){
-				$("#collapse-"+id).collapse('toggle');
-				$(context).html("Ältere Kommentare anzeigen...");
-				$(context).removeClass('open');
-				$(context).addClass('closed');
-			}
-			else if($(context).hasClass('closed')){
-				$("#collapse-"+id).collapse('toggle');
-				$(context).html("Ältere Kommentare ausblenden...");
-				$(context).removeClass('closed');
-				$(context).addClass('open');
-			}
-			else if($(context).hasClass('unloaded')){
-				var currentComments = $('#comments-' + id + ' > .media').length;
-				$(context).html("Ältere Kommentare ausblenden...");
-				$.ajax({
-					url: "/post/olderComments?id=" + id + "&current=" + currentComments,
-					type: "GET",
-					success: function(data){
-						$("#collapse-"+id).html(data);
-						$("#collapse-"+id).collapse('toggle');
-					}
-				});
-				$(context).addClass('open');
-				$(context).removeClass('unloaded');
-			}
-			window.setTimeout(resizeRings(), 400);
-			return false;
-		});
-	});
+	linkOlderComments();
 
     autolinkUrls();
 
@@ -447,33 +457,44 @@ $('body').popover({
     selector: '[rel="popover"]'
 });
 
-$('.hp-focus-search').click(function() {
-    $('#hp-search').focus();
-});
-
 /*
  * SET OR REMOVE BOOKMARKS
  */
-$('.hp-post-bookmark-icon').click(function(){
+$('.hp-pagination-container').on('click', 'a.hp-post-bookmark-icon', function() {
     var id = $(this).attr('href').split('-')[1];
     var context = this;
     var icon = this.children[0];
     $.ajax({
-        url: "/post/"+id + "/bookmark",
-        type: "PUT",
-        success: function(data){
-            if(data === "setBookmark") {
-                $(icon).addClass('glyphicon-star');
-                $(icon).removeClass('glyphicon-star-empty');
-                $(context).attr("data-original-title", "Post vergessen").tooltip('fixTitle').tooltip('show');
-            }
-            if(data === "removeBookmark") {
-                $(icon).addClass('glyphicon-star-empty');
-                $(icon).removeClass('glyphicon-star');
-                $(context).attr("data-original-title", "Post merken").tooltip('fixTitle').tooltip('show');
-            }
-        }
+     url: "/post/"+id + "/bookmark",
+     type: "PUT",
+     success: function(data){
+         if(data === "setBookmark") {
+             $(icon).addClass('glyphicon-heart');
+             $(icon).removeClass('glyphicon-heart-empty');
+             $(context).attr("data-original-title", "Post vergessen").tooltip('fixTitle').tooltip('show');
+         }
+         if(data === "removeBookmark") {
+             $(icon).addClass('glyphicon-heart-empty');
+             $(icon).removeClass('glyphicon-heart');
+             $(context).attr("data-original-title", "Post merken").tooltip('fixTitle').tooltip('show');
+         }
+     }
     });
 });
 
 truncateBreadcrumb();
+
+/*
+ * EXPAND PROFILE/GROUP TEXT
+ */
+$('#hp-profile-header .bottomline .text').readmore({
+    collapsedHeight: 47,
+    moreLink: '<a href="#">... mehr</a>',
+    lessLink: '<a href="#">schließen</a>'
+});
+
+$('#hp-profile-header .bottomline .hp-avatar-wrapper').readmore({
+    collapsedHeight: 43,
+    moreLink: '<a href="#">... weitere</a>',
+    lessLink: '<a href="#">schließen</a>'
+});
