@@ -93,7 +93,7 @@
                 <div class="bottomline">
                     <div><small>
                         <span><b>Gründer: </b>@views.html.snippets.userLink(group.owner)</span>
-                        <span>| <b>Medien: </b><a href="@routes.GroupController.media(group.id)">@group.media.size()
+                        <span>| <b>Medien: </b><a href="@routes.GroupController.media(group.id)">@group.mediaFolder.files.size()
                             Datei(en)</a></span>
                         @if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
                         <span>| <b>Token: </b>@group.token</span>

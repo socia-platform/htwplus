@@ -1,11 +1,7 @@
 package controllers;
 
-import managers.AccountManager;
-import managers.GroupManager;
-import managers.MediaManager;
-import managers.PostManager;
-import models.Account;
-import models.Post;
+import managers.*;
+import models.*;
 import models.enums.AccountRole;
 import models.services.ElasticsearchService;
 import models.services.NotificationService;
@@ -43,6 +39,9 @@ public class AdminController extends BaseController {
 
     @Inject
     GroupManager groupManager;
+
+    @Inject
+    FolderManager folderManager;
 
     @Inject
     PostManager postManager;
@@ -208,6 +207,21 @@ public class AdminController extends BaseController {
             return redirect(controllers.routes.Application.index());
         }
         return ok(createBroadcastNotification.render(AdminController.postForm, accountManager.all()));
+    }
+
+    @Transactional
+    public Result refactor() {
+
+        for (Group group : groupManager.all()) {
+            group.mediaFolder = new Folder("_" + group.title, group.owner, null, group, null);
+            folderManager.create(group.mediaFolder);
+            for (Media media : group.media) {
+                media.folder = group.mediaFolder;
+                media.group = null;
+            }
+            groupManager.update(group);
+        }
+        return ok();
     }
 
     /**

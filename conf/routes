@@ -97,6 +97,7 @@ GET         /assets/*file                              controllers.Assets.at(pat
 
 # Admin
 GET         /admin                                     controllers.AdminController.index()
+GET         /admin/group/refactor                      controllers.AdminController.refactor()
 GET         /admin/user/create                         controllers.AdminController.createAccountForm()
 POST        /admin/user/create                         controllers.AdminController.createAccount()
 POST        /admin/user/:id/delete                     controllers.AdminController.deleteAccount(id: Long)

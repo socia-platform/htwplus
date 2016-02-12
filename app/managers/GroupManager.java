@@ -24,9 +24,6 @@ public class GroupManager implements BaseManager {
     PostManager postManager;
 
     @Inject
-    MediaManager mediaManager;
-
-    @Inject
     NotificationManager notificationManager;
 
     @Inject
@@ -70,10 +67,8 @@ public class GroupManager implements BaseManager {
             postManager.delete(post);
         }
 
-        // delete media
-        for (Media media : group.mediaFolder.files) {
-            mediaManager.delete(media);
-        }
+        //delete root folder
+        folderManager.delete(group.mediaFolder);
 
         // Delete Notifications
         notificationManager.deleteReferences(group);

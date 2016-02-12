@@ -31,7 +31,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     @Required
 	@Column(unique = true)
-    @Pattern(value="^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}/\\\\\\[\\]~-]+$")
+    //@Pattern(value="^[ A-Za-z0-9\u00C0-\u00FF.!#$%&'+=?_{|}/\\\\\\[\\]~-]+$")
 	@Size(max = 255, message = "error.length")
 	public String title;
 
@@ -53,9 +53,6 @@ public class Group extends BaseNotifiable implements INotifiable {
     @OneToMany(mappedBy = "group")
     @OrderBy("createdAt DESC")
     public List<Media> media;
-
-    @OneToMany(mappedBy = "group")
-    public List<Folder> folders;
 
     @OneToOne
     public Folder mediaFolder;
