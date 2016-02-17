@@ -2,7 +2,7 @@
 @import helper._
 @import models.enums._
 
-@main("Group Media") {
+@main(group.title +" - Medien") {
 
 
 @views.html.Group.snippets.header(group)
@@ -20,7 +20,7 @@
             </ol>
 
             @if(!mediaList.isEmpty || !folderList.isEmpty) {
-            @views.html.Media.list(mediaList,folderList,models.Media.GROUP,folder.id, group.id)
+            @views.html.Media.list(mediaList,folderList,models.Media.GROUP, group.id)
             } else {
             <br/><br/>
             <i>Es wurden noch keine Dateien hochgeladen.</i>

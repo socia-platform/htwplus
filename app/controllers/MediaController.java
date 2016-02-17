@@ -1,5 +1,24 @@
 package controllers;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import managers.FolderManager;
+import managers.GroupManager;
+import managers.MediaManager;
+import models.Folder;
+import models.Group;
+import models.Media;
+import models.services.NotificationService;
+import play.data.Form;
+import play.db.jpa.Transactional;
+import play.mvc.Call;
+import play.mvc.Http;
+import play.mvc.Http.MultipartFormData;
+import play.mvc.Http.MultipartFormData.FilePart;
+import play.mvc.Result;
+import play.mvc.Security;
+
+import javax.inject.Inject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,32 +30,6 @@ import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import managers.FolderManager;
-import models.Folder;
-import models.services.NotificationService;
-import org.apache.commons.io.FileUtils;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import managers.GroupManager;
-import managers.MediaManager;
-
-import models.Group;
-import models.Media;
-import models.services.NotificationService;
-import org.apache.commons.io.FileUtils;
-import play.Logger;
-import play.data.Form;
-import play.db.jpa.Transactional;
-import play.mvc.Call;
-import play.mvc.Http;
-import play.mvc.Http.MultipartFormData;
-import play.mvc.Http.MultipartFormData.FilePart;
-import play.mvc.Result;
-import play.mvc.Security;
-
-import javax.inject.Inject;
 
 
 @Security.Authenticated(Secured.class)
@@ -75,13 +68,16 @@ public class MediaController extends BaseController {
     public Result delete(Long id) {
         Media media = mediaManager.findById(id);
 
+
         Call ret = controllers.routes.Application.index();
-        if (media.group != null) {
-            Group group = media.group;
+        if (media.folder != null) {
+            Long folderId = media.folder.id;
+            Long groupId = media.findGroup().id;
+
             if (!Secured.deleteMedia(media)) {
                 return redirect(controllers.routes.Application.index());
             }
-            ret = controllers.routes.GroupController.media(group.id, 0L);
+            ret = routes.GroupController.media(groupId, folderId);
         }
 
         mediaManager.delete(media);

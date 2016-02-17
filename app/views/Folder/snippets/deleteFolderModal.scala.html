@@ -6,7 +6,8 @@
 			<h4 class="modal-title" id="confirmModalLabel">Ordner löschen</h4>
 		</div>
 		<div class="modal-body">
-			Möchtest du den Ordner <b>@folder.name</b> wirklich löschen?
+			Möchtest du den Ordner <b>@folder.name</b> wirklich löschen?<br />
+			Alle sich darin befindlichen Dateien und Ordner werden ebenfalls gelöscht!
 		</div>
 		<div class="modal-footer">
 			<a type="button"  class="btn btn-warning" href="@routes.GroupController.deleteFolder(folder.id)">Ja</a>

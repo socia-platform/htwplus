@@ -2,7 +2,7 @@
 @import models.enums.GroupType
 @import models.enums.LinkType
 
-@main("Gruppenübersicht") {
+@main(group.title +" - Info") {
     @views.html.Group.snippets.header(group)
 
     @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {

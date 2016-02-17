@@ -600,13 +600,13 @@ public class GroupController extends BaseController {
                 return redirect(routes.GroupController.media(group.id, folderId));
             }
         }
-        if(Secured.viewGroup(group)) {
-            Logger.debug("Create Group Folder...");
+        if(Secured.isMemberOfGroup(group, Component.currentAccount())) {
             folder = new Folder(filledForm.data().get("name"), Component.currentAccount(), parentFolder, null, null);
             folderManager.create(folder);
-            Logger.debug("Group Folder -> created");
+            return redirect(routes.GroupController.media(group.id, folder.id));
         }
-        return redirect(routes.GroupController.media(group.id, folder.id));
+        flash("error", Messages.get("post.join_group_first"));
+        return redirect(routes.GroupController.media(group.id, folderId));
     }
 
     public Result deleteFolder(Long folderId) {

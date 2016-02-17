@@ -49,4 +49,19 @@ public class FolderManager implements BaseManager {
         if(folder.parent == null) return folder;
         return findRoot(folder.parent);
     }
+
+    /**
+     * count all files within a given folder and his subfolders.
+     * @param folder
+     * @return
+     */
+    public static int countAll(Folder folder) {
+        int totalFiles = folder.files.size();
+        if (!folder.folders.isEmpty()) {
+            for (Folder subFolder : folder.folders) {
+                totalFiles += countAll(subFolder);
+            }
+        }
+        return totalFiles;
+    }
 }
