@@ -263,6 +263,15 @@ $(document).on("copy", function(e) {
     }
 });
 
+/*
+ *  show "create folder" form (group media) and focus input field
+ */
+$('body').on('click', 'a.hp-create-folder', function(e) {
+ e.preventDefault();
+ $("#hp-create-folder-wrapper").removeClass('hidden');
+ $("#hp-create-folder-wrapper").find('input').focus();
+});
+
 $(document).ready(function () {
 
     /*

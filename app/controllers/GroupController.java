@@ -595,7 +595,7 @@ public class GroupController extends BaseController {
         Form<Folder> filledForm = folderForm.bindFromRequest();
 
         if(filledForm.hasErrors()) {
-            if(filledForm.data().get("name").equals("")) {
+            if(filledForm.data().get("name").isEmpty()) {
                 flash("error", "Bitte einen Ordnernamen angeben.");
                 return redirect(routes.GroupController.media(group.id, folderId));
             }

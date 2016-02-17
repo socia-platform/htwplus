@@ -3,52 +3,58 @@
 @import models._
 
 <table class="table table-hover table-condensed">
-	<thead>
-       <tr>
-		   <th style="width:23px">
-               <input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body" onclick="toggleMediaSelection(this)">
-           </th>
-           <th>Dateiname</th>
-           <th style="width:20%">Datum</th>
-           <th style="width:15%">Dateigröße</th>
-           <th style="width:35px"></th>
-       </tr>
-	</thead>
+    <thead>
+    <tr>
+        <th style="width:25px">
+            <input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body"
+                   onclick="toggleMediaSelection(this)">
+        </th>
+        <th style="width: 25px"></th>
+        <th>Dateiname</th>
+        <th class="hidden-xs" style="width:100px">Datum</th>
+        <th style="width:100px">Dateigröße</th>
+        <th style="width:35px"></th>
+    </tr>
+    </thead>
     @form(action = routes.MediaController.multiView(target,groupId)) {
     <tbody id="mediaList" class="hp-optionsTable">
-		@for(m <- mediaList) {
-		<tr>
-			<td><input name="selection" value="@m.id" type="checkbox"></td>
-	        <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500" data-original-title="von @m.owner.name">@m.title</a></td>
-	        <td>@m.createdAt.format("dd.MM.yyyy")</td>
-	        <td>@m.sizeInByte</td>
-	        <td class="hp-optionsMenu">
-                @views.html.Media.snippets.optionMenu(m)
-	        </td>
-	    </tr>
-		}
-        @if(!folderList.isEmpty) {
-            @for(folder <- folderList) {
-            <tr>
-                <td><span class="glyphicon glyphicon-folder-close"></span></td>
-                <td><a href="@routes.GroupController.media(groupId, folder.id)" rel="tooltip" data-delay="500" data-original-title="von @folder.owner.firstname">@folder.name</a></td>
-                <td>@folder.createdAt.format("dd.MM.yyyy")</td>
-                <td>Ordner</td>
-                <td class="hp-optionsMenu">
-                    @if(Secured.deleteFolder(folder)) {
-                        @views.html.Folder.snippets.optionMenu(folder)
-                    }
-                </td>
-            </tr>
+    @if(!folderList.isEmpty) {
+    @for(folder <- folderList) {
+    <tr>
+        <td></td>
+        <td><span class="glyphicon glyphicon-folder-open"></span></td>
+        <td><a href="@routes.GroupController.media(groupId, folder.id)" rel="tooltip" data-delay="500"
+               data-original-title="von @folder.owner.firstname">@folder.name</a></td>
+        <td class="hidden-xs">@folder.createdAt.format("dd.MM.yyyy")</td>
+        <td>Ordner</td>
+        <td class="hp-optionsMenu">
+            @if(Secured.deleteFolder(folder)) {
+            @views.html.Folder.snippets.optionMenu(folder)
             }
-        }
+        </td>
+    </tr>
+    }
+    }
+    @for(m <- mediaList) {
+    <tr>
+        <td><input name="selection" value="@m.id" type="checkbox"></td>
+        <td><span class="glyphicon glyphicon-file"></span></td>
+        <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500"
+               data-original-title="von @m.owner.name">@m.title</a></td>
+        <td class="hidden-xs">@m.createdAt.format("dd.MM.yyyy")</td>
+        <td>@m.sizeInByte</td>
+        <td class="hp-optionsMenu">
+            @views.html.Media.snippets.optionMenu(m)
+        </td>
+    </tr>
+    }
     </tbody>
     <tfoot>
-        <tr>
-            <td colspan="5">
-            	<input type="submit" class="btn btn-warning btn-sm" value="Auswahl herunterladen">
-            </td>
-        </tr>
+    <tr>
+        <td colspan="6">
+            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-download"></span> Auswahl herunterladen</button>
+        </td>
+    </tr>
     </tfoot>
     }
 </table>

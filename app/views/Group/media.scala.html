@@ -17,7 +17,23 @@
                 @for(parents <- navigationFolder) {
                 <li><a href="@routes.GroupController.media(group.id, parents.id)">@parents.name</a></li>
                 }
+                <li><a href="#" class="hp-create-folder">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </a></li>
             </ol>
+
+            <div id="hp-create-folder-wrapper" class="hidden">
+                <br />
+                @form(action =  routes.GroupController.createFolder(folder.id)) {
+                    <div class="form-group input-group">
+                        <input type="text" class="form-control" name="name" placeholder="Ordnername wählen">
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-warning">Erstellen</button>
+                        </span>
+                    </div>
+                }
+                <br />
+            </div>
 
             @if(!mediaList.isEmpty || !folderList.isEmpty) {
             @views.html.Media.list(mediaList,folderList,models.Media.GROUP, group.id)
@@ -32,14 +48,7 @@
             }
             <br/>
             <br/>
-            @form(routes.GroupController.createFolder(folder.id)) {
-            @inputText(
-            folderForm("name"),
-            'class -> "form-control",
-            '_label -> "Neuen Ordner anlegen: "
-            )
-            <button type="submit" class="btn btn-warning">Ordner erstellen</button>
-            }
+
         </div>
     </div>
 </div>
