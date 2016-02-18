@@ -3,11 +3,14 @@ package managers;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import models.Account;
+import models.Folder;
+import models.Group;
 import models.Media;
 import org.apache.commons.io.FileUtils;
 import play.Logger;
 import play.Play;
 import play.db.jpa.JPA;
+import views.html.Group.media;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -99,8 +102,13 @@ public class MediaManager implements BaseManager {
         return JPA.em().createQuery("FROM Media m WHERE m.owner.id = " + id).getResultList();
     }
 
-    public boolean existsInFolder(Long mediaId, Long folderId) {
-        if(mediaId.equals(folderId)) return true;
+    public boolean existsInFolder(String mediaTitle, Folder folder) {
+        List<Media> mediaList = findByFolder(folder.id);
+        for (Media media : mediaList) {
+            if (media.title.equals(mediaTitle)) {
+                return true;
+            }
+        }
         return false;
     }
 

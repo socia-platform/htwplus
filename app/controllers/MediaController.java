@@ -88,16 +88,15 @@ public class MediaController extends BaseController {
     @Transactional(readOnly = true)
     public Result multiView(String target, Long id) {
 
+        String[] action = request().body().asFormUrlEncoded().get("action");
         Call ret = controllers.routes.Application.index();
         Group group = null;
-        String filename = "result.zip";
 
         if (target.equals(Media.GROUP)) {
             group = groupManager.findById(id);
             if (!Secured.viewGroup(group)) {
                 return redirect(controllers.routes.Application.index());
             }
-            filename = createFileName(group.title);
             ret = controllers.routes.GroupController.media(id, 0L);
         } else {
             return redirect(ret);
@@ -111,36 +110,64 @@ public class MediaController extends BaseController {
             return redirect(ret);
         }
 
-        List<Media> mediaList = new ArrayList<>();
+        if (action[0].equals("delete")) {
 
-        // grab media files
-        if (mediaselection != null) {
-            for (String s : mediaselection) {
-                Media media = mediaManager.findById(Long.parseLong(s));
-                if (Secured.viewMedia(media)) {
-                    mediaList.add(media);
+            // delete media files
+            if (mediaselection != null) {
+                for (String s : mediaselection) {
+                    Media media = mediaManager.findById(Long.parseLong(s));
+                    if (Secured.deleteMedia(media)) {
+                        mediaManager.delete(media);
+                    }
+                }
+            }
+
+            // delete folder and files
+            if (folderSelection != null) {
+                for (String folderId : folderSelection) {
+                    Folder folder = folderManager.findById(Long.parseLong(folderId));
+                    if (Secured.deleteFolder(folder)) {
+                        folderManager.delete(folder);
+                    }
                 }
             }
         }
 
-        // grab folder files
-        if (folderSelection != null) {
-            for (String folderId : folderSelection) {
-                Folder folder = folderManager.findById(Long.parseLong(folderId));
-                if (Secured.viewFolder(folder)) {
-                    mediaList.addAll(folderManager.getAllMedia(folder));
+        if (action[0].equals("download")) {
+
+            String filename = createFileName(group.title);
+            List<Media> mediaList = new ArrayList<>();
+
+            // grab media files
+            if (mediaselection != null) {
+                for (String s : mediaselection) {
+                    Media media = mediaManager.findById(Long.parseLong(s));
+                    if (Secured.viewMedia(media)) {
+                        mediaList.add(media);
+                    }
                 }
             }
-        }
 
-        try {
-            File file = createZIP(mediaList, filename);
-            response().setHeader("Content-disposition", "attachment; filename=\"" + filename + "\"");
-            return ok(file);
-        } catch (IOException e) {
-            flash("error", "Etwas ist schiefgegangen. Bitte probiere es noch einmal!");
-            return redirect(ret);
+            // grab folder files
+            if (folderSelection != null) {
+                for (String folderId : folderSelection) {
+                    Folder folder = folderManager.findById(Long.parseLong(folderId));
+                    if (Secured.viewFolder(folder)) {
+                        mediaList.addAll(folderManager.getAllMedia(folder));
+                    }
+                }
+            }
+
+            try {
+                File file = createZIP(mediaList, filename);
+                response().setHeader("Content-disposition", "attachment; filename=\"" + filename + "\"");
+                return ok(file);
+            } catch (IOException e) {
+                flash("error", "Etwas ist schiefgegangen. Bitte probiere es noch einmal!");
+                return redirect(ret);
+            }
         }
+        return redirect(ret);
     }
 
     private String createFileName(String prefix) {
@@ -240,11 +267,10 @@ public class MediaController extends BaseController {
                 if (target.equals(Media.GROUP)) {
                     med.folder = folder;
                     med.temporarySender = Component.currentAccount();
-                    if (mediaManager.existsInFolder(med.id, folderId)) {
+                    if (mediaManager.existsInFolder(med.title, folder)) {
                         flash("error", error);
                         return redirect(ret);
                     }
-
                 }
                 mediaList.add(med);
             }
