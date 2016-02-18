@@ -21,7 +21,7 @@
     @if(!folderList.isEmpty) {
     @for(folder <- folderList) {
     <tr>
-        <td></td>
+        <td><input name="folderSelection" value="@folder.id" type="checkbox"></td>
         <td><span class="glyphicon glyphicon-folder-open"></span></td>
         <td><a href="@routes.GroupController.media(groupId, folder.id)" rel="tooltip" data-delay="500"
                data-original-title="von @folder.owner.firstname">@folder.name</a></td>
@@ -37,7 +37,7 @@
     }
     @for(m <- mediaList) {
     <tr>
-        <td><input name="selection" value="@m.id" type="checkbox"></td>
+        <td><input name="mediaSelection" value="@m.id" type="checkbox"></td>
         <td><span class="glyphicon glyphicon-file"></span></td>
         <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500"
                data-original-title="von @m.owner.name">@m.title</a></td>

@@ -2,7 +2,6 @@ package models;
 
 import models.base.BaseModel;
 import play.data.validation.Constraints;
-import play.db.jpa.JPA;
 
 import javax.persistence.*;
 import java.util.ArrayList;

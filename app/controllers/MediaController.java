@@ -103,22 +103,34 @@ public class MediaController extends BaseController {
             return redirect(ret);
         }
 
-        String[] selection = request().body().asFormUrlEncoded().get("selection");
-        List<Media> mediaList = new ArrayList<Media>();
+        String[] mediaselection = request().body().asFormUrlEncoded().get("mediaSelection");
+        String[] folderSelection = request().body().asFormUrlEncoded().get("folderSelection");
 
-        if (selection != null) {
-            for (String s : selection) {
+        if (mediaselection == null && folderSelection == null) {
+            flash("error", "Bitte wähle mindestens eine Datei aus.");
+            return redirect(ret);
+        }
+
+        List<Media> mediaList = new ArrayList<>();
+
+        // grab media files
+        if (mediaselection != null) {
+            for (String s : mediaselection) {
                 Media media = mediaManager.findById(Long.parseLong(s));
                 if (Secured.viewMedia(media)) {
                     mediaList.add(media);
-                } else {
-                    flash("error", "Dazu hast du keine Berechtigung!");
-                    return redirect(controllers.routes.Application.index());
                 }
             }
-        } else {
-            flash("error", "Bitte wähle mindestens eine Datei aus.");
-            return redirect(ret);
+        }
+
+        // grab folder files
+        if (folderSelection != null) {
+            for (String folderId : folderSelection) {
+                Folder folder = folderManager.findById(Long.parseLong(folderId));
+                if (Secured.viewFolder(folder)) {
+                    mediaList.addAll(folderManager.getAllMedia(folder));
+                }
+            }
         }
 
         try {
@@ -228,7 +240,7 @@ public class MediaController extends BaseController {
                 if (target.equals(Media.GROUP)) {
                     med.folder = folder;
                     med.temporarySender = Component.currentAccount();
-                    if (mediaManager.existsInGroup(med, group)) {
+                    if (mediaManager.existsInFolder(med.id, folderId)) {
                         flash("error", error);
                         return redirect(ret);
                     }

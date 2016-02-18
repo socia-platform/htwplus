@@ -6,6 +6,7 @@ import models.Studycourse;
 import play.db.jpa.JPA;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,6 +44,17 @@ public class FolderManager implements BaseManager {
             mediaManager.delete(media);
         }
         JPA.em().remove(folder);
+    }
+
+    public List<Media> getAllMedia(Folder folder) {
+        List<Media> mediaList = new ArrayList<>();
+        mediaList = mediaManager.findByFolder(folder.id);
+        if (!folder.folders.isEmpty()) {
+            for (Folder subFolder : folder.folders) {
+                mediaList.addAll(mediaManager.findByFolder(subFolder.id));
+            }
+        }
+        return mediaList;
     }
 
     public Folder findRoot(Folder folder) {

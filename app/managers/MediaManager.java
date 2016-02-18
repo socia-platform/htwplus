@@ -3,7 +3,6 @@ package managers;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import models.Account;
-import models.Group;
 import models.Media;
 import org.apache.commons.io.FileUtils;
 import play.Logger;
@@ -14,6 +13,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -81,18 +81,26 @@ public class MediaManager implements BaseManager {
         }
     }
 
+    public List<Media> findByFolder(Long folderId) {
+        List<Media> mediaList = JPA.em().createQuery("FROM Media m WHERE m.folder.id = " + folderId).getResultList();
+        List<Media> returningMediaList = new ArrayList<>();
+        for (Media media : mediaList) {
+            String path = Play.application().configuration().getString("media.path");
+            media.file = new File(path + "/" + media.url);
+            if (media.file.exists()) {
+                returningMediaList.add(media);
+            }
+        }
+        return returningMediaList;
+    }
+
     @SuppressWarnings("unchecked")
     public List<Media> listAllOwnedBy(Long id) {
         return JPA.em().createQuery("FROM Media m WHERE m.owner.id = " + id).getResultList();
     }
 
-    public boolean existsInGroup(Media media, Group group) {
-        List<Media> mediaList = group.mediaFolder.files;
-        for (Media m : mediaList) {
-            if (m.title.equals(media.title)) {
-                return true;
-            }
-        }
+    public boolean existsInFolder(Long mediaId, Long folderId) {
+        if(mediaId.equals(folderId)) return true;
         return false;
     }
 

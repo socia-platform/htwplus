@@ -3,9 +3,7 @@ package models;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.LinkType;
-import play.Play;
 import play.data.validation.Constraints.Required;
-import play.db.jpa.JPA;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -43,17 +41,17 @@ public class Media extends BaseNotifiable implements INotifiable {
     @Transient
     public File file;
 
-	@ManyToOne
-	public Folder folder;
+    @ManyToOne
+    public Folder folder;
 
     @Transient
     public String sizeInByte;
 
     public static String GROUP = "group";
 
-	public Group findGroup() {
-		return this.folder.findRoot(this.folder).group;
-	}
+    public Group findGroup() {
+        return this.folder.findRoot(this.folder).group;
+    }
 
     @Override
     public Account getSender() {
