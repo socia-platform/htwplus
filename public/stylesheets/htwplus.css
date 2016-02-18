@@ -19,6 +19,7 @@ div.alert {
 }
 
 a {
+    display: inline-block;
 	outline: none!important;
 }
 
@@ -1480,7 +1481,6 @@ div.hp-avatar-default-9 {
 }
 
 #hp-profile-header .links a {
-    display: inline-block;
     padding: 10px;
 }
 

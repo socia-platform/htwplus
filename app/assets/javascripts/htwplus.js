@@ -263,6 +263,22 @@ $(document).on("copy", function(e) {
     }
 });
 
+/*
+ *  show "create folder" form (group media) and focus input field
+ */
+$('body').on('click', 'a.hp-create-folder', function(e) {
+    e.preventDefault();
+    $("#hp-create-folder-wrapper").removeClass('hidden');
+    $("#hp-create-folder-wrapper").find('input').focus();
+});
+
+/*
+ * submit media and folder deletion form
+ */
+$('body').on('click', '.hp-mediaList-submit', function (e) {
+    $('#mediaListFrom').append('<input type="hidden" name="action" value="delete">').submit();
+});
+
 $(document).ready(function () {
 
     /*

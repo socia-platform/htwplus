@@ -533,7 +533,6 @@ public class Secured extends Security.Authenticator {
 				if (Secured.isMemberOfGroup(group, current)) {
 					return true;
 				}
-
 			case close:
 				if (Secured.isMemberOfGroup(group, current)) {
 					return true;
@@ -596,4 +595,18 @@ public class Secured extends Security.Authenticator {
         return object != null;
     }
 
+	public static boolean viewFolder(Folder folder) {
+		if (folder == null) {
+			return false;
+		}
+		if (isAdmin()) {
+			return true;
+		}
+		if (viewGroup(folder.group)) {
+			return true;
+		}
+		if (isMe(Component.currentAccount())) return true;
+
+		return false;
+	}
 }
