@@ -1,71 +1,79 @@
 package controllers;
 
-import java.util.List;
-
-import com.typesafe.config.ConfigFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import controllers.Navigation.Level;
+import managers.*;
 import models.*;
-import models.enums.AccountRole;
 import models.base.FileOperationException;
 import models.base.ValidationException;
+import models.enums.AccountRole;
 import models.enums.EmailNotifications;
-import models.enums.LinkType;
 import play.Logger;
-import models.services.AvatarService;
 import play.Play;
 import play.data.Form;
-import play.db.jpa.JPA;
-import play.mvc.Http.MultipartFormData;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
+import play.libs.Json;
+import play.mvc.Call;
+import play.mvc.Http.MultipartFormData;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Profile.*;
-import controllers.Navigation.Level;
-import play.Logger;
-import play.libs.Json;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.lang.StringUtils;
 import views.html.Profile.snippets.streamRaw;
 
+import javax.inject.Inject;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Transactional
 @Security.Authenticated(Secured.class)
 public class ProfileController extends BaseController {
 
-	static Form<Account> accountForm = Form.form(Account.class);
-	static Form<Post> postForm = Form.form(Post.class);
+    @Inject
+    AccountManager accountManager;
+
+    @Inject
+    GroupAccountManager groupAccountManager;
+
+    @Inject
+    PostManager postManager;
+
+    @Inject
+    AccountController accountController;
+
+    @Inject
+    StudycourseManager studycourseManager;
+
+    static Form<Account> accountForm = Form.form(Account.class);
+    static Form<Post> postForm = Form.form(Post.class);
     static Form<Login> loginForm = Form.form(Login.class);
 	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
+	static final int PAGE = 1;
 
-	public static Result me() {
-		Navigation.set(Level.PROFILE,"Ich");
-		Account account = Component.currentAccount();
-		if (account == null) {
-			flash("info", "Diese Person gibt es nicht.");
-			return redirect(controllers.routes.Application.index());
-		} else {
-			String avatar = Form.form().bindFromRequest().get("avatar");
-			if(avatar != null && avatar.equals("success")){
-				flash("success", "Dein Profilbild wurde erfolgreich gespeichert.");
-			}
-			return ok(index.render(account, postForm));
-			// return ok(index.render(account));
-		}
-	}
+    public Result me() {
+        Navigation.set(Level.PROFILE, "Ich");
+        Account account = Component.currentAccount();
+        if (account == null) {
+            flash("info", "Diese Person gibt es nicht.");
+            return redirect(controllers.routes.Application.index());
+        } else {
+            String avatar = Form.form().bindFromRequest().get("avatar");
+            if (avatar != null && avatar.equals("success")) {
+                flash("success", "Dein Profilbild wurde erfolgreich gespeichert.");
+            }
+            return ok(index.render(account, postForm));
+            // return ok(index.render(account));
+        }
+    }
 
-	public static Result view(final Long id) {
-		Account account = Account.findById(id);
+    public Result view(final Long id) {
+        Account account = accountManager.findById(id);
 
 		if (account == null || account.role == AccountRole.DUMMY) {
 			flash("info", "Diese Person gibt es nicht.");
 			return redirect(controllers.routes.Application.index());
 		} else {
-			if(Secured.isFriend(account)) {
-				Navigation.set(Level.FRIENDS, "Profil", account.name, controllers.routes.ProfileController.view(account.id));
+			if(Secured.isFriend(account) || Component.currentAccount().equals(account)) {
+				return redirect(routes.ProfileController.stream(account.id, PAGE, false));
 			} else {
 				Navigation.set(Level.USER, "Profil", account.name, controllers.routes.ProfileController.view(account.id));
 			}
@@ -76,188 +84,188 @@ public class ProfileController extends BaseController {
 	}
 
     @Transactional
-	public static Result stream(Long accountId, int page, boolean raw) {
-		Account account = Account.findById(accountId);
-		Account currentUser = Component.currentAccount();
-		
-		if (account == null || account.role == AccountRole.DUMMY) {
-			flash("info", "Diese Person gibt es nicht.");
-			return redirect(controllers.routes.Application.index());
-		}
+    public Result stream(Long accountId, int page, boolean raw) {
+        Account account = accountManager.findById(accountId);
+        Account currentUser = Component.currentAccount();
 
-		if (currentUser.equals(account)) {
-			Navigation.set(Level.PROFILE, "Newsstream");
-		} else {
-			Navigation.set(Level.FRIENDS, "Newsstream", account.name,
+        if (account == null || account.role == AccountRole.DUMMY) {
+            flash("info", "Diese Person gibt es nicht.");
+            return redirect(controllers.routes.Application.index());
+        }
+
+        if (currentUser.equals(account)) {
+            Navigation.set(Level.PROFILE, "Newsstream");
+        } else {
+            Navigation.set(Level.FRIENDS, "Newsstream", account.name,
                     controllers.routes.ProfileController.view(account.id));
-		}
+        }
 
-		// case for friends and own profile
-		if (Friendship.alreadyFriendly(Component.currentAccount(), account)
-				|| currentUser.equals(account) || Secured.isAdmin()) {
-            if(raw) {
-                return ok(streamRaw.render(account, Post.getFriendStream(account, LIMIT, page),
-                        postForm, Post.countFriendStream(account), LIMIT, page));
+        // case for friends and own profile
+        if (FriendshipManager.alreadyFriendly(Component.currentAccount(), account)
+                || currentUser.equals(account) || Secured.isAdmin()) {
+            if (raw) {
+                return ok(streamRaw.render(account, postManager.getFriendStream(account, LIMIT, page),
+                        postForm, postManager.countFriendStream(account), LIMIT, page));
             } else {
-                return ok(stream.render(account, Post.getFriendStream(account, LIMIT, page),
-                        postForm, Post.countFriendStream(account), LIMIT, page));
+                return ok(stream.render(account, postManager.getFriendStream(account, LIMIT, page),
+                        postForm, postManager.countFriendStream(account), LIMIT, page));
             }
-		}
-		// case for visitors
-		flash("info", "Du kannst nur den Stream deiner Freunde betrachten!");
-		return redirect(controllers.routes.ProfileController.view(accountId));
-	}
+        }
+        // case for visitors
+        flash("info", "Du kannst nur den Stream deiner Kontakte betrachten!");
+        return redirect(controllers.routes.ProfileController.view(accountId));
+    }
 
-	public static Result convert(Long id) {
-		Account account = Account.findById(id);
-		
-		if (account == null) {
-			flash("info", "Diese Person gibt es nicht.");
-			return redirect(controllers.routes.Application.index());
-		}
-		// Check Access
-		if(!Secured.isAdmin()) {
-			return redirect(controllers.routes.Application.index());
-		}
-		
-		Navigation.set(Level.PROFILE, "Konvertieren");
-		return ok(convert.render(account, accountForm.fill(account)));
-	}
+    public Result convert(Long id) {
+        Account account = accountManager.findById(id);
 
-	public static Result saveConvert(Long id) {
-		// Get regarding Object
-		Account account = Account.findById(id);
-		if (account == null) {
-			flash("info", "Diese Person gibt es nicht.");
-			return redirect(controllers.routes.Application.index());
-		}
-		
-		// Create error switch
-		Boolean error = false;
-		
-		// Check Access
-		if(!Secured.isAdmin()) {
-			return redirect(controllers.routes.Application.index());
-		}
-		
-		// Get data from request
-		Form<Account> filledForm = accountForm.bindFromRequest();
-		
-		
-		// Remove all unnecessary fields
-		filledForm.errors().remove("firstname");
-		filledForm.errors().remove("lastname");
+        if (account == null) {
+            flash("info", "Diese Person gibt es nicht.");
+            return redirect(controllers.routes.Application.index());
+        }
+        // Check Access
+        if (!Secured.isAdmin()) {
+            return redirect(controllers.routes.Application.index());
+        }
 
-		// Store old and new password for validation
+        Navigation.set(Level.PROFILE, "Konvertieren");
+        return ok(convert.render(account, accountForm.fill(account)));
+    }
+
+    public Result saveConvert(Long id) {
+        // Get regarding Object
+        Account account = accountManager.findById(id);
+        if (account == null) {
+            flash("info", "Diese Person gibt es nicht.");
+            return redirect(controllers.routes.Application.index());
+        }
+
+        // Create error switch
+        Boolean error = false;
+
+        // Check Access
+        if (!Secured.isAdmin()) {
+            return redirect(controllers.routes.Application.index());
+        }
+
+        // Get data from request
+        Form<Account> filledForm = accountForm.bindFromRequest();
+
+
+        // Remove all unnecessary fields
+        filledForm.errors().remove("firstname");
+        filledForm.errors().remove("lastname");
+
+        // Store old and new password for validation
         String email = filledForm.field("email").value();
-		String password = filledForm.field("password").value();
-		String repeatPassword = filledForm.field("repeatPassword").value();
-		
-		// Perform JPA Validation
-		if(filledForm.hasErrors()) {
-			error = true;
-		}
+        String password = filledForm.field("password").value();
+        String repeatPassword = filledForm.field("repeatPassword").value();
+
+        // Perform JPA Validation
+        if (filledForm.hasErrors()) {
+            error = true;
+        }
 
         if (email.isEmpty()) {
             filledForm.reject("email", "Für einen lokalen Account ist eine EMail nötig!");
             error = true;
         }
-		if (password.length() < 6) {
-			filledForm.reject("password", "Das Passwort muss mindestens 6 Zeichen haben.");
-			error = true;
-		}
+        if (password.length() < 6) {
+            filledForm.reject("password", "Das Passwort muss mindestens 6 Zeichen haben.");
+            error = true;
+        }
 
-		if (!password.equals(repeatPassword)) {
-			filledForm.reject("repeatPassword", "Die Passwörter stimmen nicht überein.");
-			error = true;
-		}
+        if (!password.equals(repeatPassword)) {
+            filledForm.reject("repeatPassword", "Die Passwörter stimmen nicht überein.");
+            error = true;
+        }
 
-		if (error) {
-			return badRequest(convert.render(account, filledForm));
-		} else {
-			account.password = Component.md5(password);
+        if (error) {
+            return badRequest(convert.render(account, filledForm));
+        } else {
+            account.password = Component.md5(password);
             account.email = email;
-			account.update();
-			flash("success", "Account erfolgreich konvertiert.");
-		}
-		return redirect(controllers.routes.ProfileController.view(id));
-	}
+            accountManager.update(account);
+            flash("success", "Account erfolgreich konvertiert.");
+        }
+        return redirect(controllers.routes.ProfileController.view(id));
+    }
 
-	public static Result edit(Long id) {
-		Account account = Account.findById(id);
-		if (account == null) {
-			flash("info", "Diese Person gibt es nicht.");
-			return redirect(controllers.routes.Application.index());
-		}
-		
-		// Check Access
-		if (!Secured.editAccount(account)) {
-			return redirect(controllers.routes.Application.index());
-		}
+    public Result edit(Long id) {
+        Account account = accountManager.findById(id);
+        if (account == null) {
+            flash("info", "Diese Person gibt es nicht.");
+            return redirect(controllers.routes.Application.index());
+        }
+
+        // Check Access
+        if (!Secured.editAccount(account)) {
+            return redirect(controllers.routes.Application.index());
+        }
 
         Navigation.set(Level.PROFILE, "Editieren");
-		return ok(edit.render(account, accountForm.fill(account), loginForm));
-	}
+        return ok(edit.render(account, accountForm.fill(account), loginForm, studycourseManager.getAll()));
+    }
 
-	public static Result update(Long id) {
-		// Get regarding Object
-		Account account = Account.findById(id);
-		if (account == null) {
-			flash("info", "Diese Person gibt es nicht.");
-			return redirect(controllers.routes.Application.index());
-		}
-		
-		// Check Access
-		if (!Secured.editAccount(account)) {
-			return redirect(controllers.routes.Application.index());
-		}
-		
-		// Get the data from the request
-		Form<Account> filledForm = accountForm.bindFromRequest();
-		
-		Navigation.set(Level.PROFILE, "Editieren");
-	
-		// Remove expected errors
-		filledForm.errors().remove("password");
-		filledForm.errors().remove("studycourse");
-		filledForm.errors().remove("firstname");
-		filledForm.errors().remove("lastname");
+    public Result update(Long id) {
+        // Get regarding Object
+        Account account = accountManager.findById(id);
+        if (account == null) {
+            flash("info", "Diese Person gibt es nicht.");
+            return redirect(controllers.routes.Application.index());
+        }
 
-		// Custom Validations
-		Account exisitingAccount = Account.findByEmail(filledForm.field("email").value());
-		if (exisitingAccount != null && !exisitingAccount.equals(account)) {
-			filledForm.reject("email", "Diese Mail wird bereits verwendet!");
-			return badRequest(edit.render(account, filledForm, loginForm));
-		}
-		System.out.println(filledForm.errorsAsJson());
-		// Perform JPA Validation
-		if (filledForm.hasErrors()) {
-			return badRequest(edit.render(account, filledForm, loginForm));
-		} else {
+        // Check Access
+        if (!Secured.editAccount(account)) {
+            return redirect(controllers.routes.Application.index());
+        }
 
-			// Fill an and update the model manually 
-			// because the its just a partial form
-			if (!filledForm.field("email").value().isEmpty()) {
-				account.email = filledForm.field("email").value();
-			} else {
-				account.email = null;
-			}
+        // Get the data from the request
+        Form<Account> filledForm = accountForm.bindFromRequest();
 
-			if (filledForm.data().containsKey("degree")) {
-				if (filledForm.field("degree").value().equals("null")) {
-					account.degree = null;
-				} else {
-					account.degree = filledForm.field("degree").value();
-				}
-			}
+        Navigation.set(Level.PROFILE, "Editieren");
 
-			if (filledForm.data().containsKey("semester")) {
-				if (filledForm.field("semester").value().equals("0")) {
-					account.semester = null;
-				} else {
-					account.semester = Integer.parseInt(filledForm.field("semester").value());
-				}
-			}
+        // Remove expected errors
+        filledForm.errors().remove("password");
+        filledForm.errors().remove("studycourse");
+        filledForm.errors().remove("firstname");
+        filledForm.errors().remove("lastname");
+
+        // Custom Validations
+        Account exisitingAccount = accountManager.findByEmail(filledForm.field("email").value());
+        if (exisitingAccount != null && !exisitingAccount.equals(account)) {
+            filledForm.reject("email", "Diese Mail wird bereits verwendet!");
+            return badRequest(edit.render(account, filledForm, loginForm, studycourseManager.getAll()));
+        }
+
+        // Perform JPA Validation
+        if (filledForm.hasErrors()) {
+            return badRequest(edit.render(account, filledForm, loginForm, studycourseManager.getAll()));
+        } else {
+
+            // Fill an and update the model manually
+            // because the its just a partial form
+            if (!filledForm.field("email").value().isEmpty()) {
+                account.email = filledForm.field("email").value();
+            } else {
+                account.email = null;
+            }
+
+            if (filledForm.data().containsKey("degree")) {
+                if (filledForm.field("degree").value().equals("null")) {
+                    account.degree = null;
+                } else {
+                    account.degree = filledForm.field("degree").value();
+                }
+            }
+
+            if (filledForm.data().containsKey("semester")) {
+                if (filledForm.field("semester").value().equals("0")) {
+                    account.semester = null;
+                } else {
+                    account.semester = Integer.parseInt(filledForm.field("semester").value());
+                }
+            }
 
             if (filledForm.data().containsKey("emailNotifications")) {
                 account.emailNotifications = EmailNotifications.valueOf(filledForm.field("emailNotifications").value());
@@ -269,55 +277,55 @@ public class ProfileController extends BaseController {
                 }
             }
 
-			Long studycourseId = Long.parseLong(filledForm.field("studycourse").value());
-			Studycourse studycourse;
-			if (studycourseId != 0) {
-				studycourse = Studycourse.findById(studycourseId);
-			} else {
-				studycourse = null;
-			}
-			account.studycourse = studycourse;
+            Long studycourseId = Long.parseLong(filledForm.field("studycourse").value());
+            Studycourse studycourse;
+            if (studycourseId != 0) {
+                studycourse = studycourseManager.findById(studycourseId);
+            } else {
+                studycourse = null;
+            }
+            account.studycourse = studycourse;
 
-			if (!filledForm.field("about").value().isEmpty()) {
-				account.about = filledForm.field("about").value();
-			} else {
-				account.about = null;
-			}
+            if (!filledForm.field("about").value().isEmpty()) {
+                account.about = filledForm.field("about").value();
+            } else {
+                account.about = null;
+            }
 
-			if (!filledForm.field("homepage").value().isEmpty()) {
-				account.homepage = filledForm.field("homepage").value();
-			} else {
-				account.homepage = null;
-			}
+            if (!filledForm.field("homepage").value().isEmpty()) {
+                account.homepage = filledForm.field("homepage").value();
+            } else {
+                account.homepage = null;
+            }
 
-			account.update();
-		
-			flash("success", "Profil erfolgreich gespeichert.");
-			return redirect(controllers.routes.ProfileController.me());
-		}
-	}
+            accountManager.update(account);
 
-    public static Result groups(Long id) {
-        Account account = Account.findById(id);
+            flash("success", "Profil erfolgreich gespeichert.");
+            return redirect(controllers.routes.ProfileController.me());
+        }
+    }
 
-        if(Secured.isFriend(account)) {
+    public Result groups(Long id) {
+        Account account = accountManager.findById(id);
+
+        if (Secured.isFriend(account)) {
             Navigation.set(Level.FRIENDS, "Gruppen & Kurse", account.name, controllers.routes.ProfileController.view(account.id));
         } else {
-            if(Secured.isMe(id)) {
+            if (Secured.isMe(account)) {
                 Navigation.set(Level.PROFILE, "Gruppen & Kurse");
             } else {
                 Navigation.set(Level.USER, "Gruppen & Kurse", account.name, controllers.routes.ProfileController.view(account.id));
             }
         }
 
-        return ok(groups.render(account, GroupAccount.findGroupsEstablished(account),GroupAccount.findCoursesEstablished(account)));
+        return ok(groups.render(account, groupAccountManager.findGroupsEstablished(account), groupAccountManager.findCoursesEstablished(account)));
     }
 
     @Transactional
-    public static Result deleteProfile(Long accountId) {
-        Account current = Account.findById(accountId);
+    public Result deleteProfile(Long accountId) {
+        Account current = accountManager.findById(accountId);
 
-        if(!Secured.deleteAccount(current)) {
+        if (!Secured.deleteAccount(current)) {
             flash("error", Messages.get("profile.delete.nopermission"));
             return redirect(controllers.routes.Application.index());
         }
@@ -325,163 +333,162 @@ public class ProfileController extends BaseController {
         // Check Password //
         Form<Login> filledForm = loginForm.bindFromRequest();
         String entered = filledForm.field("password").value();
-        if(entered == null || entered.length() == 0) {
+        if (entered == null || entered.length() == 0) {
             flash("error", Messages.get("profile.delete.nopassword"));
             return redirect(controllers.routes.ProfileController.update(current.id));
-        } else if(!AccountController.checkPassword(accountId, entered)) {
+        } else if (!accountController.checkPassword(accountId, entered)) {
             return redirect(controllers.routes.ProfileController.update(current.id));
         }
 
         // ACTUAL DELETION //
-        Logger.info("Deleting Account[#"+current.id+"]...");
-        current.delete();
+        Logger.info("Deleting Account[#" + current.id + "]...");
+        accountManager.delete(current);
 
         // override logout message
-        Result logoutResult = AccountController.logout();
         flash("success", Messages.get("profile.delete.success"));
-        return logoutResult;
+        return redirect(controllers.routes.AccountController.logout());
     }
 
-	/**
-	 * Handles the upload of the temporary avatar image
-	 *
-	 * @param id
-	 * @return
-	 */
-	public static Result createTempAvatar(Long id) {
+    /**
+     * Handles the upload of the temporary avatar image
+     *
+     * @param id
+     * @return
+     */
+    public Result createTempAvatar(Long id) {
 
-		Account account = Account.findById(id);
+        Account account = accountManager.findById(id);
 
-		if(account == null){
-			return notFound();
-		}
+        if (account == null) {
+            return notFound();
+        }
 
-		ObjectNode result = Json.newObject();
-		MultipartFormData body = request().body().asMultipartFormData();
-		
-		if(body == null) {
-			result.put("error", "No file attached");
-			return badRequest(result);
-		}
-		
-		MultipartFormData.FilePart avatar = body.getFile("avatarimage");
+        ObjectNode result = Json.newObject();
+        MultipartFormData body = request().body().asMultipartFormData();
 
-		if(avatar == null) {
-			result.put("error", "No file with key 'avatarimage'");
-			return badRequest(result);
-		}
+        if (body == null) {
+            result.put("error", "No file attached");
+            return badRequest(result);
+        }
 
-		try {
-			account.setTempAvatar(avatar);
-		} catch (ValidationException e) {
-			result.put("error", e.getMessage());
-			return badRequest(result);
-		}
-		
-		result.put("success", controllers.routes.ProfileController.getTempAvatar(id).toString());
-		return ok(result);
-	}
+        MultipartFormData.FilePart avatar = body.getFile("avatarimage");
 
-	/**
-	 * Get the temporary avatar image
-	 *
-	 * @param id
-	 * @return
-	 */
-	public static Result getTempAvatar(Long id) {
+        if (avatar == null) {
+            result.put("error", "No file with key 'avatarimage'");
+            return badRequest(result);
+        }
 
-		ObjectNode result = Json.newObject();
-		Account account = Account.findById(id);
+        try {
+            account.setTempAvatar(avatar);
+        } catch (ValidationException e) {
+            result.put("error", e.getMessage());
+            return badRequest(result);
+        }
 
-		if(account == null){
-			return notFound();
-		}
+        result.put("success", getTempAvatar(id).toString());
+        return ok(result);
+    }
 
-		if (!Secured.editAccount(account)) {
-			result.put("error", "Not allowed.");
-			return forbidden(result);
-		}
+    /**
+     * Get the temporary avatar image
+     *
+     * @param id
+     * @return
+     */
+    public Result getTempAvatar(Long id) {
 
-		File tempAvatar = account.getTempAvatar();
-		if(tempAvatar != null){
-			return ok(tempAvatar);
-		} else {
-			return notFound();
-		}
-	}
+        ObjectNode result = Json.newObject();
+        Account account = accountManager.findById(id);
 
-	/**
-	 * Create the real avatar with the given dimensions
-	 *
-	 * @param id
-	 * @return
-	 */
-	public static Result createAvatar(long id) {
-		ObjectNode result = Json.newObject();
-		
-		Account account = Account.findById(id);
+        if (account == null) {
+            return notFound();
+        }
 
-		if(account == null){
-			return notFound();
-		}
+        if (!Secured.editAccount(account)) {
+            result.put("error", "Not allowed.");
+            return forbidden(result);
+        }
 
-		if (!Secured.editAccount(account)) {
-			result.put("error", "Not allowed.");
-			return forbidden(result);
-		}
-		
-		Form<Account.AvatarForm> form = Form.form(Account.AvatarForm.class).bindFromRequest();
+        File tempAvatar = account.getTempAvatar();
+        if (tempAvatar != null) {
+            return ok(tempAvatar);
+        } else {
+            return notFound();
+        }
+    }
 
-		if(form.hasErrors()){
-			result.put("error", form.errorsAsJson());
-			return badRequest(result);
-		}
+    /**
+     * Create the real avatar with the given dimensions
+     *
+     * @param id
+     * @return
+     */
+    public Result createAvatar(long id) {
+        ObjectNode result = Json.newObject();
 
-		try {
-			account.saveAvatar(form.get());
-            account.indexAccount();
-			result.put("success", "saved");
-			return ok(result);
-		} catch (FileOperationException e) {
-			result.put("error", "Unexpected Error while saving avatar.");
-			return internalServerError(result);
-		}
-	}
+        Account account = accountManager.findById(id);
 
-	/**
-	 * Get the avatar of a user.
-	 *
-	 * @param id User ID
-	 * @param size Size - Possible values: "small", "medium", "large"
-	 * @return
-	 */
-	public static Result getAvatar(long id, String size){
-		Account account = Account.findById(id);
-		if(account != null){
-			File avatar;
-			switch (size) {
-				case "small":
-					avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
-					break;
-				case "medium":
-					avatar = account.getAvatar(Account.AVATAR_SIZE.MEDIUM);
-					break;
-				case "large":
-					avatar = account.getAvatar(Account.AVATAR_SIZE.LARGE);
-					break;
-				default:
-					avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
-			}
-			response().setHeader("Content-disposition","inline");
-			if(avatar != null){
-				return ok(avatar);
-			} else {
-				return notFound();
-			}
-		} else {
-			return notFound();
-		}
-	}
+        if (account == null) {
+            return notFound();
+        }
+
+        if (!Secured.editAccount(account)) {
+            result.put("error", "Not allowed.");
+            return forbidden(result);
+        }
+
+        Form<Account.AvatarForm> form = Form.form(Account.AvatarForm.class).bindFromRequest();
+
+        if (form.hasErrors()) {
+            result.put("error", form.errorsAsJson());
+            return badRequest(result);
+        }
+
+        try {
+            account.saveAvatar(form.get());
+            accountManager.indexAccount(account);
+            result.put("success", "saved");
+            return ok(result);
+        } catch (FileOperationException e) {
+            result.put("error", "Unexpected Error while saving avatar.");
+            return internalServerError(result);
+        }
+    }
+
+    /**
+     * Get the avatar of a user.
+     *
+     * @param id   User ID
+     * @param size Size - Possible values: "small", "medium", "large"
+     * @return
+     */
+    public Result getAvatar(long id, String size) {
+        Account account = accountManager.findById(id);
+        if (account != null) {
+            File avatar;
+            switch (size) {
+                case "small":
+                    avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
+                    break;
+                case "medium":
+                    avatar = account.getAvatar(Account.AVATAR_SIZE.MEDIUM);
+                    break;
+                case "large":
+                    avatar = account.getAvatar(Account.AVATAR_SIZE.LARGE);
+                    break;
+                default:
+                    avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
+            }
+            response().setHeader("Content-disposition", "inline");
+            if (avatar != null) {
+                return ok(avatar);
+            } else {
+                return notFound();
+            }
+        } else {
+            return notFound();
+        }
+    }
 
 
 }

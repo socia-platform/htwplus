@@ -1,27 +1,63 @@
 @(user: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer)
+@import play._
 
 @main("Profilstream") {
+@***
     <div class="row">
         <div class="col-lg-12" role="main">
             <div class="hp-notepad-content addmargin">
                 @defining(Component.currentAccount()) { curUser =>
 
-                    <!-- confirmDeleteFriendModal -->
-                    <div class="modal fade" id="confirmDeleteFriend@user.id" tabindex="-1" role="dialog">@views.html.Friends.snippets.deleteFriendModal(user)</div>
-                    <!-- Ende confirmDeleteFriendModal -->
+
 
     @views.html.Profile.snippets.navTabs(user)
 	<h2>@user.name's Newsstream</h2>
-	
+
 	@if(curUser.equals(user)) {
-	<h5>(Das sehen deine Freunde)</h5>
+	<h5>(Das sehen deine Kontakte)</h5>
 	}
   	<br />
 }
 	@views.html.snippets.postForm(user.id, models.Post.PROFILE, postForm)
-		
+
 	@views.html.Profile.snippets.streamRaw(user, posts, postForm, count, limit, currentPage)
             </div>
         </div>
     </div>
+***@
+
+@views.html.Profile.snippets.header(user)
+
+<div class="row">
+    <div class="col-md-12" role="main">
+        <div class="addmargin">
+            <div class="row">
+                @defining(Component.currentAccount()) { currentUser =>
+                <div class="col-md-1" role="main">
+                    @if(currentUser.hasAvatar){
+                    <img alt="avatar"
+                         src='@routes.ProfileController.getAvatar(currentUser.id, "medium")'
+                         class="hp-avatar-medium hidden-xs hidden-sm"/>
+                    } else {
+                    <div class="hidden-xs hidden-sm hp-avatar-medium hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
+                    }
+                </div>
+                <div class="col-md-11" role="complementary">
+                    <div class="hp-post-create-area">
+                        @views.html.snippets.postForm(user.id, models.Post.PROFILE, postForm)
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12" role="main">
+            <div class="row hp-pagination-container">
+                @views.html.Profile.snippets.streamRaw(user, posts, postForm, count, limit, currentPage)
+            </div>
+    </div>
+</div>
 }

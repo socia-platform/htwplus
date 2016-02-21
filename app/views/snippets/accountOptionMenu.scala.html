@@ -19,7 +19,7 @@
 
     <ul class="dropdown-menu nav-pills" role="menu" aria-labelledby="dropdownMenu">
 
-        @if(Friendship.alreadyFriendly(Component.currentAccount, user)) {
+        @if(managers.FriendshipManager.alreadyFriendly(Component.currentAccount, user)) {
 
         <li><a href="@routes.ProfileController.stream(user.id)" data-toggle="modal">
             <span class="glyphicon glyphicon-comment"></span><br>Newsstream
@@ -30,13 +30,13 @@
         </a></li>
 
         <li><a href="#confirmDeleteFriend@user.id" data-toggle="modal">
-            <span class="glyphicon glyphicon-remove"></span><br>Freundschaft beenden
+            <span class="glyphicon glyphicon-remove"></span><br>Kontakt lösen
         </a></li>
 
         } else {
 
         <li><a href="@routes.FriendshipController.requestFriend(user.id)" data-toggle="modal">
-            <span class="glyphicon glyphicon-envelope"></span><br>Freundschaftsanfrage
+            <span class="glyphicon glyphicon-envelope"></span><br>Kontaktanfrage
         </a></li>
 
         <li><a href="@routes.ProfileController.view(user.id)" data-toggle="modal">

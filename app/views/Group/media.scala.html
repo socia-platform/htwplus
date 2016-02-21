@@ -1,54 +1,55 @@
-@(group: Group, mediaForm: Form[Media], mediaList: List[Media])
+@(group: Group, mediaForm: Form[Media], mediaList: List[Media], folderList: List[Folder], folder: Folder, navigationFolder: List[Folder], folderForm: Form[Folder])
+@import helper._
 @import models.enums._
 
-@main("Group Media") {
-    <div class="row">
-        <div class="col-lg-12" role="main">
-            <div class="hp-notepad-content addmargin">
+@main(group.title +" - Medien") {
 
-                    <!-- Start infoModal -->
-                <div id="infoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="false">
-                @views.html.Group.snippets.infoModal(group)
-                </div>
-                    <!-- Ende infoModal -->
 
-                    <!-- Start confirmDeleteGroupModal -->
-                <div id="confirmDeleteGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-                @views.html.Group.snippets.deleteGroupModal(group)
-                </div>
-                    <!-- End confirmDeleteGroupModal -->
+@views.html.Group.snippets.header(group)
 
-                    <!-- Start confirmLeaveGroupModal -->
-                <div id="confirmLeaveGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-                @views.html.Group.snippets.leaveGroupModal(group)
-                </div>
-                    <!-- End confirmDeleteGroupModal -->
+<div class="row">
+    <div class="col-lg-12" role="main">
+        <div class="hp-notepad-content addmargin">
+            <br/>
+            <ol class="breadcrumb">
+                <li><a href="@routes.GroupController.media(group.id)"><span
+                        class="glyphicon glyphicon-folder-open"></span></a></li>
+                @for(parents <- navigationFolder) {
+                <li><a href="@routes.GroupController.media(group.id, parents.id)">@parents.name</a></li>
+                }
+                <li><a href="#" class="hp-create-folder">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </a></li>
+            </ol>
 
-                @views.html.Group.snippets.navTabs(group)
-
-                <div class="clear">
-                    <h2 class="hp-truncate">
-                        @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
-                        @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
-                        @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
-                        @group.title
-                    </h2>
-                    <br />
-                    <br />
-
-                    @if(!mediaList.isEmpty) {
-                        @views.html.Media.list(mediaList,models.Media.GROUP,group.id)
-                    } else {
-                        <br /><br />
-                        <i>Es wurden noch keine Dateien hochgeladen.</i>
-                    }
-                    <hr />
-                    <br />
-                    @if(Secured.uploadMedia(group)) {
-                        @views.html.Media.upload(mediaForm,models.Media.GROUP,group.id)
-                    }
-                </div>
+            <div id="hp-create-folder-wrapper" class="hidden">
+                <br />
+                @form(action =  routes.GroupController.createFolder(folder.id)) {
+                    <div class="form-group input-group">
+                        <input type="text" class="form-control" name="name" placeholder="Ordnername wählen">
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-warning">Erstellen</button>
+                        </span>
+                    </div>
+                }
+                <br />
             </div>
+
+            @if(!mediaList.isEmpty || !folderList.isEmpty) {
+            @views.html.Media.list(mediaList,folderList,models.Media.GROUP, group.id)
+            } else {
+            <br/><br/>
+            <i>Es wurden noch keine Dateien hochgeladen.</i>
+            }
+            <hr/>
+            <br/>
+            @if(Secured.uploadMedia(group)) {
+            @views.html.Media.upload(mediaForm,models.Media.GROUP,folder.id)
+            }
+            <br/>
+            <br/>
+
         </div>
     </div>
+</div>
 }

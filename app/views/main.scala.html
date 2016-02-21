@@ -23,35 +23,41 @@
             @views.html.snippets.navi()
             @views.html.snippets.breadcrumb()
         }
-		<div class="container">
-			@if(!flash.isEmpty()) {
-				<div class="row">
-					<div class="col-lg-12">
-						@if(flash.containsKey("success")) {
-							<div class="alert alert-success fade in">
-								<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
-								@flash.get("success")
-							</div>
-						}
-						@if(flash.containsKey("info")) {
-							<div class="alert alert-info fade in">
-								<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
-								@flash.get("info")
-							</div>
-						}
-						@if(flash.containsKey("error")) {
-							<div class="alert alert-danger fade in">
-								<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
-								@flash.get("error")
-							</div>
-						}
-					</div>
-				</div>
-			}
-		</div> <!-- /container -->
 
-        <div id="hp-top" class="container">
-        @views.html.snippets.notepad(title) { @content }
+        <div id="hp-top" class="container min-height">
+			<div class="row addmargin">
+				<div class="col-lg-12" style="text-align: center; font-weight: bold; font-size: 15px;">
+					<span style="color: red" class="glyphicon glyphicon-fire"></span>
+					<span title="Dieser Text verschwindet mit dem nächsten Feature-Deploy">HTWplus Versions-Update. Anomalien bitte <a href="@routes.GroupController.stream(638)">melden</a>.</span>
+					<span style="color: red" class="glyphicon glyphicon-fire"></span>
+				</div>
+			</div>
+			@if(!flash.isEmpty()) {
+			<div class="row">
+				<div class="col-lg-12">
+					@if(flash.containsKey("success")) {
+					<div class="alert alert-success fade in">
+						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+						@flash.get("success")
+					</div>
+					}
+					@if(flash.containsKey("info")) {
+					<div class="alert alert-info fade in">
+						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+						@flash.get("info")
+					</div>
+					}
+					@if(flash.containsKey("error")) {
+					<div class="alert alert-danger fade in">
+						<button type="button" class="close fade out" data-dismiss="alert">&times;</button>
+						@flash.get("error")
+					</div>
+					}
+				</div>
+			</div>
+			}
+
+        	@views.html.snippets.notepad(title) { @content }
         </div>
         
         <!-- 'Go to top' link -->
@@ -70,6 +76,7 @@
 		<script type="text/javascript" src='@routes.Assets.at("bower_components/dropzone/dist/min/dropzone.min.js")'></script>
 		<script type="text/javascript" src='@routes.Assets.at("bower_components/cropper/dist/cropper.min.js")'></script>
         <script type="text/javascript" src="@routes.Assets.at("javascript/jquery.auto.pagination-1.0-modified.js")"></script>
+        <script type="text/javascript" src='@routes.Assets.at("bower_components/readmore/readmore.min.js")'></script>
 
 		<script type="text/javascript" src='@routes.Assets.at("javascripts/htwplus.js")'></script>
 		<script type="text/javascript" src='@routes.Assets.at("javascripts/bootstrap-prettyfile.js")'></script>

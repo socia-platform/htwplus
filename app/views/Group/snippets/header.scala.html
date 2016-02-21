@@ -1,0 +1,131 @@
+@(group: Group)
+@avatarList = @{group.groupAccounts.toSeq.sortBy(_.createdAt)}
+@import models.enums._
+
+@if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
+<!-- Start confirmLeaveGroupModal -->
+<div id="confirmLeaveGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel"
+     aria-hidden="true">
+    @views.html.Group.snippets.leaveGroupModal(group)
+</div>
+<!-- End confirmDeleteGroupModal -->
+}
+@if(Secured.deleteGroup(group)) {
+<!-- Start confirmDeleteGroupModal -->
+<div id="confirmDeleteGroup" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel"
+     aria-hidden="true">
+    @views.html.Group.snippets.deleteGroupModal(group)
+</div>
+<!-- End confirmDeleteGroupModal -->
+}
+
+<div class="row">
+    <div class="col-md-12" role="main">
+        <div class="addmargin">
+            <div id="hp-profile-header">
+
+                @if(group.groupType.equals(GroupType.open)) {
+                <span style="background-color: white" class="avatar glyphicon glyphicon-globe"></span>
+                }
+                @if(group.groupType.equals(GroupType.close)) {
+                <span style="background-color: white" class="avatar glyphicon glyphicon-lock"></span>
+                }
+                @if(group.groupType.equals(GroupType.course)) {
+                <span style="background-color: white" class="avatar glyphicon glyphicon-briefcase"></span>
+                }
+
+
+                <div class="headline">
+                    <div class="links pull-right">
+                        <a href="@routes.GroupController.stream(group.id)"
+                           class='@if(Navigation.getTitle().equals("Newsstream")){active}' rel="tooltip"
+                           data-original-title="Newsstream der Gruppe" data-container="body">
+                            <span class="glyphicon glyphicon-comment"></span>
+                        </a>
+                        <a href="@routes.GroupController.media(group.id)"
+                           class='@if(Navigation.getTitle().equals("Media")){active}' rel="tooltip"
+                           data-original-title="Medien der Gruppe" data-container="body">
+                            <span class="glyphicon glyphicon-file"></span>
+                        </a>
+                        @if(!Secured.isMemberOfGroup(group, Component.currentAccount)) {
+                        <a href="@routes.GroupController.join(group.id)" rel="tooltip"
+                           data-original-title="Tritt der Gruppe bei" data-container="body">
+                            <span class="glyphicon glyphicon-log-in"></span>
+                        </a>
+                        }
+
+                        @if(Secured.editGroup(group)) {
+                        <a href="@routes.GroupController.edit(group.id)"
+                           class='@if(Navigation.getTitle().equals("Bearbeiten")){active}' rel="tooltip"
+                           data-original-title="Bearbeite die Gruppe" data-container="body">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                        }
+
+                        @if(Secured.editGroup(group)) {
+                        <a href="@routes.GroupController.invite(group.id)"
+                           class='@if(Navigation.getTitle().equals("Kontakte einladen")){active}' rel="tooltip"
+                           data-original-title="Lade deine Kontakte ein" data-container="body">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                        }
+
+                        @if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group,
+                        Component.currentAccount)) {
+                        <a href="#confirmLeaveGroup" data-toggle="modal" rel="tooltip"
+                           data-original-title="Verlasse die Gruppe" data-container="body">
+                            <span class="glyphicon glyphicon-log-out"></span>
+                        </a>
+                        }
+
+                        @if(Secured.deleteGroup(group)) {
+                        <a href="#confirmDeleteGroup" rel="tooltip" data-toggle="modal"
+                           data-original-title="Lösche die Gruppe" data-container="body">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                        }
+                    </div>
+                    <div class="clearfix"></div>
+                    <h2 class="title visible-md visible-lg">@group.title</h2>
+                    <h3 class="title visible-xs visible-sm">@group.title</h3>
+                </div>
+
+                <div class="bottomline">
+                    <div><small>
+                        <span><b>Gründer: </b>@views.html.snippets.userLink(group.owner)</span>
+                        <span>| <b>Medien: </b><a href="@routes.GroupController.media(group.id)">@managers.FolderManager.countAll(group.mediaFolder)
+                            Datei(en)</a></span>
+                        @if(group.groupType == GroupType.course && Secured.viewGroup(group)) {
+                        <span>| <b>Token: </b>@group.token</span>
+                        }</small>
+                    </div>
+
+                    <div class="hp-avatar-wrapper">
+                        <div clasS="hp-avatar-container">
+                        @for((item, index) <- group.groupAccounts.toSeq.sortBy(_.createdAt).zipWithIndex) {
+                                <a class="hp-nohref hp-avatar-list" href="@routes.ProfileController.view(item.account.id)" rel="tooltip"
+                                   data-original-title="@item.account.name" data-container="body">
+                                    @if(item.account.hasAvatar){
+                                    <img alt="avatar" src="@routes.ProfileController.getAvatar(item.account.id)"
+                                         class="hp-avatar-small"/>
+                                    } else {
+                                    <div class="hp-avatar-small hp-avatar-default-@item.account.avatar">@item.account.getInitials</div>
+                                    }
+                                </a>
+
+                        }
+                        </div>
+                    </div>
+
+                    <div><small>
+                    @if(!group.description.isEmpty()) {
+                        <br />
+                        <b>Beschreibung</b>
+                        <div class="text hp-white-space">@group.description</div>
+                    }</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

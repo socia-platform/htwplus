@@ -3,6 +3,7 @@ package controllers;
 import java.util.LinkedList;
 import java.util.List;
 
+import managers.NotificationManager;
 import models.Account;
 import models.Notification;
 import play.Play;
@@ -13,16 +14,22 @@ import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Notification.view;
 
+import javax.inject.Inject;
+
 @Transactional
 @Security.Authenticated(Secured.class)
 public class NotificationController extends BaseController {
-    static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.notification.limit"));
+
+    @Inject
+    NotificationManager notificationManager;
+
+    final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.notification.limit"));
 
     /**
      * @deprecated Deprecated since refactor of notification system
      * @return Html
      */
-	public static Html view() {
+	public Html view() {
 		return getNotifications();
 	}
 
@@ -41,12 +48,12 @@ public class NotificationController extends BaseController {
 
         List<Notification> list = null;
         try {
-            list = Notification.findByAccountIdUnread(account.id);
+            list = NotificationManager.findByAccountIdUnread(account.id);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
         List<Integer> countedNotifications = NotificationController.countNotifications(list);
         return views.html.Notification.menuitem.render(list, countedNotifications.get(0),
-                Notification.countUnreadNotificationsForAccountId(account.id)
+                NotificationManager.countUnreadNotificationsForAccountId(account.id)
         );
 	}
 
@@ -57,8 +64,8 @@ public class NotificationController extends BaseController {
      * @return SimpleResult with redirection
      */
     @Transactional
-	public static Result forward(Long notificationId) {
-		Notification notification = Notification.findById(notificationId);
+	public Result forward(Long notificationId) {
+		Notification notification = notificationManager.findById(notificationId);
 
 		if (notification == null) {
             flash("info", Messages.get("notification.obsolete_notification"));
@@ -72,7 +79,7 @@ public class NotificationController extends BaseController {
 		}
 
         notification.isRead = true;
-        notification.update();
+        notificationManager.update(notification);
 
 		return redirect(notification.targetUrl);
 	}
@@ -84,16 +91,16 @@ public class NotificationController extends BaseController {
      * @return Result
      */
     @Transactional(readOnly = true)
-    public static Result showAll(int page) {
+    public Result showAll(int page) {
         List<Notification> notifications = null;
         try {
-            notifications = Notification.findByAccountIdForPage(Component.currentAccount().id, NotificationController.LIMIT, page);
+            notifications = notificationManager.findByAccountIdForPage(Component.currentAccount().id, LIMIT, page);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
         List<Integer> countedNotifications = NotificationController.countNotifications(notifications);
         Navigation.set(Navigation.Level.NOTIFICATIONS, Messages.get("notification.title"));
         return ok(view.render(notifications, LIMIT, page,
-                Notification.countNotificationsForAccountId(Component.currentAccount().id), countedNotifications.get(1)
+                notificationManager.countNotificationsForAccountId(Component.currentAccount().id), countedNotifications.get(1)
         ));
     }
 
@@ -136,8 +143,8 @@ public class NotificationController extends BaseController {
      * @return Result
      */
     @Transactional
-    public static Result readAll() {
-        Notification.markAllAsRead(Component.currentAccount());
+    public Result readAll() {
+        notificationManager.markAllAsRead(Component.currentAccount());
         flash("success", Messages.get("notification.read_everything_ok"));
 
         return redirect(request().getHeader("referer"));

@@ -1,29 +1,111 @@
 @(currentUser: Account, posts:List[Post], postForm: Form[Post], count: Integer, limit: Integer, currentPage: Integer, filter: String)
+@import play._
 
 @main("Newsstream") {
-    @views.html.snippets.feedFilter()
-    <div class="row">
-        <div class="col-lg-12" role="main">
-            <div class="hp-notepad-content">
-                <br />
-                @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
 
-                @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage, filter)
+@***
+<div class="row">
+    <div class="col-md-12" role="main">
+        <div class="hp-notepad-content">
+            <br/>
+            @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
+
+            @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage, filter)
+        </div>
+    </div>
+</div>
+***@
+
+<div class="row">
+    <div class="col-md-10" role="main">
+        <div class="addmargin">
+            <div class="row">
+                <div class="col-md-1" role="main">
+                    @if(currentUser.hasAvatar){
+                        <img alt="avatar"
+                             src='@routes.ProfileController.getAvatar(currentUser.id, "medium")'
+                             class="hp-avatar-medium hidden-xs hidden-sm"/>
+                    } else {
+                    <div class="hidden-xs hidden-sm hp-avatar-medium hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
+                    }
+                </div>
+                <div class="col-md-11" role="complementary">
+                    <div class="hp-post-create-area">
+                        @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
+                    </div>
+                </div>
             </div>
         </div>
-        @**************
-        <div class="col-lg-3" role="complementary">
-            <nav class="hidden-xs hidden-sm">
-                <div class="hp-sitenav">
-                    <b><span class="glyphicon glyphicon-user"></span> Kontakte</b>
-                    @views.html.Friends.snippets.listAccountsLight(contacts)
-                </div>
-                <div class="hp-sitenav">
-                    <b><span class="glyphicon glyphicon-list"></span> Gruppen & Kurse</b>
-                    @views.html.Group.snippets.listGroupsLight(groups, currentUser)
-                </div>
-            </nav>
-        </div>
-        ***************@
     </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 visible-xs visible-sm hp-feed-filter">
+        <!-- Single button -->
+        <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <span class="glyphicon glyphicon-filter"></span> Filter: @Navigation.getTitle() <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href='@routes.Application.index()'>Alles</a></li>
+                <li><a href='@routes.Application.stream("account")'>Eigene Posts</a></li>
+                <li><a href='@routes.Application.stream("bookmark")'>Gemerkte Posts</a></li>
+                <li><a href='@routes.Application.stream("group")'>Gruppen</a></li>
+                <li><a href='@routes.Application.stream("contact")'>Kontakte</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-10" role="main">
+        @if(posts.size != 0){
+        <div class="row hp-pagination-container">
+            @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage, filter)
+        </div>
+        } else {
+        <div class="hp-content-placeholder addmargin">
+            @if(filter.equals("account")) {
+            <h4>Du hast noch keinen Beitrag geschrieben.</h4>
+            <h4>Wie wäre es mit einem ersten Newsstream-Eintrag?</h4>
+            }
+            @if(filter.equals("group")) {
+            <h4>Noch kein Beitrag aus Gruppen oder Kursen.</h4>
+            <h4>Trete jetzt ein paar <a href="/search?keyword=&mode=group">Gruppen</a> oder <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a> bei!</h4>
+            }
+            @if(filter.equals("contact")) {
+            <h4>Noch kein Beitrag von deinen Kontakten.</h4>
+            <h4>Möchtest du <a href="/search?keyword=&mode=user">Personen suchen</a> mit denen du dich verbinden kannst?</a></h4>
+            }
+            @if(filter.equals("bookmark")) {
+            <h4>Wussest du, dass du dir wichtige Beiträge merken kannst?</h4>
+            <h4>Klicke hierzu einfach auf das <span class="glyphicon glyphicon-heart-empty"></span>-Symobol neben jedem Post.</h4>
+            }
+            @if(filter.equals("all")) {
+            <h2><b>Hallo @currentUser.firstname, willkommen auf HTWplus!</b></h2>
+            <hr>
+            <br />
+            <h4>Leider gibt es noch keine Beiträge, die wir auf deinem Newsstream anzeigen können.</h4>
+            <br />
+            <h4>Dein Newsfeed lebt von Beiträgen aus <a href="/search?keyword=&mode=group">Gruppen</a>, <a href="/search?keyword=&mode=group&grouptype=course">Kursen</a> oder <a href="/search?keyword=&mode=user">Kontakten</a>.</h4>
+            <h4>Über die <a href="/search?keyword=">Suche</a> findest du sicherlich ganz schnell ein paar neue Verbindungen!</h4>
+            <br />
+            <i>Wenn es soweit ist, ermöglicht dir unser Post-Filter (rechts), sich nur bestimmte Beträge anzeigen zu lassen.</i></h3>
+            }
+        </div>
+        }
+    </div>
+    <div class="col-md-2 visible-md visible-lg" role="complementary">
+        <div class="hp-newsfeed-sitenav">
+            <a href='@routes.Application.index()' title="Alle Beiträge" class='@if(filter.equals("all")) {active}'>Alles</a>
+            <a href='@routes.Application.stream("account")' title="Deine Beiträge" class='@if(filter.equals("account")) {active}'>Eigene Posts</a>
+            <a href='@routes.Application.stream("bookmark")' title="Von dir gemerkte Beiträge" class='@if(filter.equals("bookmark")) {active}'>Gemerkte Posts</a>
+            <a href='@routes.Application.stream("group")' title="Beiträge aus Gruppen" class='@if(filter.equals("group")) {active}'>Gruppen</a>
+            <a href='@routes.Application.stream("contact")' title="Beiträge von deinen Kontakten" class='@if(filter.equals("contact")) {active}'>Kontakte</a>
+        </div>
+    </div>
+</div>
+
+</div>
 }

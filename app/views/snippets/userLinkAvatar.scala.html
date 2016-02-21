@@ -1,5 +1,4 @@
 @(user: Account)
-@import helper._
 
 <a class="pull-left hp-nohref" href="@if(Secured.isFriend(user)) { @routes.ProfileController.view(user.id)/stream } else { @routes.ProfileController.view(user.id) }">
 	@if(user.hasAvatar){

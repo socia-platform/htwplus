@@ -6,12 +6,12 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 
 ### Requirements
 
-* JDK 7 or higher
-* Activator (https://www.playframework.com/download)
+* JDK 8
+* Play 2.4.6 or higher (activator 1.3.7) (https://www.playframework.com/download)
 * Git
 * Node.js
-* PostgreSQL
-* Elasticsearch
+* PostgreSQL 9.3
+* Elasticsearch 2.1 or higher
 
 ### Setup
 

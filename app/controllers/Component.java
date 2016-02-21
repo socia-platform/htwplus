@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import managers.AccountManager;
 import models.Account;
 import models.Login;
 import play.Logger;
@@ -17,7 +18,12 @@ import play.mvc.Action;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+
 public class Component extends Action.Simple {
+
+    @Inject
+    AccountManager accountManager;
 	
 	@Override
 	@Transactional
@@ -25,7 +31,7 @@ public class Component extends Action.Simple {
 		String sessionId = ctx.session().get("id");
 		if(sessionId != null) {
 			Long id = Long.parseLong(ctx.session().get("id"));
-			Account account = Account.findById(id);
+			Account account = accountManager.findById(id);
 			if(account == null) {
 				ctx.session().clear();
 				Logger.info("Clear Session");

@@ -3,9 +3,8 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th style="width:36px"></th>
+            <th style="width:36px;"></th>
             <th></th>
-            <th style="width:25px"></th>
         </tr>
     </thead>
     <tbody class="hp-optionsTable">
@@ -13,19 +12,13 @@
             <tr>
                 <td></td>
                 <td>- keine Treffer -</td>
-                <td class="hp-optionsMenu"></td>
             </tr>
         }
         @for(user <- users) {
-            <tr>
+            <li>
                 <td>@views.html.snippets.userLinkAvatar(user)</td>
                 <td>@views.html.snippets.userLink(user)</td>
-                <td class="hp-optionsMenu">
-                @if(user != Component.currentAccount) {
-                    @views.html.snippets.accountOptionMenu(user, false)
-                }
-                </td>
-            </tr>
+            </li>
         }
     </tbody>
 </table>

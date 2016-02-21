@@ -7,11 +7,14 @@ import play.api.PlayException;
 import org.apache.commons.lang.Validate;
 import eu.medsea.mimeutil.MimeUtil;
 import eu.medsea.mimeutil.MimeType;
-import play.api.libs.Files;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.api.libs.MimeTypes;
+import java.io.IOException;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -195,9 +198,11 @@ public class FileService {
         }
 
         newFile.getParentFile().mkdirs();
-        boolean result = this.file.renameTo(newFile);
 
-        if(!result) {
+        try {
+            java.nio.file.Files.move(this.file.toPath(), newFile.toPath());
+        }
+        catch (IOException e) {
             throw new PlayException(
                     "File Error",
                     "The file could not be stored");
@@ -213,7 +218,11 @@ public class FileService {
     public FileService copy(String destFileName){
         String destPath = this.buildPath(destFileName);
         File destFile = new File(destPath);
-        Files.copyFile(this.file, destFile, true);
+        try {
+            Files.copy(file.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            return null;
+        }
 
         if(destFile.exists()){
             return new FileService(this.realm, destFile);
