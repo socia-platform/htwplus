@@ -249,6 +249,8 @@ public class ProfileController extends BaseController {
                 account.email = filledForm.field("email").value();
             } else {
                 account.email = null;
+                account.emailNotifications = EmailNotifications.NONE;
+                account.dailyEmailNotificationHour = null;
             }
 
             if (filledForm.data().containsKey("degree")) {
@@ -267,7 +269,7 @@ public class ProfileController extends BaseController {
                 }
             }
 
-            if (filledForm.data().containsKey("emailNotifications")) {
+            if (filledForm.data().containsKey("emailNotifications") && (account.email != null && !account.email.isEmpty())) {
                 account.emailNotifications = EmailNotifications.valueOf(filledForm.field("emailNotifications").value());
                 if (account.emailNotifications.equals(EmailNotifications.COLLECTED_DAILY)
                         && filledForm.data().containsKey("dailyEmailNotificationHour")) {
