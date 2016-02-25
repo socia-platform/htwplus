@@ -1,6 +1,7 @@
 package controllers;
 
 
+import com.ning.http.client.Request;
 import com.typesafe.config.ConfigFactory;
 import managers.AccountManager;
 import managers.FriendshipManager;
@@ -10,6 +11,7 @@ import models.*;
 import models.enums.AccountRole;
 import play.Play;
 import play.i18n.Messages;
+import play.mvc.Http;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -67,6 +69,20 @@ public class Secured extends Security.Authenticator {
         ctx.session().put("originURL", ctx.request().path());
 		return unauthorized(landingpage.render());
     }
+
+	/**
+	 * Redirect a call to his origin url or main page if he used a new tab.
+	 * This can be used if objects cant be found (accounts, posts, groups, notification ...)
+	 * @param request a user request
+	 * @Result Result instance
+     */
+	public static Result nullRedirect(Http.Request request) {
+		if (request.getHeader("referer") != null) {
+			return redirect(request.getHeader("referer"));
+		} else {
+			return redirect(routes.Application.index());
+		}
+	}
 
 	/**
 	 * Returns true, if the currently logged in user is admin.

@@ -69,8 +69,7 @@ public class NotificationController extends BaseController {
 
 		if (notification == null) {
             flash("info", Messages.get("notification.obsolete_notification"));
-
-            return redirect(request().getHeader("referer"));
+            return Secured.nullRedirect(request());
 		}
 		
 		if (!Secured.hasAccessToNotification(notification)) {
@@ -78,8 +77,11 @@ public class NotificationController extends BaseController {
 			return redirect(controllers.routes.Application.index());
 		}
 
-        notification.isRead = true;
-        notificationManager.update(notification);
+        // update only when notification is unread
+        if (!notification.isRead) {
+            notification.isRead = true;
+            notificationManager.update(notification);
+        }
 
 		return redirect(notification.targetUrl);
 	}
