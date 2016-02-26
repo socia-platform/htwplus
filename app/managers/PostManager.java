@@ -7,6 +7,7 @@ import models.enums.AccountRole;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
+import play.Configuration;
 import play.db.jpa.JPA;
 
 import javax.inject.Inject;
@@ -33,6 +34,12 @@ public class PostManager implements BaseManager {
 
     @Inject
     PostBookmarkManager postBookmarkManager;
+
+    @Inject
+    GroupManager groupManager;
+
+    @Inject
+    Configuration configuration;
 
     @Override
     public void create(Object model) {
@@ -377,8 +384,8 @@ public class PostManager implements BaseManager {
 
     public long indexAllPosts() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Post post : allWithoutAdmin()) elasticsearchService.index(post);
-        return (System.currentTimeMillis() - start) / 100;
+        for (Post post : allWithoutExceptionPosts()) elasticsearchService.index(post);
+        return (System.currentTimeMillis() - start) / 1000;
 
     }
 
@@ -388,8 +395,13 @@ public class PostManager implements BaseManager {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public List<Post> allWithoutAdmin() {
-        return JPA.em().createQuery("FROM Post p WHERE p.owner.id != 1").getResultList();
+    private List<Post> allWithoutExceptionPosts() {
+        Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
+        Account adminAccount = group.owner;
+        return JPA.em().createQuery("FROM Post p WHERE p.owner.id != :adminId AND p.group.id != :groupId OR p.group IS NULL")
+                .setParameter("groupId", group.id)
+                .setParameter("adminId", adminAccount.id)
+                .getResultList();
     }
 
     /**

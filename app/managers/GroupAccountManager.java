@@ -199,7 +199,7 @@ public class GroupAccountManager implements BaseManager {
      * if a user gets access to this group -> (re)index group document
      * and (re)index all containing post documents
      *
-     * @param group group to which should be indexed
+     * @param group group which should be indexed
      */
     private void reIndex(Group group) {
         // reindexing can be very time consuming -> do it in an own thread.
