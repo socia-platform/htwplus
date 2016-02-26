@@ -43,8 +43,14 @@ public class EmailService {
      * @param mailHtml HTML content of the mail (allowed to be null)
      */
     public void sendEmail(String subject, String recipient, String mailPlainText, String mailHtml) {
+
+        // since this instance is a singleton we need to ensure that there is no other recipient.
+        // email.addTo adds further recipients so we use email.setTo to pass a list with just one recipient.
+        List<String> recipientList = new ArrayList<>();
+        recipientList.add(recipient);
+
         email.setSubject(subject);
-        email.addTo(recipient);
+        email.setTo(recipientList);
         email.setFrom(EMAIL_SENDER);
 
         // send email either in plain text, HTML or both
