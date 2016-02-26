@@ -158,21 +158,21 @@ public class AdminController extends BaseController {
 
     public Result indexAccounts() throws IOException {
         long time = accountManager.indexAllAccounts();
-        String out = "Alle Accounts indexiert (" + Long.toString(time) + "ms)";
+        String out = "Alle Accounts indexiert (" + Long.toString(time) + " Sekunden)";
         flash("info", out);
         return ok(indexing.render());
     }
 
     public Result indexGroups() throws IOException {
         long time = groupManager.indexAllGroups();
-        String out = "Alle Gruppen indexiert (" + Long.toString(time) + "ms)";
+        String out = "Alle Gruppen indexiert (" + Long.toString(time) + " Sekunden)";
         flash("info", out);
         return ok(indexing.render());
     }
 
     public Result indexPosts() throws IOException {
         long time = postManager.indexAllPosts();
-        String out = "Alle Posts indexiert (" + Long.toString(time) + "ms)";
+        String out = "Alle Posts indexiert (" + Long.toString(time) + " Sekunden)";
         flash("info", out);
         return ok(indexing.render());
     }

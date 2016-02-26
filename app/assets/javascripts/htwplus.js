@@ -323,7 +323,7 @@ $(document).ready(function () {
             panelSelector: '.hp-pagination-element',
             loaderDivClass: 'ajax-loader',
             loaderDivStyle: 'text-align:center;margin-top:20px;font-weight:bold;',
-            loaderImage: 'assets/images/loading.gif',
+            loaderImage: '/assets/images/loading.gif',
             loaderText: 'Lade nächste Seite...'
         });
     }

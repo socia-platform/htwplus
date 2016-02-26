@@ -125,7 +125,7 @@ public class GroupManager implements BaseManager {
     public long indexAllGroups() throws IOException {
         final long start = System.currentTimeMillis();
         for (Group group : all()) elasticsearchService.index(group);
-        return (System.currentTimeMillis() - start) / 100;
+        return (System.currentTimeMillis() - start) / 1000;
 
     }
 }

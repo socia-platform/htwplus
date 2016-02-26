@@ -1,18 +1,19 @@
 package managers;
 
-import models.Account;
-import models.Group;
-import models.GroupAccount;
-import models.Post;
+import models.*;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.db.jpa.JPA;
+import play.libs.Akka;
+import play.libs.F;
+import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Iven on 16.12.2015.
@@ -31,48 +32,21 @@ public class GroupAccountManager implements BaseManager {
     @Override
     public void create(Object model) {
         JPA.em().persist(model);
-
-        // each group document contains information about their member
-        // if a user create or join to this.group -> (re)index this.group document
-        try {
-            elasticsearchService.index(((GroupAccount) model).group);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        reIndex(((GroupAccount) model).group);
     }
 
     @Override
     public void update(Object model) {
-        GroupAccount groupAccount = (GroupAccount) model;
-        JPA.em().merge(groupAccount);
-
-        // each group document contains information about their member
-        // if a user gets access to this.group -> (re)index this.group document
-        // and (re)index all containing post documents
-        try {
-            elasticsearchService.index(groupAccount.group);
-            for (Post post : postManager.getPostsForGroup(groupAccount.group, 0, 0)) {
-                elasticsearchService.index(post);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        JPA.em().merge(model);
+        reIndex(((GroupAccount) model).group);
     }
 
     @Override
     public void delete(Object model) {
         GroupAccount groupAccount = (GroupAccount) model;
         JPA.em().remove(groupAccount);
-
+        reIndex(groupAccount.group);
         notificationManager.deleteReferencesForAccountId(groupAccount.group, groupAccount.account.id);
-
-        // each group document contains information about their member
-        // if a user leaves this.group -> (re)index this.group document
-        try {
-            elasticsearchService.index(groupAccount.group);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static GroupAccount findById(Long id) {
@@ -218,5 +192,37 @@ public class GroupAccountManager implements BaseManager {
         } catch (NoResultException exp) {
             return null;
         }
+    }
+
+    /**
+     * each group document contains information about their member
+     * if a user gets access to this group -> (re)index group document
+     * and (re)index all containing post documents
+     *
+     * @param group group to which should be indexed
+     */
+    private void reIndex(Group group) {
+        // reindexing can be very time consuming -> do it in an own thread.
+        Akka.system().scheduler().scheduleOnce(
+            Duration.create(0, TimeUnit.SECONDS),
+            new Runnable() {
+                public void run() {
+                    JPA.withTransaction(new F.Callback0() {
+                        @Override
+                        public void invoke() throws Throwable {
+                            try {
+                                elasticsearchService.index(group);
+                                for (Post post : postManager.getPostsForGroup(group, 0, 0)) {
+                                    elasticsearchService.index(post);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            },
+            Akka.system().dispatcher()
+        );
     }
 }

@@ -268,7 +268,7 @@ public class AccountManager implements BaseManager {
                 elasticsearchService.index(account);
         }
 
-        return (System.currentTimeMillis() - start) / 100;
+        return (System.currentTimeMillis() - start) / 1000;
 
     }
 }
