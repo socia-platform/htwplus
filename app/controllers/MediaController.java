@@ -44,23 +44,25 @@ public class MediaController extends BaseController {
     @Inject
     FolderManager folderManager;
 
-    static Form<Media> mediaForm = Form.form(Media.class);
     final static String tempPrefix = "htwplus_temp";
     private Config conf = ConfigFactory.load();
 
     @Transactional(readOnly = true)
-    public Result view(Long id) {
-        Media media = mediaManager.findById(id);
+    public Result view(Long mediaId, String action) {
+        Media media = mediaManager.findById(mediaId);
         if (Secured.viewMedia(media)) {
-            if (media == null) {
-                return redirect(controllers.routes.Application.index());
-            } else {
-                response().setHeader("Content-Disposition", "inline; filename=\"" + media.fileName + "\"");
-                return ok(media.file);
+            switch (action) {
+                case "show":
+                    response().setHeader("Content-Disposition", "inline; filename=\"" + media.fileName + "\"");
+                    break;
+                case "download":
+                    response().setHeader("Content-Disposition", "attachment; filename=\"" + media.fileName + "\"");
+                    break;
             }
+            return ok(media.file);
         } else {
             flash("error", "Dazu hast du keine Berechtigung!");
-            return redirect(controllers.routes.Application.index());
+            return Secured.nullRedirect(request());
         }
     }
 
