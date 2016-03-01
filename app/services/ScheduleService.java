@@ -45,7 +45,7 @@ public class ScheduleService {
         // Sets the schedule for cleaning the media temp directory
         system.scheduler().schedule(
                 Duration.create(0, TimeUnit.MILLISECONDS),
-                Duration.create(30, TimeUnit.MINUTES),
+                Duration.create(2, TimeUnit.HOURS),
                 () -> {
                     mediaManager.cleanUpTemp();
                 },

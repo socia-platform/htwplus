@@ -55,7 +55,7 @@ public class MediaController extends BaseController {
             if (media == null) {
                 return redirect(controllers.routes.Application.index());
             } else {
-                response().setHeader("Content-disposition", "attachment; filename=\"" + media.fileName + "\"");
+                response().setHeader("Content-Disposition", "inline; filename=\"" + media.fileName + "\"");
                 return ok(media.file);
             }
         } else {

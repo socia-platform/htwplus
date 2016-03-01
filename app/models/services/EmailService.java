@@ -123,7 +123,7 @@ public class EmailService {
      */
     public void sendDailyHourlyNotificationsEmails() {
         try {
-            Logger.info("Start sending of daily email notifications...");
+            Logger.info("Start sending of hourly email notifications...");
 
             // load map with recipients containing list of unread notifications and iterate over the map
 
