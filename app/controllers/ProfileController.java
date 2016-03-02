@@ -7,6 +7,7 @@ import models.*;
 import models.base.FileOperationException;
 import models.base.ValidationException;
 import models.enums.AccountRole;
+import models.enums.AvatarSize;
 import models.enums.EmailNotifications;
 import play.Logger;
 import play.Play;
@@ -42,6 +43,9 @@ public class ProfileController extends BaseController {
 
     @Inject
     StudycourseManager studycourseManager;
+
+    @Inject
+    AvatarManager avatarManager;
 
     static Form<Account> accountForm = Form.form(Account.class);
     static Form<Post> postForm = Form.form(Post.class);
@@ -381,7 +385,7 @@ public class ProfileController extends BaseController {
         }
 
         try {
-            account.setTempAvatar(avatar);
+            avatarManager.setTempAvatar(avatar, account.id);
         } catch (ValidationException e) {
             result.put("error", e.getMessage());
             return badRequest(result);
@@ -411,7 +415,7 @@ public class ProfileController extends BaseController {
             return forbidden(result);
         }
 
-        File tempAvatar = account.getTempAvatar();
+        File tempAvatar = avatarManager.getTempAvatar(account.id);
         if (tempAvatar != null) {
             return ok(tempAvatar);
         } else {
@@ -447,7 +451,7 @@ public class ProfileController extends BaseController {
         }
 
         try {
-            account.saveAvatar(form.get());
+            accountManager.saveAvatar(form.get(), account);
             accountManager.indexAccount(account);
             result.put("success", "saved");
             return ok(result);
@@ -470,16 +474,16 @@ public class ProfileController extends BaseController {
             File avatar;
             switch (size) {
                 case "small":
-                    avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
+                    avatar = avatarManager.getAvatar(AvatarSize.SMALL, account.id);
                     break;
                 case "medium":
-                    avatar = account.getAvatar(Account.AVATAR_SIZE.MEDIUM);
+                    avatar = avatarManager.getAvatar(AvatarSize.MEDIUM, account.id);
                     break;
                 case "large":
-                    avatar = account.getAvatar(Account.AVATAR_SIZE.LARGE);
+                    avatar = avatarManager.getAvatar(AvatarSize.LARGE, account.id);
                     break;
                 default:
-                    avatar = account.getAvatar(Account.AVATAR_SIZE.SMALL);
+                    avatar = avatarManager.getAvatar(AvatarSize.SMALL, account.id);
             }
             response().setHeader("Content-disposition", "inline");
             if (avatar != null) {

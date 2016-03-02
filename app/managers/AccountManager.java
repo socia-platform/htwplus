@@ -3,14 +3,18 @@ package managers;
 import com.typesafe.config.ConfigFactory;
 import controllers.Component;
 import models.*;
+import models.base.FileOperationException;
 import models.enums.AccountRole;
+import models.enums.AvatarSize;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
+import models.services.FileService;
 import play.Logger;
 import play.db.jpa.JPA;
 
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -39,6 +43,9 @@ public class AccountManager implements BaseManager {
 
     @Inject
     NotificationManager notificationManager;
+
+    @Inject
+    AvatarManager avatarManager;
 
     @Override
     public void create(Object model) {
@@ -271,4 +278,10 @@ public class AccountManager implements BaseManager {
         return (System.currentTimeMillis() - start) / 1000;
 
     }
+
+    public void saveAvatar(Account.AvatarForm avatarForm, Account account) throws FileOperationException {
+        avatarManager.saveAvatar(avatarForm, account.id);
+        account.avatar = AvatarManager.AVATAR_CUSTOM;
+    }
+
 }

@@ -1,26 +1,23 @@
 package models.services;
 
+import models.base.FileOperationException;
+import org.imgscalr.Scalr;
+import play.Logger;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-import java.awt.image.ImagingOpException;
 import java.io.File;
 import java.io.IOException;
 
-import models.base.FileOperationException;
-import play.Logger;
-
-import org.imgscalr.Scalr;
-
 /**
- * This class handles all avatar aka profile picture related functionalities
+ * This class handles all image related functionalities
  */
-public class AvatarService {
+public class ImageService {
 
-    final static Logger.ALogger logger = Logger.of(AvatarService.class);
+    final static Logger.ALogger logger = Logger.of(ImageService.class);
 
-    private AvatarService(){}
+    private ImageService(){}
     
     static public boolean validateMinSize(File file, int min_length, int min_height){
         BufferedImage image;
