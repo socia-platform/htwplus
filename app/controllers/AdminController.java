@@ -1,11 +1,16 @@
 package controllers;
 
-import managers.*;
-import models.*;
+import managers.AccountManager;
+import managers.GroupManager;
+import managers.MediaManager;
+import managers.PostManager;
+import models.Account;
+import models.Post;
 import models.enums.AccountRole;
 import models.services.ElasticsearchService;
 import models.services.NotificationService;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
+import org.elasticsearch.index.IndexNotFoundException;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -39,9 +44,6 @@ public class AdminController extends BaseController {
 
     @Inject
     GroupManager groupManager;
-
-    @Inject
-    FolderManager folderManager;
 
     @Inject
     PostManager postManager;
@@ -135,6 +137,8 @@ public class AdminController extends BaseController {
             flash("info", "index gelöscht");
         } catch (NoNodeAvailableException nna) {
             flash("error", nna.getMessage());
+        } catch (IndexNotFoundException infe) {
+            flash("error", infe.getMessage());
         }
 
         return ok(indexing.render());

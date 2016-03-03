@@ -1,0 +1,26 @@
+{
+  "group": {
+    "properties": {
+      "owner": {
+        "type": "long"
+      },
+      "grouptype": {
+        "type": "string"
+      },
+      "public": {
+        "type": "boolean"
+      },
+      "member": {
+        "type": "long"
+      },
+      "avatar": {
+        "type": "string"
+      },
+      "title": {
+        "search_analyzer": "whitespace",
+        "analyzer": "edgengram_analyzer",
+        "type": "string"
+      }
+    }
+  }
+}

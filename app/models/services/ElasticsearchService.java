@@ -7,8 +7,11 @@ import com.typesafe.config.ConfigFactory;
 import managers.FriendshipManager;
 import managers.GroupAccountManager;
 import managers.PostManager;
-import models.*;
+import models.Account;
+import models.Group;
+import models.Post;
 import models.enums.LinkType;
+import org.apache.commons.io.IOUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -21,8 +24,12 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import play.Logger;
+import play.api.DefaultApplication;
 
 import javax.inject.Singleton;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -42,20 +49,23 @@ public class ElasticsearchService implements IElasticsearchService {
     @Inject
     PostManager postManger;
 
-    private Client client = null;
-    private static ElasticsearchService instance = null;
-    private Config conf = ConfigFactory.load();
+    @Inject
+    DefaultApplication app;
 
-    private final String ES_SERVER = conf.getString("elasticsearch.server");
-    private final String ES_SETTINGS = conf.getString("elasticsearch.settings");
-    private final String ES_USER_MAPPING = conf.getString("elasticsearch.userMapping");
-    private final String ES_GROUP_MAPPING = conf.getString("elasticsearch.groupMapping");
-    private final String ES_POST_MAPPING = conf.getString("elasticsearch.postMapping");
-    private final String ES_INDEX = conf.getString("elasticsearch.index");
-    private final String ES_TYPE_USER = conf.getString("elasticsearch.userType");
-    private final String ES_TYPE_GROUP = conf.getString("elasticsearch.groupType");
-    private final String ES_TYPE_POST = conf.getString("elasticsearch.postType");
-    private final int ES_RESULT_SIZE = conf.getInt("elasticsearch.search.limit");
+    private Client client = null;
+    private Config conf = ConfigFactory.load().getConfig("elasticsearch");
+
+    private final String ES_SERVER = conf.getString("server");
+    private final String ES_INDEX = conf.getString("index");
+    private final String ES_TYPE_USER = conf.getString("userType");
+    private final String ES_TYPE_GROUP = conf.getString("groupType");
+    private final String ES_TYPE_POST = conf.getString("postType");
+    private final int ES_RESULT_SIZE = conf.getInt("searchLimit");
+    private final String ES_SETTINGS = "conf/elasticsearch/settings.json";
+    private final String ES_USER_MAPPING = "conf/elasticsearch/user_mapping.json";
+    private final String ES_GROUP_MAPPING = "conf/elasticsearch/group_mapping.json";
+    private final String ES_POST_MAPPING = "conf/elasticsearch/post_mapping.json";
+
 
     public ElasticsearchService() {
         try {
@@ -64,11 +74,6 @@ public class ElasticsearchService implements IElasticsearchService {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        instance = this;
-    }
-
-    public static ElasticsearchService getInstance() {
-        return instance;
     }
 
     public Client getClient() {
@@ -97,21 +102,21 @@ public class ElasticsearchService implements IElasticsearchService {
 
     public void createAnalyzer() {
         if (isClientAvailable()) client.admin().indices().prepareCreate(ES_INDEX)
-                .setSettings(ES_SETTINGS)
+                .setSettings(loadFromFile(ES_SETTINGS))
                 .execute().actionGet();
     }
 
     public void createMapping() {
         if (isClientAvailable()) client.admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_USER)
-                .setSource(ES_USER_MAPPING)
+                .setSource(loadFromFile(ES_USER_MAPPING))
                 .execute().actionGet();
 
         if (isClientAvailable()) client.admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_POST)
-                .setSource(ES_POST_MAPPING)
+                .setSource(loadFromFile(ES_POST_MAPPING))
                 .execute().actionGet();
 
         if (isClientAvailable()) client.admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_GROUP)
-                .setSource(ES_GROUP_MAPPING)
+                .setSource(loadFromFile(ES_GROUP_MAPPING))
                 .execute().actionGet();
     }
 
@@ -318,5 +323,20 @@ public class ElasticsearchService implements IElasticsearchService {
         if (isClientAvailable()) client.prepareDelete(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .execute()
                 .actionGet();
+    }
+
+    private String loadFromFile(String filePath) {
+
+        File file = app.getFile(filePath);
+        if (file.exists()) {
+            try {
+                return IOUtils.toString(new FileInputStream(file));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return "";
     }
 }

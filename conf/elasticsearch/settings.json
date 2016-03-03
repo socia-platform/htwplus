@@ -1,0 +1,25 @@
+{
+  "analysis": {
+    "analyzer": {
+      "edgengram_analyzer": {
+        "filter": [
+          "lowercase"
+        ],
+        "tokenizer": "edgengram_tokenizer"
+      }
+    },
+    "tokenizer": {
+      "edgengram_tokenizer": {
+        "token_chars": [
+          "letter",
+          "digit"
+        ],
+        "min_gram": "2",
+        "type": "edgeNGram",
+        "max_gram": "20"
+      }
+    }
+  },
+  "number_of_shards": "1",
+  "number_of_replicas": "1"
+}

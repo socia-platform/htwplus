@@ -1,0 +1,39 @@
+{
+  "user": {
+    "properties": {
+      "studycourse": {
+        "index": "not_analyzed",
+        "type": "string"
+      },
+      "role": {
+        "index": "not_analyzed",
+        "type": "string"
+      },
+      "public": {
+        "type": "boolean"
+      },
+      "initial": {
+        "type": "string"
+      },
+      "degree": {
+        "index": "not_analyzed",
+        "type": "string"
+      },
+      "name": {
+        "search_analyzer": "whitespace",
+        "analyzer": "edgengram_analyzer",
+        "type": "string"
+      },
+      "semester": {
+        "index": "not_analyzed",
+        "type": "string"
+      },
+      "avatar": {
+        "type": "string"
+      },
+      "friends": {
+        "type": "long"
+      }
+    }
+  }
+}

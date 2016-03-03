@@ -1,0 +1,18 @@
+{
+  "post": {
+    "properties": {
+      "owner": {
+        "type": "long"
+      },
+      "viewable": {
+        "type": "long"
+      },
+      "public": {
+        "type": "boolean"
+      },
+      "content": {
+        "type": "string"
+      }
+    }
+  }
+}
