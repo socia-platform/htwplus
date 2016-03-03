@@ -402,9 +402,13 @@ $(document).ready(function () {
                         label = item._source.title;
                         hLabel = item.highlight.title;
                         groupType = item._source.grouptype;
-                        if(groupType === 'open') groupIcon = 'globe';
-                        if(groupType === 'close') groupIcon = 'lock';
-                        if(groupType === 'course') groupIcon = 'briefcase';
+                        if(item._source.avatar) {
+                            custom_avatar = true;
+                        } else {
+                            if(groupType === 'open') groupIcon = 'globe';
+                            if(groupType === 'close') groupIcon = 'lock';
+                            if(groupType === 'course') groupIcon = 'briefcase';
+                        }
                     }
                     result.push({
                         label: label,
@@ -444,7 +448,7 @@ $(document).ready(function () {
                 ].join('\n'),
                 suggestion: Handlebars.compile("" +
                     "{{#if custom_avatar}} " +
-                    "<img class='autosuggest-custom-avatar hp-avatar-small' src='/user/{{id}}/avatar' alt='avatar'>{{{hLabel}}}" +
+                    "<img class='autosuggest-custom-avatar hp-avatar-small' src='/{{type}}/{{id}}/avatar' alt='avatar'>{{{hLabel}}}" +
                     "{{else}}" +
                     "{{#if avatar}}" +
                     "<div class='autosuggest-avatar hp-avatar-small hp-avatar-default-{{avatar}}'>{{initial}}</div>" +

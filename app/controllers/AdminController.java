@@ -209,21 +209,6 @@ public class AdminController extends BaseController {
         return ok(createBroadcastNotification.render(AdminController.postForm, accountManager.all()));
     }
 
-    @Transactional
-    public Result refactor() {
-
-        for (Group group : groupManager.all()) {
-            group.mediaFolder = new Folder("_" + group.title, group.owner, null, group, null);
-            folderManager.create(group.mediaFolder);
-            for (Media media : group.media) {
-                media.folder = group.mediaFolder;
-                media.group = null;
-            }
-            groupManager.update(group);
-        }
-        return ok();
-    }
-
     /**
      * Handles posted broadcast post. As broadcastMemberList could be a large list and causes
      * Account.getAccountListByIdCollection() to be costly, this action method is realized

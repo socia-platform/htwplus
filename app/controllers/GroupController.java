@@ -1,27 +1,31 @@
 package controllers;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import controllers.Navigation.Level;
 import managers.*;
 import models.*;
+import models.base.FileOperationException;
+import models.base.ValidationException;
+import models.enums.AvatarSize;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.NotificationService;
-import play.Logger;
 import play.Play;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
+import play.libs.Json;
 import play.mvc.Call;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Group.*;
 import views.html.Group.snippets.streamRaw;
 
 import javax.inject.Inject;
+import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -49,6 +53,9 @@ public class GroupController extends BaseController {
 
     @Inject
     FolderManager folderManager;
+
+    @Inject
+    AvatarManager avatarManager;
 
     static Form<Group> groupForm = Form.form(Group.class);
     static Form<Folder> folderForm = Form.form(Folder.class);
@@ -625,4 +632,145 @@ public class GroupController extends BaseController {
         }
         return redirect(defaultRedirect);
     }
+
+    /**
+     * Handles the upload of the temporary avatar image
+     *
+     * @param id
+     * @return
+     */
+    public Result createTempAvatar(Long id) {
+
+        Group group = groupManager.findById(id);
+
+        if (group == null) {
+            return notFound();
+        }
+
+        ObjectNode result = Json.newObject();
+        Http.MultipartFormData body = request().body().asMultipartFormData();
+
+        if (body == null) {
+            result.put("error", "No file attached");
+            return badRequest(result);
+        }
+
+        Http.MultipartFormData.FilePart avatar = body.getFile("avatarimage");
+
+        if (avatar == null) {
+            result.put("error", "No file with key 'avatarimage'");
+            return badRequest(result);
+        }
+
+        try {
+            avatarManager.setTempAvatar(avatar, group.id);
+        } catch (ValidationException e) {
+            result.put("error", e.getMessage());
+            return badRequest(result);
+        }
+
+        result.put("success", getTempAvatar(id).toString());
+        return ok(result);
+    }
+
+    /**
+     * Get the temporary avatar image
+     *
+     * @param id
+     * @return
+     */
+    public Result getTempAvatar(Long id) {
+
+        ObjectNode result = Json.newObject();
+        Group group = groupManager.findById(id);
+
+        if (group == null) {
+            return notFound();
+        }
+
+        if (!Secured.editGroup(group)) {
+            result.put("error", "Not allowed.");
+            return forbidden(result);
+        }
+
+        File tempAvatar = avatarManager.getTempAvatar(group.id);
+        if (tempAvatar != null) {
+            return ok(tempAvatar);
+        } else {
+            return notFound();
+        }
+    }
+
+    /**
+     * Create the real avatar with the given dimensions
+     *
+     * @param id
+     * @return
+     */
+    public Result createAvatar(long id) {
+        ObjectNode result = Json.newObject();
+
+        Group group = groupManager.findById(id);
+
+        if (group == null) {
+            return notFound();
+        }
+
+        if (!Secured.editGroup(group)) {
+            result.put("error", "Not allowed.");
+            return forbidden(result);
+        }
+
+        Form<Avatar> form = Form.form(Avatar.class).bindFromRequest();
+
+        if (form.hasErrors()) {
+            result.put("error", form.errorsAsJson());
+            return badRequest(result);
+        }
+
+        try {
+            groupManager.saveAvatar(form.get(), group);
+            result.put("success", "saved");
+            return ok(result);
+        } catch (FileOperationException e) {
+            result.put("error", "Unexpected Error while saving avatar.");
+            return internalServerError(result);
+        }
+    }
+
+    /**
+     * Get the avatar of a group.
+     *
+     * @param id   group ID
+     * @param size Size - Possible values: "small", "medium", "large"
+     * @return
+     */
+    public Result getAvatar(long id, String size) {
+        Group group = groupManager.findById(id);
+        if (group != null) {
+            File avatar;
+            switch (size) {
+                case "small":
+                    avatar = avatarManager.getAvatar(AvatarSize.SMALL, group.id);
+                    break;
+                case "medium":
+                    avatar = avatarManager.getAvatar(AvatarSize.MEDIUM, group.id);
+                    break;
+                case "large":
+                    avatar = avatarManager.getAvatar(AvatarSize.LARGE, group.id);
+                    break;
+                default:
+                    avatar = avatarManager.getAvatar(AvatarSize.SMALL, group.id);
+            }
+            response().setHeader("Content-disposition", "inline");
+            if (avatar != null) {
+                return ok(avatar);
+            } else {
+                return notFound();
+            }
+        } else {
+            return notFound();
+        }
+    }
+
 }

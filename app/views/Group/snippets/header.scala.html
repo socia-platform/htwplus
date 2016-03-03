@@ -24,14 +24,20 @@
         <div class="addmargin">
             <div id="hp-profile-header">
 
-                @if(group.groupType.equals(GroupType.open)) {
-                <span style="background-color: white" class="avatar glyphicon glyphicon-globe"></span>
-                }
-                @if(group.groupType.equals(GroupType.close)) {
-                <span style="background-color: white" class="avatar glyphicon glyphicon-lock"></span>
-                }
-                @if(group.groupType.equals(GroupType.course)) {
-                <span style="background-color: white" class="avatar glyphicon glyphicon-briefcase"></span>
+                @if(group.hasAvatar) {
+                <img alt="avatar"
+                     src='@routes.GroupController.getAvatar(group.id, "large")'
+                     class="avatar"/>
+                } else {
+                    @if(group.groupType.equals(GroupType.open)) {
+                    <span style="background-color: white" class="avatar glyphicon glyphicon-globe"></span>
+                    }
+                    @if(group.groupType.equals(GroupType.close)) {
+                    <span style="background-color: white" class="avatar glyphicon glyphicon-lock"></span>
+                    }
+                    @if(group.groupType.equals(GroupType.course)) {
+                    <span style="background-color: white" class="avatar glyphicon glyphicon-briefcase"></span>
+                    }
                 }
 
 

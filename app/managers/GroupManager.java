@@ -1,6 +1,7 @@
 package managers;
 
 import models.*;
+import models.base.FileOperationException;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.db.jpa.JPA;
@@ -28,6 +29,9 @@ public class GroupManager implements BaseManager {
 
     @Inject
     FolderManager folderManager;
+
+    @Inject
+    AvatarManager avatarManager;
 
     public void createWithGroupAccount(Group group, Account account) {
         group.owner = account;
@@ -127,5 +131,11 @@ public class GroupManager implements BaseManager {
         for (Group group : all()) elasticsearchService.index(group);
         return (System.currentTimeMillis() - start) / 1000;
 
+    }
+
+    public void saveAvatar(Avatar avatar, Group group) throws FileOperationException {
+        avatarManager.saveAvatar(avatar, group.id);
+        group.hasAvatar = true;
+        this.update(group);
     }
 }

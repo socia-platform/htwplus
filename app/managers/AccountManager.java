@@ -279,9 +279,10 @@ public class AccountManager implements BaseManager {
 
     }
 
-    public void saveAvatar(Account.AvatarForm avatarForm, Account account) throws FileOperationException {
-        avatarManager.saveAvatar(avatarForm, account.id);
+    public void saveAvatar(Avatar avatar, Account account) throws FileOperationException {
+        avatarManager.saveAvatar(avatar, account.id);
         account.avatar = AvatarManager.AVATAR_CUSTOM;
+        this.update(account);
     }
 
 }

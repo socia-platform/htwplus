@@ -148,7 +148,7 @@ $(document).ready(function () {
                 processData: false,
                 success: function () {
                     _this.$modal.modal('hide');
-                    location.href = '/profile?avatar=success';
+                    location.href = document.referrer;
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     _this.$modal.modal('hide');

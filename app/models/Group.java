@@ -44,12 +44,11 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     public String token;
 
-    @OneToMany(mappedBy = "group")
-    @OrderBy("createdAt DESC")
-    public List<Media> media;
-
     @OneToOne
     public Folder mediaFolder;
+
+    @Column(name = "has_avatar", nullable = false, columnDefinition = "boolean default false")
+    public boolean hasAvatar;
 
     public void setTitle(String title) {
         this.title = title.trim();
@@ -60,7 +59,6 @@ public class Group extends BaseNotifiable implements INotifiable {
      */
     @Transient
     public Collection<String> inviteList = null;
-
 
     public List<ValidationError> validate() {
         List<ValidationError> errors = new ArrayList<>();
@@ -100,4 +98,5 @@ public class Group extends BaseNotifiable implements INotifiable {
 
         return controllers.routes.GroupController.index().toString();
     }
+
 }

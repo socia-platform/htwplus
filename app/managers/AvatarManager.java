@@ -2,6 +2,7 @@ package managers;
 
 import com.typesafe.config.ConfigFactory;
 import models.Account;
+import models.Avatar;
 import models.base.FileOperationException;
 import models.base.ValidationException;
 import models.enums.AvatarSize;
@@ -69,7 +70,7 @@ public class AvatarManager {
      *
      * @param avatarForm
      */
-    public void saveAvatar(Account.AvatarForm avatarForm, Long modelId) throws FileOperationException {
+    public void saveAvatar(Avatar avatarForm, Long modelId) throws FileOperationException {
         FileService fsTempAvatar = new FileService(AVATAR_REALM, this.getTempAvatarName(modelId));
         FileService fsAvatarLarge = fsTempAvatar.copy(this.getAvatarName(AvatarSize.LARGE, modelId));
         ImageService.crop(fsAvatarLarge.getFile(), avatarForm.x, avatarForm.y, avatarForm.width, avatarForm.height);

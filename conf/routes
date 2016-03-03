@@ -17,8 +17,10 @@ GET         /imprint                                   controllers.Application.i
 GET         /privacy                                   controllers.Application.privacy()
 GET         /404                                       controllers.Application.error()
 
+
 # JavaScript Routes
 GET         /assets/javascripts/routes                 controllers.Application.javascriptRoutes()
+
 
 #Group
 GET         /groups                                    controllers.GroupController.index()
@@ -41,6 +43,11 @@ GET         /group/:id/acceptInvite/:accountId         controllers.GroupControll
 GET         /group/:id/declineInvite/:accountId        controllers.GroupController.declineInvitation(id:Long, accountId: Long)
 POST        /group/:id/validate                        controllers.GroupController.validateToken(id:Long)
 POST        /group/:id/folder                          controllers.GroupController.createFolder(id:Long)
+POST        /group/:id/tempavatar                      controllers.GroupController.createTempAvatar(id:Long)
+GET         /group/:id/tempavatar                      controllers.GroupController.getTempAvatar(id:Long)
+POST        /group/:id/createavatar                    controllers.GroupController.createAvatar(id:Long)
+GET         /group/:id/avatar                          controllers.GroupController.getAvatar(id:Long, size:String ?= "small")
+
 
 #Post and Comments
 GET         /post/olderComments                        controllers.PostController.getOlderComments(id:Long,current:Integer)
@@ -88,20 +95,23 @@ POST        /media/multiple/:target/:id                controllers.MediaControll
 # Folder
 GET         /folder/:folderId/remove                   controllers.GroupController.deleteFolder(folderId:Long)
 
+
 #Notification
 GET         /notification                              controllers.NotificationController.showAll(page: Integer ?= 1)
 GET         /notification/readAll                      controllers.NotificationController.readAll()
 GET         /notification/:id                          controllers.NotificationController.forward(id:Long)
 
+
 # WebSocket
 GET         /websocket                                 controllers.WebSocketController.webSocket()
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                              controllers.Assets.at(path="/public", file)
 
+
 # Admin
 GET         /admin                                     controllers.AdminController.index()
-GET         /admin/group/refactor                      controllers.AdminController.refactor()
 GET         /admin/user/create                         controllers.AdminController.createAccountForm()
 POST        /admin/user/create                         controllers.AdminController.createAccount()
 POST        /admin/user/:id/delete                     controllers.AdminController.deleteAccount(id: Long)
@@ -116,7 +126,6 @@ GET         /admin/indexing/groups                     controllers.AdminControll
 GET         /admin/indexing/posts                      controllers.AdminController.indexPosts()
 GET         /admin/indexing/indexSettings              controllers.AdminController.indexSettings()
 GET         /admin/indexing/indexDelete                controllers.AdminController.indexDelete()
-
 
 
 # No route found? take this

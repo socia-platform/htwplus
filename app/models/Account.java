@@ -8,8 +8,6 @@ import models.enums.AccountRole;
 import models.enums.EmailNotifications;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.URL;
-import play.Logger;
-import play.data.validation.Constraints;
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Required;
 import play.libs.Json;
@@ -95,26 +93,4 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
         return false;
     }
 
-    static public class AvatarForm {
-
-        @Constraints.Required
-        public Integer x;
-
-        @Constraints.Required
-        public Integer y;
-
-        @Constraints.Required
-        public Integer width;
-
-        @Constraints.Required
-        public Integer height;
-
-        public String validate() {
-            if (!this.width.equals(this.height)) {
-                return "The chosen extract is not rectangular";
-            }
-            return null;
-        }
-
-    }
 }

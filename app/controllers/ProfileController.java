@@ -60,12 +60,7 @@ public class ProfileController extends BaseController {
             flash("info", "Diese Person gibt es nicht.");
             return redirect(controllers.routes.Application.index());
         } else {
-            String avatar = Form.form().bindFromRequest().get("avatar");
-            if (avatar != null && avatar.equals("success")) {
-                flash("success", "Dein Profilbild wurde erfolgreich gespeichert.");
-            }
             return ok(index.render(account, postForm));
-            // return ok(index.render(account));
         }
     }
 
@@ -83,7 +78,6 @@ public class ProfileController extends BaseController {
 			}
 	
 			return ok(index.render(account, postForm));
-			// return ok(index.render(account));
 		}
 	}
 
@@ -443,7 +437,7 @@ public class ProfileController extends BaseController {
             return forbidden(result);
         }
 
-        Form<Account.AvatarForm> form = Form.form(Account.AvatarForm.class).bindFromRequest();
+        Form<Avatar> form = Form.form(Avatar.class).bindFromRequest();
 
         if (form.hasErrors()) {
             result.put("error", form.errorsAsJson());
@@ -452,7 +446,6 @@ public class ProfileController extends BaseController {
 
         try {
             accountManager.saveAvatar(form.get(), account);
-            accountManager.indexAccount(account);
             result.put("success", "saved");
             return ok(result);
         } catch (FileOperationException e) {
@@ -495,6 +488,5 @@ public class ProfileController extends BaseController {
             return notFound();
         }
     }
-
 
 }

@@ -142,6 +142,7 @@ public class ElasticsearchService implements IElasticsearchService {
                         .field("grouptype", group.groupType)
                         .field("public", true)
                         .field("owner", group.owner.id)
+                        .field("avatar", group.hasAvatar)
                         .field("member", GroupAccountManager.findAccountIdsByGroup(group, LinkType.establish))
                         .endObject())
                 .execute()
