@@ -10,6 +10,7 @@ import play.Environment;
 import play.api.OptionalSourceMapper;
 import play.api.UsefulException;
 import play.api.routing.Router;
+import play.db.jpa.JPAApi;
 import play.http.DefaultHttpErrorHandler;
 import play.libs.F;
 import play.mvc.Http;
@@ -35,21 +36,26 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
 
     Configuration configuration;
 
+    private JPAApi jpaApi;
+
     @Inject
-    public ErrorHandler(Configuration configuration, Environment environment, OptionalSourceMapper optionalSourceMapper, Provider<Router> provider) {
+    public ErrorHandler(JPAApi jpaApi, Configuration configuration, Environment environment, OptionalSourceMapper optionalSourceMapper, Provider<Router> provider) {
         super(configuration, environment, optionalSourceMapper, provider);
         this.configuration = configuration;
+        this.jpaApi = jpaApi;
     }
 
     protected F.Promise<Result> onProdServerError(Http.RequestHeader request, UsefulException exception) {
-        Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
-        if(group != null){
-            Post post = new Post();
-            post.content = "Request: "+request+"\nError: "+exception;
-            post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
-            post.group = group;
-            postManager.create(post);
-        }
+        jpaApi.withTransaction(() -> {
+            Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
+            if (group != null) {
+                Post post = new Post();
+                post.content = "Request: " + request + "\nError: " + exception;
+                post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
+                post.group = group;
+                postManager.create(post);
+            }
+        });
 
         return F.Promise.<Result>pure(
                 Results.redirect(controllers.routes.Application.error())

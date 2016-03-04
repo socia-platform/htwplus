@@ -24,13 +24,13 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import play.Logger;
+import play.api.Configuration;
 import play.api.DefaultApplication;
+import play.api.Play;
+import scala.Option;
 
 import javax.inject.Singleton;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -61,10 +61,10 @@ public class ElasticsearchService implements IElasticsearchService {
     private final String ES_TYPE_GROUP = conf.getString("groupType");
     private final String ES_TYPE_POST = conf.getString("postType");
     private final int ES_RESULT_SIZE = conf.getInt("searchLimit");
-    private final String ES_SETTINGS = "conf/elasticsearch/settings.json";
-    private final String ES_USER_MAPPING = "conf/elasticsearch/user_mapping.json";
-    private final String ES_GROUP_MAPPING = "conf/elasticsearch/group_mapping.json";
-    private final String ES_POST_MAPPING = "conf/elasticsearch/post_mapping.json";
+    private final String ES_SETTINGS = "elasticsearch/settings.json";
+    private final String ES_USER_MAPPING = "elasticsearch/user_mapping.json";
+    private final String ES_GROUP_MAPPING = "elasticsearch/group_mapping.json";
+    private final String ES_POST_MAPPING = "elasticsearch/post_mapping.json";
 
 
     public ElasticsearchService() {
@@ -326,17 +326,16 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     private String loadFromFile(String filePath) {
-
-        File file = app.getFile(filePath);
-        if (file.exists()) {
+        //http://stackoverflow.com/questions/16299542/load-file-from-conf-directory-on-cloudbees
+        Option<InputStream> inputStreamOption = app.resourceAsStream(filePath);
             try {
-                return IOUtils.toString(new FileInputStream(file));
+                return IOUtils.toString(inputStreamOption.get());
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+
         return "";
     }
 }
