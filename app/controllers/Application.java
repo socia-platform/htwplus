@@ -105,7 +105,7 @@ public class Application extends BaseController {
     }
 
     public Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        SearchResponse response = elasticsearchService.doSearch("searchSuggestions", query, "all", null, 1, Component.currentAccount().id.toString(), asList("name", "title"), asList("user.friends", "group.member"));
+        SearchResponse response = elasticsearchService.doSearch("searchSuggestions", query, "all", null, 1, Component.currentAccount().id.toString(), asList("name", "title"), asList("friends", "member"));
         return ok(response.toString());
     }
 
@@ -152,7 +152,7 @@ public class Application extends BaseController {
         SearchResponse response;
 
         try {
-            response = elasticsearchService.doSearch("search", keyword.toLowerCase(), mode, facets, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("user.friends", "user.owner", "group.member", "group.owner", "post.owner", "post.viewable"));
+            response = elasticsearchService.doSearch("search", keyword.toLowerCase(), mode, facets, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("friends", "owner", "member", "viewable"));
             elasticsearchResponse.create(response, keyword, mode);
         } catch (NoNodeAvailableException nna) {
             flash("error", "Leider steht die Suche zur Zeit nicht zur Verfügung!");
