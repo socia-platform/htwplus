@@ -1,6 +1,5 @@
 @(currentPage: Integer, searchLimit: Integer, response : models.services.ElasticsearchResponse)
 @import helper._
-@import models.enums._
 @main(response.keyword){
 
     <div class="row">
@@ -43,17 +42,14 @@
                             @if(response.searchMode.equals("group") || response.searchMode.equals("all")) {
                                 <div class="well searchresult-container hp-pagination-element">
                                     <div class="group-result media">
-                                        <div class="pull-left">
-                                        @if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
-                                        @if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
-                                        @if(group.groupType.equals(GroupType.course)) { <span class="glyphicon glyphicon-briefcase"></span> }
-                                        </div>
+                                        @views.html.snippets.groupLinkAvatar(group)
                                         <div class="media-body">
                                             <div class="media-heading">
                                                 <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
                                                 <small>
                                                 @if(Secured.isMemberOfGroup(group, currentUser)) {
-                                                <span class="glyphicon glyphicon-ok" title="Du bist bereits Mitglied dieser Gruppe"></span>
+                                                    <span class="glyphicon glyphicon-ok" title="Du bist bereits Mitglied dieser Gruppe"></span>
+                                                    <span class='glyphicon @Messages("group.avatar.type."+group.groupType)'></span>
                                                 }
                                                 </small>
                                             </div>

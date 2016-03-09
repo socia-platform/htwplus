@@ -1538,6 +1538,7 @@ div.hp-avatar-default-9 {
     white-space: nowrap;
     overflow: hidden;
     padding-left: 190px;
+    font-weight: bold;
 }
 
 #hp-profile-header .headline .title small {

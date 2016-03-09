@@ -125,6 +125,9 @@ group.group_not_found=Gruppe wurde nicht gefunden!
 group.view.type.open=dieser Gruppe
 group.view.type.close=dieser Gruppe
 group.view.type.course=diesem Kurs
+group.avatar.type.open=glyphicon-globe
+group.avatar.type.close=glyphicon-lock
+group.avatar.type.course=glyphicon-briefcase
 media.group_new_media=Neues Medium <span class="hp-green">{0}</span> in der Gruppe <span class="hp-green">{1}</span>
 
 # --- admin control center

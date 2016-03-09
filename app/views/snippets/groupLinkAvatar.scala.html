@@ -1,0 +1,11 @@
+@(group: Group)
+
+<a class="pull-left hp-nohref" href="@routes.ProfileController.view(group.id)">
+	@if(group.hasAvatar){
+		<img alt="avatar" src='@routes.GroupController.getAvatar(group.id, "medium")' class="hp-avatar-medium" />
+	} else {
+		<div class="pull-left">
+			<span class='glyphicon @Messages("group.avatar.type."+group.groupType)'></span>
+		</div>
+	}
+</a>

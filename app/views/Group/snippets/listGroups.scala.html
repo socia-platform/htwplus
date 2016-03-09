@@ -23,8 +23,7 @@
 		@for(group <- groups) {
 		<tr>
 			<td>
-				@if(group.groupType.equals(GroupType.open)) { <span class="glyphicon glyphicon-globe"></span> }
-				@if(group.groupType.equals(GroupType.close)) { <span class="glyphicon glyphicon-lock"></span> }
+				<span class='glyphicon @Messages("group.avatar.type."+group.groupType)'></span>
 			</td>
 			<td>	
 				@if(Secured.isOwnerOfGroup(group, user)) {

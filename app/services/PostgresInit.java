@@ -51,7 +51,7 @@ public class PostgresInit implements DatabaseService {
                 adminAccount.firstname = "Admin";
                 adminAccount.lastname = "@HTWplus";
                 adminAccount.role = AccountRole.ADMIN;
-                adminAccount.avatar = "a1";
+                adminAccount.avatar = "1";
                 adminAccount.password = Component.md5(adminPassword);
                 accountManager.create(adminAccount);
             }
@@ -63,7 +63,7 @@ public class PostgresInit implements DatabaseService {
                 dummyAccount.firstname = "Gelöschter";
                 dummyAccount.lastname = "Account";
                 dummyAccount.role = AccountRole.DUMMY;
-                dummyAccount.avatar = "aDefault";
+                dummyAccount.avatar = "1";
                 dummyAccount.password = Component.md5(dummyPassword);
                 accountManager.create(dummyAccount);
             }
