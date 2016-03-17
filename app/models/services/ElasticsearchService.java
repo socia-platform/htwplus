@@ -262,8 +262,7 @@ public class ElasticsearchService implements IElasticsearchService {
         }
 
         // Define html tags for highlighting
-        if (caller.equals("search"))
-            searchRequest = searchRequest.setHighlighterPreTags("[startStrong]").setHighlighterPostTags("[endStrong]").setHighlighterNumOfFragments(0);
+        searchRequest = searchRequest.setHighlighterPreTags("[startStrong]").setHighlighterPostTags("[endStrong]").setHighlighterNumOfFragments(0);
 
         // Enable pagination
         searchRequest = searchRequest.setFrom((page * ES_RESULT_SIZE) - ES_RESULT_SIZE);
