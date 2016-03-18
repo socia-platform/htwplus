@@ -1,11 +1,11 @@
 package managers;
 
+import akka.actor.ActorSystem;
 import models.*;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.db.jpa.JPA;
-import play.libs.Akka;
 import play.libs.F;
 import scala.concurrent.duration.Duration;
 
@@ -202,8 +202,9 @@ public class GroupAccountManager implements BaseManager {
      * @param group group which should be indexed
      */
     private void reIndex(Group group) {
+        ActorSystem system = ActorSystem.create();
         // reindexing can be very time consuming -> do it in an own thread.
-        Akka.system().scheduler().scheduleOnce(
+        system.scheduler().scheduleOnce(
             Duration.create(0, TimeUnit.SECONDS),
             new Runnable() {
                 public void run() {
@@ -222,7 +223,7 @@ public class GroupAccountManager implements BaseManager {
                     });
                 }
             },
-            Akka.system().dispatcher()
+            system.dispatcher()
         );
     }
 }
