@@ -3,19 +3,6 @@
 
 @main("Newsstream") {
 
-@***
-<div class="row">
-    <div class="col-md-12" role="main">
-        <div class="hp-notepad-content">
-            <br/>
-            @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
-
-            @views.html.snippets.streamRaw(posts, postForm, count, limit, currentPage, filter)
-        </div>
-    </div>
-</div>
-***@
-
 <div class="row">
     <div class="col-md-10" role="main">
         <div class="addmargin">
@@ -29,6 +16,7 @@
                     <div class="hidden-xs hidden-sm hp-avatar-medium hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
                     }
                 </div>
+
                 <div class="col-md-11" role="complementary">
                     <div class="hp-post-create-area">
                         @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)

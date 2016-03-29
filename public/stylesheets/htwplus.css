@@ -841,7 +841,8 @@ div.hp-pagination {
 
 /*============================== Post & Comment View ==============================*/
 
-.hp-horizontal-form {
+.hp-horizontal-form,
+.hp-post-form {
 	padding: 0;
 	float: none !important;
 }
@@ -856,8 +857,7 @@ div.hp-pagination {
 	border-radius: 4px!important;
 }
 
-#hp-new-comment-content,
-#hp-new-post-content {
+#hp-new-comment-content {
 	height: 60px;
     transition: height 0.5s ease 0.2s;
 	-webkit-transition: height 0.5s ease 0.2s;
@@ -869,8 +869,7 @@ div.hp-pagination {
     height: 32px;
 }
 
-#hp-new-comment-content:focus,
-#hp-new-post-content:focus {
+#hp-new-comment-content:focus {
 	height: 104px;
 }
 
@@ -1359,13 +1358,19 @@ div.hp-avatar-default-9 {
 /*===== Feed Design =====*/
 
 .hp-post-create-area {
-    padding: 10px;
     margin-bottom: 20px;
-    box-sizing: content-box;
-    background-color: white;
-    -moz-box-sizing: content-box;
-    -webkit-box-sizing: content-box;
-    box-shadow: 0 0 1px #888
+}
+
+.hp-post-create-area #hp-post-submit-button {
+    display: none;
+}
+
+.hp-post-create-area .md-footer {
+    text-align: right;
+}
+
+.hp-post-create-area .md-footer .glyphicon {
+    color: white;
 }
 
 .hp-post-area {
@@ -1636,7 +1641,7 @@ a.adjust {
 }
 
 .hp-post-area .hp-post-content p img {
-    max-width: 33%;
+    max-width: 100%;
 }
 
 /*==== if content area is to short and site-nav starts floating around ==*/

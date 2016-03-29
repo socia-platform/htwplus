@@ -1,3 +1,31 @@
+(function($){
+  $.fn.markdown.messages.de = {
+    'Bold': "Fett",
+    'Italic': "Kursiv",
+    'Heading': "Überschrift",
+    'URL/Link': "Ein Link einfügen",
+    'Image': "Ein Bild einfügen",
+    'List': "Aufzählungszeichen",
+    'Ordered List': "Nummerierung",
+    'Unordered List': "Aufzählungszeichen",
+    'Code': "Quellcode",
+    'code text here': "",
+    'Quote': "Zitat",
+    'quote here': "",
+    'Preview': "Vorschau",
+    'strong text': "",
+    'emphasized text': "",
+    'heading text': "",
+    'enter link description here': "Linkbeschreibung",
+    'Insert Hyperlink': "Link zum Webseite",
+    'enter image description here': "Bildbeschreibung",
+    'Insert Image Hyperlink': "Link zum Bild",
+    'enter image title here': "Bildtitel",
+    'list text here': "",
+    'Save': "Posten"
+  };
+}(jQuery));
+
 function toggleMediaSelection(parent) {
 	var childs = document.getElementById("mediaList").getElementsByTagName("input");
 	for (i = 0; i < childs.length; i++) {
@@ -239,7 +267,6 @@ $(".hp-post-form").on("submit", function(e) {
     }
 });
 
-
 /*
  *  prevent click action for disabled list items
  */
@@ -304,6 +331,17 @@ var md = window.markdownit({
 md.renderer.rules.emoji = function(token, idx) {
   return '<img class="emoji" width="20" height="20" src="' + location.origin + '/assets/images/emojis/' + token[idx].markup + '.png" />';
 };
+
+$("#hp-new-post-content").markdown({
+    savable:true,
+    language: 'de',
+    onPreview: function(e) {
+        return md.render(e.getContent());
+    },
+    onSave: function(e) {
+        $('#hp-post-submit-button').click();
+    }
+});
 
 $(document).ready(function () {
 
