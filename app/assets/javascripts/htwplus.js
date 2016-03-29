@@ -1,3 +1,31 @@
+(function($){
+  $.fn.markdown.messages.de = {
+    'Bold': "Fett",
+    'Italic': "Kursiv",
+    'Heading': "Überschrift",
+    'URL/Link': "Ein Link einfügen",
+    'Image': "Ein Bild einfügen",
+    'List': "Aufzählungszeichen",
+    'Ordered List': "Nummerierung",
+    'Unordered List': "Aufzählungszeichen",
+    'Code': "Quellcode",
+    'code text here': "",
+    'Quote': "Zitat",
+    'quote here': "",
+    'Preview': "Vorschau",
+    'strong text': "",
+    'emphasized text': "",
+    'heading text': "",
+    'enter link description here': "Linkbeschreibung",
+    'Insert Hyperlink': "Link zum Webseite",
+    'enter image description here': "Bildbeschreibung",
+    'Insert Image Hyperlink': "Link zum Bild",
+    'enter image title here': "Bildtitel",
+    'list text here': "",
+    'Save': "Posten"
+  };
+}(jQuery));
+
 function toggleMediaSelection(parent) {
 	var childs = document.getElementById("mediaList").getElementsByTagName("input");
 	for (i = 0; i < childs.length; i++) {
@@ -126,6 +154,17 @@ function showErrorBeforeElement(element, error_message) {
     element.before('<div class="alert alert-danger"><a data-dismiss="alert" class="close" href="#">×</a>'+error_message+'</div>');
 }
 
+/** markdown post content */
+function markdownPostContent() {
+    $('.hp-truncate').each(function( index, value ) {
+        // check if element is already marked (pagination issue)
+        if (!$(this).hasClass('marked')) {
+            this.innerHTML = md.render(value.textContent);
+            $(this).addClass('marked');
+        }
+    });
+}
+
 /*
  *  Options Menu
  */
@@ -174,9 +213,9 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
         var post_container = $("#"+post_id);
 
         var old_content = replaceContentWithLoadingIndicator(post_container);
+        post_container.removeClass('marked');
         var removed_classes = post_container.attr("class");
         post_container.attr("class", ""); // remove the classes (preventing linkify and whitespace stuff to apply)
-
         post_container.load("/post/"+post_id+"/getEditForm", function(response, status, xhr) {
             if (status == "error") {
                 console.log("Error when trying to edit post: ["+status+"]");
@@ -227,7 +266,6 @@ $(".hp-post-form").on("submit", function(e) {
         }).focus();
     }
 });
-
 
 /*
  *  prevent click action for disabled list items
@@ -280,7 +318,34 @@ $('body').on('click', '.hp-mediaList-submit', function (e) {
     $('#mediaListFrom').append('<input type="hidden" name="action" value="delete">').submit();
 });
 
+/*
+ * Markdown definition
+ */
+var md = window.markdownit({
+               html: false,
+               breaks: true,
+               linkify: false,
+               typographer: true
+             }).use(window.markdownitMark).use(window.markdownitEmoji);
+
+md.renderer.rules.emoji = function(token, idx) {
+  return '<img class="emoji" width="20" height="20" src="' + location.origin + '/assets/images/emojis/' + token[idx].markup + '.png" />';
+};
+
+$("#hp-new-post-content").markdown({
+    savable:true,
+    language: 'de',
+    onPreview: function(e) {
+        return md.render(e.getContent());
+    },
+    onSave: function(e) {
+        $('#hp-post-submit-button').click();
+    }
+});
+
 $(document).ready(function () {
+
+    markdownPostContent();
 
     /*
      *  Token
@@ -309,6 +374,7 @@ $(document).ready(function () {
 		},
 		complete:function(){
 			$(".loading").hide();
+			markdownPostContent();
 			autolinkUrls();
 			linkOlderComments();
 			linkAddComments();
@@ -396,12 +462,12 @@ $(document).ready(function () {
                     var custom_avatar = false;
                     if(item._type === 'user') {
                         label = item._source.name;
-                        hLabel = item.highlight.name;
+                        hLabel = item.highlight.name[0].replace('[startStrong]', '<strong>').replace('[endStrong]', '</strong>');
                         if(item._source.avatar === 'custom') {custom_avatar = true;}
                     }
                     if(item._type === 'group') {
                         label = item._source.title;
-                        hLabel = item.highlight.title;
+                        hLabel = item.highlight.title[0].replace('[startStrong]', '<strong>').replace('[endStrong]', '</strong>');
                         groupType = item._source.grouptype;
                         if(item._source.avatar) {
                             custom_avatar = true;

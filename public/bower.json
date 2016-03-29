@@ -16,7 +16,10 @@
     "ScrollMagic": "=1.1.2",
     "dropzone": "=4.0.1",
     "cropper": "=0.9.0",
-    "readmore": ""
+    "readmore": "",
+    "markdown-it": "^6.0.0",
+    "markdown-it-mark": "=2.0.0",
+    "markdown-it-emoji": "=1.1.0"
   },
   "resolutions": {
     "gsap": "=1.14.2"

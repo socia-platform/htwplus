@@ -70,10 +70,6 @@ span.errors {
 	text-overflow: ellipsis;
 }
 
-.hp-white-space {
-	white-space: pre-line;
-}
-
 h1 {
 	text-align: center;
 }
@@ -845,7 +841,8 @@ div.hp-pagination {
 
 /*============================== Post & Comment View ==============================*/
 
-.hp-horizontal-form {
+.hp-horizontal-form,
+.hp-post-form {
 	padding: 0;
 	float: none !important;
 }
@@ -860,8 +857,7 @@ div.hp-pagination {
 	border-radius: 4px!important;
 }
 
-#hp-new-comment-content,
-#hp-new-post-content {
+#hp-new-comment-content {
 	height: 60px;
     transition: height 0.5s ease 0.2s;
 	-webkit-transition: height 0.5s ease 0.2s;
@@ -873,8 +869,7 @@ div.hp-pagination {
     height: 32px;
 }
 
-#hp-new-comment-content:focus,
-#hp-new-post-content:focus {
+#hp-new-comment-content:focus {
 	height: 104px;
 }
 
@@ -1297,7 +1292,7 @@ div.hp-avatar-default-9 {
     background-color: #0097cf;
     color: #fff;
 }
-.tt-suggestions strong, em {
+.tt-suggestions strong {
     font-weight: bold;
     font-style: normal;
 }
@@ -1363,13 +1358,19 @@ div.hp-avatar-default-9 {
 /*===== Feed Design =====*/
 
 .hp-post-create-area {
-    padding: 10px;
     margin-bottom: 20px;
-    box-sizing: content-box;
-    background-color: white;
-    -moz-box-sizing: content-box;
-    -webkit-box-sizing: content-box;
-    box-shadow: 0 0 1px #888
+}
+
+.hp-post-create-area #hp-post-submit-button {
+    display: none;
+}
+
+.hp-post-create-area .md-footer {
+    text-align: right;
+}
+
+.hp-post-create-area .md-footer .glyphicon {
+    color: white;
 }
 
 .hp-post-area {
@@ -1384,6 +1385,7 @@ div.hp-avatar-default-9 {
 .hp-post-area .hp-post-content {
     padding: 10px;
     background-color: #f5f5f5;
+    border-top: 1px solid #eee;
 }
 
 .hp-post-area .hp-post-header {
@@ -1408,12 +1410,6 @@ div.hp-avatar-default-9 {
 .hp-post-area .hp-post-header .hp-post-avatar {
     float: left;
     margin-right: 10px;
-}
-
-.hp-post-area hr {
-    margin: 0px;
-    border: 0;
-    border-top: 1px solid #eee;
 }
 
 .hp-newsfeed-sitenav {
@@ -1599,6 +1595,53 @@ a.adjust {
     width: 80px;
     text-align: center;
     text-decoration: none;
+}
+
+/*==== Markdown Styling ====*/
+
+.hp-post-area .hp-post-content table {
+    padding: 0;
+}
+.hp-post-area .hp-post-content table tr {
+    border-top: 1px solid #cccccc;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.hp-post-area .hp-post-content table tr:nth-child(2n) {
+     background-color: #f8f8f8;
+}
+
+.hp-post-area .hp-post-content table tr th {
+     font-weight: bold;
+     border: 1px solid #cccccc;
+     text-align: left;
+     margin: 0;
+     padding: 6px 13px;
+}
+
+.hp-post-area .hp-post-content table tr td {
+     border: 1px solid #cccccc;
+     text-align: left;
+     margin: 0;
+     padding: 6px 13px;
+}
+
+.hp-post-area .hp-post-content table tr th :first-child, table tr td :first-child {
+     margin-top: 0;
+}
+
+.hp-post-area .hp-post-content table tr th :last-child, table tr td :last-child {
+     margin-bottom: 0;
+}
+
+.hp-post-area .hp-post-content pre {
+    background-color: white;
+}
+
+.hp-post-area .hp-post-content p img {
+    max-width: 100%;
 }
 
 /*==== if content area is to short and site-nav starts floating around ==*/
