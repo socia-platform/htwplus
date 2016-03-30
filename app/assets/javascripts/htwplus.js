@@ -212,7 +212,7 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
         var post_id = e.currentTarget.id.split("_")[1];
         var post_container = $("#"+post_id);
 
-        var old_content = replaceContentWithLoadingIndicator(post_container);
+        //var old_content = replaceContentWithLoadingIndicator(post_container);
         post_container.removeClass('marked');
         var removed_classes = post_container.attr("class");
         post_container.attr("class", ""); // remove the classes (preventing linkify and whitespace stuff to apply)
@@ -225,28 +225,35 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                 });
                 post_container.html(old_content); // put back removed content
             } else {
-                post_container.find(".commentSubmit").click(function () {
-                    var form = post_container.find("form");
-                    $.ajax({
-                        url: form.attr('action'),
-                        type: "POST",
-                        data: form.serialize(),
-                        success: function (data) {
-                            post_container.html(data);
-                            post_container.attr("class", removed_classes);
-                        },
-                        error: function(xhr, status, errorThrown) {
-                            console.log("Error when submitting edited post: ["+status+"] " + errorThrown);
-                            showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
-                            $(".hp-reload").click(function() {
-                                window.location.reload();
-                            });
-                            post_container.html(old_content); // put back removed content
-                        }
-                    });
-
-                    replaceContentWithLoadingIndicator(post_container);
-                    return false;
+                $("#hp-edit-post-content").markdown({
+                    savable:true,
+                    language: 'de',
+                    autofocus: true,
+                    onShow: function(e) {
+                        $(".hp-post-content button[data-handler='cmdSave']").html('<span class="glyphicon glyphicon-refresh"></span> Aktualisieren');
+                    },
+                    onPreview: function(e) {
+                        return md.render(e.getContent());
+                    },
+                    onSave: function(e) {
+                        var form = post_container.find("form");
+                        $.ajax({
+                            url: form.attr('action'),
+                            type: "POST",
+                            data: form.serialize(),
+                            success: function (data) {
+                                post_container.html(data);
+                                post_container.attr("class", removed_classes);
+                            },
+                            error: function(xhr, status, errorThrown) {
+                                console.log("Error when submitting edited post: ["+status+"] " + errorThrown);
+                                showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                                $(".hp-reload").click(function() {
+                                    window.location.reload();
+                                });
+                            }
+                        });
+                    }
                 });
             }
         });
@@ -556,13 +563,13 @@ $('.hp-pagination-container').on('click', 'a.hp-post-bookmark-icon', function() 
      type: "PUT",
      success: function(data){
          if(data === "setBookmark") {
-             $(icon).addClass('glyphicon-heart');
-             $(icon).removeClass('glyphicon-heart-empty');
+             $(icon).addClass('glyphicon-floppy-saved');
+             $(icon).removeClass('glyphicon-floppy-disk');
              $(context).attr("data-original-title", "Post vergessen").tooltip('fixTitle').tooltip('show');
          }
          if(data === "removeBookmark") {
-             $(icon).addClass('glyphicon-heart-empty');
-             $(icon).removeClass('glyphicon-heart');
+             $(icon).addClass('glyphicon-floppy-disk');
+             $(icon).removeClass('glyphicon-floppy-saved');
              $(context).attr("data-original-title", "Post merken").tooltip('fixTitle').tooltip('show');
          }
      }

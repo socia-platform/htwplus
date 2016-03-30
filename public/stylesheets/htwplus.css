@@ -50,7 +50,6 @@ textarea {
   	resize: none;
 }
 
-button > .glyphicon,
 a > .glyphicon {
 	color: rgb(90,88,88);
 }
@@ -1365,11 +1364,18 @@ div.hp-avatar-default-9 {
     display: none;
 }
 
-.hp-post-create-area .md-footer {
+#hp-new-post-content,
+#hp-edit-post-content,
+.md-preview {
+    background-color: white;
+    padding: 5px;
+}
+
+.md-footer {
     text-align: right;
 }
 
-.hp-post-create-area .md-footer .glyphicon {
+.md-footer .glyphicon {
     color: white;
 }
 

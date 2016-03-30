@@ -1,11 +1,6 @@
-@(postId: Long, postForm: Form[Post])
-@helper.form(action = routes.PostController.updatePost(postId), 'class -> "hp-post-form") {
+@(post: Post, postForm: Form[Post])
+@helper.form(action = routes.PostController.updatePost(post.id), 'class -> "hp-post-form") {
     <div class="hp-horizontal-form col-xs-12">
-        <div class="input-group">
-            @helper.textarea(postForm("Content"), 'class -> "form-control", 'placeholder -> "Post bearbeiten...")
-            <span class="input-group-btn">
-                <button type="submit" class="btn btn-sm btn-warning commentSubmit">Aktualisieren</button>
-            </span>
-        </div>
+        <textarea id="hp-edit-post-content" name="content">@post.content</textarea>
     </div>
 }

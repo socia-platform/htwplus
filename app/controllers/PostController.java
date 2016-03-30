@@ -188,7 +188,7 @@ public class PostController extends BaseController {
             return badRequest();
         }
 
-        return ok(views.html.snippets.editPost.render(post.id, postForm.fill(post)));
+        return ok(views.html.snippets.editPost.render(post, postForm.fill(post)));
     }
 
     @Transactional
