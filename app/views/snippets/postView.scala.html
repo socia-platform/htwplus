@@ -44,8 +44,8 @@
                         @defining(Secured.isPostBookmarkedByAccount(currentUser, post)) { bookmark =>
                         <a href="#bookmark-@post.id" class="hp-post-options hp-post-bookmark-icon hp-nohref" rel="tooltip"
                            data-original-title="Post @if(!bookmark) {merken} else {vergessen}" data-container="body" >
-                            @if(!bookmark) { <span class='glyphicon glyphicon-heart-empty'></span>} else { <span
-                                class='glyphicon glyphicon-heart'></span> }
+                            @if(!bookmark) { <span class='glyphicon glyphicon-floppy-disk'></span>} else { <span
+                                class='glyphicon glyphicon-floppy-saved'></span> }
                         </a>
                         }
 
@@ -94,7 +94,7 @@
                                 @textarea(postForm("Content"), 'class -> "form-control", 'id -> "hp-new-comment-content",
                                 'placeholder -> "Erstelle ein Kommentar...")
                                 <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-sm btn-warning commentSubmit">Kommentieren</button>
+                                    <button type="submit" class="btn btn-sm btn-warning commentSubmit"><span class="glyphicon glyphicon-comment"></span> Kommentieren</button>
                                 </span>
                             </div>
                         </div>
