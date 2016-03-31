@@ -581,6 +581,7 @@ div.well.notification div.notification-date {
 div.well.notification div.notification-read {
     font-size: smaller;
     font-style: italic;
+    margin-bottom: 10px;
 }
 
 div.well.notification div.notification-read.read {
