@@ -66,10 +66,8 @@
                 </div>
 
                 <div class="hp-post-content">
-                    <br/>
-
+                    <br />
                     <div class="hp-truncate" id="@post.id">@post.content</div>
-                    <br/>
                     <hr/>
                     <div class="hp-comments" id="comments-@post.id">
                         @if(managers.PostManager.getCountComments(post) > ConfigFactory.load().getInt("htwplus.comments.init") &&

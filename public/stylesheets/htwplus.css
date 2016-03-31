@@ -1394,6 +1394,10 @@ div.hp-avatar-default-9 {
     border-top: 1px solid #eee;
 }
 
+.hp-post-area .hp-post-content p {
+    margin: 0 0 16px;
+}
+
 .hp-post-area .hp-post-header {
     padding: 10px;
 }
