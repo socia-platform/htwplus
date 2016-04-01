@@ -89,7 +89,7 @@
                         <table class="table table-hover table-condensed">
                             <thead>
                                 <tr>
-                                    <th style="width:92px"></th>
+                                    <th style="width:35px"></th>
                                     <th>Name</th>
                                     <th style="width:35px"></th>
                                 </tr>
@@ -98,7 +98,7 @@
                             @defining(managers.GroupAccountManager.findAccountsByGroup(group, LinkType.establish)) { accounts =>
                                 @for(account <- accounts) {
                                     <tr>
-                                        <td>@views.html.snippets.userLinkAvatar(account)</td>
+                                        <td>@views.html.snippets.userLinkAvatar(account, "small")</td>
                                         <td>@views.html.snippets.userLink(account)</td>
                                         <td class="hp-optionsMenu">
                                         @if(account.id != group.owner.id){

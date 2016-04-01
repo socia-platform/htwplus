@@ -1233,14 +1233,14 @@ div.hp-avatar-default-9 {
     line-height: 31px;
 }
 
-.hp-optionsMenu .dropdown-toggle > .glyphicon-chevron-up {
+.hp-optionsMenu .dropdown-toggle > .glyphicon-chevron-up,
+.hp-optionsTable > tr:hover .dropdown-toggle > .glyphicon {
     color: #76B900;
 }
 
-.hp-optionsTable > tr:hover .dropdown-toggle > .glyphicon {
-    color: #76B900
+tbody.hp-optionsTable > tr > td {
+    vertical-align: middle;
 }
-
 
 /*========= AutoSuggestion ==========*/
 

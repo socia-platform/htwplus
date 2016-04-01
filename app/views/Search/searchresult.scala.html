@@ -1,5 +1,7 @@
 @(currentPage: Integer, searchLimit: Integer, response : models.services.ElasticsearchResponse)
+@import models.enums.AccountRole;
 @import helper._
+
 @main("Suche"){
 
     <div class="row">
@@ -19,18 +21,24 @@
                             @if(response.searchMode.equals("user") || response.searchMode.equals("all")) {
                                 <div class="well searchresult-container hp-pagination-element">
                                     <div class="account-result media">
-                                        @views.html.snippets.userLinkAvatar(account)
+                                        @views.html.snippets.userLinkAvatar(account, "medium")
                                         <div class="media-body">
                                             <div class="media-heading">
-                                            @views.html.snippets.userLink(account, "top")
+                                                <strong>
+                                                    @views.html.snippets.userLink(account, "top")
+                                                </strong>
+                                                @if(account.role != AccountRole.STUDENT && account.role != null) {<small>(@account.role.getDisplayName())</small>}
                                             </div>
                                             <small>
-                                            @if(managers.FriendshipManager.alreadyFriendly(currentUser, account)) {
-                                                <span class="glyphicon glyphicon-ok"></span>
-                                                <span> Ihr steht  bereits in Kontakt.</span>
-                                            } else {
-                                                <span>Mit dieser Person stehst du noch nicht in Kontakt.</span>
-                                            }
+                                                @views.html.snippets.studycourseLink(account)
+                                                <br />
+                                                @if(managers.FriendshipManager.alreadyFriendly(currentUser, account)) {
+                                                    <span class="glyphicon glyphicon-ok"></span>
+                                                    <span> Ihr steht  bereits in Kontakt.</span>
+                                                } else {
+                                                    <span class="glyphicon glyphicon-plus"></span>
+                                                    <a href="@routes.FriendshipController.requestFriend(account.id)">Kontaktanfrage schicken</a>
+                                                }
                                             </small>
                                         </div>
                                     </div>
@@ -78,7 +86,7 @@
                             @if(response.searchMode.equals("post") || response.searchMode.equals("all")) {
                                 <div class="well searchresult-container hp-pagination-element">
                                     <div class="post-result media">
-                                        @views.html.snippets.userLinkAvatar(post.owner)
+                                        @views.html.snippets.userLinkAvatar(post.owner, "small")
                                         <div class="media-body">
                                             <div class="media-heading">
                                                 @views.html.snippets.userLink(post.owner)
