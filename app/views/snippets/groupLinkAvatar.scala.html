@@ -1,11 +1,9 @@
-@(group: Group)
+@(group: Group, size: String)
 
-<a class="pull-left hp-nohref" href="@routes.ProfileController.view(group.id)">
+<a class="hp-nohref" href="@routes.GroupController.stream(group.id)">
 	@if(group.hasAvatar){
-		<img alt="avatar" src='@routes.GroupController.getAvatar(group.id, "medium")' class="hp-avatar-medium" />
+		<img alt="avatar" src='@routes.GroupController.getAvatar(group.id, size)' class="hp-avatar-@size" />
 	} else {
-		<div class="pull-left">
-			<span class='glyphicon @Messages("group.avatar.type."+group.groupType)'></span>
-		</div>
+		<span class='glyphicon @Messages("group.avatar.type."+group.groupType)'></span>
 	}
 </a>

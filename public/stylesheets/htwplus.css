@@ -1242,6 +1242,10 @@ tbody.hp-optionsTable > tr > td {
     vertical-align: middle;
 }
 
+tbody.hp-optionsTable .hp-avatar-column {
+    text-align: center;
+}
+
 /*========= AutoSuggestion ==========*/
 
 .autosuggest-avatar {

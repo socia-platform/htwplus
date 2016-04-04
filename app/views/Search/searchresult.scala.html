@@ -50,7 +50,9 @@
                             @if(response.searchMode.equals("group") || response.searchMode.equals("all")) {
                                 <div class="well searchresult-container hp-pagination-element">
                                     <div class="group-result media">
-                                        @views.html.snippets.groupLinkAvatar(group)
+                                        <div class="pull-left">
+                                            @views.html.snippets.groupLinkAvatar(group, "medium")
+                                        </div>
                                         <div class="media-body">
                                             <div class="media-heading">
                                                 <a href="@routes.GroupController.view(group.id)"><b>@group.title</b></a>
