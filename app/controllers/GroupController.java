@@ -116,18 +116,19 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(id);
         Folder folder;
 
-        if(folderId != 0) {
-            folder = folderManager.findById(folderId);
-        } else {
-            folder = group.mediaFolder;
-        }
-
         if (group == null) {
             flash("error", Messages.get("group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
+
         if (!Secured.viewGroup(group)) {
             return redirect(controllers.routes.GroupController.view(id));
+        }
+
+        if(folderId != 0) {
+            folder = folderManager.findById(folderId);
+        } else {
+            folder = group.mediaFolder;
         }
 
         Navigation.set(Level.GROUPS, "Media", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
