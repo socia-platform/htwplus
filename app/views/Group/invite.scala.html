@@ -20,10 +20,10 @@
             <table class="table table-hover">
                 <thead>
                 <tr>
-                    <th style="width:23px">
+                    <th style="width:28px">
                         <input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body" onclick="toggleMediaSelection(this)">
                     </th>
-                    <th style="width:36px"></th>
+                    <th style="width:35px"></th>
                     <th>Name</th>
                     <th style="width:35px"></th>
                 </tr>
@@ -32,7 +32,7 @@
                 @for(friend <- friendsToInvite) {
                 <tr>
                     <td><input type="checkbox" name="friends[]" value="@friend.id"></td>
-                    <td>@views.html.snippets.userLinkAvatar(friend)</td>
+                    <td>@views.html.snippets.userLinkAvatar(friend, "small")</td>
                     <td>@views.html.snippets.userLink(friend)</td>
                     <td class="hp-optionsMenu">
                         @views.html.snippets.accountOptionMenu(friend)
@@ -43,7 +43,7 @@
                 @for(friend <- alreadyInvitedFriends) {
                 <tr>
                     <td><input type="checkbox" disabled="disabled"></td>
-                    <td>@views.html.snippets.userLinkAvatar(friend)</td>
+                    <td>@views.html.snippets.userLinkAvatar(friend, "small")</td>
                     <td>@views.html.snippets.userLink(friend)</td>
                     <td class="hp-optionsMenu">
                         @views.html.snippets.accountOptionMenu(friend)

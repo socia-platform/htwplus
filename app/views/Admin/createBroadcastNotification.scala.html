@@ -24,7 +24,7 @@
                 @if(!Component.currentAccount().equals(account)) {
                     <tr>
                         <td><input type="checkbox" name="account[]" value="@account.id"></td>
-                        <td>@views.html.snippets.userLinkAvatar(account)</td>
+                        <td>@views.html.snippets.userLinkAvatar(account, "small")</td>
                         <td>@views.html.snippets.userLink(account)</td>
                         <td class="hp-optionsMenu">
                             @views.html.snippets.accountOptionMenu(account)

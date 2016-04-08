@@ -35,7 +35,7 @@ function toggleMediaSelection(parent) {
 }
 
 function autolinkUrls() {
-    $('.hp-truncate').each(function(){
+    $('.hp-post').each(function(){
 		$(this).linkify({
 			tagName: 'a',
 			target: '_blank',
@@ -156,7 +156,7 @@ function showErrorBeforeElement(element, error_message) {
 
 /** markdown post content */
 function markdownPostContent() {
-    $('.hp-truncate').each(function( index, value ) {
+    $('.hp-post').each(function( index, value ) {
         // check if element is already marked (pagination issue)
         if (!$(this).hasClass('marked')) {
             this.innerHTML = md.render(value.textContent);

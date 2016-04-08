@@ -1,0 +1,8 @@
+@(user: Account)
+
+<span class="glyphicon glyphicon-education"></span>
+@if(user.studycourse != null) {
+    <a href="/search?keyword=&mode=user&studycourse=@helper.urlEncode(user.studycourse.title)">@user.studycourse.title @if(user.degree != null) {(@user.degree)}</a>
+} else {
+    <i>keine Angabe</i>
+}

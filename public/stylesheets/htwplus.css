@@ -581,6 +581,7 @@ div.well.notification div.notification-date {
 div.well.notification div.notification-read {
     font-size: smaller;
     font-style: italic;
+    margin-bottom: 10px;
 }
 
 div.well.notification div.notification-read.read {
@@ -1232,14 +1233,18 @@ div.hp-avatar-default-9 {
     line-height: 31px;
 }
 
-.hp-optionsMenu .dropdown-toggle > .glyphicon-chevron-up {
+.hp-optionsMenu .dropdown-toggle > .glyphicon-chevron-up,
+.hp-optionsTable > tr:hover .dropdown-toggle > .glyphicon {
     color: #76B900;
 }
 
-.hp-optionsTable > tr:hover .dropdown-toggle > .glyphicon {
-    color: #76B900
+tbody.hp-optionsTable > tr > td {
+    vertical-align: middle;
 }
 
+tbody.hp-optionsTable .hp-avatar-column {
+    text-align: center;
+}
 
 /*========= AutoSuggestion ==========*/
 
@@ -1392,6 +1397,10 @@ div.hp-avatar-default-9 {
     padding: 10px;
     background-color: #f5f5f5;
     border-top: 1px solid #eee;
+}
+
+.hp-post-area .hp-post-content p {
+    margin: 0 0 16px;
 }
 
 .hp-post-area .hp-post-header {

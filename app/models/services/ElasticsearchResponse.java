@@ -77,8 +77,8 @@ public class ElasticsearchResponse {
                         if (!searchHit.getHighlightFields().isEmpty())
                             searchContent = searchHit.getHighlightFields().get("content").getFragments()[0].string();
                         post.searchContent = StringEscapeUtils.escapeHtml4(searchContent)
-                                .replace("[startStrong]", "<strong>")
-                                .replace("[endStrong]", "</strong>");
+                                .replace("[startStrong]", "**")
+                                .replace("[endStrong]", "**");
                         resultList.add(post);
                     }
                     break;

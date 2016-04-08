@@ -66,10 +66,7 @@
                 </div>
 
                 <div class="hp-post-content">
-                    <br/>
-
-                    <div class="hp-truncate" id="@post.id">@post.content</div>
-                    <br/>
+                    <div class="hp-post hp-truncate" id="@post.id">@post.content</div>
                     <hr/>
                     <div class="hp-comments" id="comments-@post.id">
                         @if(managers.PostManager.getCountComments(post) > ConfigFactory.load().getInt("htwplus.comments.init") &&
@@ -92,7 +89,7 @@
                         <div class="hp-horizontal-form col-xs-12">
                             <div class="input-group">
                                 @textarea(postForm("Content"), 'class -> "form-control", 'id -> "hp-new-comment-content",
-                                'placeholder -> "Erstelle ein Kommentar...")
+                                'placeholder -> "Schreibe ein Kommentar...")
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-sm btn-warning commentSubmit"><span class="glyphicon glyphicon-comment"></span> Kommentieren</button>
                                 </span>

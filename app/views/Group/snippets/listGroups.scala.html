@@ -5,7 +5,7 @@
 <table class="table table-hover">
 	<thead>
 		<tr>
-			<th style="width:28px"></th>
+			<th style="width:35px"></th>
 			<th style="width:auto">Gruppenname</th>
 			<th style="width:35%">Erstellt von</th>
 			<th style="width:35px"></th>
@@ -22,8 +22,8 @@
         }
 		@for(group <- groups) {
 		<tr>
-			<td>
-				<span class='glyphicon @Messages("group.avatar.type."+group.groupType)'></span>
+			<td class="hp-avatar-column">
+                @views.html.snippets.groupLinkAvatar(group, "small")
 			</td>
 			<td>	
 				@if(Secured.isOwnerOfGroup(group, user)) {
