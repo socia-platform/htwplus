@@ -88,7 +88,8 @@ GET         /friend/:friendshipId/cancel               controllers.FriendshipCon
 # Media
 GET         /media/:id                                 controllers.MediaController.view(id:Long, action: String ?= "show")
 GET         /media/:id/delete                          controllers.MediaController.delete(id:Long)
-POST        /media/:target/upload/:folderId            controllers.MediaController.upload(target:String,folderId:Long)
+POST        /media/upload/:folderId                    controllers.MediaController.upload(folderId:Long)
+POST        /media/groupUpload/:folderId               controllers.MediaController.groupUpload(folderId: Long)
 POST        /media/multiple/:target/:id                controllers.MediaController.multiView(target:String,id:Long)
 
 

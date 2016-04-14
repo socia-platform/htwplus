@@ -111,9 +111,9 @@ public class GroupController extends BaseController {
     }
 
     @Transactional(readOnly = true)
-    public Result media(Long id, Long folderId) {
+    public Result media(Long groupId, Long folderId) {
         Form<Media> mediaForm = Form.form(Media.class);
-        Group group = groupManager.findById(id);
+        Group group = groupManager.findById(groupId);
         Folder folder;
 
         if (group == null) {
@@ -122,7 +122,7 @@ public class GroupController extends BaseController {
         }
 
         if (!Secured.viewGroup(group)) {
-            return redirect(controllers.routes.GroupController.view(id));
+            return redirect(controllers.routes.GroupController.view(groupId));
         }
 
         if(folderId != 0) {

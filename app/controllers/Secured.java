@@ -618,8 +618,8 @@ public class Secured extends Security.Authenticator {
 		if (isAdmin()) {
 			return true;
 		}
-		if (viewGroup(folder.group)) {
-			return true;
+		if (!viewGroup(folder.group)) {
+			return false;
 		}
 		if (isMe(Component.currentAccount())) return true;
 
