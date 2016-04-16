@@ -26,6 +26,8 @@
   };
 }(jQuery));
 
+Dropzone.autoDiscover = false;
+
 function toggleMediaSelection(parent) {
 	var childs = document.getElementById("mediaList").getElementsByTagName("input");
 	for (i = 0; i < childs.length; i++) {
@@ -340,7 +342,7 @@ md.renderer.rules.emoji = function(token, idx) {
 };
 
 $("#hp-new-post-content").markdown({
-    savable:true,
+    savable: true,
     language: 'de',
     onPreview: function(e) {
         return md.render(e.getContent());

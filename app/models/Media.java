@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,9 +32,6 @@ public class Media extends BaseNotifiable implements INotifiable {
 
     @Required
     public Long size;
-
-    @ManyToOne
-    public Group group;
 
     @ManyToOne
     public Account owner;
@@ -61,7 +59,10 @@ public class Media extends BaseNotifiable implements INotifiable {
     @Override
     public List<Account> getRecipients() {
         // new media available in group, whole group must be notified
-        return groupAccountManager.findAccountsByGroup(this.group, LinkType.establish);
+        if (folder.group != null) {
+            return groupAccountManager.findAccountsByGroup(folder.group, LinkType.establish);
+        }
+        return new ArrayList<>();
     }
 
     @Override

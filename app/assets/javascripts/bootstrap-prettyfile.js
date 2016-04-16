@@ -30,5 +30,4 @@ if ($('.prettyFile').length) {
 
 function mediaUpload() {
 	document.getElementById("loadingMedia").style.display = "inline-block";
-	$("#fileuploadForm").submit();
 }

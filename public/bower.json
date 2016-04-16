@@ -14,7 +14,7 @@
     "jquery-scrollspy": "",
     "gsap": "=1.14.2",
     "ScrollMagic": "=1.1.2",
-    "dropzone": "=4.0.1",
+    "dropzone": "=4.3.0",
     "cropper": "=0.9.0",
     "readmore": "",
     "markdown-it": "^6.0.0",
