@@ -2,25 +2,8 @@
 @import helper._
 @import play._
 
-<h4>Neue Dateien hochladen <div class="loading" id="loadingMedia"></div></h4>
-
-@form(action = routes.MediaController.groupUpload(folderId), 'enctype -> "multipart/form-data", 'id -> "fileuploadForm") {
-<div class="form-group">
-	<div class="row">
-		<div class="col-xs-12">
-			<div class="prettyFile input-group">
-				<input type="file" name="form[files][]" multiple="multiple">
-				<div class="input-group" rel="tooltip" data-original-title="Hier klicken, um Dateien auszuwählen!" data-placement="bottom" data-delay="500" data-container="body">
-					<input class="form-control" type="text" placeholder="Dateien zum Hochladen">
-					<span class="input-group-btn">
-						<button type="submit" onclick="mediaUpload()" class="btn btn-warning">Hochladen</button>
-					</span>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-}
-
-<small><i>Max. @Play.application().configuration().getInt("media.maxSize.file") MByte pro Datei & @Play.application().configuration().getInt("media.maxSize.total") MByte pro Upload möglich.</i></small>
+<h4>Neue Dateien hochladen:</h4>
+<form id="groupUploadDropzone" class="dropzone" action="/media/upload/@folderId"></form>
+<br />
+<small><i>Max. @Play.application().configuration().getInt("media.maxSize.file") MByte pro Datei möglich.</i></small>
 

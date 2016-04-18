@@ -361,7 +361,7 @@
           // Register handler and callback
           handler.push(saveHandler);
           callback.push(options.onSave);
-
+          editorFooter.append('<div class="dz-clickable">test</div>');
           editorFooter.append('<button class="btn btn-sm btn-warning" data-provider="'
                               + ns
                               + '" data-handler="'
@@ -476,7 +476,13 @@
             });
             this.on('success', function(file, path) {
               var text = textarea.val();
-              textarea.val(text.substring(0, caretPos) + '\n![description](' + path + ')\n' + text.substring(caretPos) );
+              var description = "";
+              if (file.type.startsWith("image/")) {
+                description = "!["+file.name+"]";
+              } else {
+                description = "["+file.name+"]";
+              }
+              textarea.val(text.substring(0, caretPos) + description + '(' + path + ')' + text.substring(caretPos) );
             });
             this.on('error', function(file, error, xhr) {
               console.log('Error:', error);

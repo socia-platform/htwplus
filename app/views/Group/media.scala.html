@@ -17,7 +17,7 @@
                 @for(parents <- navigationFolder) {
                 <li><a href="@routes.GroupController.media(group.id, parents.id)">@parents.name</a></li>
                 }
-                <li><a href="#" class="hp-create-folder">
+                <li><a href="#" title="Einen neuen Ordner erstellen" class="hp-create-folder">
                     <span class="glyphicon glyphicon-plus"></span>
                 </a></li>
             </ol>

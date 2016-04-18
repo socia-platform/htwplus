@@ -594,3 +594,16 @@ $('#hp-profile-header .bottomline .hp-avatar-wrapper').readmore({
     moreLink: '<a href="#">... weitere</a>',
     lessLink: '<a href="#">schließen</a>'
 });
+
+/*
+ * ENABLE DROPZONE FOR GROUP UPLOAD
+ */
+$("form#groupUploadDropzone").dropzone({
+    init: function() {
+        this.on("queuecomplete", function() {
+
+        });
+    },
+    parallelUploads: 1,
+    dictDefaultMessage: 'Datei(en) durch Klick oder Drag&Drop auswählen',
+});

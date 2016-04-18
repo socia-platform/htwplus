@@ -1384,6 +1384,12 @@ tbody.hp-optionsTable .hp-avatar-column {
     color: white;
 }
 
+form.dropzone {
+    min-height: inherit;
+    padding: 0;
+    border: 1px dashed;
+}
+
 .hp-post-area {
     margin-bottom: 15px;
     box-sizing: content-box;
