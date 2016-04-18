@@ -24,6 +24,8 @@ import views.html.Profile.snippets.streamRaw;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 @Transactional
 @Security.Authenticated(Secured.class)
@@ -46,6 +48,9 @@ public class ProfileController extends BaseController {
 
     @Inject
     AvatarManager avatarManager;
+
+    @Inject
+    MediaManager mediaManager;
 
     static Form<Account> accountForm = Form.form(Account.class);
     static Form<Post> postForm = Form.form(Post.class);
@@ -193,12 +198,12 @@ public class ProfileController extends BaseController {
         Account account = accountManager.findById(id);
         if (account == null) {
             flash("info", "Diese Person gibt es nicht.");
-            return redirect(controllers.routes.Application.index());
+            return Secured.nullRedirect(request());
         }
 
         // Check Access
         if (!Secured.editAccount(account)) {
-            return redirect(controllers.routes.Application.index());
+            return Secured.nullRedirect(request());
         }
 
         Navigation.set(Level.PROFILE, "Editieren");
@@ -319,6 +324,40 @@ public class ProfileController extends BaseController {
         }
 
         return ok(groups.render(account, groupAccountManager.findGroupsEstablished(account), groupAccountManager.findCoursesEstablished(account)));
+    }
+
+    public Result files(Long accountId) {
+        Account account = accountManager.findById(accountId);
+
+        // check account
+        if (account == null) {
+            flash("info", Messages.get("Diese Person gibt es nicht."));
+            return Secured.nullRedirect(request());
+        }
+
+        // set Navigation
+        if (Secured.isFriend(account)) {
+            Navigation.set(Level.FRIENDS, "Dateien", account.name, controllers.routes.ProfileController.view(account.id));
+        } else {
+            if (Secured.isMe(account)) {
+                Navigation.set(Level.PROFILE, "Dateien");
+            } else {
+                Navigation.set(Level.USER, "Dateien", account.name, controllers.routes.ProfileController.view(account.id));
+            }
+        }
+
+        // gather information
+        Folder accountRootFolder = account.rootFolder;
+        List<Media> fileList = accountRootFolder.files;
+        List<Folder> folderList = accountRootFolder.folders;
+        List<Folder> navigationFolder = accountRootFolder.findAncestors(accountRootFolder);
+        Collections.reverse(navigationFolder);
+        // hacky, but prevents accessing MediaController from view. use dto instead
+        for (Media media : fileList) {
+            media.sizeInByte = mediaManager.bytesToString(media.size, false);
+        }
+
+        return ok(files.render(account, fileList, folderList));
     }
 
     @Transactional

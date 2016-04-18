@@ -112,7 +112,6 @@ public class GroupController extends BaseController {
 
     @Transactional(readOnly = true)
     public Result media(Long groupId, Long folderId) {
-        Form<Media> mediaForm = Form.form(Media.class);
         Group group = groupManager.findById(groupId);
         Folder folder;
 
@@ -140,7 +139,7 @@ public class GroupController extends BaseController {
         for (Media media : mediaSet) {
             media.sizeInByte = mediaManager.bytesToString(media.size, false);
         }
-        return ok(media.render(group, mediaForm, mediaSet, folderList, folder, navigationFolder, folderForm));
+        return ok(media.render(group, mediaSet, folderList, folder, navigationFolder, folderForm));
 
     }
 

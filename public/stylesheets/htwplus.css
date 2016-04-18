@@ -18,6 +18,10 @@ div.alert {
     margin-top: 10px;
 }
 
+div.clear {
+    clear: both;
+}
+
 a {
     display: inline-block;
 	outline: none!important;
@@ -1376,12 +1380,81 @@ tbody.hp-optionsTable .hp-avatar-column {
     padding: 5px;
 }
 
-.md-footer {
-    text-align: right;
+.hp-post-form .md-editor .md-footer {
+    padding-left: 10px;
+}
+.md-footer .hp-dropzone-clickable {
+    float: left;
+    cursor: pointer;
+    margin-top: 5px;
+}
+.md-footer button {
+    float: right;
 }
 
 .md-footer .glyphicon {
     color: white;
+}
+
+.md-footer .dz-success-mark,
+.md-footer .dz-error-mark,
+.md-footer .dz-image,
+.md-footer .dz-details {
+    display: none;
+}
+
+.md-footer .dz-preview.dz-processing .dz-progress {
+    opacity: 1;
+    -webkit-transition: all 0.2s linear;
+    -moz-transition: all 0.2s linear;
+    -ms-transition: all 0.2s linear;
+    -o-transition: all 0.2s linear;
+    transition: all 0.2s linear;
+}
+.md-footer .dz-preview.dz-complete .dz-progress {
+    opacity: 0;
+    -webkit-transition: opacity 0.4s ease-in;
+    -moz-transition: opacity 0.4s ease-in;
+    -ms-transition: opacity 0.4s ease-in;
+    -o-transition: opacity 0.4s ease-in;
+    transition: opacity 0.4s ease-in;
+}
+.md-footer .dz-preview:not(.dz-processing) .dz-progress {
+    -webkit-animation: pulse 6s ease infinite;
+    -moz-animation: pulse 6s ease infinite;
+    -ms-animation: pulse 6s ease infinite;
+    -o-animation: pulse 6s ease infinite;
+    animation: pulse 6s ease infinite;
+}
+.md-footer .dz-preview .dz-progress {
+    opacity: 1;
+    z-index: 1000;
+    pointer-events: none;
+    position: absolute;
+    height: 16px;
+    left: 50%;
+    top: 50%;
+    margin-top: -8px;
+    width: 80px;
+    margin-left: -40px;
+    background: rgba(255, 255, 255, 0.9);
+    -webkit-transform: scale(1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.md-footer .dz-preview .dz-progress .dz-upload {
+    background: #333;
+    background: linear-gradient(to bottom, #666, #444);
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    -webkit-transition: width 300ms ease-in-out;
+    -moz-transition: width 300ms ease-in-out;
+    -ms-transition: width 300ms ease-in-out;
+    -o-transition: width 300ms ease-in-out;
+    transition: width 300ms ease-in-out;
 }
 
 form.dropzone {

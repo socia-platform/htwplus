@@ -1,10 +1,8 @@
 package controllers;
 
-import managers.AccountManager;
-import managers.GroupManager;
-import managers.MediaManager;
-import managers.PostManager;
+import managers.*;
 import models.Account;
+import models.Folder;
 import models.Post;
 import models.enums.AccountRole;
 import models.services.ElasticsearchService;
@@ -50,6 +48,9 @@ public class AdminController extends BaseController {
 
     @Inject
     AccountManager accountManager;
+
+    @Inject
+    FolderManager folderManager;
 
 
     static Form<Account> accountForm = form(Account.class);
@@ -284,5 +285,16 @@ public class AdminController extends BaseController {
                     }
                 }
         );
+    }
+
+    @Transactional
+    public Result refactor() {
+
+        for (Account account : accountManager.all()) {
+            account.rootFolder = new Folder("_" + account.name, account, null, null, account);
+            folderManager.create(account.rootFolder);
+            accountManager.update(account);
+        }
+        return ok();
     }
 }

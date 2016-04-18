@@ -349,6 +349,11 @@ $("#hp-new-post-content").markdown({
     },
     onSave: function(e) {
         $('#hp-post-submit-button').click();
+    },
+    dropZoneOptions: {
+        url: "/media/upload/"+$('#currentUserRootFolder')[0].innerText,
+        clickable: '.hp-dropzone-clickable',
+        previewsContainer: '.md-footer'
     }
 });
 

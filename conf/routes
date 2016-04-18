@@ -73,6 +73,7 @@ GET         /user/:id/avatar                           controllers.ProfileContro
 POST        /user/:id/edit                             controllers.ProfileController.update(id:Long)
 GET         /user/:id/stream                           controllers.ProfileController.stream(id:Long,page: Integer ?= 1, raw: Boolean ?= false)
 GET         /user/:id/groups                           controllers.ProfileController.groups(id:Long)
+GET         /user/:id/files                            controllers.ProfileController.files(id:Long)
 POST        /user/:id/delete                           controllers.ProfileController.deleteProfile(id:Long)
 
 
@@ -89,7 +90,7 @@ GET         /friend/:friendshipId/cancel               controllers.FriendshipCon
 GET         /media/:id                                 controllers.MediaController.view(id:Long, action: String ?= "show")
 GET         /media/:id/delete                          controllers.MediaController.delete(id:Long)
 POST        /media/upload/:folderId                    controllers.MediaController.upload(folderId:Long)
-POST        /media/multiple/:target/:id                controllers.MediaController.multiView(target:String,id:Long)
+POST        /media/multiple                            controllers.MediaController.multiView()
 
 
 # Folder
@@ -126,6 +127,7 @@ GET         /admin/indexing/groups                     controllers.AdminControll
 GET         /admin/indexing/posts                      controllers.AdminController.indexPosts()
 GET         /admin/indexing/indexSettings              controllers.AdminController.indexSettings()
 GET         /admin/indexing/indexDelete                controllers.AdminController.indexDelete()
+GET         /admin/refactor                      controllers.AdminController.refactor()
 
 
 # No route found? take this

@@ -50,6 +50,9 @@ public class Account extends BaseModel implements IJsonNodeSerializable {
     public Set<Friendship> friends;
 
     @OneToOne
+    public Folder rootFolder;
+
+    @OneToOne
     public Studycourse studycourse;
     public String degree;
     public Integer semester;

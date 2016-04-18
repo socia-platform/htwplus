@@ -145,6 +145,10 @@ public class Secured extends Security.Authenticator {
 	public static boolean viewGroup(Group group) {
 		Account current = Component.currentAccount();
 
+		if (group == null) {
+			return false;
+		}
+
 		if (Secured.isAdmin()) {
 			return true;
 		}
@@ -569,7 +573,7 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in account is allowed to view media
 	 */
 	public static boolean viewMedia(Media media) {
-        return media != null && Secured.viewGroup(media.findGroup());
+        return media != null && (Secured.viewGroup(media.findGroup()) || Secured.isMe(media.findAccount()));
 	}
 
 	/**
@@ -618,10 +622,9 @@ public class Secured extends Security.Authenticator {
 		if (isAdmin()) {
 			return true;
 		}
-		if (!viewGroup(folder.group)) {
-			return false;
+		if (viewGroup(folder.group) || folder == Component.currentAccount().rootFolder)  {
+			return true;
 		}
-		if (isMe(Component.currentAccount())) return true;
 
 		return false;
 	}

@@ -38,14 +38,21 @@
                             <span class="glyphicon glyphicon-th-list"></span>
                         </a>
 
+                        @if(Secured.isFriend(user) || Component.currentAccount() == user) {
+                        <a href="@routes.ProfileController.files(user.id)"
+                           class='@if(Navigation.getTitle().equals("Dateien")){active}' rel="tooltip"
+                           data-original-title="Dateien von @user.firstname" data-container="body">
+                            <span class="glyphicon glyphicon-file"></span>
+                        </a>
+                        }
+                        @if(Component.currentAccount() == user) {
+                        <a href="@routes.ProfileController.edit(user.id)" class='@if(Navigation.getTitle().equals("Editieren")){active}' rel="tooltip" data-original-title="Profil bearbeiten" data-container="body">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                        }
                         @if(Secured.isFriend(user)) {
                         <a href="#confirmDeleteFriend@user.id" rel="tooltip" data-original-title="Kontakt zu @user.firstname beenden" data-container="body" data-toggle="modal">
                             <span class="glyphicon glyphicon-remove"></span>
-                        </a>
-                        }
-                        @if(Secured.isOwnerOfAccount(user.id)) {
-                        <a href="@routes.ProfileController.edit(user.id)" class='@if(Navigation.getTitle().equals("Editieren")){active}' rel="tooltip" data-original-title="Profil bearbeiten" data-container="body">
-                            <span class="glyphicon glyphicon-pencil"></span>
                         </a>
                         }
                     </div>
