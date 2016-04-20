@@ -335,6 +335,12 @@ public class ProfileController extends BaseController {
             return Secured.nullRedirect(request());
         }
 
+        // unknown user
+        if (Secured.isUnknown(account)) {
+            flash("info", "Du kannst nur Dateien deiner Kontakte sehen.");
+            return redirect(controllers.routes.ProfileController.view(account.id));
+        }
+
         // set Navigation
         if (Secured.isFriend(account)) {
             Navigation.set(Level.FRIENDS, "Dateien", account.name, controllers.routes.ProfileController.view(account.id));

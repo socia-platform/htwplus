@@ -105,6 +105,20 @@ public class Secured extends Security.Authenticator {
     }
 
 	/**
+	 * Returns true, if the currently logged in user is unknown to the @param account
+	 * Known people are: admin, myself, friends
+	 *
+	 * @param account Account
+	 * @return True, if given currently logged in user to given account
+	 */
+	public static boolean isUnknown(Account account) {
+		if (!Secured.isFriend(account) && !Secured.isMe(account) && !Secured.isAdmin()) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Returns true, if an account is member of a group.
 	 *
 	 * @param group Group
@@ -570,10 +584,10 @@ public class Secured extends Security.Authenticator {
 	 * Returns true, if the currently logged in account is allowed to view a specific media.
 	 *
 	 * @param media Media to view
-	 * @return True, if logged in account is allowed to view media
+	 * @return True, if logged in account is allowed to see the medias folder
 	 */
 	public static boolean viewMedia(Media media) {
-        return media != null && (Secured.viewGroup(media.findGroup()) || Secured.isMe(media.findAccount()));
+        return media != null && (Secured.viewFolder(media.findRoot()));
 	}
 
 	/**
@@ -615,6 +629,11 @@ public class Secured extends Security.Authenticator {
         return object != null;
     }
 
+	/**
+	 * Checks if the currently logged in user is allowed to see the given folder.
+	 * @param folder folder which should be checked
+	 * @return true if the currently logged in account is allowed to see the folder.
+     */
 	public static boolean viewFolder(Folder folder) {
 		if (folder == null) {
 			return false;
@@ -622,7 +641,7 @@ public class Secured extends Security.Authenticator {
 		if (isAdmin()) {
 			return true;
 		}
-		if (viewGroup(folder.group) || folder == Component.currentAccount().rootFolder)  {
+		if (viewGroup(folder.group) || folder.owner == Component.currentAccount() || Secured.isFriend(folder.owner))  {
 			return true;
 		}
 

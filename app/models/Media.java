@@ -45,14 +45,12 @@ public class Media extends BaseNotifiable implements INotifiable {
     @Transient
     public String sizeInByte;
 
-    public static String GROUP = "group";
+    public Folder findRoot() {
+        return this.folder.findRoot(this.folder);
+    }
 
     public Group findGroup() {
         return this.folder.findRoot(this.folder).group;
-    }
-
-    public Account findAccount() {
-        return this.folder.findRoot(this.folder).account;
     }
 
     @Override
