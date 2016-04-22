@@ -1,9 +1,10 @@
-@(anyId: Long, target: String, postForm: Form[Post])
+@(anyId: Long, rootFolderId: Long, target: String, postForm: Form[Post])
 @import helper._
 
 @form(routes.PostController.addPost(anyId, target), 'class -> "hp-post-form", 'id -> "addPost") {
-	<div class="hp-post-form col-xs-12">
-		<textarea id="hp-new-post-content" name="content"></textarea>
-		<button id="hp-post-submit-button" type="submit" class="btn btn-warning">Posten</button>
-	</div>
+    <span id="folderToUpload" class="hidden">@rootFolderId</span>
+    <div class="hp-post-form col-xs-12">
+        <textarea id="hp-new-post-content" name="content"></textarea>
+        <button id="hp-post-submit-button" type="submit" class="btn btn-warning">Posten</button>
+    </div>
 }

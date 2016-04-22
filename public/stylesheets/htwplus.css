@@ -1383,17 +1383,13 @@ tbody.hp-optionsTable .hp-avatar-column {
 .hp-post-form .md-editor .md-footer {
     padding-left: 10px;
 }
-.md-footer .hp-dropzone-clickable {
+.md-footer .dz-clickable {
     float: left;
     cursor: pointer;
     margin-top: 5px;
 }
 .md-footer button {
     float: right;
-}
-
-.md-footer .glyphicon {
-    color: white;
 }
 
 .md-footer .dz-success-mark,
@@ -1403,14 +1399,6 @@ tbody.hp-optionsTable .hp-avatar-column {
     display: none;
 }
 
-.md-footer .dz-preview.dz-processing .dz-progress {
-    opacity: 1;
-    -webkit-transition: all 0.2s linear;
-    -moz-transition: all 0.2s linear;
-    -ms-transition: all 0.2s linear;
-    -o-transition: all 0.2s linear;
-    transition: all 0.2s linear;
-}
 .md-footer .dz-preview.dz-complete .dz-progress {
     opacity: 0;
     -webkit-transition: opacity 0.4s ease-in;
@@ -1419,13 +1407,7 @@ tbody.hp-optionsTable .hp-avatar-column {
     -o-transition: opacity 0.4s ease-in;
     transition: opacity 0.4s ease-in;
 }
-.md-footer .dz-preview:not(.dz-processing) .dz-progress {
-    -webkit-animation: pulse 6s ease infinite;
-    -moz-animation: pulse 6s ease infinite;
-    -ms-animation: pulse 6s ease infinite;
-    -o-animation: pulse 6s ease infinite;
-    animation: pulse 6s ease infinite;
-}
+
 .md-footer .dz-preview .dz-progress {
     opacity: 1;
     z-index: 1000;

@@ -23,7 +23,7 @@
                     </div>
                     <div class="col-md-11" role="complementary">
                         <div class="hp-post-create-area">
-                            @views.html.snippets.postForm(group.id, models.Post.GROUP, postForm)
+                            @views.html.snippets.postForm(group.id, group.rootFolder.id, models.Post.GROUP, postForm)
                         </div>
                     </div>
                     }

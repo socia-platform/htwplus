@@ -127,7 +127,7 @@ public class GroupController extends BaseController {
         if(folderId != 0) {
             folder = folderManager.findById(folderId);
         } else {
-            folder = group.mediaFolder;
+            folder = group.rootFolder;
         }
 
         Navigation.set(Level.GROUPS, "Media", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));

@@ -19,7 +19,7 @@
 
                 <div class="col-md-11" role="complementary">
                     <div class="hp-post-create-area">
-                        @views.html.snippets.postForm(currentUser.id, models.Post.STREAM, postForm)
+                        @views.html.snippets.postForm(currentUser.id, currentUser.rootFolder.id, models.Post.STREAM, postForm)
                     </div>
                 </div>
             </div>

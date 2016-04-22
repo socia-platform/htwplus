@@ -349,7 +349,7 @@
         }
 
         var editorFooter = $('<div/>', {
-                           'class': 'md-footer'
+                           'class': 'md-footer ' + options.dropZoneOptions.previewsContainer.substring(1)
                          }),
             createFooter = false,
             footer = '';
@@ -361,7 +361,7 @@
           // Register handler and callback
           handler.push(saveHandler);
           callback.push(options.onSave);
-          editorFooter.append('<span class="hp-dropzone-clickable">Dateianhang per Drag&Drop oder <a href="#">Dateiauswahl</a></span>');
+          editorFooter.append('<div class='+options.dropZoneOptions.clickable.substring(1)+'><span class="glyphicon glyphicon-upload"></span><span> Dateianhang per Drag&Drop oder <a href="#">Dateiauswahl</a></span></div>');
           editorFooter.append('<button class="btn btn-sm btn-warning" data-provider="'
                               + ns
                               + '" data-handler="'
@@ -370,8 +370,6 @@
                               + this.__localize('Save')
                               + '</button>');
           editorFooter.append('<div class="clear"></div>')
-
-
         }
 
         footer = typeof options.footer === 'function' ? options.footer(this) : options.footer;
@@ -471,11 +469,8 @@
       if (options.dropZoneOptions) {
         if (this.$editor.dropzone) {
           options.dropZoneOptions.init = function() {
-            var caretPos = 0;
-            this.on('drop', function(e) {
-              caretPos = textarea.prop('selectionStart');
-            });
             this.on('success', function(file, path) {
+              var caretPos = textarea.prop('selectionStart');
               var text = textarea.val();
               var description = "";
               if (file.type.startsWith("image/")) {
@@ -483,7 +478,7 @@
               } else {
                 description = "["+file.name+"]";
               }
-              textarea.val(text.substring(0, caretPos) + description + '(' + path + ')' + text.substring(caretPos) );
+              textarea.val(text.substring(0, caretPos) + description + '(' + path + ')' + text.substring(caretPos) + '\n');
             });
             this.on('error', function(file, error, xhr) {
               console.log('Error:', error);

@@ -45,7 +45,7 @@ public class Group extends BaseNotifiable implements INotifiable {
     public String token;
 
     @OneToOne
-    public Folder mediaFolder;
+    public Folder rootFolder;
 
     @Column(name = "has_avatar", nullable = false, columnDefinition = "boolean default false")
     public boolean hasAvatar;

@@ -13,6 +13,7 @@ import play.mvc.Http;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Result;
 import play.mvc.Security;
+import play.twirl.api.Content;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -44,6 +45,10 @@ public class MediaController extends BaseController {
     @Transactional(readOnly = true)
     public Result view(Long mediaId, String action) {
         Media media = mediaManager.findById(mediaId);
+        if (media == null) {
+            return notFound();
+
+        }
         if (Secured.viewMedia(media)) {
             switch (action) {
                 case "show":

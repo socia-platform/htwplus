@@ -228,7 +228,7 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                 post_container.html(old_content); // put back removed content
             } else {
                 $("#hp-edit-post-content").markdown({
-                    savable:true,
+                    savable: true,
                     language: 'de',
                     autofocus: true,
                     onShow: function(e) {
@@ -255,6 +255,11 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                                 });
                             }
                         });
+                    },
+                    dropZoneOptions: {
+                        url: "/media/upload/"+folderToUpload,
+                        clickable: '.hp-dropzone-edit-clickable',
+                        previewsContainer: '.hp-dropzone-edit-preview'
                     }
                 });
             }
@@ -341,6 +346,13 @@ md.renderer.rules.emoji = function(token, idx) {
   return '<img class="emoji" width="20" height="20" src="' + location.origin + '/assets/images/emojis/' + token[idx].markup + '.png" />';
 };
 
+// find folder to upload to
+var folderToUpload = 0;
+if ($('#folderToUpload').size() > 0) {
+    folderToUpload = $('#folderToUpload')[0].innerText;
+}
+
+// apply markdown editor
 $("#hp-new-post-content").markdown({
     savable: true,
     language: 'de',
@@ -351,9 +363,10 @@ $("#hp-new-post-content").markdown({
         $('#hp-post-submit-button').click();
     },
     dropZoneOptions: {
-        url: "/media/upload/"+$('#currentUserRootFolder')[0].innerText,
+        url: "/media/upload/"+folderToUpload,
         clickable: '.hp-dropzone-clickable',
-        previewsContainer: '.md-footer'
+        previewsContainer: '.hp-dropzone-preview',
+        parallelUploads: 1
     }
 });
 
@@ -610,5 +623,5 @@ $("form#groupUploadDropzone").dropzone({
         });
     },
     parallelUploads: 1,
-    dictDefaultMessage: 'Datei(en) durch Klick oder Drag&Drop auswählen',
+    dictDefaultMessage: '<span class="glyphicon glyphicon-upload"></span> Datei(en) durch Klick oder Drag&Drop auswählen',
 });
