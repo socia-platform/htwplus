@@ -3,22 +3,17 @@ package controllers;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import managers.FolderManager;
-import managers.GroupManager;
 import managers.MediaManager;
 import models.Folder;
-import models.Group;
 import models.Media;
 import models.services.NotificationService;
-import org.apache.commons.collections.ListUtils;
-import play.data.Form;
 import play.db.jpa.Transactional;
 import play.mvc.Call;
 import play.mvc.Http;
 import play.mvc.Http.MultipartFormData;
-import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 import play.mvc.Security;
-import views.html.Group.view;
+import play.twirl.api.Content;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -41,20 +36,19 @@ public class MediaController extends BaseController {
     MediaManager mediaManager;
 
     @Inject
-    GroupManager groupManager;
-
-    @Inject
     FolderManager folderManager;
 
     final static String tempPrefix = "htwplus_temp";
     private Config conf = ConfigFactory.load();
-
-    final int MAX_FILESIZE_TOTAL = conf.getInt("media.maxSize.total");
     final int MAX_FILESIZE = conf.getInt("media.maxSize.file");
 
     @Transactional(readOnly = true)
     public Result view(Long mediaId, String action) {
         Media media = mediaManager.findById(mediaId);
+        if (media == null) {
+            return notFound();
+
+        }
         if (Secured.viewMedia(media)) {
             switch (action) {
                 case "show":
@@ -75,7 +69,6 @@ public class MediaController extends BaseController {
     public Result delete(Long id) {
         Media media = mediaManager.findById(id);
 
-
         Call ret = controllers.routes.Application.index();
         if (media.folder != null) {
             Long folderId = media.folder.id;
@@ -93,28 +86,17 @@ public class MediaController extends BaseController {
     }
 
     @Transactional(readOnly = true)
-    public Result multiView(String target, Long id) {
+    public Result multiView() {
 
         String[] action = request().body().asFormUrlEncoded().get("action");
-        Call ret = controllers.routes.Application.index();
-        Group group = null;
-
-        if (target.equals(Media.GROUP)) {
-            group = groupManager.findById(id);
-            if (!Secured.viewGroup(group)) {
-                return redirect(controllers.routes.Application.index());
-            }
-            ret = controllers.routes.GroupController.media(id, 0L);
-        } else {
-            return redirect(ret);
-        }
+        Result ret = Secured.nullRedirect(request());
 
         String[] mediaselection = request().body().asFormUrlEncoded().get("mediaSelection");
         String[] folderSelection = request().body().asFormUrlEncoded().get("folderSelection");
 
         if (mediaselection == null && folderSelection == null) {
             flash("error", "Bitte wähle mindestens eine Datei aus.");
-            return redirect(ret);
+            return ret;
         }
 
         if (action[0].equals("delete")) {
@@ -138,11 +120,12 @@ public class MediaController extends BaseController {
                     }
                 }
             }
+            flash("success", "Datei(en) erfolgreich gelöscht!");
         }
 
         if (action[0].equals("download")) {
 
-            String filename = createFileName(group.title);
+            String filename = createFileName("HTWplus");
             List<Media> mediaList = new ArrayList<>();
 
             // grab media files
@@ -166,15 +149,15 @@ public class MediaController extends BaseController {
             }
 
             try {
-                File file = createZIP(mediaList, filename);
+                File file = createZIP(mediaList);
                 response().setHeader("Content-disposition", "attachment; filename=\"" + filename + "\"");
                 return ok(file);
             } catch (IOException e) {
                 flash("error", "Etwas ist schiefgegangen. Bitte probiere es noch einmal!");
-                return redirect(ret);
+                return ret;
             }
         }
-        return redirect(ret);
+        return ret;
     }
 
     private String createFileName(String prefix) {
@@ -182,7 +165,7 @@ public class MediaController extends BaseController {
     }
 
 
-    private File createZIP(List<Media> media, String fileName) throws IOException {
+    private File createZIP(List<Media> media) throws IOException {
 
         //cleanUpTemp(); // JUST FOR DEVELOPMENT, DO NOT USE IN PRODUCTION
         String tmpPath = conf.getString("media.tempPath");
@@ -209,41 +192,6 @@ public class MediaController extends BaseController {
     }
 
     /**
-     * Frontend route.
-     *
-     * @param folderId folder which to upload media
-     * @return routes to group media
-     */
-    public Result groupUpload(Long folderId) {
-
-        Folder folder = folderManager.findById(folderId);
-
-        if (!Secured.viewFolder(folder)) {
-            flash("error", "Dazu hast du keine Berechtigung");
-            return Secured.nullRedirect(request());
-        }
-
-        Group group = folderManager.findRoot(folder).group;
-
-        Result uploadResult = upload(folderId);
-
-        if (uploadResult.status() == REQUEST_ENTITY_TOO_LARGE) {
-            flash("error", "Es sind maximal " + MAX_FILESIZE + " MByte pro Datei & " + MAX_FILESIZE_TOTAL + " MByte pro Upload möglich!");
-        }
-        if (uploadResult.status() == INTERNAL_SERVER_ERROR) {
-            flash("error", "Während des Uploads ist etwas schiefgegangen!");
-        }
-        if (uploadResult.status() == CONFLICT) {
-            flash("error", "Eine Datei mit dem Namen existiert bereits");
-        }
-        if (uploadResult.status() == OK) {
-            flash("success", "Datei(en) erfolgreich hinzugefügt.");
-        }
-
-        return redirect(controllers.routes.GroupController.media(group.id, folderId));
-    }
-
-    /**
      * Upload some media.
      *
      * @param folderId Folder to upload.
@@ -251,61 +199,45 @@ public class MediaController extends BaseController {
      */
     @Transactional
     public Result upload(Long folderId) {
-
-        // Is it to big in total?
-        String[] contentLength = request().headers().get("Content-Length");
-        if (contentLength != null) {
-            int size = Integer.parseInt(contentLength[0]);
-            if (mediaManager.byteAsMB(size) > MAX_FILESIZE_TOTAL) {
-                return status(REQUEST_ENTITY_TOO_LARGE);
-            }
-        } else {
-            return internalServerError();
-        }
-
         // Get the data
         MultipartFormData body = request().body().asMultipartFormData();
-        List<Http.MultipartFormData.FilePart> uploads = body.getFiles();
-        List<Media> mediaList = new ArrayList<Media>();
+        Http.MultipartFormData.FilePart upload = body.getFile("file");
         Folder folder = folderManager.findById(folderId);
 
-        if (!uploads.isEmpty()) {
-            // Create the Media models and perform some checks
-            for (FilePart upload : uploads) {
-                // File too big?
-                if (mediaManager.byteAsMB(upload.getFile().length()) > MAX_FILESIZE) {
-                    return status(REQUEST_ENTITY_TOO_LARGE);
-                }
-                // File already exists?
-                if (mediaManager.existsInFolder(upload.getFilename(), folder)) {
-                    return status(CONFLICT);
-                }
+        if (!Secured.viewFolder(folder)) {
+            return forbidden("Dazu hast du keine Berechtigung");
+        }
 
-                // Everything is fine
-                Media med = new Media();
-                med.title = upload.getFilename();
-                med.mimetype = upload.getContentType();
-                med.fileName = upload.getFilename();
-                med.file = upload.getFile();
-                med.owner = Component.currentAccount();
-                med.folder = folder;
-                med.temporarySender = Component.currentAccount();
-                mediaList.add(med);
+        if (upload != null) {
+            // Create the Media models and perform some checks
+            // File too big?
+            if (mediaManager.byteAsMB(upload.getFile().length()) > MAX_FILESIZE) {
+                return status(REQUEST_ENTITY_TOO_LARGE, "Es sind maximal "+ MAX_FILESIZE + " MByte pro Datei möglich.");
             }
+            // File already exists?
+            if (mediaManager.existsInFolder(upload.getFilename(), folder)) {
+                return status(CONFLICT, "Eine Datei mit diesem Namen existiert bereits.");
+            }
+            // Everything is fine
+            Media med = new Media();
+            med.title = upload.getFilename();
+            med.mimetype = upload.getContentType();
+            med.fileName = upload.getFilename();
+            med.file = upload.getFile();
+            med.owner = Component.currentAccount();
+            med.folder = folder;
+            med.temporarySender = Component.currentAccount();
 
             // Persist medialist and create notification(s)
-            for (Media media : mediaList) {
-                try {
-                    mediaManager.create(media);
-                    NotificationService.getInstance().createNotification(media, Media.MEDIA_NEW_MEDIA);
-                } catch (Exception e) {
-                    return internalServerError(e.getMessage());
-                }
+            try {
+                mediaManager.create(med);
+                NotificationService.getInstance().createNotification(med, Media.MEDIA_NEW_MEDIA);
+            } catch (Exception e) {
+                return internalServerError("Während des Uploads ist etwas schiefgegangen!");
             }
-
-            return ok();
+            return created("/media/"+med.id);
         } else {
-            return internalServerError();
+            return internalServerError("Es konnte keine Datei gefunden werden!");
         }
     }
 }

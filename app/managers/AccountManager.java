@@ -47,11 +47,17 @@ public class AccountManager implements BaseManager {
     @Inject
     AvatarManager avatarManager;
 
+    @Inject
+    FolderManager folderManager;
+
     @Override
     public void create(Object model) {
         Account account = (Account) model;
 
         account.name = account.firstname + " " + account.lastname;
+        account.rootFolder = new Folder("_"+account.name, account, null, null, account);
+        folderManager.create(account.rootFolder);
+
         JPA.em().persist(account);
         try {
             elasticsearchService.index(account);

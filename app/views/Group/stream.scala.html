@@ -6,30 +6,42 @@
 
 @views.html.Group.snippets.header(group)
 
-<div class="row">
-    <div class="col-md-12" role="main">
-        <div class="addmargin">
-            <div class="row">
-                @defining(Component.currentAccount()) { currentUser =>
-                <div class="col-md-1" role="main">
-                    @if(currentUser.hasAvatar){
-                    <img alt="avatar"
-                         src='@routes.ProfileController.getAvatar(currentUser.id, "medium")'
-                         class="hp-avatar-medium hidden-xs hidden-sm"/>
-                    } else {
-                    <div class="hidden-xs hidden-sm hp-avatar-medium hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
+@if(Secured.isMemberOfGroup(group, Component.currentAccount())) {
+    <div class="row">
+        <div class="col-md-12" role="main">
+            <div class="addmargin">
+                <div class="row">
+                    @defining(Component.currentAccount()) { currentUser =>
+                    <div class="col-md-1" role="main">
+                        @if(currentUser.hasAvatar){
+                        <img alt="avatar"
+                             src='@routes.ProfileController.getAvatar(currentUser.id, "medium")'
+                             class="hp-avatar-medium hidden-xs hidden-sm"/>
+                        } else {
+                        <div class="hidden-xs hidden-sm hp-avatar-medium hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
+                        }
+                    </div>
+                    <div class="col-md-11" role="complementary">
+                        <div class="hp-post-create-area">
+                            @views.html.snippets.postForm(group.id, group.rootFolder.id, models.Post.GROUP, postForm)
+                        </div>
+                    </div>
                     }
                 </div>
-                <div class="col-md-11" role="complementary">
-                    <div class="hp-post-create-area">
-                        @views.html.snippets.postForm(group.id, models.Post.GROUP, postForm)
-                    </div>
-                </div>
-                }
             </div>
         </div>
     </div>
-</div>
+} else {
+    <div class="row">
+        <div class="col-lg-12" role="main">
+            <div class="hp-content-placeholder addmargin">
+                <h3><i>Du musst @Messages("group.view.type."+group.groupType.toString) <a href="@routes.GroupController.join(group.id)">beitreten</a>, um Beiträge verfassen zu können.</i></h3>
+            </div>
+        </div>
+    </div>
+    <br />
+}
+
 
 <div class="row">
     <div class="col-md-12" role="main">

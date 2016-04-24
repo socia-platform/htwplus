@@ -1,4 +1,4 @@
-@(mediaList:List[Media],folderList: List[Folder], target:String, groupId: Long)
+@(mediaList:List[Media],folderList: List[Folder], groupId: Long)
 @import helper._
 @import models._
 
@@ -36,7 +36,7 @@
         <th style="width:35px"></th>
     </tr>
     </thead>
-    @form(routes.MediaController.multiView(target,groupId), 'id -> "mediaListFrom" ) {
+    @form(routes.MediaController.multiView(), 'id -> "mediaListFrom" ) {
     <tbody id="mediaList" class="hp-optionsTable">
     @if(!folderList.isEmpty) {
     @for(folder <- folderList) {

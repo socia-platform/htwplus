@@ -1,4 +1,4 @@
-@(group: Group, mediaForm: Form[Media], mediaList: List[Media], folderList: List[Folder], folder: Folder, navigationFolder: List[Folder], folderForm: Form[Folder])
+@(group: Group, mediaList: List[Media], folderList: List[Folder], folder: Folder, navigationFolder: List[Folder], folderForm: Form[Folder])
 @import helper._
 @import models.enums._
 
@@ -17,7 +17,7 @@
                 @for(parents <- navigationFolder) {
                 <li><a href="@routes.GroupController.media(group.id, parents.id)">@parents.name</a></li>
                 }
-                <li><a href="#" class="hp-create-folder">
+                <li><a href="#" title="Einen neuen Ordner erstellen" class="hp-create-folder">
                     <span class="glyphicon glyphicon-plus"></span>
                 </a></li>
             </ol>
@@ -36,7 +36,7 @@
             </div>
 
             @if(!mediaList.isEmpty || !folderList.isEmpty) {
-            @views.html.Media.list(mediaList,folderList,models.Media.GROUP, group.id)
+            @views.html.Media.list(mediaList, folderList, group.id)
             } else {
             <br/><br/>
             <i>Es wurden noch keine Dateien hochgeladen.</i>
@@ -44,11 +44,10 @@
             <hr/>
             <br/>
             @if(Secured.uploadMedia(group)) {
-            @views.html.Media.upload(mediaForm, folder.id)
+            @views.html.Media.upload(folder.id)
             }
             <br/>
             <br/>
-
         </div>
     </div>
 </div>

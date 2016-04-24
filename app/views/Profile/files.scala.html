@@ -1,0 +1,23 @@
+@(account: Account, fileList: List[Media], folderList: List[Folder])
+
+@main("Dateien von " + account.name) {
+
+@views.html.Profile.snippets.header(account)
+
+<div class="row">
+    <div class="col-md-12" role="main">
+        <div class="hp-notepad-content addmargin">
+            <br />
+            <h4>Hier findest du alle Dateien, die du bei dir oder auf anderen Streams hochgeladen hast.</h4>
+            <h5>(In Zukunft wirst du diese Dateien genauso organisieren können, wie du es aus Gruppen kennst.)</h5>
+            <br />
+            @if(!fileList.isEmpty || !folderList.isEmpty) {
+                @views.html.Media.list(fileList, folderList, account.id)
+            } else {
+            <br/><br/>
+            <i>Es wurden noch keine Dateien hochgeladen.</i>
+            }
+        </div>
+    </div>
+</div>
+}

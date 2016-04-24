@@ -35,8 +35,8 @@ public class GroupManager implements BaseManager {
 
     public void createWithGroupAccount(Group group, Account account) {
         group.owner = account;
-        group.mediaFolder = new Folder("_"+group.title, account, null, group, null);
-        folderManager.create(group.mediaFolder);
+        group.rootFolder = new Folder("_"+group.title, account, null, group, null);
+        folderManager.create(group.rootFolder);
         create(group);
         groupAccountManager.create(new GroupAccount(group, account, LinkType.establish));
     }
@@ -72,7 +72,7 @@ public class GroupManager implements BaseManager {
         }
 
         //delete root folder
-        folderManager.delete(group.mediaFolder);
+        folderManager.delete(group.rootFolder);
 
         // Delete Notifications
         notificationManager.deleteReferences(group);

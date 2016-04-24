@@ -44,7 +44,7 @@
                 </div>
                 <div class="col-md-11" role="complementary">
                     <div class="hp-post-create-area">
-                        @views.html.snippets.postForm(user.id, models.Post.PROFILE, postForm)
+                        @views.html.snippets.postForm(user.id, currentUser.rootFolder.id, models.Post.PROFILE, postForm)
                     </div>
                 </div>
                 }

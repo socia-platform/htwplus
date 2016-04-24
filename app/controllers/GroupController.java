@@ -112,7 +112,6 @@ public class GroupController extends BaseController {
 
     @Transactional(readOnly = true)
     public Result media(Long groupId, Long folderId) {
-        Form<Media> mediaForm = Form.form(Media.class);
         Group group = groupManager.findById(groupId);
         Folder folder;
 
@@ -128,7 +127,7 @@ public class GroupController extends BaseController {
         if(folderId != 0) {
             folder = folderManager.findById(folderId);
         } else {
-            folder = group.mediaFolder;
+            folder = group.rootFolder;
         }
 
         Navigation.set(Level.GROUPS, "Media", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
@@ -140,7 +139,7 @@ public class GroupController extends BaseController {
         for (Media media : mediaSet) {
             media.sizeInByte = mediaManager.bytesToString(media.size, false);
         }
-        return ok(media.render(group, mediaForm, mediaSet, folderList, folder, navigationFolder, folderForm));
+        return ok(media.render(group, mediaSet, folderList, folder, navigationFolder, folderForm));
 
     }
 
