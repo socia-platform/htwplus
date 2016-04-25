@@ -543,7 +543,7 @@
       // Build preview element
       replacementContainer.html(content);
 
-      if (afterContainer && afterContainer.attr('class') == 'md-footer') {
+      if (afterContainer && afterContainer.hasClass('md-footer')) {
         // If there is footer element, insert the preview container before it
         replacementContainer.insertBefore(afterContainer);
       } else {
