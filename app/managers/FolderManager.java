@@ -57,7 +57,7 @@ public class FolderManager implements BaseManager {
         return mediaList;
     }
 
-    public Folder findRoot(Folder folder) {
+    public static Folder findRoot(Folder folder) {
         if(folder.parent == null) return folder;
         return findRoot(folder.parent);
     }

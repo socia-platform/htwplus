@@ -1,5 +1,6 @@
 package models;
 
+import managers.FolderManager;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.LinkType;
@@ -60,15 +61,16 @@ public class Media extends BaseNotifiable implements INotifiable {
 
     @Override
     public List<Account> getRecipients() {
-        // new media available in group, whole group must be notified
-        if (folder.group != null) {
-            return groupAccountManager.findAccountsByGroup(folder.group, LinkType.establish);
+        // new media available in group, whole group must be notified (rootFolder knows the group)
+        Folder rootFolder = FolderManager.findRoot(folder);
+        if (rootFolder.group != null) {
+            return groupAccountManager.findAccountsByGroup(rootFolder.group, LinkType.establish);
         }
         return new ArrayList<>();
     }
 
     @Override
     public String getTargetUrl() {
-        return controllers.routes.GroupController.media(this.findGroup().id, 0L).toString();
+        return controllers.routes.GroupController.media(this.findGroup().id, folder.id).toString();
     }
 }
