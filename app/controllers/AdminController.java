@@ -95,7 +95,7 @@ public class AdminController extends BaseController {
         account.lastname = filledForm.data().get("lastname");
         account.email = filledForm.data().get("email");
         account.password = Component.md5(filledForm.data().get("password"));
-        account.avatar = "a1";
+        account.avatar = "1";
         account.role = AccountRole.values()[Integer.parseInt(filledForm.data().get("role"))];
         accountManager.create(account);
 
