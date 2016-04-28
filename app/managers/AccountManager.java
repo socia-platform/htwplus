@@ -129,6 +129,12 @@ public class AccountManager implements BaseManager {
             mediaManager.update(med);
         }
 
+        // transfer root folder (change it to a subfolder for our dummy account)
+        Folder rootFolder = account.rootFolder;
+        rootFolder.account = null;
+        rootFolder.parent = dummy.rootFolder;
+        rootFolder.owner = dummy;
+
         // Delete incoming notifications //
         notificationManager.deleteNotificationsForAccount(account.id);
 
