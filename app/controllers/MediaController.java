@@ -47,7 +47,6 @@ public class MediaController extends BaseController {
         Media media = mediaManager.findById(mediaId);
         if (media == null) {
             return notFound();
-
         }
         if (Secured.viewMedia(media)) {
             switch (action) {
@@ -69,20 +68,17 @@ public class MediaController extends BaseController {
     public Result delete(Long id) {
         Media media = mediaManager.findById(id);
 
-        Call ret = controllers.routes.Application.index();
-        if (media.folder != null) {
-            Long folderId = media.folder.id;
-            Long groupId = media.findGroup().id;
+        if (media == null) {
+            return notFound();
+        }
 
-            if (!Secured.deleteMedia(media)) {
-                return redirect(controllers.routes.Application.index());
-            }
-            ret = routes.GroupController.media(groupId, folderId);
+        if (!Secured.deleteMedia(media)) {
+            return redirect(controllers.routes.Application.index());
         }
 
         mediaManager.delete(media);
         flash("success", "Datei " + media.title + " erfolgreich gelöscht!");
-        return redirect(ret);
+        return Secured.nullRedirect(request());
     }
 
     @Transactional(readOnly = true)
