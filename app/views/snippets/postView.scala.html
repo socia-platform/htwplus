@@ -77,25 +77,17 @@
                         }
 
                         @defining(PostController.getComments(post.id, commentLimit)) { comments =>
-                        @if(comments != null) {
-                        @for(comment <- comments){
-                        @views.html.snippets.postComment(comment)
+                            @if(comments != null) {
+                                @for(comment <- comments){
+                                    @views.html.snippets.postComment(comment)
+                                }
+                            }
                         }
-                        }
-                        }
+
                         @if(Secured.addComment(post)) {
-                        @form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form", 'id ->
-                        ("addComment-"+post.id)) {
-                        <div class="hp-horizontal-form col-xs-12">
-                            <div class="input-group">
-                                @textarea(postForm("Content"), 'class -> "form-control", 'id -> "hp-new-comment-content",
-                                'placeholder -> "Schreibe ein Kommentar...")
-                                <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-sm btn-warning commentSubmit"><span class="glyphicon glyphicon-comment"></span> Kommentieren</button>
-                                </span>
-                            </div>
-                        </div>
-                        }
+                            @form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form") {
+                                <textarea class="hp-new-comment-content" placeholder="schreibe ein Kommentar..." name="content" rows="1"></textarea>
+                            }
                         }
                     </div>
                     <div class="clear"></div>

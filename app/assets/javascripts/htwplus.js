@@ -92,40 +92,6 @@ function linkOlderComments() {
 	});
 }
 
-function linkAddComments() {
-	/*
-	 * ADD COMMENTS
-	 */
-    $('.hp-comment-form').each(function () {
-        var context = $(this);
-        // avoid register click event multiple times (pagination)
-        $(".commentSubmit", this).off().on('click', function () {
-            if (context.serializeArray()[0].value.trim() === "") {
-                $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
-                    $(this).animate({opacity: 1}, 100);
-                    $(this).focus();
-                }).focus();
-            } else {
-                $.ajax({
-                    url: context.attr('action'),
-                    type: "POST",
-                    data: context.serialize(),
-                    success: function (data) {
-                        context.before(data);
-                        context[0].reset();
-                    }, error: function () {
-                        $(context).find('textarea').animate({opacity: 0.3}, 100, "linear", function () {
-                            $(this).animate({opacity: 1}, 100);
-                            $(this).focus();
-                        });
-                    }
-                });
-            }
-            return false;
-        });
-    });
-}
-
 function truncateBreadcrumb() {
 	var lastBreadcrumb = $("#hp-navbar-breadcrumb .breadcrumb > li:last-child");
 	var index = 3;	// first breadcrumb item which is hidden
@@ -232,7 +198,7 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                     language: 'de',
                     autofocus: true,
                     onShow: function(e) {
-                        $(".hp-post-content button[data-handler='cmdSave']").html('<span class="glyphicon glyphicon-refresh"></span> Aktualisieren');
+                        $(".hp-dropzone-edit-preview button[data-handler='cmdSave']").html('<span class="glyphicon glyphicon-refresh"></span> Aktualisieren');
                     },
                     onPreview: function(e) {
                         return md.render(e.getContent());
@@ -265,19 +231,6 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
             }
         });
         return false;
-    }
-});
-
-/*
- * prevent submitting empty posts
- */
-$(".hp-post-form").on("submit", function(e) {
-    if($(this).find("textarea").val().trim().length <= 0) {
-        e.preventDefault();
-        $(this).find("textarea").animate({opacity:0.1},100,"linear",function() { // blink and focus textarea
-            $(this).animate({opacity:1},100);
-            $(this).focus();
-        }).focus();
     }
 });
 
@@ -336,11 +289,11 @@ $('body').on('click', '.hp-mediaList-submit', function (e) {
  * Markdown definition
  */
 var md = window.markdownit({
-               html: false,
-               breaks: true,
-               linkify: false,
-               typographer: true
-             }).use(window.markdownitMark).use(window.markdownitEmoji);
+            html: false,
+            breaks: true,
+            linkify: false,
+            typographer: true
+        }).use(window.markdownitMark).use(window.markdownitEmoji);
 
 md.renderer.rules.emoji = function(token, idx) {
   return '<img class="emoji" width="20" height="20" src="' + location.origin + '/assets/images/emojis/' + token[idx].markup + '.png" />';
@@ -360,7 +313,15 @@ $("#hp-new-post-content").markdown({
         return md.render(e.getContent());
     },
     onSave: function(e) {
-        $('#hp-post-submit-button').click();
+        // prevent submitting empty posts
+        if (e.getContent().length > 0) {
+            $('#hp-post-submit-button').click();
+        } else {
+            e.$textarea.animate({opacity:0.1},200,"linear",function() { // blink and focus textarea
+                $(this).animate({opacity:1},200);
+                $(this).focus();
+            }).focus();
+        }
     },
     dropZoneOptions: {
         url: "/media/upload/"+folderToUpload,
@@ -368,6 +329,56 @@ $("#hp-new-post-content").markdown({
         previewsContainer: '.hp-dropzone-preview',
         parallelUploads: 1
     }
+});
+
+$('body').on('click', '.hp-new-comment-content', function(e) {
+    e.preventDefault();
+    $(this).markdown({
+        savable: true,
+        autofocus: true,
+        language: 'de',
+        onShow: function(e) {
+           // resize editor header
+           $.each(e.$editor.find('.btn-group'), function( index, value ) {
+                $(value).addClass('btn-group-xs');
+           });
+           e.$editor.find('.md-control.md-control-fullscreen').css('padding', '0px');
+
+           $(".hp-dropzone-comment-preview button[data-handler='cmdSave']").html('<span class="glyphicon glyphicon-send"></span> Kommentieren');
+        },
+        onPreview: function(e) {
+           return md.render(e.getContent());
+        },
+        onSave: function(e) {
+            var context = e.$editor.parent();
+            var textarea = e.$textarea;
+            // prevent submitting empty posts
+            if (e.getContent().length > 0) {
+                $.ajax({
+                    url: context.attr('action'),
+                    type: "POST",
+                    data: context.serialize(),
+                    success: function (data) {
+                        context.before(data);
+                        context[0].reset();
+                    }, error: function () {
+
+                    }
+                });
+            } else {
+                textarea.animate({opacity: 0.1}, 200, "linear", function () {
+                       $(this).animate({opacity: 1}, 200);
+                       $(this).focus();
+                   });
+            }
+        },
+        dropZoneOptions: {
+            url: "/media/upload/"+folderToUpload,
+            clickable: '.hp-dropzone-comment-clickable',
+            previewsContainer: '.hp-dropzone-comment-preview',
+            parallelUploads: 1
+        }
+    });
 });
 
 $(document).ready(function () {
@@ -404,7 +415,6 @@ $(document).ready(function () {
 			markdownPostContent();
 			autolinkUrls();
 			linkOlderComments();
-			linkAddComments();
 		}
 	});
 
@@ -435,8 +445,6 @@ $(document).ready(function () {
             return false;
         });
     }
-
-    linkAddComments();
 
 	linkOlderComments();
 

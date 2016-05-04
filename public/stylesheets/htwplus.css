@@ -861,20 +861,10 @@ div.hp-pagination {
 	border-radius: 4px!important;
 }
 
-#hp-new-comment-content {
-	height: 60px;
-    transition: height 0.5s ease 0.2s;
-	-webkit-transition: height 0.5s ease 0.2s;
-	-moz-transition: height 0.5s ease 0.2s;
-	-ms-transition: height 0.5s ease 0.2s;
-	-o-transition: height 0.5s ease 0.2s;
-}
-#hp-new-comment-content {
-    height: 32px;
-}
-
-#hp-new-comment-content:focus {
-	height: 104px;
+form.hp-comment-form > .hp-new-comment-content {
+    width: 300px;
+    padding: 5px;
+    height: 30px;
 }
 
 .hp-comments {
@@ -1372,15 +1362,17 @@ tbody.hp-optionsTable .hp-avatar-column {
 .hp-post-create-area #hp-post-submit-button {
     display: none;
 }
+.md-editor > textarea {
+    background: white;
+    padding: 10px;
+}
 
-#hp-new-post-content,
-#hp-edit-post-content,
 .md-preview {
     background-color: white;
     padding: 5px;
 }
 
-.hp-post-form .md-editor .md-footer {
+.md-editor .md-footer {
     padding-left: 10px;
 }
 .md-footer .dz-clickable {

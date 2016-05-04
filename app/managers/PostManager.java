@@ -91,7 +91,7 @@ public class PostManager implements BaseManager {
 
     public List<Post> getPostsForGroup(final Group group, final int limit, final int page) {
         Query query = JPA.em()
-                .createQuery("SELECT p FROM Post p WHERE p.group.id = ?1 ORDER BY p.createdAt DESC")
+                .createQuery("SELECT p FROM Post p WHERE p.group.id = ?1 ORDER BY p.updatedAt DESC")
                 .setParameter(1, group.id);
 
         int offset = (page * limit) - limit;
