@@ -21,7 +21,7 @@
     </div>
 </div>
 <!-- End confirmDeleteMediaAndFolder -->
-
+@form(routes.MediaController.multiView(), 'id -> "mediaListFrom" ) {
 <table class="table table-hover table-condensed">
     <thead>
     <tr>
@@ -36,7 +36,7 @@
         <th style="width:35px"></th>
     </tr>
     </thead>
-    @form(routes.MediaController.multiView(), 'id -> "mediaListFrom" ) {
+
     <tbody id="mediaList" class="hp-optionsTable">
     @if(!folderList.isEmpty) {
     @for(folder <- folderList) {
@@ -77,5 +77,6 @@
         </td>
     </tr>
     </tfoot>
-    }
+
 </table>
+}
