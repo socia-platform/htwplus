@@ -77,7 +77,7 @@ public class MediaController extends BaseController {
         List<Media> mediaSet = folder.files;
         List<Folder> folderList = folder.folders;
 
-        return created(list.render(mediaSet, folderList, rootFolder.group.id));
+        return ok(list.render(mediaSet, folderList, rootFolder.group.id));
     }
 
 
@@ -250,12 +250,7 @@ public class MediaController extends BaseController {
                 return internalServerError("Während des Uploads ist etwas schiefgegangen!");
             }
 
-            Folder rootFolder  = FolderManager.findRoot(folder);
-            List<Media> mediaSet = folder.files;
-            List<Folder> folderList = folder.folders;
-
-            return created(list.render(mediaSet, folderList, rootFolder.id));
-            //return created("/media/"+med.id);
+            return created("/media/");
         } else {
             return internalServerError("Es konnte keine Datei gefunden werden!");
         }
