@@ -628,6 +628,7 @@ $("form#groupUploadDropzone").dropzone({
     init: function() {
         this.on("queuecomplete", function() {
             var folder = $("form#groupUploadDropzone").data("folder");
+            console.log(this);
             $.ajax({
                 url: "/media/list/" + folder,
                 type: "GET",

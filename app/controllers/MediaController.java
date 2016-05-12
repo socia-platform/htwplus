@@ -250,7 +250,7 @@ public class MediaController extends BaseController {
                 return internalServerError("Während des Uploads ist etwas schiefgegangen!");
             }
 
-            return created("/media/");
+            return created("/media/" + med.id);
         } else {
             return internalServerError("Es konnte keine Datei gefunden werden!");
         }
