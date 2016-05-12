@@ -77,6 +77,10 @@ public class MediaController extends BaseController {
         List<Media> mediaSet = folder.files;
         List<Folder> folderList = folder.folders;
 
+        for (Media media : mediaSet) {
+            media.sizeInByte = mediaManager.bytesToString(media.size, false);
+        }
+
         return ok(list.render(mediaSet, folderList, rootFolder.group.id));
     }
 
