@@ -5,6 +5,7 @@ import com.typesafe.config.ConfigFactory;
 import managers.FolderManager;
 import managers.MediaManager;
 import models.Folder;
+import models.Group;
 import models.Media;
 import models.services.NotificationService;
 import play.db.jpa.Transactional;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import views.html.Media.list;
 
 
 @Security.Authenticated(Secured.class)
@@ -63,6 +66,25 @@ public class MediaController extends BaseController {
             return Secured.nullRedirect(request());
         }
     }
+
+    public Result mediaList(Long folderId) {
+        Folder folder = folderManager.findById(folderId);
+
+        if (!Secured.viewFolder(folder)) {
+            return forbidden("Dazu hast du keine Berechtigung");
+        }
+        Folder rootFolder  = FolderManager.findRoot(folder);
+        List<Media> mediaSet = folder.files;
+        List<Folder> folderList = folder.folders;
+
+        for (Media media : mediaSet) {
+            media.sizeInByte = mediaManager.bytesToString(media.size, false);
+        }
+
+        return ok(list.render(mediaSet, folderList, rootFolder.group.id));
+    }
+
+
 
     @Transactional
     public Result delete(Long id) {
@@ -231,7 +253,8 @@ public class MediaController extends BaseController {
             } catch (Exception e) {
                 return internalServerError("Während des Uploads ist etwas schiefgegangen!");
             }
-            return created("/media/"+med.id);
+
+            return created("/media/" + med.id);
         } else {
             return internalServerError("Es konnte keine Datei gefunden werden!");
         }

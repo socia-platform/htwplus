@@ -2,80 +2,87 @@
 @import helper._
 @import models._
 
-<!-- Start confirmDeleteMediaAndFolder -->
-<div class="modal fade" id="confirmDeleteMediaAndFolder" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteMediaAndFolderLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="confirmModalLabel">Dateien und Ordner löschen</h4>
-            </div>
-            <div class="modal-body">
-                Möchtest du die markierten Dateien und Ordner wirklich löschen?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-warning hp-mediaList-submit" >Ja</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Nein</button>
+@if(!mediaList.isEmpty || !folderList.isEmpty) {
+    <!-- Start confirmDeleteMediaAndFolder -->
+    <div class="modal fade" id="confirmDeleteMediaAndFolder" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteMediaAndFolderLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="confirmModalLabel">Dateien und Ordner löschen</h4>
+                </div>
+                <div class="modal-body">
+                    Möchtest du die markierten Dateien und Ordner wirklich löschen?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning hp-mediaList-submit" >Ja</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Nein</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- End confirmDeleteMediaAndFolder -->
-
-<table class="table table-hover table-condensed">
-    <thead>
-    <tr>
-        <th style="width:25px">
-            <input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body"
-                   onclick="toggleMediaSelection(this)">
-        </th>
-        <th style="width: 25px"></th>
-        <th style="width: 100%">Dateiname</th>
-        <th class="hidden-xs" style="width:100px">Datum</th>
-        <th style="width:100px">Dateigröße</th>
-        <th style="width:35px"></th>
-    </tr>
-    </thead>
+        <!-- End confirmDeleteMediaAndFolder -->
     @form(routes.MediaController.multiView(), 'id -> "mediaListFrom" ) {
-    <tbody id="mediaList" class="hp-optionsTable">
-    @if(!folderList.isEmpty) {
-    @for(folder <- folderList) {
-    <tr>
-        <td><input name="folderSelection" value="@folder.id" type="checkbox"></td>
-        <td><span class="glyphicon glyphicon-folder-open"></span></td>
-        <td><a href="@routes.GroupController.media(groupId, folder.id)" rel="tooltip" data-delay="500"
-               data-original-title="von @folder.owner.firstname">@folder.name</a></td>
-        <td class="hidden-xs">@folder.createdAt.format("dd.MM.yyyy")</td>
-        <td>Ordner</td>
-        <td class="hp-optionsMenu">
-            @if(Secured.deleteFolder(folder)) {
-            @views.html.Folder.snippets.optionMenu(folder)
-            }
-        </td>
-    </tr>
+        <table class="table table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th style="width:25px">
+                        <input type="checkbox" rel="tooltip" data-original-title="alles aus-, abwählen" data-container="body"
+                        onclick="toggleMediaSelection(this)">
+                    </th>
+                    <th style="width: 25px"></th>
+                    <th style="width: 100%">Dateiname</th>
+                    <th class="hidden-xs" style="width:100px">Datum</th>
+                    <th style="width:100px">Dateigröße</th>
+                    <th style="width:35px"></th>
+                </tr>
+            </thead>
+
+            <tbody id="mediaList" class="hp-optionsTable">
+                @if(!folderList.isEmpty) {
+                    @for(folder <- folderList) {
+                        <tr>
+                            <td><input name="folderSelection" value="@folder.id" type="checkbox"></td>
+                            <td><span class="glyphicon glyphicon-folder-open"></span></td>
+                            <td><a href="@routes.GroupController.media(groupId, folder.id)" rel="tooltip" data-delay="500"
+                            data-original-title="von @folder.owner.firstname">@folder.name</a></td>
+                            <td class="hidden-xs">@folder.createdAt.format("dd.MM.yyyy")</td>
+                            <td>Ordner</td>
+                            <td class="hp-optionsMenu">
+                            @if(Secured.deleteFolder(folder)) {
+                                @views.html.Folder.snippets.optionMenu(folder)
+                            }
+                            </td>
+                        </tr>
+                    }
+                }
+                @for(m <- mediaList) {
+                    <tr>
+                        <td><input name="mediaSelection" value="@m.id" type="checkbox"></td>
+                        <td><span class="glyphicon glyphicon-file"></span></td>
+                        <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500"
+                        data-original-title="von @m.owner.name">@m.title</a></td>
+                        <td class="hidden-xs">@m.createdAt.format("dd.MM.yyyy")</td>
+                        <td>@m.sizeInByte</td>
+                        <td class="hp-optionsMenu">
+                        @views.html.Media.snippets.optionMenu(m)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot style="text-align: center">
+                <tr>
+                    <td colspan="6">
+                        <button type="submit" class="btn btn-default" name="action" value="download"><span class="glyphicon glyphicon-download"></span> Auswahl herunterladen</button>
+                        <button type="button" data-target="#confirmDeleteMediaAndFolder" data-toggle="modal" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> Auswahl löschen</button>
+                    </td>
+                </tr>
+            </tfoot>
+
+        </table>
     }
-    }
-    @for(m <- mediaList) {
-    <tr>
-        <td><input name="mediaSelection" value="@m.id" type="checkbox"></td>
-        <td><span class="glyphicon glyphicon-file"></span></td>
-        <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500"
-               data-original-title="von @m.owner.name">@m.title</a></td>
-        <td class="hidden-xs">@m.createdAt.format("dd.MM.yyyy")</td>
-        <td>@m.sizeInByte</td>
-        <td class="hp-optionsMenu">
-            @views.html.Media.snippets.optionMenu(m)
-        </td>
-    </tr>
-    }
-    </tbody>
-    <tfoot style="text-align: center">
-    <tr>
-        <td colspan="6">
-            <button type="submit" class="btn btn-default" name="action" value="download"><span class="glyphicon glyphicon-download"></span> Auswahl herunterladen</button>
-            <button type="button" data-target="#confirmDeleteMediaAndFolder" data-toggle="modal" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> Auswahl löschen</button>
-        </td>
-    </tr>
-    </tfoot>
-    }
-</table>
+} else {
+    <br/><br/>
+    <i>Es wurden noch keine Dateien hochgeladen.</i>
+}
+

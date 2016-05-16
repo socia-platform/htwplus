@@ -34,13 +34,9 @@
                 }
                 <br />
             </div>
-
-            @if(!mediaList.isEmpty || !folderList.isEmpty) {
-            @views.html.Media.list(mediaList, folderList, group.id)
-            } else {
-            <br/><br/>
-            <i>Es wurden noch keine Dateien hochgeladen.</i>
-            }
+            <div id="hp-group-media-list">
+                @views.html.Media.list(mediaList, folderList, group.id)
+            </div>
             <hr/>
             <br/>
             @if(Secured.uploadMedia(group)) {
