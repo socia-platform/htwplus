@@ -15,6 +15,8 @@ import play.Logger;
 import play.Play;
 import play.i18n.Messages;
 
+import java.io.IOException;
+
 /**
  * LDAP service to establish LDAP connection and request user account data from directory.
  */
@@ -182,6 +184,13 @@ public class LdapService {
         } catch (LdapException | CursorException e) {
             e.printStackTrace();
             throw new LdapConnectorException(Messages.get("ldap.wrongCredentials"));
+        }
+
+        // close the connection
+        try {
+            ldapConnection.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
