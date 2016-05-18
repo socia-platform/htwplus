@@ -60,7 +60,7 @@
                     <tr>
                         <td><input name="mediaSelection" value="@m.id" type="checkbox"></td>
                         <td><span class="glyphicon glyphicon-file"></span></td>
-                        <td><a href="@routes.MediaController.view(m.id)" rel="tooltip" data-delay="500"
+                        <td><a href="@routes.MediaController.view(m.id)" target="_blank" rel="tooltip" data-delay="500"
                         data-original-title="von @m.owner.name">@m.title</a></td>
                         <td class="hidden-xs">@m.createdAt.format("dd.MM.yyyy")</td>
                         <td>@m.sizeInByte</td>
