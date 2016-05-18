@@ -331,6 +331,16 @@ $("#hp-new-post-content").markdown({
     }
 });
 
+// remove markdown-editor from post
+$('body').on('click', 'button.hp-post-abort', function(e) {
+    var editor = $(this).parent().parent();
+    var textarea = editor.find('textarea');
+    textarea.removeClass('md-input dropzone');
+    textarea.removeData('markdown');
+    editor.parent().append(textarea);
+    editor.remove();
+});
+
 $('body').on('click', '.hp-new-comment-content', function(e) {
     e.preventDefault();
     $(this).markdown({
@@ -344,13 +354,18 @@ $('body').on('click', '.hp-new-comment-content', function(e) {
            });
            e.$editor.find('.md-control.md-control-fullscreen').css('padding', '0px');
 
-           $(".hp-dropzone-comment-preview button[data-handler='cmdSave']").html('<span class="glyphicon glyphicon-send"></span> Kommentieren');
+           // create abort button beside saveButton
+           var saveButton = e.$editor.find('.md-footer').find('button');
+           saveButton.addClass('btn-xs');
+           saveButton.after('<button type="button" class="btn btn-xs btn-default hp-post-abort"><span>Abbrechen</span></button');
+           saveButton.html('<span class="glyphicon glyphicon-send"></span> Kommentieren');
         },
         onPreview: function(e) {
            return md.render(e.getContent());
         },
         onSave: function(e) {
             var context = e.$editor.parent();
+            var target = e.$editor.parent().parent().parent();
             var textarea = e.$textarea;
             // prevent submitting empty posts
             if (e.getContent().length > 0) {
@@ -359,7 +374,7 @@ $('body').on('click', '.hp-new-comment-content', function(e) {
                     type: "POST",
                     data: context.serialize(),
                     success: function (data) {
-                        context.before(data);
+                        target.before(data);
                         context[0].reset();
                     }, error: function () {
 

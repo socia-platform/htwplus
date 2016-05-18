@@ -877,10 +877,6 @@ form.hp-comment-form > .hp-new-comment-content {
     }
 }
 
-.hp-comment-form {
-	margin-top: 15px;
-}
-
 .hp-post-form label,
 .hp-comment-form label {
 	display: none;
@@ -1382,6 +1378,7 @@ tbody.hp-optionsTable .hp-avatar-column {
 }
 .md-footer button {
     float: right;
+    margin-left: 10px;
 }
 
 .md-footer .dz-success-mark,

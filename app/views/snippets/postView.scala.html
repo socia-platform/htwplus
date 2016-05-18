@@ -85,9 +85,21 @@
                         }
 
                         @if(Secured.addComment(post)) {
-                            @form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form") {
+                        <div class="media">
+                            <a class="pull-left hp-nohref" href="@routes.ProfileController.view(currentUser.id)">
+                                @if(currentUser.hasAvatar){
+                                <img alt="avatar" src="@routes.ProfileController.getAvatar(currentUser.id)" class="hp-avatar-small" />
+                                } else {
+                                <div class="hp-avatar-small hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
+                                }
+                            </a>
+                            <div class="media-body">
+                                @form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form") {
                                 <textarea class="hp-new-comment-content" placeholder="schreibe ein Kommentar..." name="content" rows="1"></textarea>
-                            }
+                                }
+                            </div>
+                        </div>
+
                         }
                     </div>
                     <div class="clear"></div>
