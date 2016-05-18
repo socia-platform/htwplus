@@ -193,7 +193,7 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                 });
                 post_container.html(old_content); // put back removed content
             } else {
-                $("#hp-edit-post-content").markdown({
+                $(this).find('textarea').markdown({
                     savable: true,
                     language: 'de',
                     autofocus: true,
