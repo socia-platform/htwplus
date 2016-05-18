@@ -474,7 +474,7 @@
               var text = textarea.val();
               var description = "";
               if (file.type.startsWith("image/")) {
-                description = "!["+file.name+"]";
+                description = "[!["+file.name+"](" + path + ")]";
               } else {
                 description = "["+file.name+"]";
               }
