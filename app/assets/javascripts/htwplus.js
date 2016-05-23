@@ -171,51 +171,74 @@ $(".hp-optionsTable>tr>td>input").on("click", function(e) {
 });
 
 /*
- * EDIT COMMENTS
+ * EDIT POSTS AND COMMENTS
  */
+
+// remove markdown-editor from post
+$('body').on('click', 'button.hp-post-edit-abort', function(e) {
+    // get post id to find target container with content to edit
+    $(this).closest('.formContainer').remove();
+    $('#'+$(this).data('abortPostId')).show();
+});
+
+// edit post or comment
 $('body').on('click', 'a.hp-post-edit', function(e) {
-    if($(e.currentTarget).hasClass("disabled"))
+    var clickedLink = $(this);
+
+    // out of time frame?
+    if(clickedLink.hasClass("disabled"))
         return false;
     else {
-        var post_id = e.currentTarget.id.split("_")[1];
-        var post_container = $("#"+post_id);
+        // get post id to find target container with content to edit
+        var targetPostId = clickedLink.data('targetPostId');
+        var postContainer = $("#"+targetPostId);
 
-        //var old_content = replaceContentWithLoadingIndicator(post_container);
-        post_container.removeClass('marked');
-        var removed_classes = post_container.attr("class");
-        post_container.attr("class", ""); // remove the classes (preventing linkify and whitespace stuff to apply)
-        post_container.load("/post/"+post_id+"/getEditForm", function(response, status, xhr) {
+        // hide content of postContainer
+        postContainer.hide();
+        // create formContainer which will load markdown editor
+        postContainer.before('<div class="formContainer"></div>');
+
+        // load markdown editor
+        var formContainer = postContainer.prev();
+        formContainer.load("/post/"+targetPostId+"/getEditForm", function(response, status, xhr) {
             if (status == "error") {
                 console.log("Error when trying to edit post: ["+status+"]");
-                showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                showErrorBeforeElement(postContainer, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
                 $(".hp-reload").click(function() {
                     window.location.reload();
                 });
-                post_container.html(old_content); // put back removed content
+                postContainer.html(old_content); // put back removed content
+                formContainer.remove();
             } else {
                 $("#hp-edit-post-content").markdown({
                     savable: true,
                     language: 'de',
                     autofocus: true,
                     onShow: function(e) {
-                        $(".hp-dropzone-edit-preview button[data-handler='cmdSave']").html('<span class="glyphicon glyphicon-refresh"></span> Aktualisieren');
+                        var saveButton = e.$editor.find('.md-footer').find('button');
+                        saveButton.after('<button type="button" class="btn btn-sm btn-default hp-post-edit-abort" data-abort-post-id='+targetPostId+'><span>Abbrechen</span></button');
+                        saveButton.html('<span class="glyphicon glyphicon-refresh"></span> Aktualisieren');
                     },
                     onPreview: function(e) {
                         return md.render(e.getContent());
                     },
                     onSave: function(e) {
-                        var form = post_container.find("form");
+                        var form = formContainer.find("form");
                         $.ajax({
                             url: form.attr('action'),
                             type: "POST",
                             data: form.serialize(),
                             success: function (data) {
-                                post_container.html(data);
-                                post_container.attr("class", removed_classes);
+                                // replace returned data and show it
+                                postContainer.html(data);
+                                postContainer.show();
+                                // remove 'marked' to apply markdown after loading ($.ajaxSetup.complete)
+                                postContainer.removeClass('marked');
+                                formContainer.remove();
                             },
                             error: function(xhr, status, errorThrown) {
                                 console.log("Error when submitting edited post: ["+status+"] " + errorThrown);
-                                showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                                showErrorBeforeElement(postContainer, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
                                 $(".hp-reload").click(function() {
                                     window.location.reload();
                                 });
