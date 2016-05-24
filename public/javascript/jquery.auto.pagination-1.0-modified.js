@@ -56,7 +56,6 @@
                     var content = $('<div>'+data+'</div>'); // we have to wrap it in another div, because jquery doesn't parse the outer divs somehow...
 
                     // for each 'panelSelector' element in the loaded data...
-                    console.log(opts.panelSelector);
                     window.apdata = data;
                     content.find( opts.panelSelector ).each(function( index, el ) {
                         // ...insert it after the last 'panelSelector'

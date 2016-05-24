@@ -2,7 +2,7 @@
 @import play._
 
 <h4>Neue Dateien hochladen:</h4>
-<form id="groupUploadDropzone" class="dropzone" action="/media/upload/@folderId"></form>
+<form id="groupUploadDropzone" class="dropzone" action="/media/upload/@folderId" data-folder="@folderId"></form>
 <br />
 <small><i>Max. @Play.application().configuration().getInt("media.maxSize.file") MByte pro Datei möglich.</i></small>
 
