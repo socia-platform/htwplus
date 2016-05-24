@@ -203,14 +203,13 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
         formContainer.load("/post/"+targetPostId+"/getEditForm", function(response, status, xhr) {
             if (status == "error") {
                 console.log("Error when trying to edit post: ["+status+"]");
-                showErrorBeforeElement(postContainer, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                showErrorBeforeElement(postContainer, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a>');
                 $(".hp-reload").click(function() {
                     window.location.reload();
                 });
-                postContainer.html(old_content); // put back removed content
                 formContainer.remove();
             } else {
-                $(this).find('textarea').markdown({
+                formContainer.find('textarea').markdown({
                     savable: true,
                     language: 'de',
                     autofocus: true,
