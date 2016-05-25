@@ -78,7 +78,7 @@ public class EmailService {
             String subject = notifications.size() > 1
                     ? Messages.get("notification.email_notifications.collected.subject", notifications.size())
                     : Messages.get("notification.email_notifications.single.subject_specific",
-                        notifications.get(0).rendered.replaceAll("<[^>]*>", ""));
+                        notifications.get(0).rendered.replaceAll("<[^>]*>", "").replaceAll("\\r?\\n|\\r", ", "));
             // send the email
             this.sendEmail(subject, recipient.name + " <" + recipient.email + ">",
                     TemplateService.getInstance().getRenderedTemplate(PLAIN_TEXT_TEMPLATE, notifications, recipient),
