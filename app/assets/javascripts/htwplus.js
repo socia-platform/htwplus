@@ -245,7 +245,7 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                         });
                     },
                     dropZoneOptions: {
-                        url: "/media/upload/"+folderToUpload,
+                        url: "/media/upload/"+formContainer.find('textarea').data('uploadfolderId'),
                         clickable: '.hp-dropzone-edit-clickable',
                         previewsContainer: '.hp-dropzone-edit-preview'
                     }
@@ -321,12 +321,6 @@ md.renderer.rules.emoji = function(token, idx) {
   return '<img class="emoji" width="20" height="20" src="' + location.origin + '/assets/images/emojis/' + token[idx].markup + '.png" />';
 };
 
-// find folder to upload to
-var folderToUpload = 0;
-if ($('#folderToUpload').size() > 0) {
-    folderToUpload = $('#folderToUpload')[0].innerText;
-}
-
 // apply markdown editor
 $("#hp-new-post-content").markdown({
     savable: true,
@@ -346,7 +340,7 @@ $("#hp-new-post-content").markdown({
         }
     },
     dropZoneOptions: {
-        url: "/media/upload/"+folderToUpload,
+        url: "/media/upload/"+$("#hp-new-post-content").data('uploadfolderId'),
         clickable: '.hp-dropzone-clickable',
         previewsContainer: '.hp-dropzone-preview',
         parallelUploads: 1
@@ -410,7 +404,7 @@ $('body').on('click', '.hp-new-comment-content', function(e) {
             }
         },
         dropZoneOptions: {
-            url: "/media/upload/"+folderToUpload,
+            url: "/media/upload/"+$(this).data('uploadfolderId'),
             clickable: '.hp-dropzone-comment-clickable',
             previewsContainer: '.hp-dropzone-comment-preview',
             parallelUploads: 1

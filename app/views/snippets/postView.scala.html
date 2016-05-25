@@ -95,7 +95,7 @@
                             </a>
                             <div class="media-body">
                                 @form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form") {
-                                <textarea class="hp-new-comment-content" placeholder="schreibe ein Kommentar..." name="content" rows="1"></textarea>
+                                <textarea class="hp-new-comment-content" placeholder="schreibe ein Kommentar..." name="content" data-uploadfolder-id="@currentUser.rootFolder.id" rows="1"></textarea>
                                 }
                             </div>
                         </div>
