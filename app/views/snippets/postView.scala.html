@@ -51,7 +51,7 @@
 
                         @if(Secured.isAllowedToEditPost(post, currentUser)) {
                         @if(Secured.isPostStillEditable(post, currentUser)) {
-                        <a id="hp-editPost_@post.id" class="hp-post-edit hp-post-options hp-nohref" rel="tooltip" data-original-title="Post bearbeiten" data-container="body">
+                        <a id="hp-editPost_@post.id" class="hp-post-edit hp-post-options hp-nohref" rel="tooltip" data-target-post-id="@post.id" data-original-title="Post bearbeiten" data-container="body">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </a>
                         } else {
@@ -85,9 +85,21 @@
                         }
 
                         @if(Secured.addComment(post)) {
-                            @form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form") {
-                                <textarea class="hp-new-comment-content" placeholder="schreibe ein Kommentar..." name="content" rows="1"></textarea>
-                            }
+                        <div class="media">
+                            <a class="pull-left hp-nohref" href="@routes.ProfileController.view(currentUser.id)">
+                                @if(currentUser.hasAvatar){
+                                <img alt="avatar" src="@routes.ProfileController.getAvatar(currentUser.id)" class="hp-avatar-small" />
+                                } else {
+                                <div class="hp-avatar-small hp-avatar-default-@currentUser.avatar">@currentUser.getInitials</div>
+                                }
+                            </a>
+                            <div class="media-body">
+                                @form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form") {
+                                <textarea class="hp-new-comment-content" placeholder="Schreibe ein Kommentar..." name="content" data-uploadfolder-id="@currentUser.rootFolder.id" rows="1"></textarea>
+                                }
+                            </div>
+                        </div>
+
                         }
                     </div>
                     <div class="clear"></div>

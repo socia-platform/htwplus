@@ -865,6 +865,10 @@ form.hp-comment-form > .hp-new-comment-content {
     width: 300px;
     padding: 5px;
     height: 30px;
+    border-radius: 5px;
+    border-color: #ddd;
+    border-style: solid;
+    border-width: 1px;
 }
 
 .hp-comments {
@@ -875,10 +879,6 @@ form.hp-comment-form > .hp-new-comment-content {
     .hp-comments {
         margin-left: 15px;
     }
-}
-
-.hp-comment-form {
-	margin-top: 15px;
 }
 
 .hp-post-form label,
@@ -1382,6 +1382,7 @@ tbody.hp-optionsTable .hp-avatar-column {
 }
 .md-footer button {
     float: right;
+    margin-left: 10px;
 }
 
 .md-footer .dz-success-mark,
