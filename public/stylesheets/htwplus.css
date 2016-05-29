@@ -865,6 +865,10 @@ form.hp-comment-form > .hp-new-comment-content {
     width: 300px;
     padding: 5px;
     height: 30px;
+    border-radius: 5px;
+    border-color: #ddd;
+    border-style: solid;
+    border-width: 1px;
 }
 
 .hp-comments {
