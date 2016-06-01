@@ -2,9 +2,8 @@
 @import helper._
 
 @form(routes.PostController.addPost(anyId, target), 'class -> "hp-post-form", 'id -> "addPost") {
-    <span id="folderToUpload" class="hidden">@rootFolderId</span>
     <div class="hp-post-form col-xs-12">
-        <textarea id="hp-new-post-content" name="content"></textarea>
+        <textarea id="hp-new-post-content" name="content" data-uploadfolder-id="@rootFolderId"></textarea>
         <button id="hp-post-submit-button" type="submit" class="btn btn-warning">Posten</button>
     </div>
 }
