@@ -73,6 +73,10 @@ span.errors {
 	text-overflow: ellipsis;
 }
 
+.hp-truncate img {
+	max-width: 100%
+}
+
 h1 {
 	text-align: center;
 }
@@ -1707,10 +1711,6 @@ a.adjust {
 
 .hp-post-area .hp-post-content pre {
     background-color: white;
-}
-
-.hp-post-area .hp-post-content p img {
-    max-width: 100%;
 }
 
 /*==== if content area is to short and site-nav starts floating around ==*/
