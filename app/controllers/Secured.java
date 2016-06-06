@@ -641,7 +641,15 @@ public class Secured extends Security.Authenticator {
 		if (isAdmin()) {
 			return true;
 		}
-		if (viewGroup(folder.group) || folder.owner == Component.currentAccount() || Secured.isFriend(folder.owner))  {
+
+		// if its a group folder, check group rights
+		if (folder.group != null) {
+			return viewGroup(folder.group);
+		}
+
+		// if its an account folder, everybody can see it
+		// todo: necessary view management
+		if (folder.account != null) {
 			return true;
 		}
 
