@@ -171,51 +171,73 @@ $(".hp-optionsTable>tr>td>input").on("click", function(e) {
 });
 
 /*
- * EDIT COMMENTS
+ * EDIT POSTS AND COMMENTS
  */
+
+// remove markdown-editor from post
+$('body').on('click', 'button.hp-post-edit-abort', function(e) {
+    // get post id to find target container with content to edit
+    $(this).closest('.formContainer').remove();
+    $('#'+$(this).data('abortPostId')).show();
+});
+
+// edit post or comment
 $('body').on('click', 'a.hp-post-edit', function(e) {
-    if($(e.currentTarget).hasClass("disabled"))
+    var clickedLink = $(this);
+
+    // out of time frame?
+    if(clickedLink.hasClass("disabled"))
         return false;
     else {
-        var post_id = e.currentTarget.id.split("_")[1];
-        var post_container = $("#"+post_id);
+        // get post id to find target container with content to edit
+        var targetPostId = clickedLink.data('targetPostId');
+        var postContainer = $("#"+targetPostId);
 
-        //var old_content = replaceContentWithLoadingIndicator(post_container);
-        post_container.removeClass('marked');
-        var removed_classes = post_container.attr("class");
-        post_container.attr("class", ""); // remove the classes (preventing linkify and whitespace stuff to apply)
-        post_container.load("/post/"+post_id+"/getEditForm", function(response, status, xhr) {
+        // hide content of postContainer
+        postContainer.hide();
+        // create formContainer which will load markdown editor
+        postContainer.before('<div class="formContainer"></div>');
+
+        // load markdown editor
+        var formContainer = postContainer.prev();
+        formContainer.load("/post/"+targetPostId+"/getEditForm", function(response, status, xhr) {
             if (status == "error") {
                 console.log("Error when trying to edit post: ["+status+"]");
-                showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                showErrorBeforeElement(postContainer, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a>');
                 $(".hp-reload").click(function() {
                     window.location.reload();
                 });
-                post_container.html(old_content); // put back removed content
+                formContainer.remove();
             } else {
-                $(this).find('textarea').markdown({
+                formContainer.find('textarea').markdown({
                     savable: true,
                     language: 'de',
                     autofocus: true,
                     onShow: function(e) {
-                        $(".hp-dropzone-edit-preview button[data-handler='cmdSave']").html('<span class="glyphicon glyphicon-refresh"></span> Aktualisieren');
+                        var saveButton = e.$editor.find('.md-footer').find('button');
+                        saveButton.after('<button type="button" class="btn btn-sm btn-default hp-post-edit-abort" data-abort-post-id='+targetPostId+'><span>Abbrechen</span></button');
+                        saveButton.html('<span class="glyphicon glyphicon-refresh"></span> Aktualisieren');
                     },
                     onPreview: function(e) {
                         return md.render(e.getContent());
                     },
                     onSave: function(e) {
-                        var form = post_container.find("form");
+                        var form = formContainer.find("form");
                         $.ajax({
                             url: form.attr('action'),
                             type: "POST",
                             data: form.serialize(),
                             success: function (data) {
-                                post_container.html(data);
-                                post_container.attr("class", removed_classes);
+                                // replace returned data and show it
+                                postContainer.html(data);
+                                postContainer.show();
+                                // remove 'marked' to apply markdown after loading ($.ajaxSetup.complete)
+                                postContainer.removeClass('marked');
+                                formContainer.remove();
                             },
                             error: function(xhr, status, errorThrown) {
                                 console.log("Error when submitting edited post: ["+status+"] " + errorThrown);
-                                showErrorBeforeElement(post_container, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
+                                showErrorBeforeElement(postContainer, '<strong>Ein Fehler ist aufgetreten!</strong> <a class="hp-reload" href="#">Bitte laden Sie die Seite neu!</a> (Vielleicht ist der Bearbeitungszeitraum zuende?)');
                                 $(".hp-reload").click(function() {
                                     window.location.reload();
                                 });
@@ -223,7 +245,7 @@ $('body').on('click', 'a.hp-post-edit', function(e) {
                         });
                     },
                     dropZoneOptions: {
-                        url: "/media/upload/"+folderToUpload,
+                        url: "/media/upload/"+formContainer.find('textarea').data('uploadfolderId'),
                         clickable: '.hp-dropzone-edit-clickable',
                         previewsContainer: '.hp-dropzone-edit-preview'
                     }
@@ -299,12 +321,6 @@ md.renderer.rules.emoji = function(token, idx) {
   return '<img class="emoji" width="20" height="20" src="' + location.origin + '/assets/images/emojis/' + token[idx].markup + '.png" />';
 };
 
-// find folder to upload to
-var folderToUpload = 0;
-if ($('#folderToUpload').size() > 0) {
-    folderToUpload = $('#folderToUpload')[0].innerText;
-}
-
 // apply markdown editor
 $("#hp-new-post-content").markdown({
     savable: true,
@@ -324,11 +340,21 @@ $("#hp-new-post-content").markdown({
         }
     },
     dropZoneOptions: {
-        url: "/media/upload/"+folderToUpload,
+        url: "/media/upload/"+$("#hp-new-post-content").data('uploadfolderId'),
         clickable: '.hp-dropzone-clickable',
         previewsContainer: '.hp-dropzone-preview',
         parallelUploads: 1
     }
+});
+
+// remove markdown-editor from post
+$('body').on('click', 'button.hp-post-abort', function(e) {
+    var editor = $(this).parent().parent();
+    var textarea = editor.find('textarea');
+    textarea.removeClass('md-input dropzone');
+    textarea.removeData('markdown');
+    editor.parent().append(textarea);
+    editor.remove();
 });
 
 $('body').on('click', '.hp-new-comment-content', function(e) {
@@ -344,13 +370,18 @@ $('body').on('click', '.hp-new-comment-content', function(e) {
            });
            e.$editor.find('.md-control.md-control-fullscreen').css('padding', '0px');
 
-           $(".hp-dropzone-comment-preview button[data-handler='cmdSave']").html('<span class="glyphicon glyphicon-send"></span> Kommentieren');
+           // create abort button beside saveButton
+           var saveButton = e.$editor.find('.md-footer').find('button');
+           saveButton.addClass('btn-xs');
+           saveButton.after('<button type="button" class="btn btn-xs btn-default hp-post-abort"><span>Abbrechen</span></button');
+           saveButton.html('<span class="glyphicon glyphicon-send"></span> Kommentieren');
         },
         onPreview: function(e) {
            return md.render(e.getContent());
         },
         onSave: function(e) {
             var context = e.$editor.parent();
+            var target = e.$editor.parent().parent().parent();
             var textarea = e.$textarea;
             // prevent submitting empty posts
             if (e.getContent().length > 0) {
@@ -359,7 +390,7 @@ $('body').on('click', '.hp-new-comment-content', function(e) {
                     type: "POST",
                     data: context.serialize(),
                     success: function (data) {
-                        context.before(data);
+                        target.before(data);
                         context[0].reset();
                     }, error: function () {
 
@@ -373,7 +404,7 @@ $('body').on('click', '.hp-new-comment-content', function(e) {
             }
         },
         dropZoneOptions: {
-            url: "/media/upload/"+folderToUpload,
+            url: "/media/upload/"+$(this).data('uploadfolderId'),
             clickable: '.hp-dropzone-comment-clickable',
             previewsContainer: '.hp-dropzone-comment-preview',
             parallelUploads: 1

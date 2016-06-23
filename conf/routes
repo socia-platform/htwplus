@@ -109,6 +109,7 @@ GET         /websocket                                 controllers.WebSocketCont
 
 
 # Map static resources from the /public folder to the /assets URL path
+GET         /favicon.ico                               controllers.Assets.at(path="/public", file="images/favicon.png")
 GET         /assets/*file                              controllers.Assets.at(path="/public", file)
 
 

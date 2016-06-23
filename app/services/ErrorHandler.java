@@ -5,6 +5,7 @@ import managers.GroupManager;
 import managers.PostManager;
 import models.Group;
 import models.Post;
+import models.services.NotificationService;
 import play.Configuration;
 import play.Environment;
 import play.api.OptionalSourceMapper;
@@ -54,6 +55,7 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
                 post.group = group;
                 postManager.create(post);
+                NotificationService.getInstance().createNotification(post, Post.GROUP);
             }
         });
 

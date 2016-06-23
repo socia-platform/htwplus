@@ -73,6 +73,10 @@ span.errors {
 	text-overflow: ellipsis;
 }
 
+.hp-truncate img {
+	max-width: 100%
+}
+
 h1 {
 	text-align: center;
 }
@@ -865,6 +869,10 @@ form.hp-comment-form > .hp-new-comment-content {
     width: 300px;
     padding: 5px;
     height: 30px;
+    border-radius: 5px;
+    border-color: #ddd;
+    border-style: solid;
+    border-width: 1px;
 }
 
 .hp-comments {
@@ -875,10 +883,6 @@ form.hp-comment-form > .hp-new-comment-content {
     .hp-comments {
         margin-left: 15px;
     }
-}
-
-.hp-comment-form {
-	margin-top: 15px;
 }
 
 .hp-post-form label,
@@ -1382,6 +1386,7 @@ tbody.hp-optionsTable .hp-avatar-column {
 }
 .md-footer button {
     float: right;
+    margin-left: 10px;
 }
 
 .md-footer .dz-success-mark,
@@ -1706,10 +1711,6 @@ a.adjust {
 
 .hp-post-area .hp-post-content pre {
     background-color: white;
-}
-
-.hp-post-area .hp-post-content p img {
-    max-width: 100%;
 }
 
 /*==== if content area is to short and site-nav starts floating around ==*/
