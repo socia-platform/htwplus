@@ -497,12 +497,12 @@ $(document).ready(function () {
                     var custom_avatar = false;
                     if(item._type === 'user') {
                         label = item._source.name;
-                        hLabel = item.highlight.name[0].replace('[startStrong]', '<strong>').replace('[endStrong]', '</strong>');
+                        hLabel = item.highlight.name[0].replace(/\[startStrong\]/g, '<strong>').replace(/\[endStrong\]/g, '</strong>');
                         if(item._source.avatar === 'custom') {custom_avatar = true;}
                     }
                     if(item._type === 'group') {
                         label = item._source.title;
-                        hLabel = item.highlight.title[0].replace('[startStrong]', '<strong>').replace('[endStrong]', '</strong>');
+                        hLabel = item.highlight.title[0].replace(/\[startStrong\]/g, '<strong>').replace(/\[endStrong\]/g, '</strong>');
                         groupType = item._source.grouptype;
                         if(item._source.avatar) {
                             custom_avatar = true;
