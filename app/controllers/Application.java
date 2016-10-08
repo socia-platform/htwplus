@@ -105,7 +105,11 @@ public class Application extends BaseController {
     }
 
     public Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
-        SearchResponse response = elasticsearchService.doSearch("searchSuggestions", query, "all", null, 1, Component.currentAccount().id.toString(), asList("name", "title"), asList("friends", "member"));
+        Account currentAccount = Component.currentAccount();
+        if (currentAccount == null) {
+            return forbidden();
+        }
+        SearchResponse response = elasticsearchService.doSearch("searchSuggestions", query, "all", null, 1, currentAccount.id.toString(), asList("name", "title"), asList("friends", "member"));
         return ok(response.toString());
     }
 
