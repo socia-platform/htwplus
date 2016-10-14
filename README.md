@@ -7,10 +7,10 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 ### Requirements
 
 * JDK 8
-* Play 2.4.6 or higher (activator 1.3.7) (https://www.playframework.com/download)
+* Play 2.4.6 (activator 1.3.7) (https://downloads.typesafe.com/typesafe-activator/1.3.7/typesafe-activator-1.3.7-minimal.zip)
 * Git
 * Node.js
-* PostgreSQL 9.3
+* PostgreSQL 9.3 or higher
 * Elasticsearch 2.1 or higher
 
 ### Setup
@@ -19,7 +19,7 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 * Copy conf/application.sample.conf to conf/application.conf
 * Edit the application.conf
  * Provide database settings
- * Provide media.path and media.tempPath
+ * Provide media.path, media.tempPath and media.fileStore
 * Open the repository directory in shell
 * Install Node.js packages with `npm install`
 * Install frontend dependencies with Bower
