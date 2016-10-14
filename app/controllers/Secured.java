@@ -3,10 +3,7 @@ package controllers;
 
 import com.ning.http.client.Request;
 import com.typesafe.config.ConfigFactory;
-import managers.AccountManager;
-import managers.FriendshipManager;
-import managers.GroupManager;
-import managers.PostBookmarkManager;
+import managers.*;
 import models.*;
 import models.enums.AccountRole;
 import play.Play;
@@ -643,8 +640,9 @@ public class Secured extends Security.Authenticator {
 		}
 
 		// if its a group folder, check group rights
-		if (folder.group != null) {
-			return viewGroup(folder.group);
+		Folder rootFolder = FolderManager.findRoot(folder);
+		if (rootFolder.group != null) {
+			return viewGroup(rootFolder.group);
 		}
 
 		// if its an account folder, everybody can see it
