@@ -41,7 +41,7 @@
 			</dl>
 			<dl>
 				<dt>Mitglieder</dt>
-				@defining(managers.GroupAccountManager.findAccountsByGroup(group, LinkType.establish)) { accounts =>
+				@defining(managers.GroupAccountManager.filterGroupAccountsByLinkType(group.groupAccounts, LinkType.establish)) { accounts =>
 			    	@for(account <- accounts) {
                     	<dd> @views.html.snippets.userLink(account)</dd>
                     }

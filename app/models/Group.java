@@ -34,6 +34,7 @@ public class Group extends BaseNotifiable implements INotifiable {
     public String description;
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    @OrderBy("createdAt ASC")
     public Set<GroupAccount> groupAccounts;
 
     @ManyToOne

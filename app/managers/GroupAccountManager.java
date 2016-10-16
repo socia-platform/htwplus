@@ -12,7 +12,9 @@ import scala.concurrent.duration.Duration;
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -149,7 +151,7 @@ public class GroupAccountManager implements BaseManager {
     /**
      * Retrieve Accounts from Group with given LinkType.
      */
-    public static List<Account> findAccountsByGroup(final Group group, final LinkType type) {
+    public List<Account> findAccountsByGroup(final Group group, final LinkType type) {
         @SuppressWarnings("unchecked")
         List<Account> accounts = (List<Account>) JPA
                 .em()
@@ -225,5 +227,21 @@ public class GroupAccountManager implements BaseManager {
             },
             system.dispatcher()
         );
+    }
+
+    /**
+     * filter GroupAccounts by LinkType
+     * @param groupAccountList list of groupAccounts
+     * @param linkType to filter
+     * @return Accounts
+     */
+    public static List<Account> filterGroupAccountsByLinkType(Set<GroupAccount> groupAccountList, LinkType linkType) {
+        List<Account> accountList = new ArrayList<>();
+        for (GroupAccount groupAccount : groupAccountList) {
+            if (groupAccount.linkType.equals(linkType)) {
+                accountList.add(groupAccount.account);
+            }
+        }
+        return accountList;
     }
 }

@@ -1,5 +1,4 @@
 @(group: Group)
-@avatarList = @{group.groupAccounts.toSeq.sortBy(_.createdAt)}
 @import models.enums._
 
 @if(Secured.isMemberOfGroup(group, Component.currentAccount) && !Secured.isOwnerOfGroup(group, Component.currentAccount)) {
@@ -108,18 +107,19 @@
 
                     <div class="hp-avatar-wrapper">
                         <div clasS="hp-avatar-container">
-                        @for((item, index) <- group.groupAccounts.toSeq.sortBy(_.createdAt).zipWithIndex) {
-                                <a class="hp-nohref hp-avatar-list" href="@routes.ProfileController.view(item.account.id)" rel="tooltip"
-                                   data-original-title="@item.account.name" data-container="body">
-                                    @if(item.account.hasAvatar){
-                                    <img alt="avatar" src="@routes.ProfileController.getAvatar(item.account.id)"
+                            @defining(managers.GroupAccountManager.filterGroupAccountsByLinkType(group.groupAccounts, LinkType.establish)) { accounts =>
+                                @for((item, index) <- accounts.zipWithIndex) {
+                                <a class="hp-nohref hp-avatar-list" href="@routes.ProfileController.view(item.id)" rel="tooltip"
+                                   data-original-title="@item.name" data-container="body">
+                                    @if(item.hasAvatar){
+                                    <img alt="avatar" src="@routes.ProfileController.getAvatar(item.id)"
                                          class="hp-avatar-small"/>
                                     } else {
-                                    <div class="hp-avatar-small hp-avatar-default-@item.account.avatar">@item.account.getInitials</div>
+                                    <div class="hp-avatar-small hp-avatar-default-@item.avatar">@item.getInitials</div>
                                     }
                                 </a>
-
-                        }
+                                }
+                            }
                         </div>
                     </div>
 

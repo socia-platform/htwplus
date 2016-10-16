@@ -1,5 +1,5 @@
 @(currentPage: Integer, searchLimit: Integer, response : models.services.ElasticsearchResponse)
-@import models.enums.AccountRole;
+@import models.enums._
 @import helper._
 
 @main("Suche"){
@@ -75,7 +75,7 @@
                                                 <br />
 
                                                 <b>Mitglieder:</b>
-                                                <span>@group.groupAccounts.size</span>
+                                                <span>@managers.GroupAccountManager.filterGroupAccountsByLinkType(group.groupAccounts, LinkType.establish).size</span>
 
                                             </small>
                                         </div>

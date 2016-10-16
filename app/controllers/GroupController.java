@@ -20,7 +20,6 @@ import play.mvc.Call;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
-import play.twirl.api.Html;
 import views.html.Group.*;
 import views.html.Group.snippets.streamRaw;
 
@@ -502,7 +501,7 @@ public class GroupController extends BaseController {
         }
 
         Navigation.set(Level.GROUPS, "Kontakte einladen", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
-        return ok(invite.render(group, friendshipManager.friendsToInvite(Component.currentAccount(), group), GroupAccountManager.findAccountsByGroup(group, LinkType.invite)));
+        return ok(invite.render(group, friendshipManager.friendsToInvite(Component.currentAccount(), group), groupAccountManager.findAccountsByGroup(group, LinkType.invite)));
     }
 
     @Transactional

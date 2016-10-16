@@ -95,7 +95,7 @@
                                 </tr>
                             </thead>
                             <tbody class="hp-optionsTable">
-                            @defining(managers.GroupAccountManager.findAccountsByGroup(group, LinkType.establish)) { accounts =>
+                            @defining(managers.GroupAccountManager.filterGroupAccountsByLinkType(group.groupAccounts, LinkType.establish)) { accounts =>
                                 @for(account <- accounts) {
                                     <tr>
                                         <td>@views.html.snippets.userLinkAvatar(account, "small")</td>
