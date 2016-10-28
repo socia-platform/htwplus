@@ -11,7 +11,7 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 * Git
 * Node.js
 * PostgreSQL 9.3 or higher
-* Elasticsearch 2.1 or higher
+* Elasticsearch 2.1 - 2.4.1
 
 ### Setup
 
