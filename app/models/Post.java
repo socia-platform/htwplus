@@ -11,6 +11,7 @@ import play.data.validation.Constraints.Required;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Post extends BaseNotifiable implements INotifiable {
@@ -52,6 +53,9 @@ public class Post extends BaseNotifiable implements INotifiable {
 
     @Transient
     public String searchContent;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    public Set<PostBookmark> postBookmarks;
 
     public String validate() {
         if (this.content.trim().length() <= 0) {
