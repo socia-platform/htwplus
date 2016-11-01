@@ -207,7 +207,7 @@ public class GroupAccountManager implements BaseManager {
         ActorSystem system = ActorSystem.create();
         // reindexing can be very time consuming -> do it in an own thread.
         system.scheduler().scheduleOnce(
-            Duration.create(0, TimeUnit.SECONDS),
+            Duration.create(3, TimeUnit.SECONDS),
             new Runnable() {
                 public void run() {
                     JPA.withTransaction(new F.Callback0() {

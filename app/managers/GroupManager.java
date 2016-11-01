@@ -44,11 +44,6 @@ public class GroupManager implements BaseManager {
     @Override
     public void create(Object model) {
         JPA.em().persist(model);
-        try {
-            elasticsearchService.index(model);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
