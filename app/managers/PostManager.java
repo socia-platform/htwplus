@@ -3,7 +3,6 @@ package managers;
 import models.Account;
 import models.Group;
 import models.Post;
-import models.enums.AccountRole;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
@@ -47,12 +46,14 @@ public class PostManager implements BaseManager {
 
         JPA.em().persist(post);
         try {
-            if (!post.owner.role.equals(AccountRole.ADMIN)) {
-                elasticsearchService.index(post);
-            }
+            elasticsearchService.index(post);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void createWithoutIndex(Post post) {
+        JPA.em().persist(post);
     }
 
     @Override

@@ -54,7 +54,7 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 post.content = "Request: " + request + "\nError: " + exception;
                 post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
                 post.group = group;
-                postManager.create(post);
+                postManager.createWithoutIndex(post);
                 NotificationService.getInstance().createNotification(post, Post.GROUP);
             }
         });
