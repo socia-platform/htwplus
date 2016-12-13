@@ -127,9 +127,10 @@ GET         /admin/indexing                            controllers.AdminControll
 GET         /admin/indexing/accounts                   controllers.AdminController.indexAccounts()
 GET         /admin/indexing/groups                     controllers.AdminController.indexGroups()
 GET         /admin/indexing/posts                      controllers.AdminController.indexPosts()
+GET         /admin/indexing/media                      controllers.AdminController.indexMedia()
 GET         /admin/indexing/indexSettings              controllers.AdminController.indexSettings()
 GET         /admin/indexing/indexDelete                controllers.AdminController.indexDelete()
-GET         /admin/refactor                      controllers.AdminController.refactor()
+GET         /admin/refactor                            controllers.AdminController.refactor()
 
 
 # No route found? take this

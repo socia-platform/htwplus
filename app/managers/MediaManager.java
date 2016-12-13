@@ -6,10 +6,15 @@ import models.Account;
 import models.Folder;
 import models.Group;
 import models.Media;
+import models.enums.GroupType;
+import models.enums.LinkType;
+import models.services.ElasticsearchService;
 import org.apache.commons.io.FileUtils;
 import play.Logger;
 import play.Play;
 import play.db.jpa.JPA;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import views.html.Group.media;
 
@@ -17,10 +22,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by Iven on 17.12.2015.
@@ -29,6 +31,12 @@ public class MediaManager implements BaseManager {
 
     @Inject
     NotificationManager notificationManager;
+
+    @Inject
+    GroupAccountManager groupAccountManager;
+
+    @Inject
+    ElasticsearchService elasticsearchService;
 
     private Config conf = ConfigFactory.load();
     final String tempPrefix = "htwplus_temp";
@@ -69,6 +77,10 @@ public class MediaManager implements BaseManager {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<Media> findAll() {
+        return JPA.em().createQuery("FROM Media").getResultList();
     }
 
     public Media findById(Long id) {
@@ -208,5 +220,43 @@ public class MediaManager implements BaseManager {
 
     public int byteAsMB(long size) {
         return (int) (size / 1024 / 1024);
+    }
+
+    public long indexAllMedia() throws IOException {
+        final long start = System.currentTimeMillis();
+        for (Media medium : findAll()) elasticsearchService.index(medium);
+        return (System.currentTimeMillis() - start) / 1000;
+
+    }
+
+    /**
+     * Collect all AccountIds, which are able to view this medium
+     *
+     * @return List of AccountIds
+     */
+    public Set<Long> findAllowedToViewAccountIds(Media medium) {
+
+        Set<Long> viewableIds = new HashSet<>();
+
+        Folder rootFolder = medium.findRoot();
+
+        // medium belongs to account
+        if (rootFolder.account != null) {
+            viewableIds.add(rootFolder.owner.id);
+        }
+
+        // medium belongs to group
+        if(rootFolder.group != null) {
+            viewableIds.addAll(groupAccountManager.findAccountIdsByGroup(rootFolder.group, LinkType.establish));
+        }
+
+        return viewableIds;
+    }
+
+    public boolean isPublic(Media medium) {
+        if(medium.findGroup() != null) {
+            return medium.findGroup().groupType.equals(GroupType.open);
+        }
+        return false;
     }
 }
