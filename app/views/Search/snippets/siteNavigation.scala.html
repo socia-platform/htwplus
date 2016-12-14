@@ -16,5 +16,9 @@
             <span class="glyphicon glyphicon-comment"></span>
             <a class="@if(response.lPostDocuments == 0) {disabled}" href='/search?keyword=@response.keyword&mode=post'>@Messages("search.post")</a><small> (@response.lPostDocuments)</small>
         </div>
+        <div class="hp-searchnav">
+            <span class="glyphicon glyphicon-file"></span>
+            <a class="@if(response.lMediumDocuments == 0) {disabled}" href='/search?keyword=@response.keyword&mode=medium'>@Messages("search.medium")</a><small> (@response.lMediumDocuments)</small>
+        </div>
     </div>
 </div>

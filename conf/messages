@@ -150,6 +150,7 @@ search.headline=Suchergebnisse für <b>{0}</b>
 search.group=Gruppen und Kurse
 search.user=Personen
 search.post=Posts und Kommentare
+search.medium=Medien
 search.group.grouptype.open=Offen
 search.group.grouptype.close=Geschlossen
 search.group.grouptype.course=Kurs

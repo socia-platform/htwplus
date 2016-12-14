@@ -49,6 +49,7 @@ public class MediaManager implements BaseManager {
         try {
             createFile(media);
             JPA.em().persist(media);
+            elasticsearchService.index(media);
         } catch (Exception e) {
             try {
                 throw e;
