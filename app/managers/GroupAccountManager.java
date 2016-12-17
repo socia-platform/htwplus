@@ -151,7 +151,7 @@ public class GroupAccountManager implements BaseManager {
     /**
      * Retrieve Accounts from Group with given LinkType.
      */
-    public List<Account> findAccountsByGroup(final Group group, final LinkType type) {
+    public static List<Account> findAccountsByGroup(final Group group, final LinkType type) {
         @SuppressWarnings("unchecked")
         List<Account> accounts = (List<Account>) JPA
                 .em()
