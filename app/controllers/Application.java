@@ -109,7 +109,7 @@ public class Application extends BaseController {
         if (currentAccount == null) {
             return forbidden();
         }
-        SearchResponse response = elasticsearchService.doSearch("searchSuggestions", query, "all", null, 1, currentAccount.id.toString(), asList("name", "title"), asList("friends", "member"));
+        SearchResponse response = elasticsearchService.doSearch("searchSuggestions", query, "all", null, 1, currentAccount.id.toString(), asList("name", "title", "filename"), asList("friends", "member", "viewable"));
         return ok(response.toString());
     }
 
