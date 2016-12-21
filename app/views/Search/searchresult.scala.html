@@ -65,7 +65,7 @@
                                             </div>
                                             <small>
                                                 <b>Beschreibung:</b>
-                                                @if(!group.description.equals("")) {
+                                                @if(group.description != null && !group.description.equals("")) {
                                                 <span>@group.description</span>
                                                 } else { <i>keine Beschreibung</i> }
                                                 <br />
