@@ -27,36 +27,24 @@ public class FriendshipManager implements BaseManager {
 
     @Override
     public void create(Object model) {
+        Friendship friendship = ((Friendship) model);
         JPA.em().persist(model);
+        reIndex(friendship);
     }
 
     @Override
     public void update(Object model) {
+        Friendship friendship = ((Friendship) model);
         JPA.em().merge(model);
-
-        // each account document contains information about their friends
-        // if a user accepts a friendship -> (re)index this.account document
-        try {
-            elasticsearchService.index(model);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        reIndex(friendship);
     }
 
     @Override
     public void delete(Object model) {
         Friendship friendship = ((Friendship) model);
         JPA.em().remove(friendship);
-
         notificationManager.deleteReferences(friendship);
-
-        // each account document contains information about their friends
-        // if a user deletes his friendship -> (re)index this.account document
-        try {
-            elasticsearchService.index(friendship);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        reIndex(friendship);
     }
 
     public Friendship findById(Long id) {
@@ -169,5 +157,16 @@ public class FriendshipManager implements BaseManager {
         }
 
         return inevitableFriends;
+    }
+
+    private void reIndex(Friendship friendship) {
+        // each account document contains information about their friends
+        // if a user accepts or deletes a friendship -> (re)index both user documents
+        try {
+            elasticsearchService.index(friendship.account);
+            elasticsearchService.index(friendship.friend);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
