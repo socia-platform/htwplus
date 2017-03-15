@@ -20,20 +20,18 @@ import javax.inject.Inject;
 @Security.Authenticated(Secured.class)
 public class WebSocketController extends BaseController {
 
-    @Inject
-    AccountManager accountManager;
-
     /**
      * Handles the web socket channel by invoking Akka actor.
      *
      * @return Web socket instance including JSON nodes
-     */
+     *
     @Transactional(readOnly = true)
-    public WebSocket<JsonNode> webSocket() {
+    public WebSocket webSocket() {
+
         final Account account = this.getCurrentAccount();
 
         // called when the WebSocket Handshake is done.
-        return new WebSocket<JsonNode>() {
+        return new WebSocket() {
             @Override
             public void onReady(In<JsonNode> in, Out<JsonNode> out) {
                 if (account == null) {
@@ -60,13 +58,15 @@ public class WebSocketController extends BaseController {
                 });
             }
         };
+
+        return null;
     }
 
     /**
      * Returns the current account ID from current HTTP context.
      *
      * @return Account of current user
-     */
+     *
     private Account getCurrentAccount() {
         try {
             return JPA.withTransaction(new F.Function0<Account>() {
@@ -80,4 +80,5 @@ public class WebSocketController extends BaseController {
             return null;
         }
     }
+    */
 }

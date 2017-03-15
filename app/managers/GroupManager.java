@@ -15,23 +15,27 @@ import java.util.List;
  */
 public class GroupManager implements BaseManager {
 
-    @Inject
-    ElasticsearchService elasticsearchService;
+    private final ElasticsearchService elasticsearchService;
+    private final GroupAccountManager groupAccountManager;
+    private final PostManager postManager;
+    private final NotificationManager notificationManager;
+    private final FolderManager folderManager;
+    private final AvatarManager avatarManager;
 
     @Inject
-    GroupAccountManager groupAccountManager;
+    public GroupManager(ElasticsearchService elasticsearchService, GroupAccountManager groupAccountManager,
+                        PostManager postManager,
+                        NotificationManager notificationManager,
+                        FolderManager folderManager,
+                        AvatarManager avatarManager) {
+        this.elasticsearchService = elasticsearchService;
+        this.groupAccountManager = groupAccountManager;
+        this.postManager = postManager;
+        this.notificationManager = notificationManager;
+        this.folderManager = folderManager;
+        this.avatarManager = avatarManager;
 
-    @Inject
-    PostManager postManager;
-
-    @Inject
-    NotificationManager notificationManager;
-
-    @Inject
-    FolderManager folderManager;
-
-    @Inject
-    AvatarManager avatarManager;
+    }
 
     public void createWithGroupAccount(Group group, Account account) {
         group.owner = account;
@@ -82,7 +86,7 @@ public class GroupManager implements BaseManager {
         return JPA.em().find(Group.class, id);
     }
 
-    public Group findByTitle(String title) {
+    public static Group findByTitle(String title) {
         List<Group> groups = (List<Group>) JPA.em()
                 .createQuery("FROM Group g WHERE g.title = ?1")
                 .setParameter(1, title).getResultList();

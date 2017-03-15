@@ -8,13 +8,9 @@ import models.Notification;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.EmailNotifications;
-import play.DefaultApplication;
 import play.Logger;
-import play.Play;
-import play.api.Application;
-import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 import play.libs.Akka;
-import play.libs.F;
 import play.libs.Json;
 import scala.concurrent.duration.Duration;
 
@@ -29,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class NotificationService {
 
+    JPAApi jpaApi;
+    WebSocketService webSocketService;
     private EmailService email;
 
     /**
@@ -40,9 +38,11 @@ public class NotificationService {
      * Private constructor for singleton instance
      */
     @Inject
-    public NotificationService(DefaultApplication application) {
+    public NotificationService(JPAApi jpaApi, EmailService email, WebSocketService webSocketService) {
         instance = this;
-        this.email = application.injector().instanceOf(EmailService.class);
+        this.email = email;
+        this.jpaApi = jpaApi;
+        this.webSocketService = webSocketService;
     }
 
     public static NotificationService getInstance() {
@@ -101,55 +101,52 @@ public class NotificationService {
 
         @Override
         public void run() {
-            JPA.withTransaction(new F.Callback0() {
-                @Override
-                public void invoke() throws Throwable {
-                    List<Account> recipients = notifiable.getRecipients();
+            jpaApi.withTransaction(() -> {
+                List<Account> recipients = notifiable.getRecipients();
 
-                    // if no recipients, abort
-                    if (recipients == null || recipients.size() == 0) {
-                        return;
+                // if no recipients, abort
+                if (recipients == null || recipients.size() == 0) {
+                    return;
+                }
+
+                // run through all recipients
+                for (Account recipient : recipients) {
+                    // if sender == recipient, it is not necessary to create a notification -> continue
+                    if (recipient.equals(notifiable.getSender())) {
+                        continue;
                     }
 
-                    // run through all recipients
-                    for (Account recipient : recipients) {
-                        // if sender == recipient, it is not necessary to create a notification -> continue
-                        if (recipient.equals(notifiable.getSender())) {
-                            continue;
-                        }
+                    // create new notification and persist in database
+                    Notification notification = notifiable.getNotification(recipient);
+                    notification.isRead = false;
+                    notification.isSent = false;
+                    notification.recipient = recipient;
+                    notification.sender = notifiable.getSender();
+                    notification.referenceId = notifiable.getReference().id;
+                    notification.referenceType = notifiable.getReference().getClass().getSimpleName();
+                    notification.targetUrl = notifiable.getTargetUrl();
 
-                        // create new notification and persist in database
-                        Notification notification = notifiable.getNotification(recipient);
-                        notification.isRead = false;
-                        notification.isSent = false;
-                        notification.recipient = recipient;
-                        notification.sender = notifiable.getSender();
-                        notification.referenceId = notifiable.getReference().id;
-                        notification.referenceType = notifiable.getReference().getClass().getSimpleName();
-                        notification.targetUrl = notifiable.getTargetUrl();
-
-                        try {
-                            // render notification content
-                            notification.rendered = notifiable.render(notification);
-                            NotificationManager notificationManager = new NotificationManager();
-                            // if no ID is set already, persist new instance, otherwise update given instance
-                            if (notification.id == null) {
-                                notificationManager.create(notification);
-                                Logger.info("Created new notification for user: " + recipient.id.toString());
-                            } else {
-                                notificationManager.update(notification);
-                                Logger.info("Updated notification (ID: " + notification.id.toString()
-                                        + ") for user: " + recipient.id.toString()
-                                );
-                            }
-
-                            self.webSocketPush(notification);
-                            self.handleMail(notification);
-                        } catch (Exception e) {
-                            Logger.error("Could not render notification. Notification will not be stored in DB" +
-                                            " nor will the user be notified in any way." + e.getMessage()
+                    try {
+                        // render notification content
+                        notification.rendered = notifiable.render(notification);
+                        NotificationManager notificationManager = new NotificationManager(jpaApi);
+                        // if no ID is set already, persist new instance, otherwise update given instance
+                        if (notification.id == null) {
+                            notificationManager.create(notification);
+                            Logger.info("Created new notification for user: " + recipient.id.toString());
+                        } else {
+                            notificationManager.update(notification);
+                            Logger.info("Updated notification (ID: " + notification.id.toString()
+                                    + ") for user: " + recipient.id.toString()
                             );
                         }
+
+                        self.webSocketPush(notification);
+                        self.handleMail(notification);
+                    } catch (Exception e) {
+                        Logger.error("Could not render notification. Notification will not be stored in DB" +
+                                        " nor will the user be notified in any way." + e.getMessage()
+                        );
                     }
                 }
             });
@@ -161,11 +158,11 @@ public class NotificationService {
          * @param notification Notification
          */
         public void webSocketPush(final Notification notification) {
-            ActorRef recipientActor = WebSocketService.getInstance().getActorForAccount(notification.recipient);
+            ActorRef recipientActor = webSocketService.getActorForAccount(notification.recipient);
 
             // continue if recipientActor is instance (he is currently online)
             if (recipientActor != null) {
-                ObjectNode node = WebSocketService.getInstance()
+                ObjectNode node = webSocketService
                         .successResponseTemplate(WebSocketService.WS_METHOD_RECEIVE_NOTIFICATION);
                 node.put("notification", notification.getAsJson());
                 node.put("unreadCount", NotificationManager.countUnreadNotificationsForAccountId(notification.recipient.id));

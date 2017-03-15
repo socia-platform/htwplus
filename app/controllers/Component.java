@@ -5,6 +5,7 @@ import static play.data.Form.form;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.CompletionStage;
 
 import managers.AccountManager;
 import models.Account;
@@ -22,12 +23,16 @@ import javax.inject.Inject;
 
 public class Component extends Action.Simple {
 
+    private final AccountManager accountManager;
+
     @Inject
-    AccountManager accountManager;
+    public Component(AccountManager accountManager) {
+        this.accountManager = accountManager;
+    }
 	
 	@Override
 	@Transactional
-    public Promise<Result> call(Context ctx) throws Throwable {
+    public CompletionStage<Result> call(Context ctx) {
 		String sessionId = ctx.session().get("id");
 		if(sessionId != null) {
 			Long id = Long.parseLong(ctx.session().get("id"));

@@ -9,9 +9,11 @@ import models.base.ValidationException;
 import models.enums.AccountRole;
 import models.enums.AvatarSize;
 import models.enums.EmailNotifications;
+import play.Configuration;
 import play.Logger;
 import play.Play;
 import play.data.Form;
+import play.data.FormFactory;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.libs.Json;
@@ -31,31 +33,40 @@ import java.util.List;
 @Security.Authenticated(Secured.class)
 public class ProfileController extends BaseController {
 
-    @Inject
     AccountManager accountManager;
-
-    @Inject
     GroupAccountManager groupAccountManager;
-
-    @Inject
     PostManager postManager;
-
-    @Inject
     AccountController accountController;
-
-    @Inject
     StudycourseManager studycourseManager;
-
-    @Inject
     AvatarManager avatarManager;
+    MediaManager mediaManager;
+    Configuration configuration;
+    FormFactory formFactory;
 
     @Inject
-    MediaManager mediaManager;
+    public ProfileController(AccountManager accountManager,
+            GroupAccountManager groupAccountManager,
+            PostManager postManager,
+            AccountController accountController,
+            StudycourseManager studycourseManager,
+            AvatarManager avatarManager,
+            MediaManager mediaManager,
+            Configuration configuration,FormFactory formFactory) {
+        this.accountManager = accountManager;
+        this.groupAccountManager = groupAccountManager;
+        this.postManager = postManager;
+        this.accountController = accountController;
+        this.studycourseManager = studycourseManager;
+        this.avatarManager = avatarManager;
+        this.mediaManager = mediaManager;
+        this.configuration = configuration;
+        this.formFactory = formFactory;
 
-    static Form<Account> accountForm = Form.form(Account.class);
-    static Form<Post> postForm = Form.form(Post.class);
-    static Form<Login> loginForm = Form.form(Login.class);
-	static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
+    }
+    Form<Account> accountForm = formFactory.form(Account.class);
+    Form<Post> postForm = formFactory.form(Post.class);
+    Form<Login> loginForm = formFactory.form(Login.class);
+	final int LIMIT = Integer.parseInt(configuration.getString("htwplus.post.limit"));
 	static final int PAGE = 1;
 
     public Result me() {
@@ -482,7 +493,7 @@ public class ProfileController extends BaseController {
             return forbidden(result);
         }
 
-        Form<Avatar> form = Form.form(Avatar.class).bindFromRequest();
+        Form<Avatar> form = formFactory.form(Avatar.class).bindFromRequest();
 
         if (form.hasErrors()) {
             result.put("error", form.errorsAsJson());

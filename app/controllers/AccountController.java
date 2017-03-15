@@ -1,6 +1,5 @@
 package controllers;
 
-import com.google.inject.Inject;
 import managers.AccountManager;
 import models.Account;
 import models.Login;
@@ -9,14 +8,14 @@ import models.services.LdapService;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
+import play.data.FormFactory;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
 import views.html.landingpage;
 
+import javax.inject.Inject;
 import java.util.Random;
-
-import static play.data.Form.form;
 
 /**
  * Controller for authenticate purposes.
@@ -24,13 +23,18 @@ import static play.data.Form.form;
 @Transactional
 public class AccountController extends BaseController {
 
-    @Inject
-    AccountManager accountManager;
+    private AccountManager accountManager;
+    private FormFactory formFactory;
 
+    @Inject
+    public AccountController(AccountManager accountManager, FormFactory formFactory) {
+        this.accountManager = accountManager;
+        this.formFactory = formFactory;
+    }
     /**
      * Defines a form wrapping the Account class.
      */
-    final static Form<Account> signupForm = form(Account.class);
+    final Form<Account> signupForm = formFactory.form(Account.class);
 
     /**
      * Default authentication action.
@@ -38,7 +42,7 @@ public class AccountController extends BaseController {
      * @return Result
      */
     public Result authenticate() {
-        DynamicForm form = form().bindFromRequest();
+        DynamicForm form = formFactory.form().bindFromRequest();
         String username = form.field("email").value();
 
         // save originURL before clearing the session (it gets cleared in defaultAuthenticate() and LdapAuthenticate())
@@ -60,7 +64,7 @@ public class AccountController extends BaseController {
      * @return Result
      */
     private Result LdapAuthenticate(final String redirect) {
-        Form<Login> form = form(Login.class).bindFromRequest();
+        Form<Login> form = formFactory.form(Login.class).bindFromRequest();
         String matriculationNumber = form.field("email").value();
         String password = form.field("password").value();
         String rememberMe = form.field("rememberMe").value();
@@ -115,7 +119,7 @@ public class AccountController extends BaseController {
     }
 
     private Result defaultAuthenticate(final String redirect) {
-        Form<Login> loginForm = form(Login.class).bindFromRequest();
+        Form<Login> loginForm = formFactory.form(Login.class).bindFromRequest();
         if (loginForm.hasErrors()) {
             flash("error", loginForm.globalError().message());
             Component.addToContext(Component.ContextIdent.loginForm, loginForm);

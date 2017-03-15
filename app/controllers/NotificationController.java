@@ -6,7 +6,7 @@ import java.util.List;
 import managers.NotificationManager;
 import models.Account;
 import models.Notification;
-import play.Play;
+import play.Configuration;
 import play.twirl.api.Html;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
@@ -20,10 +20,18 @@ import javax.inject.Inject;
 @Security.Authenticated(Secured.class)
 public class NotificationController extends BaseController {
 
-    @Inject
     NotificationManager notificationManager;
+    Configuration configuration;
 
-    final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.notification.limit"));
+    @Inject
+    public NotificationController(NotificationManager notificationManager,
+            Configuration configuration) {
+        this.notificationManager = notificationManager;
+        this.configuration = configuration;
+
+    }
+
+    final int LIMIT = Integer.parseInt(configuration.getString("htwplus.notification.limit"));
 
     /**
      * @deprecated Deprecated since refactor of notification system

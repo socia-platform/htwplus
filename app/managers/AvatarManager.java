@@ -1,19 +1,26 @@
 package managers;
 
-import com.typesafe.config.ConfigFactory;
-import models.Account;
 import models.Avatar;
 import models.base.FileOperationException;
 import models.base.ValidationException;
 import models.enums.AvatarSize;
 import models.services.FileService;
 import models.services.ImageService;
+import play.Configuration;
 import play.i18n.Messages;
 import play.mvc.Http;
 
+import javax.inject.Inject;
 import java.io.File;
 
 public class AvatarManager {
+
+    Configuration configuration;
+
+    @Inject
+    public AvatarManager(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     static public String AVATAR_REALM = "avatar";
     static public int AVATAR_MIN_SIZE = 250;
@@ -32,7 +39,7 @@ public class AvatarManager {
     public void setTempAvatar(Http.MultipartFormData.FilePart filePart, Long modelId) throws ValidationException {
         FileService fileService = new FileService(AVATAR_REALM, filePart);
 
-        int maxSize = ConfigFactory.load().getInt("avatar.maxSize");
+        int maxSize = configuration.getInt("avatar.maxSize");
         if (!fileService.validateSize(FileService.MBAsByte(maxSize))) {
             throw new ValidationException(Messages.get("error.fileToBig"));
         }

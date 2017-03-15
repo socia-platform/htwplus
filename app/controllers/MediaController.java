@@ -1,20 +1,15 @@
 package controllers;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import managers.FolderManager;
 import managers.MediaManager;
 import models.Folder;
-import models.Group;
 import models.Media;
 import models.services.NotificationService;
+import play.Configuration;
 import play.db.jpa.Transactional;
-import play.mvc.Call;
-import play.mvc.Http;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Result;
 import play.mvc.Security;
-import play.twirl.api.Content;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -35,15 +30,22 @@ import views.html.Media.list;
 @Security.Authenticated(Secured.class)
 public class MediaController extends BaseController {
 
-    @Inject
     MediaManager mediaManager;
+    FolderManager folderManager;
+    Configuration configuration;
 
     @Inject
-    FolderManager folderManager;
+    public MediaController(MediaManager mediaManager,
+            FolderManager folderManager,
+            Configuration configuration) {
+        this.mediaManager = mediaManager;
+        this.folderManager = folderManager;
+        this.configuration = configuration;
+
+    }
 
     final static String tempPrefix = "htwplus_temp";
-    private Config conf = ConfigFactory.load();
-    final int MAX_FILESIZE = conf.getInt("media.maxSize.file");
+    int MAX_FILESIZE = configuration.getInt("media.maxSize.file");
 
     @Transactional(readOnly = true)
     public Result view(Long mediaId, String action) {
@@ -186,7 +188,7 @@ public class MediaController extends BaseController {
     private File createZIP(List<Media> media) throws IOException {
 
         //cleanUpTemp(); // JUST FOR DEVELOPMENT, DO NOT USE IN PRODUCTION
-        String tmpPath = conf.getString("media.tempPath");
+        String tmpPath = configuration.getString("media.tempPath");
         File file = File.createTempFile(tempPrefix, ".tmp", new File(tmpPath));
 
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(file));
@@ -219,7 +221,7 @@ public class MediaController extends BaseController {
     public Result upload(Long folderId) {
         // Get the data
         MultipartFormData body = request().body().asMultipartFormData();
-        Http.MultipartFormData.FilePart upload = body.getFile("file");
+        MultipartFormData.FilePart<File> upload = body.getFile("file");
         Folder folder = folderManager.findById(folderId);
 
         if (!Secured.viewFolder(folder)) {

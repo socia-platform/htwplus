@@ -26,24 +26,21 @@ import javax.inject.Provider;
  */
 public class ErrorHandler extends DefaultHttpErrorHandler {
 
-    @Inject
     GroupManager groupManager;
-
-    @Inject
     PostManager postManager;
-
-    @Inject
     AccountManager accountManager;
-
     Configuration configuration;
-
-    private JPAApi jpaApi;
+    JPAApi jpaApi;
 
     @Inject
-    public ErrorHandler(JPAApi jpaApi, Configuration configuration, Environment environment, OptionalSourceMapper optionalSourceMapper, Provider<Router> provider) {
+    public ErrorHandler(JPAApi jpaApi, Configuration configuration, Environment environment, OptionalSourceMapper optionalSourceMapper, Provider<Router> provider, AccountManager accountManager, GroupManager groupManager,
+            PostManager postManager) {
         super(configuration, environment, optionalSourceMapper, provider);
         this.configuration = configuration;
         this.jpaApi = jpaApi;
+        this.accountManager = accountManager;
+        this.groupManager = groupManager;
+        this.postManager = postManager;
     }
 
     protected F.Promise<Result> onProdServerError(Http.RequestHeader request, UsefulException exception) {

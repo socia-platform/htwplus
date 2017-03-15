@@ -20,11 +20,14 @@ import java.util.List;
 @Transactional
 public class FriendshipController extends BaseController {
 
-    @Inject
     FriendshipManager friendshipManager;
+    AccountManager accountManager;
 
     @Inject
-    AccountManager accountManager;
+    public FriendshipController(FriendshipManager friendshipManager, AccountManager accountManager) {
+        this.friendshipManager = friendshipManager;
+        this.accountManager = accountManager;
+    }
 
     public Result index() {
         Navigation.set(Level.FRIENDS, "Übersicht");

@@ -16,14 +16,18 @@ import java.util.List;
  */
 public class FriendshipManager implements BaseManager {
 
-    @Inject
     ElasticsearchService elasticsearchService;
-
-    @Inject
     NotificationManager notificationManager;
+    GroupAccountManager groupAccountManager;
 
     @Inject
-    GroupAccountManager groupAccountManager;
+    public FriendshipManager(ElasticsearchService elasticsearchService,
+            NotificationManager notificationManager,
+            GroupAccountManager groupAccountManager) {
+        this.elasticsearchService = elasticsearchService;
+        this.notificationManager = notificationManager;
+        this.groupAccountManager = groupAccountManager;
+    }
 
     @Override
     public void create(Object model) {

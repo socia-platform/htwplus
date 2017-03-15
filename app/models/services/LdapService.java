@@ -11,16 +11,26 @@ import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.directory.ldap.client.api.exception.InvalidConnectionException;
 
+import play.Configuration;
 import play.Logger;
 import play.Play;
 import play.i18n.Messages;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 /**
  * LDAP service to establish LDAP connection and request user account data from directory.
  */
 public class LdapService {
+
+    Configuration configuration;
+
+    @Inject
+    public LdapService(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     /**
      * First name
      */
@@ -87,9 +97,9 @@ public class LdapService {
      * Private constructor for singleton instance
      */
     private LdapService() {
-        this.ldapServer = Play.application().configuration().getString("ldap.server");
-        this.ldapPort = Integer.parseInt(Play.application().configuration().getString("ldap.port"));
-        this.ldapStartTls = Boolean.parseBoolean(Play.application().configuration().getString("ldap.startTls"));
+        this.ldapServer = configuration.getString("ldap.server");
+        this.ldapPort = Integer.parseInt(configuration.getString("ldap.port"));
+        this.ldapStartTls = Boolean.parseBoolean(configuration.getString("ldap.startTls"));
     }
 
     /**
@@ -115,23 +125,23 @@ public class LdapService {
      */
     public void connect(String userName, String password) throws LdapConnectorException {
         // connection and search related parameters
-        String userRoot = Play.application().configuration().getString("ldap.userRoot");
-        String groupRoot = Play.application().configuration().getString("ldap.groupRoot");
-        String connectionBind = Play.application().configuration().getString("ldap.connectionBind")
+        String userRoot = configuration.getString("ldap.userRoot");
+        String groupRoot = configuration.getString("ldap.groupRoot");
+        String connectionBind = configuration.getString("ldap.connectionBind")
                 .replace("%USER%", userName)
                 .replace("%USER_ROOT%", userRoot);
-        String userSearch = Play.application().configuration().getString("ldap.userSearch")
+        String userSearch = configuration.getString("ldap.userSearch")
                 .replace("%USER%", userName);
         String groupSearch = Play.application().configuration().getString("ldap.groupSearch")
                 .replace("%BIND%", connectionBind);
 
         // LDAP keys for values from LDAP ldapServer
-        String userFirstName = Play.application().configuration().getString("ldap.serverValues.firstName");
-        String userLastName = Play.application().configuration().getString("ldap.serverValues.lastName");
-        String groupName = Play.application().configuration().getString("ldap.serverValues.groupName");
-        String studentRole = Play.application().configuration().getString("ldap.serverValues.studentRole");
-        String profRole = Play.application().configuration().getString("ldap.serverValues.profRole");
-        String tutorRole = Play.application().configuration().getString("ldap.serverValues.tutorRole");
+        String userFirstName = configuration.getString("ldap.serverValues.firstName");
+        String userLastName = configuration.getString("ldap.serverValues.lastName");
+        String groupName = configuration.getString("ldap.serverValues.groupName");
+        String studentRole = configuration.getString("ldap.serverValues.studentRole");
+        String profRole = configuration.getString("ldap.serverValues.profRole");
+        String tutorRole = configuration.getString("ldap.serverValues.tutorRole");
 
         LdapNetworkConnection ldapConnection;
 

@@ -10,6 +10,7 @@ import models.Account;
 import models.actors.WebSocketActor;
 import play.Logger;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 import play.libs.Akka;
 import play.libs.F;
 import play.libs.Json;
@@ -33,8 +34,16 @@ public class WebSocketService {
     public static final String WS_RESPONSE_OK = "OK";
     public static final String WS_RESPONSE_ERROR = "ERROR";
 
-    @Inject
     AccountManager accountManager;
+    JPAApi jpaApi;
+
+    @Inject
+    public WebSocketService(AccountManager accountManager,
+            JPAApi jpaApi) {
+        this.accountManager = accountManager;
+        this.jpaApi = jpaApi;
+
+    }
 
     /**
      * Singleton instance
@@ -46,19 +55,15 @@ public class WebSocketService {
      */
     Map<Long, ActorRef> accountActor = new HashMap<>();
 
-    /**
-     * Private constructor for singleton instance
-     */
-    private WebSocketService() { }
 
     /**
      * Returns the singleton instance.
      *
      * @return NotificationHandler instance
      */
-    public static WebSocketService getInstance() {
+    public WebSocketService getInstance() {
         if (WebSocketService.instance == null) {
-            WebSocketService.instance = new WebSocketService();
+            WebSocketService.instance = new WebSocketService(accountManager, jpaApi);
         }
 
         return WebSocketService.instance;
@@ -215,11 +220,8 @@ public class WebSocketService {
      */
     private Account getAccountById(final Long accountId) {
         try {
-            return JPA.withTransaction(new F.Function0<Account>() {
-                @Override
-                public Account apply() throws Throwable {
-                    return accountManager.findById(accountId);
-                }
+            return jpaApi.withTransaction(() -> {
+                return accountManager.findById(accountId);
             });
         } catch (Throwable throwable) {
             throwable.printStackTrace();
@@ -236,11 +238,8 @@ public class WebSocketService {
      */
     private boolean isFriendshipEstablished(final Account a, final Account b) {
         try {
-            return JPA.withTransaction(new F.Function0<Boolean>() {
-                @Override
-                public Boolean apply() throws Throwable {
-                    return FriendshipManager.alreadyFriendly(a, b);
-                }
+            return jpaApi.withTransaction(() -> {
+                return FriendshipManager.alreadyFriendly(a, b);
             });
         } catch (Throwable throwable) {
             throwable.printStackTrace();

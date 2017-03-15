@@ -6,6 +6,7 @@ import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 import play.libs.F;
 import scala.concurrent.duration.Duration;
 
@@ -22,14 +23,21 @@ import java.util.concurrent.TimeUnit;
  */
 public class GroupAccountManager implements BaseManager {
 
-    @Inject
     ElasticsearchService elasticsearchService;
-
-    @Inject
     NotificationManager notificationManager;
+    PostManager postManager;
+    JPAApi jpaApi;
 
     @Inject
-    PostManager postManager;
+    public GroupAccountManager(ElasticsearchService elasticsearchService,
+            NotificationManager notificationManager,
+            PostManager postManager,
+            JPAApi jpaApi) {
+        this.elasticsearchService = elasticsearchService;
+        this.notificationManager = notificationManager;
+        this.postManager = postManager;
+        this.jpaApi = jpaApi;
+    }
 
     @Override
     public void create(Object model) {
@@ -210,17 +218,14 @@ public class GroupAccountManager implements BaseManager {
             Duration.create(3, TimeUnit.SECONDS),
             new Runnable() {
                 public void run() {
-                    JPA.withTransaction(new F.Callback0() {
-                        @Override
-                        public void invoke() throws Throwable {
-                            try {
-                                elasticsearchService.index(group);
-                                for (Post post : postManager.getPostsForGroup(group, 0, 0)) {
-                                    elasticsearchService.index(post);
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                    jpaApi.withTransaction(() -> {
+                        try {
+                            elasticsearchService.index(group);
+                            for (Post post : postManager.getPostsForGroup(group, 0, 0)) {
+                                elasticsearchService.index(post);
                             }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     });
                 }

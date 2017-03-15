@@ -9,6 +9,7 @@ import models.enums.AvatarSize;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import models.services.FileService;
+import play.Configuration;
 import play.Logger;
 import play.db.jpa.JPA;
 
@@ -23,32 +24,39 @@ import java.util.List;
  */
 public class AccountManager implements BaseManager {
 
-    @Inject
     ElasticsearchService elasticsearchService;
-
-    @Inject
     PostManager postManager;
-
-    @Inject
     GroupManager groupManager;
-
-    @Inject
     GroupAccountManager groupAccountManager;
-
-    @Inject
     FriendshipManager friendshipManager;
-
-    @Inject
     MediaManager mediaManager;
-
-    @Inject
     NotificationManager notificationManager;
-
-    @Inject
     AvatarManager avatarManager;
+    FolderManager folderManager;
+    Configuration configuration;
 
     @Inject
-    FolderManager folderManager;
+    public AccountManager(ElasticsearchService elasticsearchService,
+            PostManager postManager,
+            GroupManager groupManager,
+            GroupAccountManager groupAccountManager,
+            FriendshipManager friendshipManager,
+            MediaManager mediaManager,
+            NotificationManager notificationManager,
+            AvatarManager avatarManager,
+            FolderManager folderManager,
+            Configuration configuration) {
+            this.elasticsearchService = elasticsearchService;
+        this.postManager = postManager;
+        this.groupManager = groupManager;
+        this.groupAccountManager = groupAccountManager;
+        this.friendshipManager = friendshipManager;
+        this.mediaManager = mediaManager;
+        this.notificationManager = notificationManager;
+        this.avatarManager = avatarManager;
+        this.folderManager = folderManager;
+        this.configuration = configuration;
+    }
 
     @Override
     public void create(Object model) {
@@ -83,10 +91,10 @@ public class AccountManager implements BaseManager {
     public void delete(Object model) {
         Account account = (Account) model;
 
-        Account dummy = findByEmail(ConfigFactory.load().getString("htwplus.dummy.mail"));
+        Account dummy = findByEmail(configuration.getString("htwplus.dummy.mail"));
 
         if (dummy == null) {
-            Logger.error("Couldn't delete account because there is no Dummy Account! (mail=" + ConfigFactory.load().getString("htwplus.dummy.mail") + ")");
+            Logger.error("Couldn't delete account because there is no Dummy Account! (mail=" + configuration.getString("htwplus.dummy.mail") + ")");
             throw new RuntimeException("Couldn't delete account because there is no Dummy Account!");
         }
 

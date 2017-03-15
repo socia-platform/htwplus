@@ -1,8 +1,8 @@
 @(folderId: Long)
-@import play._
+@import com.typesafe.config.ConfigFactory
 
 <h4>Neue Dateien hochladen:</h4>
 <form id="groupUploadDropzone" class="dropzone" action="/media/upload/@folderId" data-folder="@folderId"></form>
 <br />
-<small><i>Max. @Play.application().configuration().getInt("media.maxSize.file") MByte pro Datei möglich.</i></small>
+<small><i>Max. @ConfigFactory.load().getInt("media.maxSize.file") MByte pro Datei möglich.</i></small>
 

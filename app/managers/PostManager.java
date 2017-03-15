@@ -19,27 +19,30 @@ import java.util.*;
  */
 public class PostManager implements BaseManager {
 
-    @Inject
     ElasticsearchService elasticsearchService;
-
-    @Inject
     NotificationManager notificationManager;
-
-    @Inject
     FriendshipManager friendshipManager;
-
-    @Inject
     GroupAccountManager groupAccountManager;
-
-    @Inject
     PostBookmarkManager postBookmarkManager;
-
-    @Inject
     GroupManager groupManager;
-
-    @Inject
     Configuration configuration;
 
+    @Inject
+    public PostManager(ElasticsearchService elasticsearchService,
+            NotificationManager notificationManager,
+            FriendshipManager friendshipManager,
+            GroupAccountManager groupAccountManager,
+            PostBookmarkManager postBookmarkManager,
+            GroupManager groupManager,
+            Configuration configuration) {
+        this.elasticsearchService = elasticsearchService;
+        this.notificationManager = notificationManager;
+        this.friendshipManager = friendshipManager;
+        this.groupAccountManager = groupAccountManager;
+        this.postBookmarkManager = postBookmarkManager;
+        this.groupManager = groupManager;
+        this.configuration = configuration;
+    }
     @Override
     public void create(Object model) {
         Post post = (Post) model;

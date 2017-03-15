@@ -10,9 +10,10 @@ import models.enums.AvatarSize;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.NotificationService;
-import play.Play;
+import play.Configuration;
 import play.data.DynamicForm;
 import play.data.Form;
+import play.data.FormFactory;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.libs.Json;
@@ -33,34 +34,45 @@ import java.util.List;
 @Security.Authenticated(Secured.class)
 public class GroupController extends BaseController {
 
-    @Inject
     GroupManager groupManager;
-
-    @Inject
     GroupAccountManager groupAccountManager;
-
-    @Inject
     MediaManager mediaManager;
-
-    @Inject
     FriendshipManager friendshipManager;
-
-    @Inject
     PostManager postManager;
-
-    @Inject
     AccountManager accountManager;
-
-    @Inject
     FolderManager folderManager;
+    AvatarManager avatarManager;
+    Configuration configuration;
+    FormFactory formFactory;
 
     @Inject
-    AvatarManager avatarManager;
+    public GroupController(GroupManager groupManager,
+            GroupAccountManager groupAccountManager,
+            MediaManager mediaManager,
+            FriendshipManager friendshipManager,
+            PostManager postManager,
+            AccountManager accountManager,
+            FolderManager folderManager,
+            AvatarManager avatarManager,
+            Configuration configuration,
+            FormFactory formFactory) {
+        this.groupManager = groupManager;
+        this.groupAccountManager = groupAccountManager;
+        this.mediaManager = mediaManager;
+        this.friendshipManager = friendshipManager;
+        this.postManager = postManager;
+        this.accountManager = accountManager;
+        this.folderManager = folderManager;
+        this.avatarManager = avatarManager;
+        this.configuration = configuration;
+        this.formFactory = formFactory;
 
-    static Form<Group> groupForm = Form.form(Group.class);
-    static Form<Folder> folderForm = Form.form(Folder.class);
-    static Form<Post> postForm = Form.form(Post.class);
-    static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
+    }
+
+    Form<Group> groupForm = formFactory.form(Group.class);
+    Form<Folder> folderForm = formFactory.form(Folder.class);
+    Form<Post> postForm = formFactory.form(Post.class);
+    final int LIMIT = Integer.parseInt(configuration.getString("htwplus.post.limit"));
     static final int PAGE = 1;
 
     public Result index() {
@@ -221,7 +233,7 @@ public class GroupController extends BaseController {
         }
 
         Navigation.set(Level.GROUPS, "Bearbeiten", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
-        Form<Group> groupForm = Form.form(Group.class).fill(group);
+        Form<Group> groupForm = formFactory.form(Group.class).fill(group);
         groupForm.data().put("type", String.valueOf(group.groupType.ordinal()));
         return ok(edit.render(group, groupForm));
 
@@ -517,7 +529,7 @@ public class GroupController extends BaseController {
 
         if (Secured.inviteMember(group)) {
             // bind invite list to group
-            DynamicForm form = Form.form().bindFromRequest();
+            DynamicForm form = formFactory.form().bindFromRequest();
             group.inviteList = form.data().values();
 
             // if no one is invited, abort
@@ -721,7 +733,7 @@ public class GroupController extends BaseController {
             return forbidden(result);
         }
 
-        Form<Avatar> form = Form.form(Avatar.class).bindFromRequest();
+        Form<Avatar> form = formFactory.form(Avatar.class).bindFromRequest();
 
         if (form.hasErrors()) {
             result.put("error", form.errorsAsJson());

@@ -1,7 +1,6 @@
 
 package models.services;
 
-import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import managers.FriendshipManager;
@@ -23,12 +22,10 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import play.Environment;
 import play.Logger;
-import play.api.Configuration;
-import play.api.DefaultApplication;
-import play.api.Play;
-import scala.Option;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.*;
 import java.net.InetAddress;
@@ -46,11 +43,14 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 @Singleton
 public class ElasticsearchService implements IElasticsearchService {
 
-    @Inject
     PostManager postManger;
+    Environment environment;
 
     @Inject
-    DefaultApplication app;
+    public ElasticsearchService(PostManager postManger) {
+        this.postManger = postManger;
+        this.environment = environment;
+    }
 
     private Client client = null;
     private Config conf = ConfigFactory.load().getConfig("elasticsearch");
@@ -326,15 +326,7 @@ public class ElasticsearchService implements IElasticsearchService {
 
     private String loadFromFile(String filePath) {
         //http://stackoverflow.com/questions/16299542/load-file-from-conf-directory-on-cloudbees
-        Option<InputStream> inputStreamOption = app.resourceAsStream(filePath);
-            try {
-                return IOUtils.toString(inputStreamOption.get());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        return "";
+        File inputStreamOption =  environment.getFile(filePath);
+        return inputStreamOption.toString();
     }
 }

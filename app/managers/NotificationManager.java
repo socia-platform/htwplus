@@ -5,8 +5,10 @@ import models.Notification;
 import models.base.BaseModel;
 import models.enums.EmailNotifications;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 import play.libs.F;
 
+import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +19,14 @@ import java.util.Map;
  * Created by Iven on 17.12.2015.
  */
 public class NotificationManager implements BaseManager {
+
+    JPAApi jpaApi;
+
+    @Inject
+    public NotificationManager(JPAApi jpaApi) {
+        this.jpaApi = jpaApi;
+    }
+
     @Override
     public void create(Object object) {
         JPA.em().persist(object);
@@ -208,9 +218,7 @@ public class NotificationManager implements BaseManager {
      */
     @SuppressWarnings("unchecked")
     public Map<Account, List<Notification>> findUsersWithDailyHourlyEmailNotifications() throws Throwable {
-        List<Object[]> notificationsRecipients = JPA.withTransaction(new F.Function0<List<Object[]>>() {
-            @Override
-            public List<Object[]> apply() throws Throwable {
+        List<Object[]> notificationsRecipients = jpaApi.withTransaction(() -> {
                 return (List<Object[]>) JPA.em()
                         .createQuery("FROM Notification n JOIN n.recipient a WHERE n.isSent = false AND n.isRead = false "
                                 + "AND ((a.emailNotifications = :daily AND HOUR(CURRENT_TIME) = a.dailyEmailNotificationHour) "
@@ -219,7 +227,6 @@ public class NotificationManager implements BaseManager {
                         .setParameter("daily", EmailNotifications.COLLECTED_DAILY)
                         .setParameter("hourly", EmailNotifications.HOURLY)
                         .getResultList();
-            }
         });
 
         // translate list of notifications and accounts into map

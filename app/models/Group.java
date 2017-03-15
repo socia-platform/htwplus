@@ -63,7 +63,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     public List<ValidationError> validate() {
         List<ValidationError> errors = new ArrayList<>();
-        if (new GroupManager().findByTitle(this.title) != null) {
+        if (GroupManager.findByTitle(this.title) != null) {
             errors.add(new ValidationError("title", "error.title"));
             return errors;
         }

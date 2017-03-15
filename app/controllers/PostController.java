@@ -10,9 +10,10 @@ import models.Group;
 import models.Post;
 import models.PostBookmark;
 import models.services.NotificationService;
-import play.Play;
+import play.Configuration;
 import play.api.mvc.Call;
 import play.data.Form;
+import play.data.FormFactory;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
@@ -25,19 +26,30 @@ import java.util.List;
 @Security.Authenticated(Secured.class)
 public class PostController extends BaseController {
 
-    @Inject
     GroupManager groupManager;
-
-    @Inject
     PostManager postManager;
-
-    @Inject
     PostBookmarkManager postBookmarkManager;
+    AccountManager accountManager;
+    Configuration configuration;
+    FormFactory formFactory;
 
     @Inject
-    AccountManager accountManager;
+    public PostController(GroupManager groupManager,
+            PostManager postManager,
+            PostBookmarkManager postBookmarkManager,
+            AccountManager accountManager,
+            Configuration configuration,
+            FormFactory formFactory) {
+        this.groupManager = groupManager;
+        this.postManager = postManager;
+        this.postBookmarkManager = postBookmarkManager;
+        this.accountManager = accountManager;
+        this.configuration = configuration;
+        this.formFactory = formFactory;
 
-    static Form<Post> postForm = Form.form(Post.class);
+    }
+
+    Form<Post> postForm = formFactory.form(Post.class);
     static final int PAGE = 1;
     static final String STREAM_FILTER = "all";
 
@@ -236,7 +248,7 @@ public class PostController extends BaseController {
         String result = "";
 
         // subtract already displayed comments
-        int limit = PostManager.countCommentsForPost(id) - Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
+        int limit = PostManager.countCommentsForPost(id) - Integer.parseInt(configuration.getString("htwplus.comments.init"));
 
         List<Post> comments;
         comments = PostManager.getCommentsForPost(id, limit, 0);

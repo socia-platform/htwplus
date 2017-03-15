@@ -5,7 +5,6 @@ import managers.MediaManager;
 import models.services.EmailService;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-import play.DefaultApplication;
 import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
@@ -23,10 +22,10 @@ public class ScheduleService {
     private ActorSystem system;
 
     @Inject
-    public ScheduleService(DefaultApplication app) {
+    public ScheduleService(EmailService emailService, MediaManager mediaManager) {
         system = ActorSystem.create();
-        this.emailService = app.injector().instanceOf(EmailService.class);
-        this.mediaManager = app.injector().instanceOf(MediaManager.class);
+        this.emailService = emailService;
+        this.mediaManager = mediaManager;
         schedule();
     }
 

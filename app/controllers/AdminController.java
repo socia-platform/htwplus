@@ -12,6 +12,7 @@ import org.elasticsearch.index.IndexNotFoundException;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
+import play.data.FormFactory;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.libs.F;
@@ -34,27 +35,27 @@ import static play.data.Form.form;
 @With(AdminAction.class)
 public class AdminController extends BaseController {
 
-    @Inject
-    ElasticsearchService elasticsearchService;
+    private final ElasticsearchService elasticsearchService;
+    private final MediaManager mediaManager;
+    private final GroupManager groupManager;
+    private final PostManager postManager;
+    private final AccountManager accountManager;
+    private final FolderManager folderManager;
+    FormFactory formFactory;
 
     @Inject
-    MediaManager mediaManager;
+    public AdminController(ElasticsearchService elasticsearchService, MediaManager mediaManager, GroupManager groupManager, PostManager postManager, AccountManager accountManager, FolderManager folderManager, FormFactory formFactory) {
+        this.elasticsearchService = elasticsearchService;
+        this.mediaManager = mediaManager;
+        this.groupManager = groupManager;
+        this.postManager = postManager;
+        this.accountManager = accountManager;
+        this.folderManager = folderManager;
+        this.formFactory = formFactory;
+    }
 
-    @Inject
-    GroupManager groupManager;
-
-    @Inject
-    PostManager postManager;
-
-    @Inject
-    AccountManager accountManager;
-
-    @Inject
-    FolderManager folderManager;
-
-
-    static Form<Account> accountForm = form(Account.class);
-    static Form<Post> postForm = form(Post.class);
+    Form<Account> accountForm = formFactory.form(Account.class);
+    Form<Post> postForm = formFactory.form(Post.class);
 
     public Result index() {
         return ok(index.render());
@@ -113,7 +114,7 @@ public class AdminController extends BaseController {
             return redirect(controllers.routes.AdminController.listAccounts());
         }
 
-        DynamicForm df = play.data.Form.form().bindFromRequest();
+        DynamicForm df = formFactory.form().bindFromRequest();
         if (!df.get("confirmText").toLowerCase().equals("account wirklich löschen")) {
             flash("error", Messages.get("admin.delete_account.wrongconfirm"));
             return redirect(controllers.routes.AdminController.listAccounts());
@@ -205,7 +206,7 @@ public class AdminController extends BaseController {
      * Returns the rendered form for broadcast posts.
      *
      * @return Result
-     */
+
     @Transactional
     public Result broadcastNotificationForm() {
         if (!Secured.isAdmin()) {
@@ -220,9 +221,10 @@ public class AdminController extends BaseController {
      * asynchronous to be non blocking.
      *
      * @return Result
-     */
+
     @Transactional
     public Promise<Result> broadcastNotification() {
+
         Promise<Result> promiseResult = Promise.promise(
                 new F.Function0<Result>() {
                     public Result apply() {
@@ -286,6 +288,7 @@ public class AdminController extends BaseController {
                 }
         );
     }
+    */
 
     @Transactional
     public Result refactor() {

@@ -38,10 +38,6 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
     @Transient
     public Account temporarySender;
 
-    @Transient
-    @Inject
-    public GroupAccountManager groupAccountManager;
-
     @Override
     public BaseModel getReference() {
         return this;

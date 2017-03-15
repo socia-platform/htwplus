@@ -14,8 +14,12 @@ import java.util.List;
  */
 public class FolderManager implements BaseManager {
 
-    @Inject
     MediaManager mediaManager;
+
+    @Inject
+    public FolderManager(MediaManager mediaManager) {
+        this.mediaManager = mediaManager;
+    }
 
     public Folder findById(long id) {
         return JPA.em().find(Folder.class, id);
