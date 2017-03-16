@@ -23,8 +23,8 @@ import java.util.Random;
 @Transactional
 public class AccountController extends BaseController {
 
-    private AccountManager accountManager;
-    private FormFactory formFactory;
+    AccountManager accountManager;
+    FormFactory formFactory;
 
     @Inject
     public AccountController(AccountManager accountManager, FormFactory formFactory) {
@@ -34,7 +34,7 @@ public class AccountController extends BaseController {
     /**
      * Defines a form wrapping the Account class.
      */
-    final Form<Account> signupForm = formFactory.form(Account.class);
+    //final Form<Account> signupForm = formFactory.form(Account.class);
 
     /**
      * Default authentication action.

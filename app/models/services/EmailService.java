@@ -45,11 +45,14 @@ public class EmailService {
         this.notificationManager = notificationManager;
         this.jpaApi = jpaApi;
 
+        this.EMAIL_SENDER = configuration.getString("htwplus.email.sender");
+
+
     }
 
-    private final String EMAIL_SENDER = configuration.getString("htwplus.email.sender");
-    private final String PLAIN_TEXT_TEMPLATE = "views.html.Emails.notificationsPlainText";
-    private final String HTML_TEMPLATE = "views.html.Emails.notificationsHtml";
+    private String EMAIL_SENDER;
+    private String PLAIN_TEXT_TEMPLATE = "views.html.Emails.notificationsPlainText";
+    private String HTML_TEMPLATE = "views.html.Emails.notificationsHtml";
 
     /**
      * Sends an email.

@@ -34,16 +34,12 @@ public class WebSocketService {
     public static final String WS_RESPONSE_OK = "OK";
     public static final String WS_RESPONSE_ERROR = "ERROR";
 
+    @Inject
     AccountManager accountManager;
-    JPAApi jpaApi;
 
     @Inject
-    public WebSocketService(AccountManager accountManager,
-            JPAApi jpaApi) {
-        this.accountManager = accountManager;
-        this.jpaApi = jpaApi;
+    JPAApi jpaApi;
 
-    }
 
     /**
      * Singleton instance
@@ -63,7 +59,7 @@ public class WebSocketService {
      */
     public WebSocketService getInstance() {
         if (WebSocketService.instance == null) {
-            WebSocketService.instance = new WebSocketService(accountManager, jpaApi);
+            WebSocketService.instance = new WebSocketService();
         }
 
         return WebSocketService.instance;

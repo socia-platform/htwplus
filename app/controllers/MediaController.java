@@ -42,10 +42,12 @@ public class MediaController extends BaseController {
         this.folderManager = folderManager;
         this.configuration = configuration;
 
+        this.MAX_FILESIZE = configuration.getInt("media.maxSize.file");
+
     }
 
     final static String tempPrefix = "htwplus_temp";
-    int MAX_FILESIZE = configuration.getInt("media.maxSize.file");
+    int MAX_FILESIZE;
 
     @Transactional(readOnly = true)
     public Result view(Long mediaId, String action) {

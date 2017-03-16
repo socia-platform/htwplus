@@ -29,12 +29,9 @@ import java.util.Collection;
  */
 public class FileService {
 
-    Configuration configuration;
 
     @Inject
-    public FileService(Configuration configuration) {
-        this.configuration = configuration;
-    }
+    Configuration configuration;
 
     public static String MIME_JPEG = "image/jpeg";
     public static String MIME_PNG = "image/png";

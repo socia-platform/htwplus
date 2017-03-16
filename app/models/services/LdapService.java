@@ -24,12 +24,9 @@ import java.io.IOException;
  */
 public class LdapService {
 
-    Configuration configuration;
 
     @Inject
-    public LdapService(Configuration configuration) {
-        this.configuration = configuration;
-    }
+    Configuration configuration;
 
     /**
      * First name

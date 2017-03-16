@@ -508,7 +508,7 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in user is owner of account
 	 */
 	public static boolean isOwnerOfAccount(final Long accountId) {
-		return AccountManager.isOwner(accountId, Component.currentAccount());
+		return AccountManager.isOwner2(accountId, Component.currentAccount());
 	}
 
 	/**

@@ -25,19 +25,16 @@ import java.util.List;
 @Singleton
 public class ElasticsearchResponse {
 
-    PostManager postManager;
-    GroupManager groupManager;
-    AccountManager accountManager;
 
     @Inject
-    public ElasticsearchResponse(PostManager postManager,
-            GroupManager groupManager,
-            AccountManager accountManager) {
-        this.postManager = postManager;
-        this.groupManager = groupManager;
-        this.accountManager = accountManager;
+    PostManager postManager;
 
-    }
+    @Inject
+    GroupManager groupManager;
+
+    @Inject
+    AccountManager accountManager;
+
 
     SearchResponse elasticsearchResponse;
     public List<Object> resultList;

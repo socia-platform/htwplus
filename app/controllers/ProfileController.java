@@ -62,11 +62,16 @@ public class ProfileController extends BaseController {
         this.configuration = configuration;
         this.formFactory = formFactory;
 
+        this.accountForm = formFactory.form(Account.class);
+        this.postForm = formFactory.form(Post.class);
+        this.loginForm = formFactory.form(Login.class);
+        this.LIMIT = configuration.getInt("htwplus.post.limit");
+
     }
-    Form<Account> accountForm = formFactory.form(Account.class);
-    Form<Post> postForm = formFactory.form(Post.class);
-    Form<Login> loginForm = formFactory.form(Login.class);
-	final int LIMIT = Integer.parseInt(configuration.getString("htwplus.post.limit"));
+    Form<Account> accountForm;
+    Form<Post> postForm;
+    Form<Login> loginForm;
+	int LIMIT;
 	static final int PAGE = 1;
 
     public Result me() {

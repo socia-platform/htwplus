@@ -42,6 +42,8 @@ public class AdminController extends BaseController {
     private final AccountManager accountManager;
     private final FolderManager folderManager;
     FormFactory formFactory;
+    Form<Account> accountForm;
+    Form<Post> postForm;
 
     @Inject
     public AdminController(ElasticsearchService elasticsearchService, MediaManager mediaManager, GroupManager groupManager, PostManager postManager, AccountManager accountManager, FolderManager folderManager, FormFactory formFactory) {
@@ -52,10 +54,11 @@ public class AdminController extends BaseController {
         this.accountManager = accountManager;
         this.folderManager = folderManager;
         this.formFactory = formFactory;
+        this.accountForm = formFactory.form(Account.class);
+        this.postForm =  formFactory.form(Post.class);
     }
 
-    Form<Account> accountForm = formFactory.form(Account.class);
-    Form<Post> postForm = formFactory.form(Post.class);
+
 
     public Result index() {
         return ok(index.render());

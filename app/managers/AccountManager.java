@@ -12,6 +12,7 @@ import models.services.FileService;
 import play.Configuration;
 import play.Logger;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
@@ -34,6 +35,7 @@ public class AccountManager implements BaseManager {
     AvatarManager avatarManager;
     FolderManager folderManager;
     Configuration configuration;
+    JPAApi jpaApi;
 
     @Inject
     public AccountManager(ElasticsearchService elasticsearchService,
@@ -45,7 +47,7 @@ public class AccountManager implements BaseManager {
             NotificationManager notificationManager,
             AvatarManager avatarManager,
             FolderManager folderManager,
-            Configuration configuration) {
+            Configuration configuration, JPAApi jpaApi) {
             this.elasticsearchService = elasticsearchService;
         this.postManager = postManager;
         this.groupManager = groupManager;
@@ -56,6 +58,7 @@ public class AccountManager implements BaseManager {
         this.avatarManager = avatarManager;
         this.folderManager = folderManager;
         this.configuration = configuration;
+        this.jpaApi = jpaApi;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class AccountManager implements BaseManager {
         account.rootFolder = new Folder("_"+account.name, account, null, null, account);
         folderManager.create(account.rootFolder);
 
-        JPA.em().persist(account);
+        jpaApi.em().persist(account);
         try {
             elasticsearchService.index(account);
         } catch (IOException e) {
@@ -79,7 +82,7 @@ public class AccountManager implements BaseManager {
         Account account = (Account) model;
 
         account.name = account.firstname + " " + account.lastname;
-        JPA.em().merge(account);
+        jpaApi.em().merge(account);
         try {
             elasticsearchService.index(account);
         } catch (IOException e) {
@@ -154,7 +157,7 @@ public class AccountManager implements BaseManager {
 
         elasticsearchService.delete(account);
 
-        JPA.em().remove(account);
+        jpaApi.em().remove(account);
     }
 
     /**
@@ -164,12 +167,12 @@ public class AccountManager implements BaseManager {
      * @return Account instance
      */
     public Account findById(Long id) {
-        return JPA.em().find(Account.class, id);
+        return jpaApi.em().find(Account.class, id);
     }
 
     @SuppressWarnings("unchecked")
     public List<Account> findAll(){
-        return JPA.em().createQuery("SELECT a FROM Account a ORDER BY a.name").getResultList();
+        return jpaApi.em().createQuery("SELECT a FROM Account a ORDER BY a.name").getResultList();
     }
 
     /**
@@ -180,7 +183,7 @@ public class AccountManager implements BaseManager {
             return null;
         }
         try{
-            return (Account) JPA.em()
+            return (Account) jpaApi.em()
                     .createQuery("from Account a where a.email = :email")
                     .setParameter("email", email).getSingleResult();
         } catch (NoResultException exp) {
@@ -193,7 +196,7 @@ public class AccountManager implements BaseManager {
      */
     public Account findByLoginName(String loginName) {
         try{
-            return (Account) JPA.em()
+            return (Account) jpaApi.em()
                     .createQuery("from Account a where a.loginname = :loginname")
                     .setParameter("loginname", loginName).getSingleResult();
         } catch (NoResultException exp) {
@@ -206,7 +209,7 @@ public class AccountManager implements BaseManager {
      */
     public Account findByName(String name) {
         try{
-            return (Account) JPA.em()
+            return (Account) jpaApi.em()
                     .createQuery("from Account a where a.name = :name")
                     .setParameter("name", name).getSingleResult();
         } catch (NoResultException exp) {
@@ -220,10 +223,25 @@ public class AccountManager implements BaseManager {
      * @param password of the user should match to the email ;)
      * @return Returns the current account or Null
      */
-    public static Account authenticate(String email, String password) {
+    public static Account authenticate2(String email, String password) {
         Account currentAcc = null;
         try {
             final Account result = (Account) JPA.em()
+                    .createQuery("from Account a where a.email = :email")
+                    .setParameter("email", email).getSingleResult();
+            if (result != null && Component.md5(password).equals(result.password)) {
+                currentAcc = result;
+            }
+            return currentAcc;
+        } catch (NoResultException exp) {
+            return currentAcc;
+        }
+    }
+
+    public Account authenticate(String email, String password) {
+        Account currentAcc = null;
+        try {
+            final Account result = (Account) jpaApi.em()
                     .createQuery("from Account a where a.email = :email")
                     .setParameter("email", email).getSingleResult();
             if (result != null && Component.md5(password).equals(result.password)) {
@@ -241,11 +259,20 @@ public class AccountManager implements BaseManager {
      */
     @SuppressWarnings("unchecked")
     public List<Account> all() {
-        return JPA.em().createQuery("FROM Account").getResultList();
+        return jpaApi.em().createQuery("FROM Account").getResultList();
     }
 
-    public static boolean isOwner(Long accountId, Account currentUser) {
+    public static boolean isOwner2(Long accountId, Account currentUser) {
         Account a = JPA.em().find(Account.class, accountId);
+        if(a.equals(currentUser)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isOwner(Long accountId, Account currentUser) {
+        Account a = jpaApi.em().find(Account.class, accountId);
         if(a.equals(currentUser)){
             return true;
         } else {
@@ -268,7 +295,7 @@ public class AccountManager implements BaseManager {
             joinedAccountIds.append(accountIds.get(i));
         }
 
-        return JPA.em()
+        return jpaApi.em()
                 .createQuery("FROM Account a WHERE a.id IN (" + joinedAccountIds.toString() + ")", Account.class)
                 .getResultList();
     }

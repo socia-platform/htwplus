@@ -29,9 +29,11 @@ public class NotificationController extends BaseController {
         this.notificationManager = notificationManager;
         this.configuration = configuration;
 
+        this.LIMIT = configuration.getInt("htwplus.notification.limit");
+
     }
 
-    final int LIMIT = Integer.parseInt(configuration.getString("htwplus.notification.limit"));
+    int LIMIT;
 
     /**
      * @deprecated Deprecated since refactor of notification system

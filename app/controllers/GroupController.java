@@ -67,12 +67,16 @@ public class GroupController extends BaseController {
         this.configuration = configuration;
         this.formFactory = formFactory;
 
+        this.groupForm = formFactory.form(Group.class);
+        this.folderForm = formFactory.form(Folder.class);
+        this.postForm = formFactory.form(Post.class);
+        this.limit = configuration.getInt("htwplus.post.limit");
     }
 
-    Form<Group> groupForm = formFactory.form(Group.class);
-    Form<Folder> folderForm = formFactory.form(Folder.class);
-    Form<Post> postForm = formFactory.form(Post.class);
-    final int LIMIT = Integer.parseInt(configuration.getString("htwplus.post.limit"));
+    Form<Group> groupForm;
+    Form<Folder> folderForm;
+    Form<Post> postForm;
+    int limit;
     static final int PAGE = 1;
 
     public Result index() {
@@ -113,12 +117,12 @@ public class GroupController extends BaseController {
         }
 
         Navigation.set(Level.GROUPS, "Newsstream", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
-        List<Post> posts = postManager.getPostsForGroup(group, LIMIT, page);
+        List<Post> posts = postManager.getPostsForGroup(group, limit, page);
 
         if (raw) {
-            return ok(streamRaw.render(group, posts, postForm, postManager.countPostsForGroup(group), LIMIT, page));
+            return ok(streamRaw.render(group, posts, postForm, postManager.countPostsForGroup(group), limit, page));
         } else {
-            return ok(stream.render(group, posts, postForm, postManager.countPostsForGroup(group), LIMIT, page));
+            return ok(stream.render(group, posts, postForm, postManager.countPostsForGroup(group), limit, page));
         }
     }
 

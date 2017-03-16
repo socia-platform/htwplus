@@ -58,11 +58,12 @@ public class Application extends BaseController {
         this.accountManager = accountManager;
         this.configuration = configuration;
         this.formFactory = formFactory;
-
+        this.postForm = formFactory.form(Post.class);
+        this.limit = configuration.getInt("htwplus.post.limit");
     }
 
-    Form<Post> postForm = formFactory.form(Post.class);
-    final int LIMIT = configuration.getInt("htwplus.post.limit");
+    Form<Post> postForm;
+    int limit;
     static final int PAGE = 1;
 
     public Result javascriptRoutes() {
@@ -80,7 +81,7 @@ public class Application extends BaseController {
     public Result index() {
         Navigation.set(Level.STREAM, "Alles");
         Account currentAccount = Component.currentAccount();
-        return ok(stream.render(currentAccount, postManager.getStream(currentAccount, LIMIT, PAGE), postForm, postManager.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
+        return ok(stream.render(currentAccount, postManager.getStream(currentAccount, limit, PAGE), postForm, postManager.countStream(currentAccount, ""), limit, PAGE, "all"));
     }
 
     public Result help() {
@@ -110,9 +111,9 @@ public class Application extends BaseController {
         Account currentAccount = Component.currentAccount();
 
         if (raw) {
-            return ok(streamRaw.render(postManager.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, postManager.countStream(currentAccount, filter), LIMIT, page, filter));
+            return ok(streamRaw.render(postManager.getFilteredStream(currentAccount, limit, page, filter), postForm, postManager.countStream(currentAccount, filter), limit, page, filter));
         } else {
-            return ok(stream.render(currentAccount, postManager.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, postManager.countStream(currentAccount, filter), LIMIT, page, filter));
+            return ok(stream.render(currentAccount, postManager.getFilteredStream(currentAccount, limit, page, filter), postForm, postManager.countStream(currentAccount, filter), limit, page, filter));
         }
     }
 
@@ -182,7 +183,7 @@ public class Application extends BaseController {
 
         return ok(views.html.Search.searchresult.render(
                 page,
-                LIMIT,
+                limit,
                 elasticsearchResponse));
     }
 

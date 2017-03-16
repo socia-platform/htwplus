@@ -14,9 +14,9 @@ import services.ScheduleService;
 public class StartupModul extends AbstractModule {
     @Override
     protected void configure() {
-        //bind(NotificationService.class);
-        //bind(ScheduleService.class);
-        //bind(DatabaseService.class).annotatedWith(Names.named("elasticsearch")).to(ElasticsearchInit.class);
-        //bind(DatabaseService.class).annotatedWith(Names.named("postgres")).to(PostgresInit.class);
+        bind(NotificationService.class).asEagerSingleton();
+        bind(ScheduleService.class).asEagerSingleton();
+        bind(DatabaseService.class).annotatedWith(Names.named("elasticsearch")).to(ElasticsearchInit.class).asEagerSingleton();
+        bind(DatabaseService.class).annotatedWith(Names.named("postgres")).to(PostgresInit.class).asEagerSingleton();
     }
 }

@@ -5,6 +5,7 @@ import models.base.FileOperationException;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -15,27 +16,27 @@ import java.util.List;
  */
 public class GroupManager implements BaseManager {
 
-    private final ElasticsearchService elasticsearchService;
-    private final GroupAccountManager groupAccountManager;
-    private final PostManager postManager;
-    private final NotificationManager notificationManager;
-    private final FolderManager folderManager;
-    private final AvatarManager avatarManager;
+    @Inject
+    ElasticsearchService elasticsearchService;
 
     @Inject
-    public GroupManager(ElasticsearchService elasticsearchService, GroupAccountManager groupAccountManager,
-                        PostManager postManager,
-                        NotificationManager notificationManager,
-                        FolderManager folderManager,
-                        AvatarManager avatarManager) {
-        this.elasticsearchService = elasticsearchService;
-        this.groupAccountManager = groupAccountManager;
-        this.postManager = postManager;
-        this.notificationManager = notificationManager;
-        this.folderManager = folderManager;
-        this.avatarManager = avatarManager;
+    GroupAccountManager groupAccountManager;
 
-    }
+    @Inject
+    PostManager postManager;
+
+    @Inject
+    NotificationManager notificationManager;
+
+    @Inject
+    FolderManager folderManager;
+
+    @Inject
+    AvatarManager avatarManager;
+
+    @Inject
+    JPAApi jpaApi;
+
 
     public void createWithGroupAccount(Group group, Account account) {
         group.owner = account;
@@ -47,7 +48,7 @@ public class GroupManager implements BaseManager {
 
     @Override
     public void create(Object model) {
-        JPA.em().persist(model);
+        jpaApi.em().persist(model);
     }
 
     @Override
@@ -79,14 +80,26 @@ public class GroupManager implements BaseManager {
         // Delete Elasticsearch document
         elasticsearchService.delete(group);
 
-        JPA.em().remove(group);
+        jpaApi.em().remove(group);
     }
 
     public Group findById(Long id) {
-        return JPA.em().find(Group.class, id);
+        return jpaApi.em().find(Group.class, id);
     }
 
-    public static Group findByTitle(String title) {
+    public Group findByTitle(String title) {
+        List<Group> groups = (List<Group>) jpaApi.em()
+                .createQuery("FROM Group g WHERE g.title = ?1")
+                .setParameter(1, title).getResultList();
+
+        if (groups.isEmpty()) {
+            return null;
+        } else {
+            return groups.get(0);
+        }
+    }
+
+    public static Group findByTitle2(String title) {
         List<Group> groups = (List<Group>) JPA.em()
                 .createQuery("FROM Group g WHERE g.title = ?1")
                 .setParameter(1, title).getResultList();
@@ -99,11 +112,11 @@ public class GroupManager implements BaseManager {
     }
 
     public List<Group> all() {
-        return JPA.em().createQuery("FROM Group").getResultList();
+        return jpaApi.em().createQuery("FROM Group").getResultList();
     }
 
     public List<Group> listAllGroupsOwnedBy(Long id) {
-        return JPA.em().createQuery("FROM Group g WHERE g.owner.id = " + id).getResultList();
+        return jpaApi.em().createQuery("FROM Group g WHERE g.owner.id = " + id).getResultList();
     }
 
     /**

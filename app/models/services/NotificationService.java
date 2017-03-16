@@ -27,7 +27,7 @@ public class NotificationService {
 
     JPAApi jpaApi;
     WebSocketService webSocketService;
-    private EmailService email;
+    EmailService email;
 
     /**
      * Singleton instance
@@ -129,7 +129,7 @@ public class NotificationService {
                     try {
                         // render notification content
                         notification.rendered = notifiable.render(notification);
-                        NotificationManager notificationManager = new NotificationManager(jpaApi);
+                        NotificationManager notificationManager = new NotificationManager();
                         // if no ID is set already, persist new instance, otherwise update given instance
                         if (notification.id == null) {
                             notificationManager.create(notification);

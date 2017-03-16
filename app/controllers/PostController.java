@@ -47,9 +47,10 @@ public class PostController extends BaseController {
         this.configuration = configuration;
         this.formFactory = formFactory;
 
+        this.postForm = formFactory.form(Post.class);
     }
 
-    Form<Post> postForm = formFactory.form(Post.class);
+    Form<Post> postForm;
     static final int PAGE = 1;
     static final String STREAM_FILTER = "all";
 

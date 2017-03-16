@@ -19,30 +19,29 @@ import java.util.*;
  */
 public class PostManager implements BaseManager {
 
-    ElasticsearchService elasticsearchService;
-    NotificationManager notificationManager;
-    FriendshipManager friendshipManager;
-    GroupAccountManager groupAccountManager;
-    PostBookmarkManager postBookmarkManager;
-    GroupManager groupManager;
-    Configuration configuration;
 
     @Inject
-    public PostManager(ElasticsearchService elasticsearchService,
-            NotificationManager notificationManager,
-            FriendshipManager friendshipManager,
-            GroupAccountManager groupAccountManager,
-            PostBookmarkManager postBookmarkManager,
-            GroupManager groupManager,
-            Configuration configuration) {
-        this.elasticsearchService = elasticsearchService;
-        this.notificationManager = notificationManager;
-        this.friendshipManager = friendshipManager;
-        this.groupAccountManager = groupAccountManager;
-        this.postBookmarkManager = postBookmarkManager;
-        this.groupManager = groupManager;
-        this.configuration = configuration;
-    }
+    ElasticsearchService elasticsearchService;
+
+    @Inject
+    NotificationManager notificationManager;
+
+    @Inject
+    FriendshipManager friendshipManager;
+
+    @Inject
+    GroupAccountManager groupAccountManager;
+
+    @Inject
+    PostBookmarkManager postBookmarkManager;
+
+    @Inject
+    GroupManager groupManager;
+
+    @Inject
+    Configuration configuration;
+
+
     @Override
     public void create(Object model) {
         Post post = (Post) model;
@@ -332,7 +331,7 @@ public class PostManager implements BaseManager {
 
         // everybody from post.group can see this post
         if (belongsToGroup(post)) {
-            viewableIds.addAll(GroupAccountManager.findAccountIdsByGroup(post.group, LinkType.establish));
+            viewableIds.addAll(groupAccountManager.findAccountIdsByGroup(post.group, LinkType.establish));
         }
 
 
@@ -355,7 +354,7 @@ public class PostManager implements BaseManager {
 
             // every member from post.parent.group can see this post
             if (belongsToGroup(post.parent)) {
-                viewableIds.addAll(GroupAccountManager.findAccountIdsByGroup(post.parent.group, LinkType.establish));
+                viewableIds.addAll(groupAccountManager.findAccountIdsByGroup(post.parent.group, LinkType.establish));
             }
 
             // every friend from post.parent.account can see this post

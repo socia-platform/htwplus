@@ -19,10 +19,10 @@ import javax.inject.Singleton;
 @Singleton
 public class PostgresInit implements DatabaseService {
 
-    private final JPAApi jpaApi;
-    private final AccountManager accountManager;
-    private final GroupManager groupManager;
-    private final Configuration configuration;
+    JPAApi jpaApi;
+    AccountManager accountManager;
+    GroupManager groupManager;
+    Configuration configuration;
 
     @Inject
     public PostgresInit(JPAApi jpaApi, AccountManager accountManager, GroupManager groupManager, Configuration configuration) {
@@ -42,7 +42,8 @@ public class PostgresInit implements DatabaseService {
         final String dummyMail = configuration.getString("htwplus.dummy.mail");
         final String dummyPassword = configuration.getString("htwplus.dummy.pw");
 
-        jpaApi.withTransaction(() -> {
+
+        this.jpaApi.withTransaction(() -> {
 
             // create admin account if none exists
             Account adminAccount = accountManager.findByEmail(adminMail);

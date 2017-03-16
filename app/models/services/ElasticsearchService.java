@@ -43,14 +43,15 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 @Singleton
 public class ElasticsearchService implements IElasticsearchService {
 
-    PostManager postManger;
-    Environment environment;
 
     @Inject
-    public ElasticsearchService(PostManager postManger) {
-        this.postManger = postManger;
-        this.environment = environment;
-    }
+    PostManager postManger;
+
+    @Inject
+    GroupAccountManager groupAccountManager;
+
+    @Inject
+    Environment environment;
 
     private Client client = null;
     private Config conf = ConfigFactory.load().getConfig("elasticsearch");
@@ -148,7 +149,7 @@ public class ElasticsearchService implements IElasticsearchService {
                         .field("public", true)
                         .field("owner", group.owner.id)
                         .field("avatar", group.hasAvatar)
-                        .field("member", GroupAccountManager.findAccountIdsByGroup(group, LinkType.establish))
+                        .field("member", groupAccountManager.findAccountIdsByGroup(group, LinkType.establish))
                         .endObject())
                 .execute()
                 .actionGet();

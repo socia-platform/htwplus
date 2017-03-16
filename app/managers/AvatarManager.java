@@ -15,12 +15,10 @@ import java.io.File;
 
 public class AvatarManager {
 
-    Configuration configuration;
 
     @Inject
-    public AvatarManager(Configuration configuration) {
-        this.configuration = configuration;
-    }
+    Configuration configuration;
+
 
     static public String AVATAR_REALM = "avatar";
     static public int AVATAR_MIN_SIZE = 250;

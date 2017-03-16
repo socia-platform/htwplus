@@ -25,15 +25,13 @@ import java.util.UUID;
  */
 public class MediaManager implements BaseManager {
 
-    NotificationManager notificationManager;
-    Configuration configuration;
 
     @Inject
-    public MediaManager(NotificationManager notificationManager,
-            Configuration configuration) {
-        this.notificationManager = notificationManager;
-        this.configuration = configuration;
-    }
+    NotificationManager notificationManager;
+
+    @Inject
+    Configuration configuration;
+
 
     final String tempPrefix = "htwplus_temp";
 
