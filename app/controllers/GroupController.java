@@ -42,6 +42,7 @@ public class GroupController extends BaseController {
     AccountManager accountManager;
     FolderManager folderManager;
     AvatarManager avatarManager;
+    NotificationService notificationService;
     Configuration configuration;
     FormFactory formFactory;
 
@@ -53,7 +54,7 @@ public class GroupController extends BaseController {
             PostManager postManager,
             AccountManager accountManager,
             FolderManager folderManager,
-            AvatarManager avatarManager,
+            AvatarManager avatarManager, NotificationService notificationService,
             Configuration configuration,
             FormFactory formFactory) {
         this.groupManager = groupManager;
@@ -64,6 +65,7 @@ public class GroupController extends BaseController {
         this.accountManager = accountManager;
         this.folderManager = folderManager;
         this.avatarManager = avatarManager;
+        this.notificationService = notificationService;
         this.configuration = configuration;
         this.formFactory = formFactory;
 
@@ -395,7 +397,7 @@ public class GroupController extends BaseController {
         } else if (group.groupType.equals(GroupType.close)) {
             groupAccountManager.create(new GroupAccount(group, account, LinkType.request));
             group.temporarySender = account;
-            NotificationService.getInstance().createNotification(group, Group.GROUP_NEW_REQUEST);
+            notificationService.createNotification(group, Group.GROUP_NEW_REQUEST);
             flash("success", Messages.get("group.group_request_sent"));
             return redirect(controllers.routes.GroupController.index());
         } else if (group.groupType.equals(GroupType.course)) {
@@ -472,7 +474,7 @@ public class GroupController extends BaseController {
 
         group.temporarySender = group.owner;
         group.addTemporaryRecipient(account);
-        NotificationService.getInstance().createNotification(group, Group.GROUP_REQUEST_SUCCESS);
+        notificationService.createNotification(group, Group.GROUP_REQUEST_SUCCESS);
 
         return redirect(controllers.routes.GroupController.index());
     }
@@ -502,7 +504,7 @@ public class GroupController extends BaseController {
         }
         group.temporarySender = group.owner;
         group.addTemporaryRecipient(account);
-        NotificationService.getInstance().createNotification(group, Group.GROUP_REQUEST_DECLINE);
+        notificationService.createNotification(group, Group.GROUP_REQUEST_DECLINE);
 
         return redirect(controllers.routes.GroupController.index());
     }
@@ -551,7 +553,7 @@ public class GroupController extends BaseController {
                     // Create group account link to inviteAccount and add to notification recipient list
                     // if the inviteAccount is not already member, the sender and recipients are friends
                     // and the group account link is not already set up.
-                    if (!Secured.isMemberOfGroup(group, inviteAccount) && FriendshipManager.alreadyFriendly(currentUser, inviteAccount) && groupAccount == null) {
+                    if (!Secured.isMemberOfGroup(group, inviteAccount) && friendshipManager.alreadyFriendly(currentUser, inviteAccount) && groupAccount == null) {
                         groupAccountManager.create(new GroupAccount(group, inviteAccount, LinkType.invite));
 
                         // add inviteAccount to temporaryRecipients list for notifications later
@@ -565,7 +567,7 @@ public class GroupController extends BaseController {
             }
 
             group.temporarySender = currentUser;
-            NotificationService.getInstance().createNotification(group, Group.GROUP_INVITATION);
+            notificationService.createNotification(group, Group.GROUP_INVITATION);
         }
 
         flash("success", Messages.get("group.invite_invited"));

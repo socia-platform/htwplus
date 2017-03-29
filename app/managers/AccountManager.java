@@ -1,14 +1,11 @@
 package managers;
 
-import com.typesafe.config.ConfigFactory;
 import controllers.Component;
 import models.*;
 import models.base.FileOperationException;
 import models.enums.AccountRole;
-import models.enums.AvatarSize;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
-import models.services.FileService;
 import play.Configuration;
 import play.Logger;
 import play.db.jpa.JPA;
@@ -16,7 +13,6 @@ import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -238,19 +234,18 @@ public class AccountManager implements BaseManager {
         }
     }
 
-    public Account authenticate(String email, String password) {
-        Account currentAcc = null;
+    public boolean isAccountValid(String email, String password) {
         try {
-            final Account result = (Account) jpaApi.em()
+            final Account result = (Account) JPA.em()
                     .createQuery("from Account a where a.email = :email")
                     .setParameter("email", email).getSingleResult();
             if (result != null && Component.md5(password).equals(result.password)) {
-                currentAcc = result;
+                return true;
             }
-            return currentAcc;
         } catch (NoResultException exp) {
-            return currentAcc;
+            return false;
         }
+        return false;
     }
 
     /**

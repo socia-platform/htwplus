@@ -34,7 +34,7 @@ public class ScheduleService {
         // set the email schedule to next full hour clock for sending daily and hourly emails
         system.scheduler().schedule(
                 Duration.create(nextExecutionInSeconds(getNextHour(), 0), TimeUnit.SECONDS),
-                Duration.create(1, TimeUnit.HOURS),
+                Duration.create(10, TimeUnit.MINUTES),
                 () -> {
                     emailService.sendDailyHourlyNotificationsEmails();
                 },

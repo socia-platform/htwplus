@@ -40,6 +40,7 @@ public class ProfileController extends BaseController {
     StudycourseManager studycourseManager;
     AvatarManager avatarManager;
     MediaManager mediaManager;
+    FriendshipManager friendshipManager;
     Configuration configuration;
     FormFactory formFactory;
 
@@ -50,7 +51,7 @@ public class ProfileController extends BaseController {
             AccountController accountController,
             StudycourseManager studycourseManager,
             AvatarManager avatarManager,
-            MediaManager mediaManager,
+            MediaManager mediaManager, FriendshipManager friendshipManager,
             Configuration configuration,FormFactory formFactory) {
         this.accountManager = accountManager;
         this.groupAccountManager = groupAccountManager;
@@ -59,6 +60,7 @@ public class ProfileController extends BaseController {
         this.studycourseManager = studycourseManager;
         this.avatarManager = avatarManager;
         this.mediaManager = mediaManager;
+        this.friendshipManager = friendshipManager;
         this.configuration = configuration;
         this.formFactory = formFactory;
 
@@ -120,7 +122,7 @@ public class ProfileController extends BaseController {
         }
 
         // case for friends and own profile
-        if (FriendshipManager.alreadyFriendly(Component.currentAccount(), account)
+        if (friendshipManager.alreadyFriendly(Component.currentAccount(), account)
                 || currentUser.equals(account) || Secured.isAdmin()) {
             if (raw) {
                 return ok(streamRaw.render(account, postManager.getFriendStream(account, LIMIT, page),

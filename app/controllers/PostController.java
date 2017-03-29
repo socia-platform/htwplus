@@ -32,6 +32,7 @@ public class PostController extends BaseController {
     AccountManager accountManager;
     Configuration configuration;
     FormFactory formFactory;
+    NotificationService notificationService;
 
     @Inject
     public PostController(GroupManager groupManager,
@@ -39,13 +40,14 @@ public class PostController extends BaseController {
             PostBookmarkManager postBookmarkManager,
             AccountManager accountManager,
             Configuration configuration,
-            FormFactory formFactory) {
+            FormFactory formFactory, NotificationService notificationService) {
         this.groupManager = groupManager;
         this.postManager = postManager;
         this.postBookmarkManager = postBookmarkManager;
         this.accountManager = accountManager;
         this.configuration = configuration;
         this.formFactory = formFactory;
+        this.notificationService = notificationService;
 
         this.postForm = formFactory.form(Post.class);
     }
@@ -102,7 +104,7 @@ public class PostController extends BaseController {
                     post.owner = Component.currentAccount();
                     post.group = group;
                     postManager.create(post);
-                    NotificationService.getInstance().createNotification(post, Post.GROUP);
+                    notificationService.createNotification(post, Post.GROUP);
                 }
             } else {
                 flash("info", Messages.get("post.join_group_first"));
@@ -122,7 +124,7 @@ public class PostController extends BaseController {
                     post.owner = account;
                     postManager.create(post);
                     if (!account.equals(profile)) {
-                        NotificationService.getInstance().createNotification(post, Post.PROFILE);
+                        notificationService.createNotification(post, Post.PROFILE);
                     }
                 }
 
@@ -176,16 +178,16 @@ public class PostController extends BaseController {
 
             if (postManager.belongsToGroup(parent)) {
                 // this is a comment in a group post
-                NotificationService.getInstance().createNotification(post, Post.COMMENT_GROUP);
+                notificationService.createNotification(post, Post.COMMENT_GROUP);
             }
 
             if (postManager.belongsToAccount(parent)) {
                 if (!account.equals(parent.owner) && !parent.account.equals(parent.owner)) {
                     // this is a comment on a news stream post from another person
-                    NotificationService.getInstance().createNotification(post, Post.COMMENT_OWN_PROFILE);
+                    notificationService.createNotification(post, Post.COMMENT_OWN_PROFILE);
                 } else if (!account.equals(parent.account)) {
                     // this is a comment on a foreign news stream post
-                    NotificationService.getInstance().createNotification(post, Post.COMMENT_PROFILE);
+                    notificationService.createNotification(post, Post.COMMENT_PROFILE);
                 }
             }
 
@@ -232,9 +234,9 @@ public class PostController extends BaseController {
         //int max = Integer.parseInt(Play.application().configuration().getString("htwplus.comments.init"));
         int offset = 0;
         if (limit != 0) {
-            offset = PostManager.countCommentsForPost(id) - limit;
+            offset = PostManager.countCommentsForPost2(id) - limit;
         }
-        return PostManager.getCommentsForPost(id, limit, offset);
+        return PostManager.getCommentsForPost2(id, limit, offset);
     }
 
 
@@ -249,10 +251,10 @@ public class PostController extends BaseController {
         String result = "";
 
         // subtract already displayed comments
-        int limit = PostManager.countCommentsForPost(id) - Integer.parseInt(configuration.getString("htwplus.comments.init"));
+        int limit = postManager.countCommentsForPost(id) - Integer.parseInt(configuration.getString("htwplus.comments.init"));
 
         List<Post> comments;
-        comments = PostManager.getCommentsForPost(id, limit, 0);
+        comments = postManager.getCommentsForPost(id, limit, 0);
         for (Post post : comments) {
             result = result.concat(views.html.snippets.postComment.render(post).toString());
         }

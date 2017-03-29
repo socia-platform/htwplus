@@ -22,11 +22,13 @@ public class FriendshipController extends BaseController {
 
     FriendshipManager friendshipManager;
     AccountManager accountManager;
+    NotificationService notificationService;
 
     @Inject
-    public FriendshipController(FriendshipManager friendshipManager, AccountManager accountManager) {
+    public FriendshipController(FriendshipManager friendshipManager, AccountManager accountManager, NotificationService notificationService) {
         this.friendshipManager = friendshipManager;
         this.accountManager = accountManager;
+        this.notificationService = notificationService;
     }
 
     public Result index() {
@@ -57,7 +59,7 @@ public class FriendshipController extends BaseController {
 
         Friendship friendship = new Friendship(currentUser, potentialFriend, LinkType.request);
         friendshipManager.create(friendship);
-        NotificationService.getInstance().createNotification(friendship, Friendship.FRIEND_NEW_REQUEST);
+        notificationService.createNotification(friendship, Friendship.FRIEND_NEW_REQUEST);
 
         flash("success", "Deine Einladung wurde verschickt!");
         return redirect(controllers.routes.FriendshipController.index());
@@ -112,7 +114,7 @@ public class FriendshipController extends BaseController {
             // and create new friend-connection between currentAccount and requester
             Friendship friendship = new Friendship(currentUser, potentialFriend, LinkType.establish);
             friendshipManager.create(friendship);
-            NotificationService.getInstance().createNotification(friendship, Friendship.FRIEND_REQUEST_SUCCESS);
+            notificationService.createNotification(friendship, Friendship.FRIEND_REQUEST_SUCCESS);
 
             flash("success", "Kontakt erfolgreich hergestellt!");
         }
@@ -131,7 +133,7 @@ public class FriendshipController extends BaseController {
         if (requestLink != null && requestLink.friend.equals(Component.currentAccount())) {
             requestLink.linkType = LinkType.reject;
             friendshipManager.update(requestLink);
-            NotificationService.getInstance().createNotification(requestLink, Friendship.FRIEND_REQUEST_DECLINE);
+            notificationService.createNotification(requestLink, Friendship.FRIEND_REQUEST_DECLINE);
         }
 
         return redirect(controllers.routes.FriendshipController.index());

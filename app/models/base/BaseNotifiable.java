@@ -1,6 +1,5 @@
 package models.base;
 
-
 import managers.GroupAccountManager;
 import models.Account;
 import models.Group;
@@ -8,7 +7,6 @@ import models.Notification;
 import models.enums.LinkType;
 import models.services.TemplateService;
 
-import javax.inject.Inject;
 import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +92,7 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      * @return List of accounts of group
      */
     public List<Account> getGroupAsAccountList(final Group group) {
-    	return GroupAccountManager.findAccountsByGroup2(group, LinkType.establish);
+        return GroupAccountManager.findAccountsByGroup2(group, LinkType.establish);
     }
 
     /**

@@ -42,7 +42,6 @@ public class PostgresInit implements DatabaseService {
         final String dummyMail = configuration.getString("htwplus.dummy.mail");
         final String dummyPassword = configuration.getString("htwplus.dummy.pw");
 
-
         this.jpaApi.withTransaction(() -> {
 
             // create admin account if none exists

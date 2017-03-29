@@ -518,7 +518,7 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in account has friendship to account
 	 */
 	public static boolean isFriend(Account account) {
-		return FriendshipManager.alreadyFriendly(Component.currentAccount(), account);
+		return FriendshipManager.alreadyFriendly2(Component.currentAccount(), account);
 	}
 
 	/**

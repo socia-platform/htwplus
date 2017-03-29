@@ -7,7 +7,6 @@ import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
-import play.libs.F;
 import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
@@ -157,14 +156,15 @@ public class GroupAccountManager implements BaseManager {
      * Retrieve Accounts from Group with given LinkType.
      */
     public static List<Account> findAccountsByGroup2(final Group group, final LinkType type) {
-        @SuppressWarnings("unchecked")
-        List<Account> accounts = (List<Account>) JPA
+         return JPA.withTransaction(() -> {
+             List<Account> accounts = (List<Account>) JPA
                 .em()
                 .createQuery(
                         "SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
                 .setParameter(1, group.id).setParameter(2, type)
                 .getResultList();
-        return accounts;
+            return accounts;
+         });
     }
 
     /**

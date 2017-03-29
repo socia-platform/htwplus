@@ -29,10 +29,6 @@ import java.util.Collection;
  */
 public class FileService {
 
-
-    @Inject
-    Configuration configuration;
-
     public static String MIME_JPEG = "image/jpeg";
     public static String MIME_PNG = "image/png";
 
@@ -49,8 +45,8 @@ public class FileService {
      * @param realm Namespace of the file
      * @param file The File
      */
-    public FileService(String realm, File file){
-        this.initPath(realm);
+    public FileService(String realm, File file, String path){
+        this.initPath(realm, path);
         this.initProperties(file);
     }
 
@@ -60,8 +56,8 @@ public class FileService {
      * @param realm Namespace of the file
      * @param filePart The FilePart
      */
-    public FileService(String realm, Http.MultipartFormData.FilePart<File> filePart){
-        this(realm, filePart.getFile());
+    public FileService(String realm, Http.MultipartFormData.FilePart<File> filePart, String path){
+        this(realm, filePart.getFile(), path);
         this.contentType = filePart.getContentType();
         this.fileName = filePart.getFilename();
     }
@@ -72,8 +68,8 @@ public class FileService {
      * @param realm Namespace of the file
      * @param fileName The file name
      */
-    public FileService(String realm, String fileName) throws FileOperationException {
-        this.initPath(realm);
+    public FileService(String realm, String fileName, String path) throws FileOperationException {
+        this.initPath(realm, path);
         File file = this.openFile(fileName);
         if(file == null) {
             throw new FileOperationException("File does not exit");
@@ -86,8 +82,8 @@ public class FileService {
      *
      * @param realm The namespace
      */
-    private void initPath(String realm) {
-        this.path = configuration.getString("media.fileStore");
+    private void initPath(String realm, String path) {
+        this.path = path;
         if(this.path ==  null) {
             throw new PlayException(
                     "Configuration Error",
@@ -231,7 +227,7 @@ public class FileService {
         }
 
         if(destFile.exists()){
-            return new FileService(this.realm, destFile);
+            return new FileService(this.realm, destFile, path);
         } else {
             return null;
         }

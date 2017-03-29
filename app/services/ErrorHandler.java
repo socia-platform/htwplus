@@ -29,18 +29,20 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
     GroupManager groupManager;
     PostManager postManager;
     AccountManager accountManager;
+    NotificationService notificationService;
     Configuration configuration;
     JPAApi jpaApi;
 
     @Inject
     public ErrorHandler(JPAApi jpaApi, Configuration configuration, Environment environment, OptionalSourceMapper optionalSourceMapper, Provider<Router> provider, AccountManager accountManager, GroupManager groupManager,
-            PostManager postManager) {
+            PostManager postManager, NotificationService notificationService) {
         super(configuration, environment, optionalSourceMapper, provider);
         this.configuration = configuration;
         this.jpaApi = jpaApi;
         this.accountManager = accountManager;
         this.groupManager = groupManager;
         this.postManager = postManager;
+        this.notificationService = notificationService;
     }
 
     protected F.Promise<Result> onProdServerError(Http.RequestHeader request, UsefulException exception) {
@@ -52,7 +54,7 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
                 post.group = group;
                 postManager.createWithoutIndex(post);
-                NotificationService.getInstance().createNotification(post, Post.GROUP);
+                notificationService.createNotification(post, Post.GROUP);
             }
         });
 

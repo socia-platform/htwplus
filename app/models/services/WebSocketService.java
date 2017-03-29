@@ -9,10 +9,8 @@ import managers.FriendshipManager;
 import models.Account;
 import models.actors.WebSocketActor;
 import play.Logger;
-import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
 import play.libs.Akka;
-import play.libs.F;
 import play.libs.Json;
 import play.mvc.WebSocket;
 
@@ -36,10 +34,10 @@ public class WebSocketService {
 
     @Inject
     AccountManager accountManager;
-
+    @Inject
+    FriendshipManager friendshipManager;
     @Inject
     JPAApi jpaApi;
-
 
     /**
      * Singleton instance
@@ -57,7 +55,7 @@ public class WebSocketService {
      *
      * @return NotificationHandler instance
      */
-    public WebSocketService getInstance() {
+    public static WebSocketService getInstance() {
         if (WebSocketService.instance == null) {
             WebSocketService.instance = new WebSocketService();
         }
@@ -235,7 +233,7 @@ public class WebSocketService {
     private boolean isFriendshipEstablished(final Account a, final Account b) {
         try {
             return jpaApi.withTransaction(() -> {
-                return FriendshipManager.alreadyFriendly(a, b);
+                return friendshipManager.alreadyFriendly(a, b);
             });
         } catch (Throwable throwable) {
             throwable.printStackTrace();

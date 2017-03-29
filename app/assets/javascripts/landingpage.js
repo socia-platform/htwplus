@@ -81,66 +81,10 @@ function resizeScenes() {
     //resizeRings();
 }
 
-function changeText(element) {
-	var newTitle = $('#hp-feature-text-' + element + ' .hp-feature-title').html();
-	var newDescription = $('#hp-feature-text-' + element + ' .hp-feature-description').html();
-	$('#hp-feature-text .hp-feature-title').html(newTitle);
-    $('#hp-feature-text .hp-feature-description').html(newDescription);
-    return true;
-}
-
-function buildScenes() {
-    // init controller
-    TweenMax.defaultOverwrite = false;
-    controller = new ScrollMagic();
-
-    // get all animation items
-    var features = [];
-    $($("[id^=hp-feature-text-]")).each(function() {
-        features[features.length] = $(this).attr('id').replace('hp-feature-text-', '');
-    });
-
-    // build scenes - pins for demo and text area
-    demoScene = new ScrollScene({triggerElement: "#hp-features-trigger"})
-        .addTo(controller)
-        //.addIndicators()
-        .duration(features.length * 500)
-        .setPin("#hp-feature-demo")
-        .triggerHook(50 / $(window).height());
-    textScene = new ScrollScene({triggerElement: "#hp-features-trigger"})
-        .addTo(controller)
-        //.addIndicators()
-        .duration(features.length * 500)
-        .setPin("#hp-feature-text")
-        .triggerHook(50 / $(window).height());
-
-    // build scenes - tweens for features
-    for (i = 1; i < features.length; i++) {
-        var tween = new TimelineMax()
-            .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 1}, {overwrite: false, opacity: 0}), 0)
-            .add(TweenMax.fromTo('#hp-feature-text', 0.2, {y: 0}, {overwrite: false, y: -500}), 0)
-            .add(TweenMax.fromTo('#hp-feature-text', 0.3, {y: 1500}, {overwrite: false, y: 0,
-                onStart: changeText, onStartParams: [features[i]],
-                onReverseComplete: changeText, onReverseCompleteParams: [features[i-1]]
-            }), 0.2)
-            .add(TweenMax.fromTo('#hp-feature-text', 0.1, {opacity: 0}, {overwrite: false, opacity: 1}), 0.2)
-            .add(TweenMax.fromTo(('#hp-feature-demo-').concat(features[i]), 0.3, {display: 'none', opacity: 0}, {overwrite: false, display: 'block', opacity: 1}), 0.2);
-        scenes[scenes.length] = new ScrollScene({triggerElement: ('#hp-features-trigger')})
-            .addTo(controller)
-            //.addIndicators()
-            .setTween(tween)
-            .offset($('#hp-feature-demo').innerHeight() + 500 * (i + 1))
-            .triggerHook(1);
-    }
-    TweenMax.set('#hp-feature-text', {opacity: 1, y: 0});
-
-    resizeScenes();
-}
-
 /**
  * window listener & main stuff
  */
-$(window).load(function() {
+$(window).on("load", function() {
 	// load banner dimensions (aspect ratio will be needed)
     var newImg = new Image();
     //newImg.src = window.location.origin.toString() + '/assets/images/LandingpageBackground/default_medium.jpg';
@@ -169,14 +113,8 @@ $(window).load(function() {
     resizeBackground();
 });
 
-$(document).ready(function() {
-    buildScenes();
-});
-
 $(window).resize(function() {
 	resizeBackground();
-    controlAnimation();
-	updateScenes();
 	resizeScenes();
 });
 

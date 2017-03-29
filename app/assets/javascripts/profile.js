@@ -148,7 +148,7 @@ $(document).ready(function () {
                 processData: false,
                 success: function () {
                     _this.$modal.modal('hide');
-                    location.href = document.referrer;
+                    location.reload();
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     _this.$modal.modal('hide');

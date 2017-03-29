@@ -33,14 +33,16 @@ public class MediaController extends BaseController {
     MediaManager mediaManager;
     FolderManager folderManager;
     Configuration configuration;
+    NotificationService notificationService;
 
     @Inject
     public MediaController(MediaManager mediaManager,
             FolderManager folderManager,
-            Configuration configuration) {
+            Configuration configuration, NotificationService notificationService) {
         this.mediaManager = mediaManager;
         this.folderManager = folderManager;
         this.configuration = configuration;
+        this.notificationService = notificationService;
 
         this.MAX_FILESIZE = configuration.getInt("media.maxSize.file");
 
@@ -253,7 +255,7 @@ public class MediaController extends BaseController {
             // Persist medialist and create notification(s)
             try {
                 mediaManager.create(med);
-                NotificationService.getInstance().createNotification(med, Media.MEDIA_NEW_MEDIA);
+                notificationService.createNotification(med, Media.MEDIA_NEW_MEDIA);
             } catch (Exception e) {
                 return internalServerError("Während des Uploads ist etwas schiefgegangen!");
             }

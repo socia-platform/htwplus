@@ -43,13 +43,12 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 @Singleton
 public class ElasticsearchService implements IElasticsearchService {
 
-
     @Inject
     PostManager postManger;
-
     @Inject
     GroupAccountManager groupAccountManager;
-
+    @Inject
+    FriendshipManager friendshipManager;
     @Inject
     Environment environment;
 
@@ -167,7 +166,7 @@ public class ElasticsearchService implements IElasticsearchService {
                         .field("initial", account.getInitials())
                         .field("avatar", account.avatar)
                         .field("public", true)
-                        .field("friends", FriendshipManager.findFriendsId(account))
+                        .field("friends", friendshipManager.findFriendsId(account))
                         .endObject())
                 .execute()
                 .actionGet();
@@ -326,8 +325,14 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     private String loadFromFile(String filePath) {
-        //http://stackoverflow.com/questions/16299542/load-file-from-conf-directory-on-cloudbees
-        File inputStreamOption =  environment.getFile(filePath);
-        return inputStreamOption.toString();
+        try {
+            return IOUtils.toString(environment.resourceAsStream(filePath));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 }

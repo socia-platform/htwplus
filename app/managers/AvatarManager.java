@@ -35,7 +35,9 @@ public class AvatarManager {
      * @throws ValidationException
      */
     public void setTempAvatar(Http.MultipartFormData.FilePart filePart, Long modelId) throws ValidationException {
-        FileService fileService = new FileService(AVATAR_REALM, filePart);
+        FileService fileService;
+        fileService = new FileService(AVATAR_REALM, filePart, configuration.getString("media.fileStore"));
+
 
         int maxSize = configuration.getInt("avatar.maxSize");
         if (!fileService.validateSize(FileService.MBAsByte(maxSize))) {
@@ -63,7 +65,7 @@ public class AvatarManager {
     public File getTempAvatar(Long modelId) {
         FileService fileService;
         try {
-            fileService = new FileService(AVATAR_REALM, this.getTempAvatarName(modelId));
+            fileService = new FileService(AVATAR_REALM, this.getTempAvatarName(modelId), configuration.getString("media.fileStore"));
             return fileService.getFile();
         } catch (FileOperationException e) {
             return null;
@@ -76,7 +78,7 @@ public class AvatarManager {
      * @param avatarForm
      */
     public void saveAvatar(Avatar avatarForm, Long modelId) throws FileOperationException {
-        FileService fsTempAvatar = new FileService(AVATAR_REALM, this.getTempAvatarName(modelId));
+        FileService fsTempAvatar = new FileService(AVATAR_REALM, this.getTempAvatarName(modelId), configuration.getString("media.fileStore"));
         FileService fsAvatarLarge = fsTempAvatar.copy(this.getAvatarName(AvatarSize.LARGE, modelId));
         ImageService.crop(fsAvatarLarge.getFile(), avatarForm.x, avatarForm.y, avatarForm.width, avatarForm.height);
         FileService fsAvatarMedium = fsAvatarLarge.copy(this.getAvatarName(AvatarSize.MEDIUM, modelId));
@@ -95,7 +97,7 @@ public class AvatarManager {
     public File getAvatar(AvatarSize size, Long modelId) {
         FileService fileService;
         try {
-            fileService = new FileService(AvatarManager.AVATAR_REALM, this.getAvatarName(size, modelId));
+            fileService = new FileService(AvatarManager.AVATAR_REALM, this.getAvatarName(size, modelId), configuration.getString("media.fileStore"));
             return fileService.getFile();
         } catch (FileOperationException e) {
             return null;

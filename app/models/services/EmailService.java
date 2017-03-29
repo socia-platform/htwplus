@@ -1,12 +1,8 @@
 package models.services;
 
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import managers.NotificationManager;
 import play.Configuration;
 import play.db.jpa.JPAApi;
-import play.libs.F;
 import play.libs.mailer.Email;
 import play.libs.mailer.MailerClient;
 import javax.inject.Inject;
@@ -15,7 +11,6 @@ import javax.inject.Singleton;
 import models.Account;
 import models.Notification;
 import play.Logger;
-import play.db.jpa.JPA;
 import play.i18n.Messages;
 
 import java.util.ArrayList;
