@@ -3,6 +3,8 @@
 @import play._
 @import com.typesafe.config.ConfigFactory
 
+@currentView
+
 <div class="hp-pagination-element">
     <div class="col-md-1" role="main">
         @if(post.owner.hasAvatar){
@@ -95,7 +97,7 @@
                             </a>
                             <div class="media-body">
                                 @form(routes.PostController.addComment(post.id), 'class -> "hp-comment-form") {
-                                <textarea class="hp-new-comment-content" placeholder="Schreibe ein Kommentar..." name="content" data-uploadfolder-id="@currentUser.rootFolder.id" rows="1"></textarea>
+                                <textarea class="hp-new-comment-content" placeholder="Schreibe ein Kommentar..." name="content" data-uploadfolder-id="@if(post.belongsToGroup) {@post.group.rootFolder.id} else {@currentUser.rootFolder.id}" rows="1"></textarea>
                                 }
                             </div>
                         </div>
