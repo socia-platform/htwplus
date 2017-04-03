@@ -1,0 +1,20 @@
+{
+  "medium": {
+    "properties": {
+      "owner": {
+        "type": "long"
+      },
+      "viewable": {
+        "type": "long"
+      },
+      "public": {
+        "type": "boolean"
+      },
+      "filename": {
+        "type": "string",
+        "analyzer": "edgengram_analyzer",
+        "search_analyzer": "whitespace"
+      }
+    }
+  }
+}

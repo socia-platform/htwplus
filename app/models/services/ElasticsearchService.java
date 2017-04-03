@@ -5,9 +5,11 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import managers.FriendshipManager;
 import managers.GroupAccountManager;
+import managers.MediaManager;
 import managers.PostManager;
 import models.Account;
 import models.Group;
+import models.Media;
 import models.Post;
 import models.enums.LinkType;
 import org.apache.commons.io.IOUtils;
@@ -50,6 +52,8 @@ public class ElasticsearchService implements IElasticsearchService {
     @Inject
     FriendshipManager friendshipManager;
     @Inject
+    MediaManager mediaManager;
+    @Inject
     Environment environment;
 
     private Client client = null;
@@ -60,11 +64,13 @@ public class ElasticsearchService implements IElasticsearchService {
     private final String ES_TYPE_USER = conf.getString("userType");
     private final String ES_TYPE_GROUP = conf.getString("groupType");
     private final String ES_TYPE_POST = conf.getString("postType");
+    private final String ES_TYPE_MEDIUM = conf.getString("mediumType");
     private final int ES_RESULT_SIZE = conf.getInt("searchLimit");
     private final String ES_SETTINGS = "elasticsearch/settings.json";
     private final String ES_USER_MAPPING = "elasticsearch/user_mapping.json";
     private final String ES_GROUP_MAPPING = "elasticsearch/group_mapping.json";
     private final String ES_POST_MAPPING = "elasticsearch/post_mapping.json";
+    private final String ES_MEDIUM_MAPPING = "elasticsearch/medium_mapping.json";
 
 
     public ElasticsearchService() {
@@ -118,12 +124,17 @@ public class ElasticsearchService implements IElasticsearchService {
         if (isClientAvailable()) client.admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_GROUP)
                 .setSource(loadFromFile(ES_GROUP_MAPPING))
                 .execute().actionGet();
+
+        if (isClientAvailable()) client.admin().indices().preparePutMapping(ES_INDEX).setType(ES_TYPE_MEDIUM)
+                .setSource(loadFromFile(ES_MEDIUM_MAPPING))
+                .execute().actionGet();
     }
 
     public void index(Object model) throws IOException {
         if (model instanceof Post) indexPost(((Post) model));
         if (model instanceof Group) indexGroup(((Group) model));
         if (model instanceof Account) indexAccount(((Account) model));
+        if (model instanceof Media) indexMedium(((Media) model));
     }
 
     private void indexPost(Post post) throws IOException {
@@ -167,6 +178,19 @@ public class ElasticsearchService implements IElasticsearchService {
                         .field("avatar", account.avatar)
                         .field("public", true)
                         .field("friends", friendshipManager.findFriendsId(account))
+                        .endObject())
+                .execute()
+                .actionGet();
+    }
+
+    private void indexMedium(Media medium) throws IOException {
+        if (isClientAvailable()) client.prepareIndex(ES_INDEX, ES_TYPE_MEDIUM, medium.id.toString())
+                .setSource(jsonBuilder()
+                        .startObject()
+                        .field("owner", medium.owner.id)
+                        .field("filename", medium.fileName)
+                        .field("viewable", mediaManager.findAllowedToViewAccountIds(medium))
+                        .field("public", mediaManager.isPublic(medium))
                         .endObject())
                 .execute()
                 .actionGet();
