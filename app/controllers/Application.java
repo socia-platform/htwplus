@@ -169,7 +169,7 @@ public class Application extends BaseController {
         SearchResponse response;
 
         try {
-            response = elasticsearchService.doSearch("search", keyword.toLowerCase(), mode, facets, page, currentAccount.id.toString(), asList("name", "title", "content"), asList("friends", "owner", "member", "viewable"));
+            response = elasticsearchService.doSearch("search", keyword.toLowerCase(), mode, facets, page, currentAccount.id.toString(), asList("name", "title", "content", "filename"), asList("friends", "owner", "member", "viewable"));
             elasticsearchResponse.create(response, keyword, mode);
         } catch (NoNodeAvailableException nna) {
             flash("error", "Leider steht die Suche zur Zeit nicht zur Verfügung!");
