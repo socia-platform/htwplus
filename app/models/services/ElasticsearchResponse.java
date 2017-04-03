@@ -2,9 +2,11 @@ package models.services;
 
 import managers.AccountManager;
 import managers.GroupManager;
+import managers.MediaManager;
 import managers.PostManager;
 import models.Account;
 import models.Group;
+import models.Media;
 import models.Post;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.elasticsearch.action.search.SearchResponse;
@@ -35,6 +37,8 @@ public class ElasticsearchResponse {
     @Inject
     AccountManager accountManager;
 
+    @Inject
+    MediaManager mediaManager;
 
     SearchResponse elasticsearchResponse;
     public List<Object> resultList;
@@ -44,6 +48,7 @@ public class ElasticsearchResponse {
     public long lUserDocuments;
     public long lGroupDocuments;
     public long lPostDocuments;
+    public long lMediumDocuments;
 
     public HashMap studycoursesMap;
     public HashMap degreeMap;
@@ -89,6 +94,12 @@ public class ElasticsearchResponse {
                     if (group != null)
                         resultList.add(group);
                     break;
+                case "medium":
+                    Media medium = mediaManager.findById(Long.parseLong(searchHit.getId()));
+                    if (medium != null)
+                        medium.sizeInByte = mediaManager.bytesToString(medium.size, false);
+                        resultList.add(medium);
+                    break;
                 default:
                     Logger.info("no matching case for ID: " + searchHit.getId());
             }
@@ -99,6 +110,7 @@ public class ElasticsearchResponse {
         lUserDocuments = new Long(0L);
         lGroupDocuments = new Long(0L);
         lPostDocuments = new Long(0L);
+        lMediumDocuments = new Long(0L);
 
         studycoursesMap = new HashMap<String, Long>();
         degreeMap = new HashMap<String, Long>();
@@ -119,6 +131,9 @@ public class ElasticsearchResponse {
                     break;
                 case "post":
                     lPostDocuments = bucket.getDocCount();
+                    break;
+                case "medium":
+                    lMediumDocuments = bucket.getDocCount();
                     break;
             }
         }
@@ -157,6 +172,6 @@ public class ElasticsearchResponse {
     }
 
     public long getDocumentCount() {
-        return lUserDocuments + lGroupDocuments + lPostDocuments;
+        return lUserDocuments + lGroupDocuments + lPostDocuments + lMediumDocuments;
     }
 }

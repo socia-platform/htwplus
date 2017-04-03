@@ -524,7 +524,7 @@ $(document).ready(function () {
                     var label = '';
                     var hLabel = '';
                     var groupType = '';
-                    var groupIcon = '';
+                    var icon = '';
                     var custom_avatar = false;
                     if(item._type === 'user') {
                         label = item._source.name;
@@ -538,10 +538,16 @@ $(document).ready(function () {
                         if(item._source.avatar) {
                             custom_avatar = true;
                         } else {
-                            if(groupType === 'open') groupIcon = 'globe';
-                            if(groupType === 'close') groupIcon = 'lock';
-                            if(groupType === 'course') groupIcon = 'briefcase';
+                            if(groupType === 'open') icon = 'globe';
+                            if(groupType === 'close') icon = 'lock';
+                            if(groupType === 'course') icon = 'briefcase';
                         }
+                    }
+                    if(item._type === 'medium') {
+                        label = item._source.filename;
+                        hLabel = item.highlight.filename[0].replace(/\[startStrong\]/g, '<strong>').replace(/\[endStrong\]/g, '</strong>');
+                        groupType = item._source.grouptype;
+                        icon = 'file';
                     }
                     result.push({
                         label: label,
@@ -552,7 +558,7 @@ $(document).ready(function () {
                         type: item._type,
                         avatar: item._source.avatar,
                         groupType: groupType,
-                        groupIcon: groupIcon
+                        icon: icon
                     });
                 });
                 return result;
@@ -588,13 +594,17 @@ $(document).ready(function () {
                     "<div class='autosuggest-username'>{{{hLabel}}}</div>" +
                     "{{/if}}" +
                     "{{/if}}" +
-                    "{{#if groupIcon}}" +
-                    "<span class='glyphicon glyphicon-{{groupIcon}} autosuggest-group-icon'></span>{{{hLabel}}}" +
+                    "{{#if icon}}" +
+                    "<span class='glyphicon glyphicon-{{icon}} autosuggest-group-icon'></span>{{{hLabel}}}" +
                     "{{/if}}")
             }
         }
     ).on('typeahead:selected', function($e, searchResult){
-        window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
+        if (searchResult.type === 'medium') {
+            window.open(window.location.origin + "/media/" + searchResult.id);
+        } else {
+            window.location.href = window.location.origin + "/"+searchResult.type+"/" + searchResult.id + '/stream';
+        }
     });
 });
 

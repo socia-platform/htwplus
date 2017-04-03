@@ -186,6 +186,13 @@ public class AdminController extends BaseController {
         return ok(indexing.render());
     }
 
+    public Result indexMedia() throws IOException {
+        long time = mediaManager.indexAllMedia();
+        String out = "Alle Media indexiert (" + Long.toString(time) + " Sekunden)";
+        flash("info", out);
+        return ok(indexing.render());
+    }
+
     public Result viewMediaTemp() {
         //https://issues.apache.org/jira/browse/IO-373
         //String size = FileUtils.byteCountToDisplaySize(MediaController.sizeTemp());

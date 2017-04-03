@@ -106,6 +106,34 @@
                             }
                         }
 
+                        case medium: Media => {
+                            @if(response.searchMode.equals("medium") || response.searchMode.equals("all")) {
+                            <div class="well searchresult-container hp-pagination-element">
+                                <div class="group-result media">
+                                    <div class="pull-left">
+                                        <span class='glyphicon glyphicon-file'></span>
+                                    </div>
+                                    <div class="media-body">
+                                        <div class="media-heading">
+                                            <a href="@routes.MediaController.view(medium.id)"><b>@medium.title</b></a>
+                                        </div>
+                                        <small>
+                                            <b>Eigentümer:</b>
+                                            @views.html.snippets.userLink(medium.owner)
+                                            <br />
+                                            <b>Hochgeladen am:</b>
+                                            @medium.createdAt.format("dd.MM.yyyy")
+                                            <br />
+                                            <b>Dateigröße:</b>
+                                            @medium.sizeInByte
+                                            <br />
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            }
+                        }
+
                         case _ => { @result }
                     }
                 }
@@ -118,6 +146,7 @@
         @if(response.searchMode.equals("user")) { @views.html.Search.snippets.userSiteNavigation(response) }
         @if(response.searchMode.equals("group")) { @views.html.Search.snippets.groupSiteNavigation(response) }
         @if(response.searchMode.equals("post")) { @views.html.Search.snippets.postSiteNavigation(response) }
+        @if(response.searchMode.equals("medium")) { @views.html.Search.snippets.mediumSiteNavigation(response) }
     </div>
 
 }
