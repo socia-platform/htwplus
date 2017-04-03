@@ -17,16 +17,25 @@ import play.Play;
 import play.i18n.Messages;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 
 /**
  * LDAP service to establish LDAP connection and request user account data from directory.
  */
+@Singleton
 public class LdapService {
 
+    private Configuration configuration;
 
     @Inject
-    Configuration configuration;
+    public LdapService(Configuration configuration) {
+        this.configuration = configuration;
+        this.ldapServer = configuration.getString("ldap.server");
+        this.ldapPort = Integer.parseInt(configuration.getString("ldap.port"));
+        this.ldapStartTls = Boolean.parseBoolean(configuration.getString("ldap.startTls"));
+    }
+
 
     /**
      * First name
@@ -83,33 +92,6 @@ public class LdapService {
      */
     public AccountRole getRole() {
         return role;
-    }
-
-    /**
-     * Singleton instance
-     */
-    private static LdapService instance = null;
-
-    /**
-     * Private constructor for singleton instance
-     */
-    private LdapService() {
-        this.ldapServer = configuration.getString("ldap.server");
-        this.ldapPort = Integer.parseInt(configuration.getString("ldap.port"));
-        this.ldapStartTls = Boolean.parseBoolean(configuration.getString("ldap.startTls"));
-    }
-
-    /**
-     * Returns the singleton instance.
-     *
-     * @return NotificationHandler instance
-     */
-    public static LdapService getInstance() {
-        if (LdapService.instance == null) {
-            LdapService.instance = new LdapService();
-        }
-
-        return LdapService.instance;
     }
 
     /**

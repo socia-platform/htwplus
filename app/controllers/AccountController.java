@@ -25,11 +25,13 @@ public class AccountController extends BaseController {
 
     AccountManager accountManager;
     FormFactory formFactory;
+    LdapService ldapService;
 
     @Inject
-    public AccountController(AccountManager accountManager, FormFactory formFactory) {
+    public AccountController(AccountManager accountManager, FormFactory formFactory, LdapService ldapService) {
         this.accountManager = accountManager;
         this.formFactory = formFactory;
+        this.ldapService = ldapService;
     }
     /**
      * Defines a form wrapping the Account class.
@@ -72,10 +74,8 @@ public class AccountController extends BaseController {
         // Clean the username
         matriculationNumber = matriculationNumber.trim().toLowerCase();
 
-        // establish LDAP connection and try to get user data
-        LdapService ldap = LdapService.getInstance();
         try {
-            ldap.connect(matriculationNumber, password);
+            ldapService.connect(matriculationNumber, password);
         } catch (LdapService.LdapConnectorException e) {
             flash("error", e.getMessage());
             Component.addToContext(Component.ContextIdent.loginForm, form);
@@ -85,16 +85,16 @@ public class AccountController extends BaseController {
         // try to find user in DB, set role if found (default STUDENT role)
         Account account = accountManager.findByLoginName(matriculationNumber);
         AccountRole role = AccountRole.STUDENT;
-        if (ldap.getRole() != null) {
-            role = ldap.getRole();
+        if (ldapService.getRole() != null) {
+            role = ldapService.getRole();
         }
 
         // if user is not found in DB, create new user from LDAP data, otherwise update user data
         if (account == null) {
             account = new Account();
             Logger.info("New Account for " + matriculationNumber + " will be created.");
-            account.firstname = ldap.getFirstName();
-            account.lastname = ldap.getLastName();
+            account.firstname = ldapService.getFirstName();
+            account.lastname = ldapService.getLastName();
             account.loginname = matriculationNumber;
             account.password = "LDAP - not needed";
             Random generator = new Random();
@@ -102,8 +102,8 @@ public class AccountController extends BaseController {
             account.role = role;
             accountManager.create(account);
         } else {
-            account.firstname = ldap.getFirstName();
-            account.lastname = ldap.getLastName();
+            account.firstname = ldapService.getFirstName();
+            account.lastname = ldapService.getLastName();
             account.role = role;
             accountManager.update(account);
         }
@@ -161,9 +161,8 @@ public class AccountController extends BaseController {
                 return true;
             }
         } else { // LDAP Account
-            LdapService ldap = LdapService.getInstance();
             try {
-                ldap.connect(account.loginname, password); // try logging in with the specified password
+                ldapService.connect(account.loginname, password); // try logging in with the specified password
                 return true; // login successful
             } catch (LdapService.LdapConnectorException e) {
                 flash("error", e.getMessage());
