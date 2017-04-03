@@ -121,6 +121,9 @@
                                             <b>Eigentümer:</b>
                                             @views.html.snippets.userLink(medium.owner)
                                             <br />
+                                            <b>Gespeichert in:</b>
+                                            @medium.folder.name
+                                            <br />
                                             <b>Hochgeladen am:</b>
                                             @medium.createdAt.format("dd.MM.yyyy")
                                             <br />
