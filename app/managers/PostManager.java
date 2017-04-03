@@ -3,11 +3,14 @@ package managers;
 import models.Account;
 import models.Group;
 import models.Post;
+import models.base.BaseNotifiable;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
+import models.services.NotificationService;
 import play.Configuration;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
 import javax.persistence.Query;
@@ -21,30 +24,27 @@ public class PostManager implements BaseManager {
 
     @Inject
     ElasticsearchService elasticsearchService;
-
     @Inject
     NotificationManager notificationManager;
-
     @Inject
     FriendshipManager friendshipManager;
-
     @Inject
     GroupAccountManager groupAccountManager;
-
     @Inject
     PostBookmarkManager postBookmarkManager;
-
     @Inject
     GroupManager groupManager;
-
     @Inject
     Configuration configuration;
+    @Inject
+    JPAApi jpaApi;
+
 
     @Override
     public void create(Object model) {
         Post post = (Post) model;
 
-        JPA.em().persist(post);
+        jpaApi.em().persist(post);
         try {
             elasticsearchService.index(post);
         } catch (IOException e) {
@@ -53,7 +53,7 @@ public class PostManager implements BaseManager {
     }
 
     public void createWithoutIndex(Post post) {
-        JPA.em().persist(post);
+        jpaApi.em().persist(post);
     }
 
     @Override
@@ -74,13 +74,23 @@ public class PostManager implements BaseManager {
 
         notificationManager.deleteReferences(post);
 
-        JPA.em().remove(post);
+        jpaApi.em().remove(post);
 
         // Delete Elasticsearch document
         elasticsearchService.delete(post);
     }
 
-    public static List<Post> getCommentsForPost(Long id, int limit, int offset) {
+    public List<Post> getCommentsForPost(Long id, int limit, int offset) {
+        Query query = jpaApi.em()
+                .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
+                .setParameter(1, id);
+
+        query = limit(query, limit, offset);
+
+        return (List<Post>) query.getResultList();
+    }
+
+    public static List<Post> getCommentsForPost2(Long id, int limit, int offset) {
         Query query = JPA.em()
                 .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
                 .setParameter(1, id);
@@ -91,7 +101,7 @@ public class PostManager implements BaseManager {
     }
 
     public List<Post> getPostsForGroup(final Group group, final int limit, final int page) {
-        Query query = JPA.em()
+        Query query = jpaApi.em()
                 .createQuery("SELECT p FROM Post p WHERE p.group.id = ?1 ORDER BY p.updatedAt DESC")
                 .setParameter(1, group.id);
 
@@ -110,15 +120,15 @@ public class PostManager implements BaseManager {
     }
 
     public Post findById(Long id) {
-        return JPA.em().find(Post.class, id);
+        return jpaApi.em().find(Post.class, id);
     }
 
     public int countPostsForGroup(final Group group) {
-        return ((Number) JPA.em().createQuery("SELECT COUNT(p) FROM Post p WHERE p.group.id = ?1").setParameter(1, group.id).getSingleResult()).intValue();
+        return ((Number) jpaApi.em().createQuery("SELECT COUNT(p) FROM Post p WHERE p.group.id = ?1").setParameter(1, group.id).getSingleResult()).intValue();
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Post> findStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final List<Post> bookmarkList, final String filter, final int limit, final int offset) {
+    public List<Post> findStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final List<Post> bookmarkList, final String filter, final int limit, final int offset) {
         Query query = streamForAccount("SELECT DISTINCT p ", account, groupList, friendList, bookmarkList, filter, " ORDER BY p.updatedAt DESC");
 
         // set limit and offset
@@ -126,7 +136,7 @@ public class PostManager implements BaseManager {
         return query.getResultList();
     }
 
-    public static int countStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final List<Post> bookmarkList, final String filter) {
+    public int countStreamForAccount(final Account account, final List<Group> groupList, final List<Account> friendList, final List<Post> bookmarkList, final String filter) {
         final Query query = streamForAccount("SELECT DISTINCT COUNT(p)", account, groupList, friendList, bookmarkList, filter, "");
         return ((Number) query.getSingleResult()).intValue();
     }
@@ -137,7 +147,7 @@ public class PostManager implements BaseManager {
      * @param accountList - a list containing all accounts we want to search in (usually contact from account)
      * @return List of Posts
      */
-    public static Query streamForAccount(String selectClause, Account account, List<Group> groupList, List<Account> accountList, List<Post> bookmarkList, String filter, String orderByClause) {
+    public Query streamForAccount(String selectClause, Account account, List<Group> groupList, List<Account> accountList, List<Post> bookmarkList, String filter, String orderByClause) {
 
         HashMap<String, String> streamClausesMap = new HashMap<>();
         List<String> streamClausesList = new ArrayList<>();
@@ -216,7 +226,7 @@ public class PostManager implements BaseManager {
         // assemble query.
         // insert dummy where clause (1=2) for the unlikely event of empty @streamClausesList (e.g. new user with no groups or contact)
         String completeQuery = selectClause + " FROM Post p WHERE 1=2 " + assembleClauses(streamClausesList) + orderByClause;
-        Query query = JPA.em().createQuery(completeQuery);
+        Query query = jpaApi.em().createQuery(completeQuery);
 
         // check @completeQuery for parameter which are needed.
         // () are necessary to distinguish between :account and :accountList
@@ -245,7 +255,11 @@ public class PostManager implements BaseManager {
         return assembledClauses;
     }
 
-    public static int countCommentsForPost(final Long id) {
+    public int countCommentsForPost(final Long id) {
+        return ((Number) jpaApi.em().createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
+    }
+
+    public static int countCommentsForPost2(final Long id) {
         return ((Number) JPA.em().createQuery("SELECT COUNT(p.id) FROM Post p WHERE p.parent.id = ?1").setParameter(1, id).getSingleResult()).intValue();
     }
 
@@ -299,7 +313,7 @@ public class PostManager implements BaseManager {
     }
 
     public static int getCountComments(Post post) {
-        return countCommentsForPost(post.id);
+        return countCommentsForPost2(post.id);
     }
 
     public boolean belongsToGroup(Post post) {
@@ -329,14 +343,14 @@ public class PostManager implements BaseManager {
 
         // everybody from post.group can see this post
         if (belongsToGroup(post)) {
-            viewableIds.addAll(GroupAccountManager.findAccountIdsByGroup(post.group, LinkType.establish));
+            viewableIds.addAll(groupAccountManager.findAccountIdsByGroup(post.group, LinkType.establish));
         }
 
 
         if (belongsToAccount(post)) {
 
             // every friend from post.account can see this post
-            viewableIds.addAll(FriendshipManager.findFriendsId(post.account));
+            viewableIds.addAll(friendshipManager.findFriendsId(post.account));
 
             // the owner of this.account can see this post
             viewableIds.add(post.account.id);
@@ -352,12 +366,12 @@ public class PostManager implements BaseManager {
 
             // every member from post.parent.group can see this post
             if (belongsToGroup(post.parent)) {
-                viewableIds.addAll(GroupAccountManager.findAccountIdsByGroup(post.parent.group, LinkType.establish));
+                viewableIds.addAll(groupAccountManager.findAccountIdsByGroup(post.parent.group, LinkType.establish));
             }
 
             // every friend from post.parent.account can see this post
             if (belongsToAccount(post.parent)) {
-                viewableIds.addAll(FriendshipManager.findFriendsId(post.parent.account));
+                viewableIds.addAll(friendshipManager.findFriendsId(post.parent.account));
 
                 // everybody can see his own comment
                 if (isMine(post.parent)) {
@@ -399,7 +413,7 @@ public class PostManager implements BaseManager {
     private List<Post> allWithoutExceptionPosts() {
         Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
         Account adminAccount = group.owner;
-        return JPA.em().createQuery("FROM Post p WHERE p.owner.id != :adminId AND p.group.id != :groupId OR p.group IS NULL")
+        return jpaApi.em().createQuery("FROM Post p WHERE p.owner.id != :adminId AND p.group.id != :groupId OR p.group IS NULL")
                 .setParameter("groupId", group.id)
                 .setParameter("adminId", adminAccount.id)
                 .getResultList();
@@ -412,7 +426,7 @@ public class PostManager implements BaseManager {
      */
     @SuppressWarnings("unchecked")
     public List<Post> listAllPostsOwnedBy(Long id) {
-        return JPA.em().createQuery("FROM Post p WHERE p.owner.id = " + id).getResultList();
+        return jpaApi.em().createQuery("FROM Post p WHERE p.owner.id = " + id).getResultList();
     }
 
     /**
@@ -420,6 +434,6 @@ public class PostManager implements BaseManager {
      */
     @SuppressWarnings("unchecked")
     public List<Post> listAllPostsPostedOnAccount(Long id) {
-        return JPA.em().createQuery("FROM Post p WHERE p.account.id = " + id).getResultList();
+        return jpaApi.em().createQuery("FROM Post p WHERE p.account.id = " + id).getResultList();
     }
 }

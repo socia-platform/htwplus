@@ -6,7 +6,7 @@ import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.db.jpa.JPA;
-import play.libs.F;
+import play.db.jpa.JPAApi;
 import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
@@ -24,34 +24,38 @@ public class GroupAccountManager implements BaseManager {
 
     @Inject
     ElasticsearchService elasticsearchService;
-
     @Inject
     NotificationManager notificationManager;
-
     @Inject
     PostManager postManager;
+    @Inject
+    JPAApi jpaApi;
 
     @Override
     public void create(Object model) {
-        JPA.em().persist(model);
+        jpaApi.em().persist(model);
         reIndex(((GroupAccount) model).group);
     }
 
     @Override
     public void update(Object model) {
-        JPA.em().merge(model);
+        jpaApi.em().merge(model);
         reIndex(((GroupAccount) model).group);
     }
 
     @Override
     public void delete(Object model) {
         GroupAccount groupAccount = (GroupAccount) model;
-        JPA.em().remove(groupAccount);
+        jpaApi.em().remove(groupAccount);
         reIndex(groupAccount.group);
         notificationManager.deleteReferencesForAccountId(groupAccount.group, groupAccount.account.id);
     }
 
-    public static GroupAccount findById(Long id) {
+    public GroupAccount findById(Long id) {
+        return jpaApi.em().find(GroupAccount.class, id);
+    }
+
+    public static GroupAccount findById2(Long id) {
         return JPA.em().find(GroupAccount.class, id);
     }
 
@@ -60,7 +64,7 @@ public class GroupAccountManager implements BaseManager {
      */
     public List<Group> findEstablished(Account account) {
         @SuppressWarnings("unchecked")
-        List<Group> groupAccounts = JPA
+        List<Group> groupAccounts = jpaApi
                 .em()
                 .createQuery(
                         "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2")
@@ -74,7 +78,7 @@ public class GroupAccountManager implements BaseManager {
      */
     public List<Group> findGroupsEstablished(Account account) {
         @SuppressWarnings("unchecked")
-        List<Group> groupAccounts = JPA
+        List<Group> groupAccounts = jpaApi
                 .em()
                 .createQuery(
                         "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType != ?3 ORDER BY ga.group.title ASC")
@@ -89,7 +93,7 @@ public class GroupAccountManager implements BaseManager {
      */
     public List<Group> findCoursesEstablished(final Account account) {
         @SuppressWarnings("unchecked")
-        List<Group> courseAccounts = JPA
+        List<Group> courseAccounts = jpaApi
                 .em()
                 .createQuery(
                         "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType = ?3  ORDER BY ga.group.title ASC")
@@ -104,7 +108,7 @@ public class GroupAccountManager implements BaseManager {
      */
     @SuppressWarnings("unchecked")
     public List<Group> findPublicEstablished(final Account account) {
-        return JPA
+        return jpaApi
                 .em()
                 .createQuery(
                         "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType = ?3")
@@ -122,7 +126,7 @@ public class GroupAccountManager implements BaseManager {
      */
     public List<GroupAccount> findRequests(Account account) {
         @SuppressWarnings("unchecked")
-        List<GroupAccount> groupAccounts = JPA
+        List<GroupAccount> groupAccounts = jpaApi
                 .em()
                 .createQuery(
                         "SELECT ga FROM GroupAccount ga WHERE ((ga.group.owner.id = ?1 OR ga.account.id = ?1) AND ga.linkType = ?2) OR (ga.account.id = ?1 AND ga.linkType = ?3) OR (ga.account.id = ?1 AND ga.linkType = ?4)")
@@ -140,7 +144,7 @@ public class GroupAccountManager implements BaseManager {
      */
     public boolean hasLinkTypes(Account account, Group group) {
         try {
-            JPA.em().createQuery("SELECT ga FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.group.id = ?2")
+            jpaApi.em().createQuery("SELECT ga FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.group.id = ?2")
                     .setParameter(1, account.id).setParameter(2, group.id).getSingleResult();
         } catch (NoResultException exp) {
             return false;
@@ -151,9 +155,24 @@ public class GroupAccountManager implements BaseManager {
     /**
      * Retrieve Accounts from Group with given LinkType.
      */
-    public static List<Account> findAccountsByGroup(final Group group, final LinkType type) {
+    public static List<Account> findAccountsByGroup2(final Group group, final LinkType type) {
+         return JPA.withTransaction(() -> {
+             List<Account> accounts = (List<Account>) JPA
+                .em()
+                .createQuery(
+                        "SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
+                .setParameter(1, group.id).setParameter(2, type)
+                .getResultList();
+            return accounts;
+         });
+    }
+
+    /**
+     * Retrieve Accounts from Group with given LinkType.
+     */
+    public List<Account> findAccountsByGroup(final Group group, final LinkType type) {
         @SuppressWarnings("unchecked")
-        List<Account> accounts = (List<Account>) JPA
+        List<Account> accounts = (List<Account>) jpaApi
                 .em()
                 .createQuery(
                         "SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
@@ -165,9 +184,20 @@ public class GroupAccountManager implements BaseManager {
     /**
      * Retrieve AccountsId from Group with given LinkType.
      */
-    public static List<Long> findAccountIdsByGroup(final Group group, final LinkType type) {
+    public static List<Long> findAccountIdsByGroup2(final Group group, final LinkType type) {
         @SuppressWarnings("unchecked")
         List<Long> accounts = (List<Long>) JPA
+                .em()
+                .createQuery(
+                        "SELECT ga.account.id FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
+                .setParameter(1, group.id).setParameter(2, type)
+                .getResultList();
+        return accounts;
+    }
+
+    public List<Long> findAccountIdsByGroup(final Group group, final LinkType type) {
+        @SuppressWarnings("unchecked")
+        List<Long> accounts = (List<Long>) jpaApi
                 .em()
                 .createQuery(
                         "SELECT ga.account.id FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
@@ -185,7 +215,7 @@ public class GroupAccountManager implements BaseManager {
      */
     public GroupAccount find(Account account, Group group) {
         try {
-            return (GroupAccount) JPA
+            return (GroupAccount) jpaApi
                     .em()
                     .createQuery(
                             "SELECT ga FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.group.id = ?2")
@@ -210,17 +240,14 @@ public class GroupAccountManager implements BaseManager {
             Duration.create(3, TimeUnit.SECONDS),
             new Runnable() {
                 public void run() {
-                    JPA.withTransaction(new F.Callback0() {
-                        @Override
-                        public void invoke() throws Throwable {
-                            try {
-                                elasticsearchService.index(group);
-                                for (Post post : postManager.getPostsForGroup(group, 0, 0)) {
-                                    elasticsearchService.index(post);
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                    jpaApi.withTransaction(() -> {
+                        try {
+                            elasticsearchService.index(group);
+                            for (Post post : postManager.getPostsForGroup(group, 0, 0)) {
+                                elasticsearchService.index(post);
                             }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     });
                 }

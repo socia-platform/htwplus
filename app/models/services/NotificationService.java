@@ -1,20 +1,22 @@
 package models.services;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import managers.GroupAccountManager;
 import managers.NotificationManager;
 import models.Account;
 import models.Notification;
+import models.Post;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.EmailNotifications;
-import play.DefaultApplication;
+import models.enums.GroupType;
+import models.enums.LinkType;
 import play.Logger;
-import play.Play;
-import play.api.Application;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 import play.libs.Akka;
-import play.libs.F;
 import play.libs.Json;
 import scala.concurrent.duration.Duration;
 
@@ -29,26 +31,23 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class NotificationService {
 
-    private EmailService email;
-
-    /**
-     * Singleton instance
-     */
-    private static NotificationService instance = null;
+    WebSocketService webSocketService;
+    EmailService email;
+    NotificationManager notificationManager;
+    ActorSystem system;
+    JPAApi jpaApi;
 
     /**
      * Private constructor for singleton instance
      */
     @Inject
-    public NotificationService(DefaultApplication application) {
-        instance = this;
-        this.email = application.injector().instanceOf(EmailService.class);
+    public NotificationService(EmailService email, WebSocketService webSocketService, NotificationManager notificationManager, JPAApi jpaApi) {
+        this.email = email;
+        this.webSocketService = webSocketService;
+        this.notificationManager = notificationManager;
+        this.system = ActorSystem.create();
+        this.jpaApi = jpaApi;
     }
-
-    public static NotificationService getInstance() {
-        return instance;
-    }
-
 
     /**
      * Creates one or more notifications by the notifiable instance.
@@ -58,10 +57,10 @@ public class NotificationService {
      */
     public void createNotification(final INotifiable notifiable) {
         // schedule async process in 0 second from now on
-        Akka.system().scheduler().scheduleOnce(
+        system.scheduler().scheduleOnce(
                 Duration.create(0, TimeUnit.SECONDS),
                 new NotificationRunnable(notifiable),
-                Akka.system().dispatcher()
+                system.dispatcher()
         );
     }
 
@@ -101,55 +100,51 @@ public class NotificationService {
 
         @Override
         public void run() {
-            JPA.withTransaction(new F.Callback0() {
-                @Override
-                public void invoke() throws Throwable {
-                    List<Account> recipients = notifiable.getRecipients();
+            jpaApi.withTransaction(() -> {
+                List<Account> recipients = notifiable.getRecipients();
 
-                    // if no recipients, abort
-                    if (recipients == null || recipients.size() == 0) {
-                        return;
+                // if no recipients, abort
+                if (recipients == null || recipients.size() == 0) {
+                    return;
+                }
+
+                // run through all recipients
+                for (Account recipient : recipients) {
+                    // if sender == recipient, it is not necessary to create a notification -> continue
+                    if (recipient.equals(notifiable.getSender())) {
+                        continue;
                     }
 
-                    // run through all recipients
-                    for (Account recipient : recipients) {
-                        // if sender == recipient, it is not necessary to create a notification -> continue
-                        if (recipient.equals(notifiable.getSender())) {
-                            continue;
-                        }
+                    // create new notification and persist in database
+                    Notification notification = notifiable.getNotification(recipient);
+                    notification.isRead = false;
+                    notification.isSent = false;
+                    notification.recipient = recipient;
+                    notification.sender = notifiable.getSender();
+                    notification.referenceId = notifiable.getReference().id;
+                    notification.referenceType = notifiable.getReference().getClass().getSimpleName();
+                    notification.targetUrl = notifiable.getTargetUrl();
 
-                        // create new notification and persist in database
-                        Notification notification = notifiable.getNotification(recipient);
-                        notification.isRead = false;
-                        notification.isSent = false;
-                        notification.recipient = recipient;
-                        notification.sender = notifiable.getSender();
-                        notification.referenceId = notifiable.getReference().id;
-                        notification.referenceType = notifiable.getReference().getClass().getSimpleName();
-                        notification.targetUrl = notifiable.getTargetUrl();
-
-                        try {
-                            // render notification content
-                            notification.rendered = notifiable.render(notification);
-                            NotificationManager notificationManager = new NotificationManager();
-                            // if no ID is set already, persist new instance, otherwise update given instance
-                            if (notification.id == null) {
-                                notificationManager.create(notification);
-                                Logger.info("Created new notification for user: " + recipient.id.toString());
-                            } else {
-                                notificationManager.update(notification);
-                                Logger.info("Updated notification (ID: " + notification.id.toString()
-                                        + ") for user: " + recipient.id.toString()
-                                );
-                            }
-
-                            self.webSocketPush(notification);
-                            self.handleMail(notification);
-                        } catch (Exception e) {
-                            Logger.error("Could not render notification. Notification will not be stored in DB" +
-                                            " nor will the user be notified in any way." + e.getMessage()
+                    try {
+                        // render notification content
+                        notification.rendered = notifiable.render(notification);
+                        // if no ID is set already, persist new instance, otherwise update given instance
+                        if (notification.id == null) {
+                            notificationManager.create(notification);
+                            Logger.info("Created new notification for user: " + recipient.id.toString());
+                        } else {
+                            notificationManager.update(notification);
+                            Logger.info("Updated notification (ID: " + notification.id.toString()
+                                    + ") for user: " + recipient.id.toString()
                             );
                         }
+
+                        self.webSocketPush(notification);
+                        self.handleMail(notification);
+                    } catch (Exception e) {
+                        Logger.error("Could not render notification. Notification will not be stored in DB" +
+                                        " nor will the user be notified in any way." + e.getMessage()
+                        );
                     }
                 }
             });
@@ -161,14 +156,14 @@ public class NotificationService {
          * @param notification Notification
          */
         public void webSocketPush(final Notification notification) {
-            ActorRef recipientActor = WebSocketService.getInstance().getActorForAccount(notification.recipient);
+            ActorRef recipientActor = webSocketService.getActorForAccount(notification.recipient);
 
             // continue if recipientActor is instance (he is currently online)
             if (recipientActor != null) {
-                ObjectNode node = WebSocketService.getInstance()
+                ObjectNode node = webSocketService
                         .successResponseTemplate(WebSocketService.WS_METHOD_RECEIVE_NOTIFICATION);
                 node.put("notification", notification.getAsJson());
-                node.put("unreadCount", NotificationManager.countUnreadNotificationsForAccountId(notification.recipient.id));
+                node.put("unreadCount", notificationManager.countUnreadNotificationsForAccountId(notification.recipient.id));
                 recipientActor.tell(Json.toJson(node), null);
             }
         }

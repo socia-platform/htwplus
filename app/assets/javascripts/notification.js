@@ -115,7 +115,7 @@ function WS() {
 
         var notificationCounters = $('#hp-notifications-item').find('.badge');
         // if update counters
-        for (var counterIndex = 0; counterIndex < notificationCounters.size(); counterIndex++) {
+        for (var counterIndex = 0; counterIndex < notificationCounters.length; counterIndex++) {
             if (notificationCounters.hasOwnProperty(counterIndex)) {
                 notificationCounters[counterIndex].innerHTML = unreadNotifications;
                 this.updateFaviconTitle(unreadNotifications);

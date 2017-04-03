@@ -1,6 +1,5 @@
 package controllers;
 
-import com.typesafe.config.ConfigFactory;
 import controllers.Navigation.Level;
 import managers.AccountManager;
 import managers.GroupManager;
@@ -12,9 +11,11 @@ import models.services.ElasticsearchResponse;
 import models.services.ElasticsearchService;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
+import play.Configuration;
 import play.Logger;
 import play.Routes;
 import play.data.Form;
+import play.data.FormFactory;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
@@ -34,24 +35,36 @@ import static java.util.Arrays.asList;
 @Transactional
 public class Application extends BaseController {
 
-    static Form<Post> postForm = Form.form(Post.class);
-    static final int LIMIT = ConfigFactory.load().getInt("htwplus.post.limit");
-    static final int PAGE = 1;
-
-    @Inject
     ElasticsearchService elasticsearchService;
-
-    @Inject
     ElasticsearchResponse elasticsearchResponse;
-
-    @Inject
     GroupManager groupManager;
-
-    @Inject
     PostManager postManager;
+    AccountManager accountManager;
+    Configuration configuration;
+    FormFactory formFactory;
 
     @Inject
-    AccountManager accountManager;
+    public Application(ElasticsearchService elasticsearchService,
+            ElasticsearchResponse elasticsearchResponse,
+            GroupManager groupManager,
+            PostManager postManager,
+            AccountManager accountManager,
+            Configuration configuration,
+            FormFactory formFactory) {
+        this.elasticsearchService = elasticsearchService;
+        this.elasticsearchResponse = elasticsearchResponse;
+        this.groupManager = groupManager;
+        this. postManager = postManager;
+        this.accountManager = accountManager;
+        this.configuration = configuration;
+        this.formFactory = formFactory;
+        this.postForm = formFactory.form(Post.class);
+        this.limit = configuration.getInt("htwplus.post.limit");
+    }
+
+    Form<Post> postForm;
+    int limit;
+    static final int PAGE = 1;
 
     public Result javascriptRoutes() {
         response().setContentType("text/javascript");
@@ -68,7 +81,7 @@ public class Application extends BaseController {
     public Result index() {
         Navigation.set(Level.STREAM, "Alles");
         Account currentAccount = Component.currentAccount();
-        return ok(stream.render(currentAccount, postManager.getStream(currentAccount, LIMIT, PAGE), postForm, postManager.countStream(currentAccount, ""), LIMIT, PAGE, "all"));
+        return ok(stream.render(currentAccount, postManager.getStream(currentAccount, limit, PAGE), postForm, postManager.countStream(currentAccount, ""), limit, PAGE, "all"));
     }
 
     public Result help() {
@@ -98,9 +111,9 @@ public class Application extends BaseController {
         Account currentAccount = Component.currentAccount();
 
         if (raw) {
-            return ok(streamRaw.render(postManager.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, postManager.countStream(currentAccount, filter), LIMIT, page, filter));
+            return ok(streamRaw.render(postManager.getFilteredStream(currentAccount, limit, page, filter), postForm, postManager.countStream(currentAccount, filter), limit, page, filter));
         } else {
-            return ok(stream.render(currentAccount, postManager.getFilteredStream(currentAccount, LIMIT, page, filter), postForm, postManager.countStream(currentAccount, filter), LIMIT, page, filter));
+            return ok(stream.render(currentAccount, postManager.getFilteredStream(currentAccount, limit, page, filter), postForm, postManager.countStream(currentAccount, filter), limit, page, filter));
         }
     }
 
@@ -122,13 +135,13 @@ public class Application extends BaseController {
     public Result search(int page) throws ExecutionException, InterruptedException {
 
         Account currentAccount = Component.currentAccount();
-        String keyword = Form.form().bindFromRequest().field("keyword").value();
-        String mode = Form.form().bindFromRequest().field("mode").value();
-        String studycourseParam = Form.form().bindFromRequest().field("studycourse").value();
-        String degreeParam = Form.form().bindFromRequest().field("degree").value();
-        String semesterParam = Form.form().bindFromRequest().field("semester").value();
-        String roleParam = Form.form().bindFromRequest().field("role").value();
-        String grouptypeParam = Form.form().bindFromRequest().field("grouptype").value();
+        String keyword = formFactory.form().bindFromRequest().field("keyword").value();
+        String mode = formFactory.form().bindFromRequest().field("mode").value();
+        String studycourseParam = formFactory.form().bindFromRequest().field("studycourse").value();
+        String degreeParam = formFactory.form().bindFromRequest().field("degree").value();
+        String semesterParam = formFactory.form().bindFromRequest().field("semester").value();
+        String roleParam = formFactory.form().bindFromRequest().field("role").value();
+        String grouptypeParam = formFactory.form().bindFromRequest().field("grouptype").value();
 
         HashMap<String, String[]> facets = new HashMap<>();
         facets.put("studycourse", buildUserFacetList(studycourseParam));
@@ -170,7 +183,7 @@ public class Application extends BaseController {
 
         return ok(views.html.Search.searchresult.render(
                 page,
-                LIMIT,
+                limit,
                 elasticsearchResponse));
     }
 
@@ -191,7 +204,7 @@ public class Application extends BaseController {
 
         // Guest case
         if (account == null) {
-            account = accountManager.findByEmail(play.Play.application().configuration().getString("htwplus.admin.mail"));
+            account = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
         }
 
         Form<Post> filledForm = postForm.bindFromRequest();

@@ -2,8 +2,8 @@ package managers;
 
 import models.Folder;
 import models.Media;
-import models.Studycourse;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -14,8 +14,14 @@ import java.util.List;
  */
 public class FolderManager implements BaseManager {
 
-    @Inject
     MediaManager mediaManager;
+    JPAApi jpaApi;
+
+    @Inject
+    public FolderManager(MediaManager mediaManager, JPAApi jpaApi) {
+        this.mediaManager = mediaManager;
+        this.jpaApi = jpaApi;
+    }
 
     public Folder findById(long id) {
         return JPA.em().find(Folder.class, id);
@@ -23,7 +29,7 @@ public class FolderManager implements BaseManager {
 
     @Override
     public void create(Object model) {
-        JPA.em().persist(model);
+        jpaApi.em().persist(model);
     }
 
     @Override

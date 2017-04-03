@@ -1,6 +1,5 @@
 package controllers;
 
-import com.google.inject.Inject;
 import managers.AccountManager;
 import models.Account;
 import models.Login;
@@ -9,14 +8,14 @@ import models.services.LdapService;
 import play.Logger;
 import play.data.DynamicForm;
 import play.data.Form;
+import play.data.FormFactory;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
 import views.html.landingpage;
 
+import javax.inject.Inject;
 import java.util.Random;
-
-import static play.data.Form.form;
 
 /**
  * Controller for authenticate purposes.
@@ -24,13 +23,18 @@ import static play.data.Form.form;
 @Transactional
 public class AccountController extends BaseController {
 
-    @Inject
     AccountManager accountManager;
+    FormFactory formFactory;
 
+    @Inject
+    public AccountController(AccountManager accountManager, FormFactory formFactory) {
+        this.accountManager = accountManager;
+        this.formFactory = formFactory;
+    }
     /**
      * Defines a form wrapping the Account class.
      */
-    final static Form<Account> signupForm = form(Account.class);
+    //final Form<Account> signupForm = formFactory.form(Account.class);
 
     /**
      * Default authentication action.
@@ -38,19 +42,19 @@ public class AccountController extends BaseController {
      * @return Result
      */
     public Result authenticate() {
-        DynamicForm form = form().bindFromRequest();
+        DynamicForm form = formFactory.form().bindFromRequest();
         String username = form.field("email").value();
 
         // save originURL before clearing the session (it gets cleared in defaultAuthenticate() and LdapAuthenticate())
         String redirect = session().get("originURL");
 
         if (username.contains("@")) {
-            return defaultAuthenticate(redirect);
+            return emailAuthenticate(redirect);
         } else if (username.length() == 0) {
             flash("error", "Also deine Matrikelnummer brauchen wir schon!");
             return badRequest(landingpage.render());
         } else {
-            return LdapAuthenticate(redirect);
+            return ldapAuthenticate(redirect);
         }
     }
 
@@ -59,8 +63,8 @@ public class AccountController extends BaseController {
      *
      * @return Result
      */
-    private Result LdapAuthenticate(final String redirect) {
-        Form<Login> form = form(Login.class).bindFromRequest();
+    private Result ldapAuthenticate(final String redirect) {
+        Form<Login> form = formFactory.form(Login.class).bindFromRequest();
         String matriculationNumber = form.field("email").value();
         String password = form.field("password").value();
         String rememberMe = form.field("rememberMe").value();
@@ -114,17 +118,18 @@ public class AccountController extends BaseController {
         return redirect(redirect);
     }
 
-    private Result defaultAuthenticate(final String redirect) {
-        Form<Login> loginForm = form(Login.class).bindFromRequest();
-        if (loginForm.hasErrors()) {
-            flash("error", loginForm.globalError().message());
+    private Result emailAuthenticate(final String redirect) {
+        Form<Login> loginForm = formFactory.form(Login.class).bindFromRequest();
+        Login login = loginForm.get();
+        if (!accountManager.isAccountValid(login.email, login.password)) {
+            flash("error", "Bitte melde dich mit deiner Matrikelnummer an.");
             Component.addToContext(Component.ContextIdent.loginForm, loginForm);
             return badRequest(landingpage.render());
         } else {
             session().clear();
             session("email", loginForm.get().email);
-            session("id", accountManager.findByEmail(loginForm.get().email).id.toString());
-            session("firstname", accountManager.findByEmail(loginForm.get().email).firstname);
+            session("id", accountManager.findByEmail(login.email).id.toString());
+            session("firstname", accountManager.findByEmail(login.email).firstname);
             if (loginForm.get().rememberMe != null) {
                 session("rememberMe", "1");
             }
@@ -149,8 +154,7 @@ public class AccountController extends BaseController {
         }
 
         if (account.loginname == null || account.loginname.length() == 0) { // not an LDAP Account
-            Account auth = accountManager.authenticate(account.email, password);
-            if (auth == null || auth.id != account.id) {
+            if (accountManager.isAccountValid(account.email, password)) {
                 flash("error", Messages.get("profile.delete.wrongpassword"));
                 return false;
             } else {

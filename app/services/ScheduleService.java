@@ -1,15 +1,18 @@
 package services;
 
 import akka.actor.ActorSystem;
+import akka.actor.Cancellable;
 import managers.MediaManager;
 import models.services.EmailService;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-import play.DefaultApplication;
+import play.api.inject.ApplicationLifecycle;
+import play.libs.F;
 import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,29 +24,37 @@ public class ScheduleService {
     private EmailService emailService;
     private MediaManager mediaManager;
     private ActorSystem system;
+    private ApplicationLifecycle lifecycle;
 
     @Inject
-    public ScheduleService(DefaultApplication app) {
+    public ScheduleService(EmailService emailService, MediaManager mediaManager, ApplicationLifecycle lifecycle) {
         system = ActorSystem.create();
-        this.emailService = app.injector().instanceOf(EmailService.class);
-        this.mediaManager = app.injector().instanceOf(MediaManager.class);
+        this.emailService = emailService;
+        this.mediaManager = mediaManager;
+        this.lifecycle = lifecycle;
         schedule();
     }
 
     private void schedule() {
 
         // set the email schedule to next full hour clock for sending daily and hourly emails
-        system.scheduler().schedule(
+        Cancellable emailScheudler = system.scheduler().schedule(
                 Duration.create(nextExecutionInSeconds(getNextHour(), 0), TimeUnit.SECONDS),
-                Duration.create(1, TimeUnit.HOURS),
+                Duration.create(1, TimeUnit.MINUTES),
                 () -> {
                     emailService.sendDailyHourlyNotificationsEmails();
                 },
                 system.dispatcher()
         );
 
+        // cancel it on application stop
+        lifecycle.addStopHook(() -> {
+            emailScheudler.cancel();
+            return CompletableFuture.completedFuture(null);
+        });
+
         // Sets the schedule for cleaning the media temp directory
-        system.scheduler().schedule(
+        Cancellable cleanUpScheudler = system.scheduler().schedule(
                 Duration.create(0, TimeUnit.MILLISECONDS),
                 Duration.create(2, TimeUnit.HOURS),
                 () -> {
@@ -51,6 +62,12 @@ public class ScheduleService {
                 },
                 system.dispatcher()
         );
+
+        // cancel it on application stop
+        lifecycle.addStopHook(() -> {
+            cleanUpScheudler.cancel();
+            return CompletableFuture.completedFuture(null);
+        });
     }
 
     /**

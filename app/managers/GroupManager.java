@@ -5,6 +5,7 @@ import models.base.FileOperationException;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -33,6 +34,10 @@ public class GroupManager implements BaseManager {
     @Inject
     AvatarManager avatarManager;
 
+    @Inject
+    JPAApi jpaApi;
+
+
     public void createWithGroupAccount(Group group, Account account) {
         group.owner = account;
         group.rootFolder = new Folder("_"+group.title, account, null, group, null);
@@ -43,7 +48,7 @@ public class GroupManager implements BaseManager {
 
     @Override
     public void create(Object model) {
-        JPA.em().persist(model);
+        jpaApi.em().persist(model);
     }
 
     @Override
@@ -75,14 +80,26 @@ public class GroupManager implements BaseManager {
         // Delete Elasticsearch document
         elasticsearchService.delete(group);
 
-        JPA.em().remove(group);
+        jpaApi.em().remove(group);
     }
 
     public Group findById(Long id) {
-        return JPA.em().find(Group.class, id);
+        return jpaApi.em().find(Group.class, id);
     }
 
     public Group findByTitle(String title) {
+        List<Group> groups = (List<Group>) jpaApi.em()
+                .createQuery("FROM Group g WHERE g.title = ?1")
+                .setParameter(1, title).getResultList();
+
+        if (groups.isEmpty()) {
+            return null;
+        } else {
+            return groups.get(0);
+        }
+    }
+
+    public static Group findByTitle2(String title) {
         List<Group> groups = (List<Group>) JPA.em()
                 .createQuery("FROM Group g WHERE g.title = ?1")
                 .setParameter(1, title).getResultList();
@@ -95,11 +112,11 @@ public class GroupManager implements BaseManager {
     }
 
     public List<Group> all() {
-        return JPA.em().createQuery("FROM Group").getResultList();
+        return jpaApi.em().createQuery("FROM Group").getResultList();
     }
 
     public List<Group> listAllGroupsOwnedBy(Long id) {
-        return JPA.em().createQuery("FROM Group g WHERE g.owner.id = " + id).getResultList();
+        return jpaApi.em().createQuery("FROM Group g WHERE g.owner.id = " + id).getResultList();
     }
 
     /**

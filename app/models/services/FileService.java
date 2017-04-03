@@ -1,18 +1,20 @@
 package models.services;
 
 import models.base.FileOperationException;
-import play.Play;
+import play.Configuration;
 import play.Logger;
 import play.api.PlayException;
 import org.apache.commons.lang.Validate;
 import eu.medsea.mimeutil.MimeUtil;
 import eu.medsea.mimeutil.MimeType;
+import play.mvc.Http;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.api.libs.MimeTypes;
+
+import javax.inject.Inject;
 import java.io.IOException;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
@@ -26,7 +28,7 @@ import java.util.Collection;
  * @Todo Not completed yet
  */
 public class FileService {
-    
+
     public static String MIME_JPEG = "image/jpeg";
     public static String MIME_PNG = "image/png";
 
@@ -43,8 +45,8 @@ public class FileService {
      * @param realm Namespace of the file
      * @param file The File
      */
-    public FileService(String realm, File file){
-        this.initPath(realm);
+    public FileService(String realm, File file, String path){
+        this.initPath(realm, path);
         this.initProperties(file);
     }
 
@@ -54,8 +56,8 @@ public class FileService {
      * @param realm Namespace of the file
      * @param filePart The FilePart
      */
-    public FileService(String realm, FilePart filePart){
-        this(realm, filePart.getFile());
+    public FileService(String realm, Http.MultipartFormData.FilePart<File> filePart, String path){
+        this(realm, filePart.getFile(), path);
         this.contentType = filePart.getContentType();
         this.fileName = filePart.getFilename();
     }
@@ -66,8 +68,8 @@ public class FileService {
      * @param realm Namespace of the file
      * @param fileName The file name
      */
-    public FileService(String realm, String fileName) throws FileOperationException {
-        this.initPath(realm);
+    public FileService(String realm, String fileName, String path) throws FileOperationException {
+        this.initPath(realm, path);
         File file = this.openFile(fileName);
         if(file == null) {
             throw new FileOperationException("File does not exit");
@@ -80,8 +82,8 @@ public class FileService {
      *
      * @param realm The namespace
      */
-    private void initPath(String realm) {
-        this.path = Play.application().configuration().getString("media.fileStore");
+    private void initPath(String realm, String path) {
+        this.path = path;
         if(this.path ==  null) {
             throw new PlayException(
                     "Configuration Error",
@@ -225,7 +227,7 @@ public class FileService {
         }
 
         if(destFile.exists()){
-            return new FileService(this.realm, destFile);
+            return new FileService(this.realm, destFile, path);
         } else {
             return null;
         }

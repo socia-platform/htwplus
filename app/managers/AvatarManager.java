@@ -1,19 +1,24 @@
 package managers;
 
-import com.typesafe.config.ConfigFactory;
-import models.Account;
 import models.Avatar;
 import models.base.FileOperationException;
 import models.base.ValidationException;
 import models.enums.AvatarSize;
 import models.services.FileService;
 import models.services.ImageService;
+import play.Configuration;
 import play.i18n.Messages;
 import play.mvc.Http;
 
+import javax.inject.Inject;
 import java.io.File;
 
 public class AvatarManager {
+
+
+    @Inject
+    Configuration configuration;
+
 
     static public String AVATAR_REALM = "avatar";
     static public int AVATAR_MIN_SIZE = 250;
@@ -30,9 +35,11 @@ public class AvatarManager {
      * @throws ValidationException
      */
     public void setTempAvatar(Http.MultipartFormData.FilePart filePart, Long modelId) throws ValidationException {
-        FileService fileService = new FileService(AVATAR_REALM, filePart);
+        FileService fileService;
+        fileService = new FileService(AVATAR_REALM, filePart, configuration.getString("media.fileStore"));
 
-        int maxSize = ConfigFactory.load().getInt("avatar.maxSize");
+
+        int maxSize = configuration.getInt("avatar.maxSize");
         if (!fileService.validateSize(FileService.MBAsByte(maxSize))) {
             throw new ValidationException(Messages.get("error.fileToBig"));
         }
@@ -58,7 +65,7 @@ public class AvatarManager {
     public File getTempAvatar(Long modelId) {
         FileService fileService;
         try {
-            fileService = new FileService(AVATAR_REALM, this.getTempAvatarName(modelId));
+            fileService = new FileService(AVATAR_REALM, this.getTempAvatarName(modelId), configuration.getString("media.fileStore"));
             return fileService.getFile();
         } catch (FileOperationException e) {
             return null;
@@ -71,7 +78,7 @@ public class AvatarManager {
      * @param avatarForm
      */
     public void saveAvatar(Avatar avatarForm, Long modelId) throws FileOperationException {
-        FileService fsTempAvatar = new FileService(AVATAR_REALM, this.getTempAvatarName(modelId));
+        FileService fsTempAvatar = new FileService(AVATAR_REALM, this.getTempAvatarName(modelId), configuration.getString("media.fileStore"));
         FileService fsAvatarLarge = fsTempAvatar.copy(this.getAvatarName(AvatarSize.LARGE, modelId));
         ImageService.crop(fsAvatarLarge.getFile(), avatarForm.x, avatarForm.y, avatarForm.width, avatarForm.height);
         FileService fsAvatarMedium = fsAvatarLarge.copy(this.getAvatarName(AvatarSize.MEDIUM, modelId));
@@ -90,7 +97,7 @@ public class AvatarManager {
     public File getAvatar(AvatarSize size, Long modelId) {
         FileService fileService;
         try {
-            fileService = new FileService(AvatarManager.AVATAR_REALM, this.getAvatarName(size, modelId));
+            fileService = new FileService(AvatarManager.AVATAR_REALM, this.getAvatarName(size, modelId), configuration.getString("media.fileStore"));
             return fileService.getFile();
         } catch (FileOperationException e) {
             return null;

@@ -105,7 +105,7 @@ GET         /notification/:id                          controllers.NotificationC
 
 
 # WebSocket
-GET         /websocket                                 controllers.WebSocketController.webSocket()
+# GET         /websocket                                 controllers.WebSocketController.webSocket()
 
 
 # Map static resources from the /public folder to the /assets URL path
@@ -121,8 +121,8 @@ POST        /admin/user/:id/delete                     controllers.AdminControll
 GET         /admin/user/list                           controllers.AdminController.listAccounts()
 GET         /admin/media/                              controllers.AdminController.viewMediaTemp()
 GET         /admin/media/clean                         controllers.AdminController.cleanMediaTemp()
-GET         /admin/broadcast_notification              controllers.AdminController.broadcastNotificationForm()
-POST        /admin/broadcast_notification              controllers.AdminController.broadcastNotification()
+# GET         /admin/broadcast_notification              controllers.AdminController.broadcastNotificationForm()
+# POST        /admin/broadcast_notification              controllers.AdminController.broadcastNotification()
 GET         /admin/indexing                            controllers.AdminController.indexing()
 GET         /admin/indexing/accounts                   controllers.AdminController.indexAccounts()
 GET         /admin/indexing/groups                     controllers.AdminController.indexGroups()

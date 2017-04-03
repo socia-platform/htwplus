@@ -4,14 +4,12 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import models.Account;
 import models.Folder;
-import models.Group;
 import models.Media;
 import org.apache.commons.io.FileUtils;
+import play.Configuration;
 import play.Logger;
-import play.Play;
 import play.db.jpa.JPA;
 import java.nio.file.Files;
-import views.html.Group.media;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -27,10 +25,14 @@ import java.util.UUID;
  */
 public class MediaManager implements BaseManager {
 
+
     @Inject
     NotificationManager notificationManager;
 
-    private Config conf = ConfigFactory.load();
+    @Inject
+    Configuration configuration;
+
+
     final String tempPrefix = "htwplus_temp";
 
     @Override
@@ -76,7 +78,7 @@ public class MediaManager implements BaseManager {
         if (media == null) {
             return null;
         }
-        String path = Play.application().configuration().getString("media.path");
+        String path = configuration.getString("media.path");
         media.file = new File(path + "/" + media.url);
         if (media.file.exists()) {
             return media;
@@ -89,7 +91,7 @@ public class MediaManager implements BaseManager {
         List<Media> mediaList = JPA.em().createQuery("FROM Media m WHERE m.folder.id = " + folderId).getResultList();
         List<Media> returningMediaList = new ArrayList<>();
         for (Media media : mediaList) {
-            String path = Play.application().configuration().getString("media.path");
+            String path = configuration.getString("media.path");
             media.file = new File(path + "/" + media.url);
             if (media.file.exists()) {
                 returningMediaList.add(media);
@@ -128,7 +130,7 @@ public class MediaManager implements BaseManager {
     }
 
     private void deleteFile(Media media) throws FileNotFoundException {
-        String path = Play.application().configuration().getString("media.path");
+        String path = configuration.getString("media.path");
         File file = new File(path + "/" + media.url);
         if (file.exists()) {
             file.delete();
@@ -138,7 +140,7 @@ public class MediaManager implements BaseManager {
     }
 
     private void createFile(Media media) throws Exception {
-        String path = Play.application().configuration().getString("media.path");
+        String path = configuration.getString("media.path");
         File newFile = new File(path + "/" + media.url);
         if (newFile.exists()) {
             throw new Exception("File exists already");
@@ -170,7 +172,7 @@ public class MediaManager implements BaseManager {
     public void cleanUpTemp() {
         Logger.info("Cleaning the Tempory Media Directory");
 
-        String tmpPath = conf.getString("media.tempPath");
+        String tmpPath = configuration.getString("media.tempPath");
         File dir = new File(tmpPath);
         Logger.info("Directory: " + dir.toString());
         File[] files = dir.listFiles();
@@ -201,7 +203,7 @@ public class MediaManager implements BaseManager {
      * Size of temporary media directoy used for ZIP Downloads
      */
     public long sizeTemp() {
-        String tmpPath = conf.getString("media.tempPath");
+        String tmpPath = configuration.getString("media.tempPath");
         File dir = new File(tmpPath);
         return FileUtils.sizeOfDirectory(dir);
     }

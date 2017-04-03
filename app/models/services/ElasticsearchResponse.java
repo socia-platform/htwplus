@@ -25,6 +25,7 @@ import java.util.List;
 @Singleton
 public class ElasticsearchResponse {
 
+
     @Inject
     PostManager postManager;
 
@@ -33,6 +34,7 @@ public class ElasticsearchResponse {
 
     @Inject
     AccountManager accountManager;
+
 
     SearchResponse elasticsearchResponse;
     public List<Object> resultList;

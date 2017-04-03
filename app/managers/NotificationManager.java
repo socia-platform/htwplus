@@ -5,8 +5,10 @@ import models.Notification;
 import models.base.BaseModel;
 import models.enums.EmailNotifications;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 import play.libs.F;
 
+import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,20 +19,25 @@ import java.util.Map;
  * Created by Iven on 17.12.2015.
  */
 public class NotificationManager implements BaseManager {
+
+
+    @Inject
+    JPAApi jpaApi;
+
     @Override
     public void create(Object object) {
-        JPA.em().persist(object);
+        jpaApi.em().persist(object);
     }
 
     @Override
     public void update(Object object) {
         ((Notification) object).updatedAt();
-        JPA.em().merge(object);
+        jpaApi.em().merge(object);
     }
 
     @Override
     public void delete(Object object) {
-        JPA.em().remove(object);
+        jpaApi.em().remove(object);
 
     }
 
@@ -45,7 +52,7 @@ public class NotificationManager implements BaseManager {
      */
     @SuppressWarnings("unchecked")
     public List<Notification> findByAccountId(final Long accountId, final int maxResults, final int offsetResults) throws Throwable {
-        return (List<Notification>) JPA.em()
+        return (List<Notification>) jpaApi.em()
                 .createQuery("FROM Notification n WHERE n.recipient.id = :accountId ORDER BY n.isRead ASC, n.updatedAt DESC")
                 .setParameter("accountId", accountId)
                 .setMaxResults(maxResults)
@@ -62,7 +69,7 @@ public class NotificationManager implements BaseManager {
      */
     @SuppressWarnings("unchecked")
     public List<Notification> findBySenderId(final Long senderId) {
-        return (List<Notification>) JPA.em()
+        return (List<Notification>) jpaApi.em()
                 .createQuery("FROM Notification n WHERE n.sender.id = :senderId")
                 .setParameter("senderId", senderId)
                 .getResultList();
@@ -102,7 +109,7 @@ public class NotificationManager implements BaseManager {
      * @param reference BaseModel reference
      */
     public void deleteReferences(final BaseModel reference) {
-        JPA.em().createQuery("DELETE FROM Notification n WHERE n.referenceId = :referenceId")
+        jpaApi.em().createQuery("DELETE FROM Notification n WHERE n.referenceId = :referenceId")
                 .setParameter("referenceId", reference.id)
                 .executeUpdate();
     }
@@ -114,7 +121,7 @@ public class NotificationManager implements BaseManager {
      * @param accountId User account ID
      */
     public void deleteReferencesForAccountId(final BaseModel reference, final long accountId) {
-        JPA.em().createQuery("DELETE FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :accountId")
+        jpaApi.em().createQuery("DELETE FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :accountId")
                 .setParameter("referenceId", reference.id)
                 .setParameter("accountId", accountId)
                 .executeUpdate();
@@ -126,7 +133,7 @@ public class NotificationManager implements BaseManager {
      * @param accountId User account ID
      */
     public void deleteNotificationsForAccount(final long accountId) {
-        JPA.em().createQuery("DELETE FROM Notification n WHERE n.recipient.id = :accountId")
+        jpaApi.em().createQuery("DELETE FROM Notification n WHERE n.recipient.id = :accountId")
                 .setParameter("accountId", accountId)
                 .executeUpdate();
     }
@@ -138,7 +145,7 @@ public class NotificationManager implements BaseManager {
      * @return Notification instance
      */
     public Notification findById(Long id) {
-        return JPA.em().find(Notification.class, id);
+        return jpaApi.em().find(Notification.class, id);
     }
 
     /**
@@ -150,11 +157,13 @@ public class NotificationManager implements BaseManager {
      * @throws NoResultException
      */
     public static Notification findByReferenceIdAndRecipientId(Long referenceId, Long recipientId) throws NoResultException {
-        return JPA.em()
-                .createQuery("FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :recipientId", Notification.class)
-                .setParameter("referenceId", referenceId)
-                .setParameter("recipientId", recipientId)
-                .getSingleResult();
+        return JPA.withTransaction(() -> {
+            return JPA.em()
+                    .createQuery("FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :recipientId", Notification.class)
+                    .setParameter("referenceId", referenceId)
+                    .setParameter("recipientId", recipientId)
+                    .getSingleResult();
+        });
     }
 
     /**
@@ -164,7 +173,7 @@ public class NotificationManager implements BaseManager {
      * @return Notification instance
      */
     public List<Notification> findByRenderedContent(String renderedContent) throws NoResultException {
-        return JPA.em()
+        return jpaApi.em()
                 .createQuery("FROM Notification n WHERE n.rendered = :renderedContent", Notification.class)
                 .setParameter("renderedContent", renderedContent)
                 .getResultList();
@@ -177,7 +186,7 @@ public class NotificationManager implements BaseManager {
      * @return Number of notifications
      */
     public int countNotificationsForAccountId(final Long accountId) {
-        return ((Number) JPA.em()
+        return ((Number) jpaApi.em()
                 .createQuery("SELECT COUNT(n) FROM Notification n WHERE n.recipient.id = :accountId")
                 .setParameter("accountId", accountId)
                 .getSingleResult()).intValue();
@@ -208,22 +217,10 @@ public class NotificationManager implements BaseManager {
      */
     @SuppressWarnings("unchecked")
     public Map<Account, List<Notification>> findUsersWithDailyHourlyEmailNotifications() throws Throwable {
-        List<Object[]> notificationsRecipients = JPA.withTransaction(new F.Function0<List<Object[]>>() {
-            @Override
-            public List<Object[]> apply() throws Throwable {
-                return (List<Object[]>) JPA.em()
-                        .createQuery("FROM Notification n JOIN n.recipient a WHERE n.isSent = false AND n.isRead = false "
-                                + "AND ((a.emailNotifications = :daily AND HOUR(CURRENT_TIME) = a.dailyEmailNotificationHour) "
-                                + "OR a.emailNotifications = :hourly) ORDER BY n.recipient.id DESC"
-                        )
-                        .setParameter("daily", EmailNotifications.COLLECTED_DAILY)
-                        .setParameter("hourly", EmailNotifications.HOURLY)
-                        .getResultList();
-            }
-        });
+        Map<Account, List<Notification>> accountMap = new HashMap<>();
+        List<Object[]> notificationsRecipients = findRecipients();
 
         // translate list of notifications and accounts into map
-        Map<Account, List<Notification>> accountMap = new HashMap<>();
         for (Object[] entry : notificationsRecipients) {
             Notification notification = (Notification) entry[0];
             Account account = (Account) entry[1];
@@ -244,6 +241,18 @@ public class NotificationManager implements BaseManager {
         return accountMap;
     }
 
+    private List<Object[]> findRecipients() {
+        return jpaApi.withTransaction(() -> {
+            return jpaApi.em()
+                    .createQuery("FROM Notification n JOIN n.recipient a WHERE n.isSent = false AND n.isRead = false "
+                            + "AND ((a.emailNotifications = :daily AND HOUR(CURRENT_TIME) = a.dailyEmailNotificationHour) "
+                            + "OR a.emailNotifications = :hourly) ORDER BY n.recipient.id DESC"
+                    )
+                    .setParameter("daily", EmailNotifications.COLLECTED_DAILY)
+                    .setParameter("hourly", EmailNotifications.HOURLY)
+                    .getResultList();
+        });
+    }
 
     /**
      * Marks all unread notifications as read for an account.
@@ -251,7 +260,7 @@ public class NotificationManager implements BaseManager {
      * @param account Account
      */
     public void markAllAsRead(Account account) {
-        JPA.em()
+        jpaApi.em()
                 .createQuery("UPDATE Notification n SET n.isRead = true WHERE n.recipient = :account AND n.isRead = false")
                 .setParameter("account", account)
                 .executeUpdate();

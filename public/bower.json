@@ -7,21 +7,21 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "handlebars": "=2.0.0",
+    "handlebars": "*",
     "typehead.js": "=0.10.5",
-    "jQuery-linkify": "=1.1.7",
-    "jquery": "=1.11.0",
-    "jquery-scrollspy": "",
-    "gsap": "=1.14.2",
-    "ScrollMagic": "=1.1.2",
-    "dropzone": "=4.3.0",
-    "cropper": "=0.9.0",
-    "readmore": "",
-    "markdown-it": "^6.0.0",
-    "markdown-it-mark": "=2.0.0",
-    "markdown-it-emoji": "=1.1.0"
+    "jQuery-linkify": "*",
+    "jquery": "=2.2.4",
+    "jquery-scrollspy": "*",
+    "gsap": "*",
+    "ScrollMagic": "*",
+    "dropzone": "*",
+    "cropper": "*",
+    "readmore": "*",
+    "markdown-it": "*",
+    "markdown-it-mark": "*",
+    "markdown-it-emoji": "*"
   },
   "resolutions": {
-    "gsap": "=1.14.2"
+    "gsap": "*"
   }
 }

@@ -10,9 +10,10 @@ import models.enums.AvatarSize;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.NotificationService;
-import play.Play;
+import play.Configuration;
 import play.data.DynamicForm;
 import play.data.Form;
+import play.data.FormFactory;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.libs.Json;
@@ -33,34 +34,51 @@ import java.util.List;
 @Security.Authenticated(Secured.class)
 public class GroupController extends BaseController {
 
-    @Inject
     GroupManager groupManager;
-
-    @Inject
     GroupAccountManager groupAccountManager;
-
-    @Inject
     MediaManager mediaManager;
-
-    @Inject
     FriendshipManager friendshipManager;
-
-    @Inject
     PostManager postManager;
-
-    @Inject
     AccountManager accountManager;
-
-    @Inject
     FolderManager folderManager;
+    AvatarManager avatarManager;
+    NotificationService notificationService;
+    Configuration configuration;
+    FormFactory formFactory;
 
     @Inject
-    AvatarManager avatarManager;
+    public GroupController(GroupManager groupManager,
+            GroupAccountManager groupAccountManager,
+            MediaManager mediaManager,
+            FriendshipManager friendshipManager,
+            PostManager postManager,
+            AccountManager accountManager,
+            FolderManager folderManager,
+            AvatarManager avatarManager, NotificationService notificationService,
+            Configuration configuration,
+            FormFactory formFactory) {
+        this.groupManager = groupManager;
+        this.groupAccountManager = groupAccountManager;
+        this.mediaManager = mediaManager;
+        this.friendshipManager = friendshipManager;
+        this.postManager = postManager;
+        this.accountManager = accountManager;
+        this.folderManager = folderManager;
+        this.avatarManager = avatarManager;
+        this.notificationService = notificationService;
+        this.configuration = configuration;
+        this.formFactory = formFactory;
 
-    static Form<Group> groupForm = Form.form(Group.class);
-    static Form<Folder> folderForm = Form.form(Folder.class);
-    static Form<Post> postForm = Form.form(Post.class);
-    static final int LIMIT = Integer.parseInt(Play.application().configuration().getString("htwplus.post.limit"));
+        this.groupForm = formFactory.form(Group.class);
+        this.folderForm = formFactory.form(Folder.class);
+        this.postForm = formFactory.form(Post.class);
+        this.limit = configuration.getInt("htwplus.post.limit");
+    }
+
+    Form<Group> groupForm;
+    Form<Folder> folderForm;
+    Form<Post> postForm;
+    int limit;
     static final int PAGE = 1;
 
     public Result index() {
@@ -101,12 +119,12 @@ public class GroupController extends BaseController {
         }
 
         Navigation.set(Level.GROUPS, "Newsstream", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
-        List<Post> posts = postManager.getPostsForGroup(group, LIMIT, page);
+        List<Post> posts = postManager.getPostsForGroup(group, limit, page);
 
         if (raw) {
-            return ok(streamRaw.render(group, posts, postForm, postManager.countPostsForGroup(group), LIMIT, page));
+            return ok(streamRaw.render(group, posts, postForm, postManager.countPostsForGroup(group), limit, page));
         } else {
-            return ok(stream.render(group, posts, postForm, postManager.countPostsForGroup(group), LIMIT, page));
+            return ok(stream.render(group, posts, postForm, postManager.countPostsForGroup(group), limit, page));
         }
     }
 
@@ -221,7 +239,7 @@ public class GroupController extends BaseController {
         }
 
         Navigation.set(Level.GROUPS, "Bearbeiten", group.title, controllers.routes.GroupController.stream(group.id, PAGE, false));
-        Form<Group> groupForm = Form.form(Group.class).fill(group);
+        Form<Group> groupForm = formFactory.form(Group.class).fill(group);
         groupForm.data().put("type", String.valueOf(group.groupType.ordinal()));
         return ok(edit.render(group, groupForm));
 
@@ -379,7 +397,7 @@ public class GroupController extends BaseController {
         } else if (group.groupType.equals(GroupType.close)) {
             groupAccountManager.create(new GroupAccount(group, account, LinkType.request));
             group.temporarySender = account;
-            NotificationService.getInstance().createNotification(group, Group.GROUP_NEW_REQUEST);
+            notificationService.createNotification(group, Group.GROUP_NEW_REQUEST);
             flash("success", Messages.get("group.group_request_sent"));
             return redirect(controllers.routes.GroupController.index());
         } else if (group.groupType.equals(GroupType.course)) {
@@ -456,7 +474,7 @@ public class GroupController extends BaseController {
 
         group.temporarySender = group.owner;
         group.addTemporaryRecipient(account);
-        NotificationService.getInstance().createNotification(group, Group.GROUP_REQUEST_SUCCESS);
+        notificationService.createNotification(group, Group.GROUP_REQUEST_SUCCESS);
 
         return redirect(controllers.routes.GroupController.index());
     }
@@ -486,7 +504,7 @@ public class GroupController extends BaseController {
         }
         group.temporarySender = group.owner;
         group.addTemporaryRecipient(account);
-        NotificationService.getInstance().createNotification(group, Group.GROUP_REQUEST_DECLINE);
+        notificationService.createNotification(group, Group.GROUP_REQUEST_DECLINE);
 
         return redirect(controllers.routes.GroupController.index());
     }
@@ -517,7 +535,7 @@ public class GroupController extends BaseController {
 
         if (Secured.inviteMember(group)) {
             // bind invite list to group
-            DynamicForm form = Form.form().bindFromRequest();
+            DynamicForm form = formFactory.form().bindFromRequest();
             group.inviteList = form.data().values();
 
             // if no one is invited, abort
@@ -535,7 +553,7 @@ public class GroupController extends BaseController {
                     // Create group account link to inviteAccount and add to notification recipient list
                     // if the inviteAccount is not already member, the sender and recipients are friends
                     // and the group account link is not already set up.
-                    if (!Secured.isMemberOfGroup(group, inviteAccount) && FriendshipManager.alreadyFriendly(currentUser, inviteAccount) && groupAccount == null) {
+                    if (!Secured.isMemberOfGroup(group, inviteAccount) && friendshipManager.alreadyFriendly(currentUser, inviteAccount) && groupAccount == null) {
                         groupAccountManager.create(new GroupAccount(group, inviteAccount, LinkType.invite));
 
                         // add inviteAccount to temporaryRecipients list for notifications later
@@ -549,7 +567,7 @@ public class GroupController extends BaseController {
             }
 
             group.temporarySender = currentUser;
-            NotificationService.getInstance().createNotification(group, Group.GROUP_INVITATION);
+            notificationService.createNotification(group, Group.GROUP_INVITATION);
         }
 
         flash("success", Messages.get("group.invite_invited"));
@@ -721,7 +739,7 @@ public class GroupController extends BaseController {
             return forbidden(result);
         }
 
-        Form<Avatar> form = Form.form(Avatar.class).bindFromRequest();
+        Form<Avatar> form = formFactory.form(Avatar.class).bindFromRequest();
 
         if (form.hasErrors()) {
             result.put("error", form.errorsAsJson());

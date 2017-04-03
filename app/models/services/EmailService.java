@@ -1,10 +1,8 @@
 package models.services;
 
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import managers.NotificationManager;
-import play.libs.F;
+import play.Configuration;
+import play.db.jpa.JPAApi;
 import play.libs.mailer.Email;
 import play.libs.mailer.MailerClient;
 import javax.inject.Inject;
@@ -13,7 +11,6 @@ import javax.inject.Singleton;
 import models.Account;
 import models.Notification;
 import play.Logger;
-import play.db.jpa.JPA;
 import play.i18n.Messages;
 
 import java.util.ArrayList;
@@ -25,14 +22,32 @@ import java.util.Map;
 @Singleton
 public class EmailService {
 
-    private Config conf = ConfigFactory.load();
-    private final String EMAIL_SENDER = conf.getString("htwplus.email.sender");
-    private final String PLAIN_TEXT_TEMPLATE = "views.html.Emails.notificationsPlainText";
-    private final String HTML_TEMPLATE = "views.html.Emails.notificationsHtml";
+    Configuration configuration;
+    MailerClient mailerClient;
+    Email email;
+    NotificationManager notificationManager;
+    JPAApi jpaApi;
 
-    @Inject MailerClient mailerClient;
-    @Inject Email email;
-    @Inject NotificationManager notificationManager;
+    @Inject
+    public EmailService(Configuration configuration,
+            MailerClient mailerClient,
+            Email email,
+            NotificationManager notificationManager,
+            JPAApi jpaApi) {
+        this.configuration = configuration;
+        this.mailerClient = mailerClient;
+        this.email = email;
+        this.notificationManager = notificationManager;
+        this.jpaApi = jpaApi;
+
+        this.EMAIL_SENDER = configuration.getString("htwplus.email.sender");
+
+
+    }
+
+    private String EMAIL_SENDER;
+    private String PLAIN_TEXT_TEMPLATE = "views.html.Emails.notificationsPlainText";
+    private String HTML_TEMPLATE = "views.html.Emails.notificationsHtml";
 
     /**
      * Sends an email.
@@ -86,13 +101,10 @@ public class EmailService {
             );
 
             // mark notifications to be sent (JPA transaction required, as this is a async process)
-            JPA.withTransaction(new F.Callback0() {
-                @Override
-                public void invoke() throws Throwable {
-                    for (Notification notification : notifications) {
-                        notification.isSent = true;
-                        notificationManager.update(notification);
-                    }
+            jpaApi.withTransaction(() -> {
+                for (Notification notification : notifications) {
+                    notification.isSent = true;
+                    notificationManager.update(notification);
                 }
             });
 

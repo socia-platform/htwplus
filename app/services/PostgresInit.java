@@ -1,7 +1,5 @@
 package services;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import controllers.Component;
 import managers.AccountManager;
 import managers.GroupManager;
@@ -9,6 +7,7 @@ import models.Account;
 import models.Group;
 import models.enums.AccountRole;
 import models.enums.GroupType;
+import play.Configuration;
 import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
@@ -20,28 +19,30 @@ import javax.inject.Singleton;
 @Singleton
 public class PostgresInit implements DatabaseService {
 
-    private JPAApi jpaApi;
+    JPAApi jpaApi;
     AccountManager accountManager;
     GroupManager groupManager;
-
-    private final Config conf = ConfigFactory.load();
-    private final String adminGroupTitle = conf.getString("htwplus.admin.group");
-    private final String adminMail = conf.getString("htwplus.admin.mail");
-    private final String adminPassword = conf.getString("htwplus.admin.pw");
-    private final String dummyMail = conf.getString("htwplus.dummy.mail");
-    private final String dummyPassword = conf.getString("htwplus.dummy.pw");
+    Configuration configuration;
 
     @Inject
-    public PostgresInit(JPAApi jpaApi, AccountManager accountManager, GroupManager groupManager) {
+    public PostgresInit(JPAApi jpaApi, AccountManager accountManager, GroupManager groupManager, Configuration configuration) {
         this.jpaApi = jpaApi;
         this.accountManager = accountManager;
         this.groupManager = groupManager;
+        this.configuration = configuration;
         initialization();
     }
 
     @Override
     public void initialization() {
-        jpaApi.withTransaction(() -> {
+
+        final String adminGroupTitle = configuration.getString("htwplus.admin.group");
+        final String adminMail = configuration.getString("htwplus.admin.mail");
+        final String adminPassword = configuration.getString("htwplus.admin.pw");
+        final String dummyMail = configuration.getString("htwplus.dummy.mail");
+        final String dummyPassword = configuration.getString("htwplus.dummy.pw");
+
+        this.jpaApi.withTransaction(() -> {
 
             // create admin account if none exists
             Account adminAccount = accountManager.findByEmail(adminMail);

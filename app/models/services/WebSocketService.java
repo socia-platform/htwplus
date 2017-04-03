@@ -9,9 +9,8 @@ import managers.FriendshipManager;
 import models.Account;
 import models.actors.WebSocketActor;
 import play.Logger;
-import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 import play.libs.Akka;
-import play.libs.F;
 import play.libs.Json;
 import play.mvc.WebSocket;
 
@@ -35,6 +34,10 @@ public class WebSocketService {
 
     @Inject
     AccountManager accountManager;
+    @Inject
+    FriendshipManager friendshipManager;
+    @Inject
+    JPAApi jpaApi;
 
     /**
      * Singleton instance
@@ -46,10 +49,6 @@ public class WebSocketService {
      */
     Map<Long, ActorRef> accountActor = new HashMap<>();
 
-    /**
-     * Private constructor for singleton instance
-     */
-    private WebSocketService() { }
 
     /**
      * Returns the singleton instance.
@@ -215,11 +214,8 @@ public class WebSocketService {
      */
     private Account getAccountById(final Long accountId) {
         try {
-            return JPA.withTransaction(new F.Function0<Account>() {
-                @Override
-                public Account apply() throws Throwable {
-                    return accountManager.findById(accountId);
-                }
+            return jpaApi.withTransaction(() -> {
+                return accountManager.findById(accountId);
             });
         } catch (Throwable throwable) {
             throwable.printStackTrace();
@@ -236,11 +232,8 @@ public class WebSocketService {
      */
     private boolean isFriendshipEstablished(final Account a, final Account b) {
         try {
-            return JPA.withTransaction(new F.Function0<Boolean>() {
-                @Override
-                public Boolean apply() throws Throwable {
-                    return FriendshipManager.alreadyFriendly(a, b);
-                }
+            return jpaApi.withTransaction(() -> {
+                return friendshipManager.alreadyFriendly(a, b);
             });
         } catch (Throwable throwable) {
             throwable.printStackTrace();

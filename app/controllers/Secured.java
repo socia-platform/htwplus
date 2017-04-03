@@ -1,12 +1,10 @@
 package controllers;
 
-
-import com.ning.http.client.Request;
 import com.typesafe.config.ConfigFactory;
 import managers.*;
 import models.*;
 import models.enums.AccountRole;
-import play.Play;
+import play.Configuration;
 import play.i18n.Messages;
 import play.mvc.Http;
 import play.mvc.Http.Context;
@@ -21,6 +19,13 @@ import java.util.Date;
  * This class provides several authorization methods for security reasons.
  */
 public class Secured extends Security.Authenticator {
+
+	Configuration configuration;
+
+	@Inject
+	public Secured(Configuration configuration) {
+		this.configuration = configuration;
+	}
 
 	/**
 	 * Returns the ID of the currently logged in user.
@@ -39,7 +44,7 @@ public class Secured extends Security.Authenticator {
         if (previousTick != null && !previousTick.equals("")) {
             long previousT = Long.valueOf(previousTick);
             long currentT = new Date().getTime();
-            long timeout = Long.valueOf(Play.application().configuration().getString("sessionTimeout")) * 1000 * 60;
+            long timeout = Long.valueOf(configuration.getString("sessionTimeout")) * 1000 * 60;
             long passedT = currentT - previousT;
             if (passedT > timeout && !ctx.session().containsKey("rememberMe")) {
                 // session expired
@@ -503,7 +508,7 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in user is owner of account
 	 */
 	public static boolean isOwnerOfAccount(final Long accountId) {
-		return AccountManager.isOwner(accountId, Component.currentAccount());
+		return AccountManager.isOwner2(accountId, Component.currentAccount());
 	}
 
 	/**
@@ -513,7 +518,7 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in account has friendship to account
 	 */
 	public static boolean isFriend(Account account) {
-		return FriendshipManager.alreadyFriendly(Component.currentAccount(), account);
+		return FriendshipManager.alreadyFriendly2(Component.currentAccount(), account);
 	}
 
 	/**

@@ -1,7 +1,6 @@
 
 package models.services;
 
-import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import managers.FriendshipManager;
@@ -23,12 +22,10 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import play.Environment;
 import play.Logger;
-import play.api.Configuration;
-import play.api.DefaultApplication;
-import play.api.Play;
-import scala.Option;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.*;
 import java.net.InetAddress;
@@ -48,9 +45,12 @@ public class ElasticsearchService implements IElasticsearchService {
 
     @Inject
     PostManager postManger;
-
     @Inject
-    DefaultApplication app;
+    GroupAccountManager groupAccountManager;
+    @Inject
+    FriendshipManager friendshipManager;
+    @Inject
+    Environment environment;
 
     private Client client = null;
     private Config conf = ConfigFactory.load().getConfig("elasticsearch");
@@ -148,7 +148,7 @@ public class ElasticsearchService implements IElasticsearchService {
                         .field("public", true)
                         .field("owner", group.owner.id)
                         .field("avatar", group.hasAvatar)
-                        .field("member", GroupAccountManager.findAccountIdsByGroup(group, LinkType.establish))
+                        .field("member", groupAccountManager.findAccountIdsByGroup(group, LinkType.establish))
                         .endObject())
                 .execute()
                 .actionGet();
@@ -166,7 +166,7 @@ public class ElasticsearchService implements IElasticsearchService {
                         .field("initial", account.getInitials())
                         .field("avatar", account.avatar)
                         .field("public", true)
-                        .field("friends", FriendshipManager.findFriendsId(account))
+                        .field("friends", friendshipManager.findFriendsId(account))
                         .endObject())
                 .execute()
                 .actionGet();
@@ -325,15 +325,13 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     private String loadFromFile(String filePath) {
-        //http://stackoverflow.com/questions/16299542/load-file-from-conf-directory-on-cloudbees
-        Option<InputStream> inputStreamOption = app.resourceAsStream(filePath);
-            try {
-                return IOUtils.toString(inputStreamOption.get());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            return IOUtils.toString(environment.resourceAsStream(filePath));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return "";
     }
