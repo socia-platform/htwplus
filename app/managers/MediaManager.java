@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import play.Configuration;
 import play.Logger;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,6 +38,9 @@ public class MediaManager implements BaseManager {
 
     @Inject
     ElasticsearchService elasticsearchService;
+
+    @Inject
+    JPAApi jpaApi;
 
     final String tempPrefix = "htwplus_temp";
 
@@ -98,7 +102,7 @@ public class MediaManager implements BaseManager {
     }
 
     public List<Media> findByFolder(Long folderId) {
-        List<Media> mediaList = JPA.em().createQuery("FROM Media m WHERE m.folder.id = " + folderId).getResultList();
+        List<Media> mediaList = jpaApi.em().createQuery("FROM Media m WHERE m.folder.id = " + folderId).getResultList();
         List<Media> returningMediaList = new ArrayList<>();
         for (Media media : mediaList) {
             String path = configuration.getString("media.path");

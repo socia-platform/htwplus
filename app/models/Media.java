@@ -55,6 +55,10 @@ public class Media extends BaseNotifiable implements INotifiable {
         return this.folder.findRoot(this.folder).group;
     }
 
+    public Account findAccount() {
+        return this.folder.findRoot(this.folder).account;
+    }
+
     @Override
     public Account getSender() {
         return this.temporarySender;

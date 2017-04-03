@@ -7,10 +7,6 @@
         <div class="col-lg-12" role="main">
             <div class="hp-notepad-content addmargin">
 
-                @***
-                @views.html.Group.snippets.navTabs(group)
-                ***@
-
                 <h2>Gruppe erstellen</h2>
                 <br>
 
@@ -21,7 +17,7 @@
 
                         @if(Secured.createCourse()) {
                             @helper.inputGroupType(groupForm("type"),
-                                options = options("0"->"Öffentliche Gruppe","1"->"Private Gruppe","2"->"Kurs"),
+                                options = options("0"->"Öffentliche Gruppe (Inhalte dieser Gruppe sind für alle sichtbar!)","1"->"Private Gruppe","2"->"Kurs"),
                                 '_label -> "Typ")
                         } else {
                             @helper.inputGroupType(groupForm("type"),

@@ -122,7 +122,11 @@
                                             @views.html.snippets.userLink(medium.owner)
                                             <br />
                                             <b>Gespeichert in:</b>
-                                            @medium.folder.name
+                                            @if(medium.findGroup() != null) {
+                                            <a href="@routes.GroupController.media(medium.findGroup().id, medium.folder.id)">@medium.folder.name</a>
+                                            <small>(Gruppe: @medium.findGroup().title)</small>
+                                            }
+                                            @if(medium.findAccount() != null) { <a href="@routes.ProfileController.files(medium.owner.id)">öffentliche Dateien</a> }
                                             <br />
                                             <b>Hochgeladen am:</b>
                                             @medium.createdAt.format("dd.MM.yyyy")

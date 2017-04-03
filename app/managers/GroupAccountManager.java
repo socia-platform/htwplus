@@ -29,6 +29,8 @@ public class GroupAccountManager implements BaseManager {
     @Inject
     PostManager postManager;
     @Inject
+    MediaManager mediaManager;
+    @Inject
     JPAApi jpaApi;
 
     @Override
@@ -234,26 +236,22 @@ public class GroupAccountManager implements BaseManager {
      * @param group group which should be indexed
      */
     private void reIndex(Group group) {
-        ActorSystem system = ActorSystem.create();
-        // reindexing can be very time consuming -> do it in an own thread.
-        system.scheduler().scheduleOnce(
-            Duration.create(3, TimeUnit.SECONDS),
-            new Runnable() {
-                public void run() {
-                    jpaApi.withTransaction(() -> {
-                        try {
-                            elasticsearchService.index(group);
-                            for (Post post : postManager.getPostsForGroup(group, 0, 0)) {
-                                elasticsearchService.index(post);
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
+        new Thread(() -> {
+            jpaApi.withTransaction(() -> {
+                try {
+                    elasticsearchService.index(group);
+                    for (Post post : postManager.getPostsForGroup(group, 0, 0)) {
+                        elasticsearchService.index(post);
+                    }
+
+                    for (Media medium : mediaManager.findByFolder(group.rootFolder.id)) {
+                        elasticsearchService.index(medium);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            },
-            system.dispatcher()
-        );
+            });
+        }).start();
     }
 
     /**
