@@ -193,33 +193,12 @@ public class Application extends BaseController {
     }
 
     public Result feedback() {
-        Navigation.set("Feedback");
-        return ok(feedback.render(postForm));
-    }
-
-    public Result addFeedback() {
-
-        Account account = Component.currentAccount();
-        Group group = groupManager.findByTitle("HTWplus Feedback");
-
-        // Guest case
-        if (account == null) {
-            account = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
+        final String feedbackGroup = configuration.getString("htwplus.feedback.group");
+        Group feedback = groupManager.findByTitle(feedbackGroup);
+        if (feedback != null) {
+            return redirect(controllers.routes.GroupController.view(feedback.id));
         }
-
-        Form<Post> filledForm = postForm.bindFromRequest();
-        if (filledForm.hasErrors()) {
-            flash("error", "Jo, fast. Probiere es noch einmal mit Inhalt ;-)");
-            return redirect(controllers.routes.Application.feedback());
-        } else {
-            Post p = filledForm.get();
-            p.owner = account;
-            p.group = group;
-            postManager.create(p);
-            flash("success", "Vielen Dank für Dein Feedback!");
-        }
-
-        return redirect(controllers.routes.Application.index());
+        return notFound();
     }
 
     public Result imprint() {

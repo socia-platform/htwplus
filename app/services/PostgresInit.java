@@ -41,6 +41,7 @@ public class PostgresInit implements DatabaseService {
         final String adminPassword = configuration.getString("htwplus.admin.pw");
         final String dummyMail = configuration.getString("htwplus.dummy.mail");
         final String dummyPassword = configuration.getString("htwplus.dummy.pw");
+        final String feedbackGroupTitle = configuration.getString("htwplus.feedback.group");
 
         this.jpaApi.withTransaction(() -> {
 
@@ -79,9 +80,9 @@ public class PostgresInit implements DatabaseService {
             }
 
             // create feedback group if none exists
-            if (groupManager.findByTitle("HTWplus Feedback") == null) {
+            if (groupManager.findByTitle(feedbackGroupTitle) == null) {
                 Group feedbackGroup = new Group();
-                feedbackGroup.title = "HTWplus Feedback";
+                feedbackGroup.title = feedbackGroupTitle;
                 feedbackGroup.groupType = GroupType.open;
                 feedbackGroup.description = "Du hast Wünsche, Ideen, Anregungen, Kritik oder Probleme mit der Seite? Hier kannst du es loswerden!";
                 groupManager.createWithGroupAccount(feedbackGroup, adminAccount);

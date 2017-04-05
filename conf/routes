@@ -12,7 +12,6 @@ POST        /login                                     controllers.AccountContro
 GET         /logout                                    controllers.AccountController.logout()
 GET         /help                                      controllers.Application.help()
 GET         /feedback                                  controllers.Application.feedback()
-POST        /feedback/add                              controllers.Application.addFeedback()
 GET         /imprint                                   controllers.Application.imprint()
 GET         /privacy                                   controllers.Application.privacy()
 GET         /404                                       controllers.Application.error()
