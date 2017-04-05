@@ -3,20 +3,14 @@ package models.services;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import managers.GroupAccountManager;
 import managers.NotificationManager;
 import models.Account;
 import models.Notification;
-import models.Post;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.EmailNotifications;
-import models.enums.GroupType;
-import models.enums.LinkType;
 import play.Logger;
-import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
-import play.libs.Akka;
 import play.libs.Json;
 import scala.concurrent.duration.Duration;
 
@@ -56,12 +50,9 @@ public class NotificationService {
      * @param notifiable Notifiable instance, to retrieve the required notification data
      */
     public void createNotification(final INotifiable notifiable) {
-        // schedule async process in 0 second from now on
-        system.scheduler().scheduleOnce(
-                Duration.create(0, TimeUnit.SECONDS),
-                new NotificationRunnable(notifiable),
-                system.dispatcher()
-        );
+        new Thread(() -> {
+            new NotificationRunnable(notifiable).run();
+        }).start();
     }
 
     /**
@@ -179,16 +170,12 @@ public class NotificationService {
                     && !notification.isSent
                     && !notification.isRead
                     ) {
-                // schedule another for email handling async process in 0 second from now on
-                Akka.system().scheduler().scheduleOnce(
-                        Duration.create(0, TimeUnit.SECONDS),
-                        new Runnable() {
-                            // runs the Akka schedule
-                            public void run() {
-                                email.sendNotificationEmail(notification);
-                            }
-                        },
-                        Akka.system().dispatcher()
+                // since hibernate persist and update contradictions
+                // schedule another process for email handling in 5 second from now on
+                system.scheduler().scheduleOnce(
+                    Duration.create(5, TimeUnit.SECONDS),
+                    () -> { email.sendNotificationEmail(notification); },
+                    system.dispatcher()
                 );
             }
         }

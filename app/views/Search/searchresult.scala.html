@@ -39,6 +39,9 @@
                                                     <span class="glyphicon glyphicon-plus"></span>
                                                     <a href="@routes.FriendshipController.requestFriend(account.id)">Kontaktanfrage schicken</a>
                                                 }
+                                                <br />
+                                                <span>Seit <b>@account.createdAt.format("dd.MM.YYYY")</b> dabei.</span>
+                                                <br />
                                             </small>
                                         </div>
                                     </div>
@@ -72,6 +75,10 @@
 
                                                 <b>Gründer:</b>
                                                 @views.html.snippets.userLink(group.owner)
+                                                <br />
+
+                                                <b>Erstellt am:</b>
+                                                @group.createdAt.format("dd.MM.YYYY")
                                                 <br />
 
                                                 <b>Mitglieder:</b>

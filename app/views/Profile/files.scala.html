@@ -7,10 +7,12 @@
 <div class="row">
     <div class="col-md-12" role="main">
         <div class="hp-notepad-content addmargin">
-            <br />
-            <h4>Hier findest du alle Dateien, die du bei dir oder auf anderen Streams hochgeladen hast.</h4>
-            <h5>(In Zukunft wirst du diese Dateien genauso organisieren können, wie du es aus Gruppen kennst.)</h5>
-            <br />
+            @if(account.equals(Component.currentAccount())) {
+                <br />
+                <h4>Hier findest du alle Dateien, die du bei dir oder auf anderen Streams hochgeladen hast.</h4>
+                <h5>(In Zukunft wirst du diese Dateien genauso organisieren können, wie du es aus Gruppen kennst.)</h5>
+                <br />
+            }
             @views.html.Media.list(fileList, folderList, account.id)
         </div>
     </div>

@@ -17,9 +17,11 @@
                 @for(parents <- navigationFolder) {
                 <li><a href="@routes.GroupController.media(group.id, parents.id)">@parents.name</a></li>
                 }
+                @if(Secured.uploadMedia(group)) {
                 <li><a href="#" title="Einen neuen Ordner erstellen" class="hp-create-folder">
                     <span class="glyphicon glyphicon-plus"></span>
                 </a></li>
+                }
             </ol>
 
             <div id="hp-create-folder-wrapper" class="hidden">
@@ -40,7 +42,9 @@
             <hr/>
             <br/>
             @if(Secured.uploadMedia(group)) {
-            @views.html.Media.upload(folder.id)
+                @views.html.Media.upload(folder.id)
+            } else {
+                <i>Du hast leider keine Berechtigung etwas hochzuladen.</i>
             }
             <br/>
             <br/>
