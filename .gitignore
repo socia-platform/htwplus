@@ -24,6 +24,7 @@ server.pid
 .classpath
 .project
 conf/application.conf
+conf/logback.xml
 public/media
 public/bower_components
 htwplus
