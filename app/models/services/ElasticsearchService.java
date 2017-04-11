@@ -12,7 +12,6 @@ import models.Group;
 import models.Media;
 import models.Post;
 import models.enums.LinkType;
-import org.apache.commons.io.IOUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -34,6 +33,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -44,6 +44,8 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
  */
 @Singleton
 public class ElasticsearchService implements IElasticsearchService {
+
+    final Logger.ALogger logger = Logger.of(ElasticsearchService.class);
 
     @Inject
     PostManager postManger;
@@ -87,9 +89,9 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     public void closeClient() {
-        Logger.info("closing ES client...");
+        logger.info("closing ES client...");
         client.close();
-        Logger.info("ES client closed");
+        logger.info("ES client closed");
     }
 
     public boolean isClientAvailable() {
@@ -314,12 +316,12 @@ public class ElasticsearchService implements IElasticsearchService {
          searchRequest.setPostFilter(boolFilterBuilder2);
          }*/
 
-        //Logger.info(searchRequest.toString());
+        //logger.info(searchRequest.toString());
 
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
 
-        //Logger.info(response.toString());
+        //logger.info(response.toString());
 
         return response;
     }
@@ -349,14 +351,7 @@ public class ElasticsearchService implements IElasticsearchService {
     }
 
     private String loadFromFile(String filePath) {
-        try {
-            return IOUtils.toString(environment.resourceAsStream(filePath));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return "";
+        Scanner s = new Scanner(environment.resourceAsStream(filePath)).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 }

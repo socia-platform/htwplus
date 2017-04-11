@@ -6,7 +6,6 @@ import models.Media;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
-import org.apache.commons.io.FileUtils;
 import play.Configuration;
 import play.Logger;
 import play.db.jpa.JPA;
@@ -211,15 +210,6 @@ public class MediaManager implements BaseManager {
             Logger.info("files is null");
         }
 
-    }
-
-    /**
-     * Size of temporary media directoy used for ZIP Downloads
-     */
-    public long sizeTemp() {
-        String tmpPath = configuration.getString("media.tempPath");
-        File dir = new File(tmpPath);
-        return FileUtils.sizeOfDirectory(dir);
     }
 
     public int byteAsMB(long size) {

@@ -1,24 +1,18 @@
 package models.services;
 
 import models.base.FileOperationException;
-import play.Configuration;
+import org.springframework.util.Assert;
 import play.Logger;
 import play.api.PlayException;
-import org.apache.commons.lang.Validate;
-import eu.medsea.mimeutil.MimeUtil;
-import eu.medsea.mimeutil.MimeType;
 import play.mvc.Http;
-import play.mvc.Http.MultipartFormData.FilePart;
 import play.api.libs.MimeTypes;
 
-import javax.inject.Inject;
 import java.io.IOException;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * This class acts as a abstraction level for file system operations.
@@ -37,7 +31,6 @@ public class FileService {
     private File file;
     private String contentType;
     private String fileName;
-    private FilePart filePart;
 
     /**
      * Get a FileService from a basic File
@@ -90,7 +83,7 @@ public class FileService {
                     "The configuration key 'media.fileStore' is not set");
         }
         this.realm = realm;
-        Validate.notNull(this.realm, "The realm cannot be null");
+        Assert.notNull(this.realm, "The realm cannot be null");
     }
 
     /**
@@ -100,7 +93,7 @@ public class FileService {
      */
     private void initProperties(File file) {
         this.file = file;
-        Validate.notNull(this.file, "The file cannot be null");
+        Assert.notNull(this.file, "The file cannot be null");
     }
 
     /**
@@ -135,7 +128,7 @@ public class FileService {
      * @return boolean True if valid
      */
     public boolean validateSize(long size) {
-        Validate.notNull(this.file, "The file property is null.");
+        Assert.notNull(this.file, "The file property is null.");
         long fileSize = file.length();
         if(fileSize > size){
             return false;
@@ -152,7 +145,7 @@ public class FileService {
      * @return boolean True if valid
      */
     public boolean validateContentType(String[] contentTypes){
-        Validate.notNull(this.contentType, "Content type is not set");
+        Assert.notNull(this.contentType, "Content type is not set");
         MimeTypes.defaultTypes();
         if(Arrays.asList(contentTypes).contains(this.contentType)) {
             return true;
@@ -162,33 +155,13 @@ public class FileService {
     }
 
     /**
-     * Try to determine the content type with the Mime Type Detection utility.
-     * If successful the contentType property is set automatically.
-     *
-     * @return Content Tyoe
-     */
-    public String guessContentType() {
-        Validate.notNull(this.file, "The file property is null.");
-        MimeUtil.registerMimeDetector("eu.medsea.mimeutil.detector.MagicMimeMimeDetector");
-        Collection<MimeType> mimeTypes = MimeUtil.getMimeTypes(file);
-        String result;
-        if(!mimeTypes.isEmpty()){
-            result = mimeTypes.iterator().next().toString();
-        } else {
-            result = null;
-        }
-        this.contentType = result;
-        return result;
-    }
-
-    /**
      * Save the file to a custom file name within the realm.
      *
      * @param fileName The name of the file
      * @param overwrite Set to true if already existing file should be overwritten
      */
     public void saveFile(String fileName, boolean overwrite) {
-        Validate.notNull(this.file, "The file property is null.");
+        Assert.notNull(this.file, "The file property is null.");
         String path = this.buildPath(fileName);
         Logger.info(path);
         File newFile = new File(path);
