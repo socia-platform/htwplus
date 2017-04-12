@@ -82,6 +82,7 @@ public class MediaManager implements BaseManager {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<Media> findAll() {
         return JPA.em().createQuery("FROM Media").getResultList();
     }
@@ -100,6 +101,7 @@ public class MediaManager implements BaseManager {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<Media> findByFolder(Long folderId) {
         List<Media> mediaList = jpaApi.em().createQuery("FROM Media m WHERE m.folder.id = " + folderId).getResultList();
         List<Media> returningMediaList = new ArrayList<>();

@@ -133,6 +133,7 @@ public class FriendshipManager implements BaseManager {
                 .setParameter(1, accountId).getResultList();
     }
 
+    @SuppressWarnings("unchecked")
     public List<Long> findFriendsId(final Account account){
         return (List<Long>) jpaApi.em().createQuery("SELECT fs.friend.id FROM Friendship fs WHERE fs.account.id = ?1 AND fs.linkType = ?2")
                 .setParameter(1, account.id).setParameter(2, LinkType.establish).getResultList();

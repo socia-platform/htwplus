@@ -1,3 +1,5 @@
+@(loginForm: Form[Login])
+
 <!DOCTYPE html>
 <html lang="de">
 
@@ -28,7 +30,24 @@
                     -->
                     </div>
                     <div id="hp-login-right" class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-4 col-md-offset-1">
-                    @controllers.Component.loginForm()
+                        <img id="hp-plusi" src='@routes.Assets.at("images/Plusi/eule_froh.png")'>
+                        <h2>Anmelden</h2>
+
+                        @helper.form(routes.AccountController.authenticate) {
+                        <div class="form-group">
+                            <input type="text" class="form-control input-lg" id="loginUser" name="email" placeholder="Matrikelnummer (z.B.: s0123456)" value='@loginForm("email").value'>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control input-lg" id="loginPassword" name="password" placeholder="Dein HTW Passwort (LSF)">
+                        </div>
+                        <div class="checkbox pull-left">
+                            <label>
+                                <input type="checkbox" name="rememberMe" value="1"> Angemeldet bleiben
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning btn-lg pull-right">Anmelden</button>
+                        }
                     </div>
                     <div class="col-xs-12 col-sm-10 col-sm-offset-1">
                         @if(flash.containsKey("success")) {

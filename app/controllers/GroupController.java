@@ -11,11 +11,12 @@ import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.NotificationService;
 import play.Configuration;
+import play.api.i18n.Lang;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.data.FormFactory;
 import play.db.jpa.Transactional;
-import play.i18n.Messages;
+import play.i18n.MessagesApi;
 import play.libs.Json;
 import play.mvc.Call;
 import play.mvc.Http;
@@ -45,18 +46,21 @@ public class GroupController extends BaseController {
     NotificationService notificationService;
     Configuration configuration;
     FormFactory formFactory;
+    MessagesApi messagesApi;
 
     @Inject
     public GroupController(GroupManager groupManager,
-            GroupAccountManager groupAccountManager,
-            MediaManager mediaManager,
-            FriendshipManager friendshipManager,
-            PostManager postManager,
-            AccountManager accountManager,
-            FolderManager folderManager,
-            AvatarManager avatarManager, NotificationService notificationService,
-            Configuration configuration,
-            FormFactory formFactory) {
+                           GroupAccountManager groupAccountManager,
+                           MediaManager mediaManager,
+                           FriendshipManager friendshipManager,
+                           PostManager postManager,
+                           AccountManager accountManager,
+                           FolderManager folderManager,
+                           AvatarManager avatarManager,
+                           NotificationService notificationService,
+                           Configuration configuration,
+                           FormFactory formFactory,
+                           MessagesApi messagesApi) {
         this.groupManager = groupManager;
         this.groupAccountManager = groupAccountManager;
         this.mediaManager = mediaManager;
@@ -68,6 +72,7 @@ public class GroupController extends BaseController {
         this.notificationService = notificationService;
         this.configuration = configuration;
         this.formFactory = formFactory;
+        this.messagesApi = messagesApi;
 
         this.groupForm = formFactory.form(Group.class);
         this.folderForm = formFactory.form(Folder.class);
@@ -95,7 +100,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(id);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
         if (Secured.viewGroup(group)) {
@@ -111,7 +116,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(id);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
         if (!Secured.viewGroup(group)) {
@@ -134,7 +139,7 @@ public class GroupController extends BaseController {
         Folder folder;
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -229,7 +234,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(id);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -250,7 +255,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -303,7 +308,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(id);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -320,7 +325,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -332,7 +337,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -362,7 +367,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(id);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -398,7 +403,7 @@ public class GroupController extends BaseController {
             groupAccountManager.create(new GroupAccount(group, account, LinkType.request));
             group.temporarySender = account;
             notificationService.createNotification(group, Group.GROUP_NEW_REQUEST);
-            flash("success", Messages.get("group.group_request_sent"));
+            flash("success", messagesApi.get(Lang.defaultLang(), "group.group_request_sent"));
             return redirect(controllers.routes.GroupController.index());
         } else if (group.groupType.equals(GroupType.course)) {
             return redirect(controllers.routes.GroupController.token(id));
@@ -412,7 +417,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -457,7 +462,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -468,7 +473,7 @@ public class GroupController extends BaseController {
                 groupAccountManager.update(groupAccount);
             }
         } else {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -492,7 +497,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -514,7 +519,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -527,7 +532,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -540,7 +545,7 @@ public class GroupController extends BaseController {
 
             // if no one is invited, abort
             if (group.inviteList.size() < 1) {
-                flash("error", Messages.get("group.invite_no_invite"));
+                flash("error", messagesApi.get(Lang.defaultLang(), "group.invite_no_invite"));
                 return redirect(controllers.routes.GroupController.invite(groupId));
             }
 
@@ -570,7 +575,7 @@ public class GroupController extends BaseController {
             notificationService.createNotification(group, Group.GROUP_INVITATION);
         }
 
-        flash("success", Messages.get("group.invite_invited"));
+        flash("success", messagesApi.get(Lang.defaultLang(), "group.invite_invited"));
         return redirect(controllers.routes.GroupController.stream(groupId, PAGE, false));
     }
 
@@ -578,7 +583,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -597,7 +602,7 @@ public class GroupController extends BaseController {
         Group group = groupManager.findById(groupId);
 
         if (group == null) {
-            flash("error", Messages.get("group.group_not_found"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "group.group_not_found"));
             return redirect(controllers.routes.GroupController.index());
         }
 
@@ -630,7 +635,7 @@ public class GroupController extends BaseController {
             folderManager.create(folder);
             return redirect(routes.GroupController.media(group.id, folder.id));
         }
-        flash("error", Messages.get("post.join_group_first"));
+        flash("error", messagesApi.get(Lang.defaultLang(), "post.join_group_first"));
         return redirect(routes.GroupController.media(group.id, folderId));
     }
 
@@ -742,7 +747,7 @@ public class GroupController extends BaseController {
         Form<Avatar> form = formFactory.form(Avatar.class).bindFromRequest();
 
         if (form.hasErrors()) {
-            result.put("error", form.errorsAsJson());
+            result.set("error", form.errorsAsJson());
             return badRequest(result);
         }
 

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import play.i18n.Messages;
 import play.mvc.Http.Context;
 import play.mvc.*;
 
@@ -37,7 +36,7 @@ public class Navigation {
 		titleMapping.put(Level.USER, "Person");
 		titleMapping.put(Level.ADMIN, "Control Center");
         titleMapping.put(Level.SEARCH, "Suche");
-        titleMapping.put(Level.NOTIFICATIONS, Messages.get("notification.news"));
+        titleMapping.put(Level.NOTIFICATIONS, "Neuigkeiten");
 	}
 	
 	private static Call fallbackCall = controllers.routes.Application.index();

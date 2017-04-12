@@ -7,7 +7,8 @@ import models.enums.AvatarSize;
 import models.services.FileService;
 import models.services.ImageService;
 import play.Configuration;
-import play.i18n.Messages;
+import play.api.i18n.Lang;
+import play.i18n.MessagesApi;
 import play.mvc.Http;
 
 import javax.inject.Inject;
@@ -15,10 +16,11 @@ import java.io.File;
 
 public class AvatarManager {
 
-
     @Inject
     Configuration configuration;
 
+    @Inject
+    MessagesApi messagesApi;
 
     static public String AVATAR_REALM = "avatar";
     static public int AVATAR_MIN_SIZE = 250;
@@ -34,6 +36,7 @@ public class AvatarManager {
      * @param filePart The uploaded file part
      * @throws ValidationException
      */
+    @SuppressWarnings("unchecked")
     public void setTempAvatar(Http.MultipartFormData.FilePart filePart, Long modelId) throws ValidationException {
         FileService fileService;
         fileService = new FileService(AVATAR_REALM, filePart, configuration.getString("media.fileStore"));
@@ -41,17 +44,17 @@ public class AvatarManager {
 
         int maxSize = configuration.getInt("avatar.maxSize");
         if (!fileService.validateSize(FileService.MBAsByte(maxSize))) {
-            throw new ValidationException(Messages.get("error.fileToBig"));
+            throw new ValidationException(messagesApi.get(Lang.defaultLang(), "error.fileToBig"));
         }
         String[] allowedContentTypes = {FileService.MIME_JPEG, FileService.MIME_PNG};
         if (!fileService.validateContentType(allowedContentTypes)) {
-            throw new ValidationException(Messages.get("error.contentTypeNotSupported"));
+            throw new ValidationException(messagesApi.get(Lang.defaultLang(), "error.contentTypeNotSupported"));
         }
         if (!ImageService.validateMinSize(fileService.getFile(), AVATAR_MIN_SIZE, AVATAR_MIN_SIZE)) {
-            throw new ValidationException(Messages.get("error.resolutionLow"));
+            throw new ValidationException(messagesApi.get(Lang.defaultLang(), "error.resolutionLow"));
         }
         if (!ImageService.validateMaxSize(fileService.getFile(), AVATAR_MAX_SIZE, AVATAR_MAX_SIZE)) {
-            throw new ValidationException(Messages.get("error.resolutionHigh"));
+            throw new ValidationException(messagesApi.get(Lang.defaultLang(), "error.resolutionHigh"));
         }
 
         fileService.saveFile(this.getTempAvatarName(modelId), true);

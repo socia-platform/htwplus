@@ -3,7 +3,6 @@ package models.services;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import play.Logger;
-import play.i18n.Messages;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,6 +32,7 @@ public class TemplateService {
     public static TemplateService getInstance() {
         if (TemplateService.instance == null) {
             TemplateService.instance = new TemplateService();
+            Messages
         }
 
         return TemplateService.instance;
@@ -119,15 +119,15 @@ public class TemplateService {
 
         if (dateDifference > 7) {
             SimpleDateFormat dateFormatDate = new SimpleDateFormat("dd.MM.yyyy");
-            return Messages.get("post.date_colloquially_date", dateFormatDate.format(date), dateFormatTime.format(date));
+            return new String("Am " + dateFormatDate.format(date) + " um " + dateFormatTime.format(date) + " Uhr");
         } else if (dateDifference > 2) {
-            return Messages.get("post.date_colloquially_days", dateDifference, dateFormatTime.format(date));
+            return new String("Vor " + dateDifference + " Tagen um " + dateFormatTime.format(date) + " Uhr");
         } else if (dateDifference > 1) {
-            return Messages.get("post.date_colloquially_day_before_yesterday", dateFormatTime.format(date));
+            return new String("Vorgestern um " + dateFormatTime.format(date) + " Uhr");
         } else if (dateDifference > 0) {
-            return Messages.get("post.date_colloquially_yesterday", dateFormatTime.format(date));
+            return new String("Gestern um " + dateFormatTime.format(date) + " Uhr");
         } else {
-            return Messages.get("post.date_colloquially_today", dateFormatTime.format(date));
+            return new String("Heute um " + dateFormatTime.format(date) + " Uhr");
         }
     }
 }

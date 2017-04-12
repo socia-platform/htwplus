@@ -222,6 +222,7 @@ public class MediaController extends BaseController {
      * @return Result
      */
     @Transactional
+    @SuppressWarnings("unchecked")
     public Result upload(Long folderId) {
         // Get the data
         MultipartFormData body = request().body().asMultipartFormData();

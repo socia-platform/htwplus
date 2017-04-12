@@ -54,6 +54,7 @@ public class PostBookmarkManager implements BaseManager {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public List<Post> findByAccount(Account account) {
         return JPA.em().createQuery("SELECT pl.post FROM PostBookmark pl WHERE pl.owner.id = :accountId")
                 .setParameter("accountId", account.id)

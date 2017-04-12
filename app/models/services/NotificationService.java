@@ -35,7 +35,7 @@ public class NotificationService {
      * Private constructor for singleton instance
      */
     @Inject
-    public NotificationService(EmailService email, WebSocketService webSocketService, NotificationManager notificationManager, JPAApi jpaApi) {
+    public NotificationService(EmailService email, NotificationManager notificationManager, JPAApi jpaApi) {
         this.email = email;
         this.webSocketService = webSocketService;
         this.notificationManager = notificationManager;
@@ -147,6 +147,7 @@ public class NotificationService {
          * @param notification Notification
          */
         public void webSocketPush(final Notification notification) {
+            /**
             ActorRef recipientActor = webSocketService.getActorForAccount(notification.recipient);
 
             // continue if recipientActor is instance (he is currently online)
@@ -157,6 +158,7 @@ public class NotificationService {
                 node.put("unreadCount", notificationManager.countUnreadNotificationsForAccountId(notification.recipient.id));
                 recipientActor.tell(Json.toJson(node), null);
             }
+            */
         }
 
         /**

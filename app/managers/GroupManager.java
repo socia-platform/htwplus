@@ -87,6 +87,7 @@ public class GroupManager implements BaseManager {
         return jpaApi.em().find(Group.class, id);
     }
 
+    @SuppressWarnings("unchecked")
     public Group findByTitle(String title) {
         List<Group> groups = (List<Group>) jpaApi.em()
                 .createQuery("FROM Group g WHERE g.title = ?1")
@@ -99,6 +100,7 @@ public class GroupManager implements BaseManager {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static Group findByTitle2(String title) {
         List<Group> groups = (List<Group>) JPA.em()
                 .createQuery("FROM Group g WHERE g.title = ?1")
@@ -111,10 +113,12 @@ public class GroupManager implements BaseManager {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<Group> all() {
         return jpaApi.em().createQuery("FROM Group").getResultList();
     }
 
+    @SuppressWarnings("unchecked")
     public List<Group> listAllGroupsOwnedBy(Long id) {
         return jpaApi.em().createQuery("FROM Group g WHERE g.owner.id = " + id).getResultList();
     }

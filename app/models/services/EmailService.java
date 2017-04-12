@@ -2,7 +2,9 @@ package models.services;
 
 import managers.NotificationManager;
 import play.Configuration;
+import play.api.i18n.Lang;
 import play.db.jpa.JPAApi;
+import play.i18n.MessagesApi;
 import play.libs.mailer.Email;
 import play.libs.mailer.MailerClient;
 import javax.inject.Inject;
@@ -11,7 +13,6 @@ import javax.inject.Singleton;
 import models.Account;
 import models.Notification;
 import play.Logger;
-import play.i18n.Messages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,18 +28,21 @@ public class EmailService {
     Email email;
     NotificationManager notificationManager;
     JPAApi jpaApi;
+    MessagesApi messagesApi;
 
     @Inject
     public EmailService(Configuration configuration,
-            MailerClient mailerClient,
-            Email email,
-            NotificationManager notificationManager,
-            JPAApi jpaApi) {
+                        MailerClient mailerClient,
+                        Email email,
+                        NotificationManager notificationManager,
+                        JPAApi jpaApi,
+                        MessagesApi messagesApi) {
         this.configuration = configuration;
         this.mailerClient = mailerClient;
         this.email = email;
         this.notificationManager = notificationManager;
         this.jpaApi = jpaApi;
+        this.messagesApi = messagesApi;
 
         this.EMAIL_SENDER = configuration.getString("htwplus.email.sender");
 
@@ -91,8 +95,8 @@ public class EmailService {
     public void sendNotificationsEmail(final List<Notification> notifications, Account recipient) {
         try {
             String subject = notifications.size() > 1
-                    ? Messages.get("notification.email_notifications.collected.subject", notifications.size())
-                    : Messages.get("notification.email_notifications.single.subject_specific",
+                    ? messagesApi.get(Lang.defaultLang(), "notification.email_notifications.collected.subject", notifications.size())
+                    : messagesApi.get(Lang.defaultLang(), "notification.email_notifications.single.subject_specific",
                         notifications.get(0).rendered.replaceAll("<[^>]*>", "").replaceAll("\\r?\\n|\\r", ", "));
             // send the email
             this.sendEmail(subject, recipient.name + " <" + recipient.email + ">",

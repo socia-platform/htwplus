@@ -7,6 +7,7 @@ import play.libs.F;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Created by Iven on 02.12.2015.
@@ -24,7 +25,7 @@ public class ElasticsearchInit implements DatabaseService {
         // close Elasticsearch connection before shutdown
         lifecycle.addStopHook(() -> {
             elasticsearchService.closeClient();
-            return F.Promise.pure(null);
+            return CompletableFuture.completedFuture(null);
         });
     }
 

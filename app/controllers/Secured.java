@@ -5,7 +5,10 @@ import managers.*;
 import models.*;
 import models.enums.AccountRole;
 import play.Configuration;
-import play.i18n.Messages;
+import play.api.i18n.Lang;
+import play.data.Form;
+import play.data.FormFactory;
+import play.i18n.MessagesApi;
 import play.mvc.Http;
 import play.mvc.Http.Context;
 import play.mvc.Result;
@@ -20,11 +23,15 @@ import java.util.Date;
  */
 public class Secured extends Security.Authenticator {
 
-	Configuration configuration;
+	private final Configuration configuration;
+	private final FormFactory formFactory;
+	private final MessagesApi messagesApi;
 
 	@Inject
-	public Secured(Configuration configuration) {
+	public Secured(Configuration configuration, FormFactory formFactory, MessagesApi messagesApi) {
 		this.configuration = configuration;
+		this.formFactory = formFactory;
+		this.messagesApi = messagesApi;
 	}
 
 	/**
@@ -49,7 +56,7 @@ public class Secured extends Security.Authenticator {
             if (passedT > timeout && !ctx.session().containsKey("rememberMe")) {
                 // session expired
             	ctx.session().clear();
-            	play.mvc.Controller.flash("info", Messages.get("error.sessionExpired"));
+            	play.mvc.Controller.flash("info", messagesApi.get(Lang.defaultLang(), "error.sessionExpired"));
                 return null;
             } 
         }
@@ -66,10 +73,15 @@ public class Secured extends Security.Authenticator {
 	 * @return Result instance
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
     public Result onUnauthorized(Context ctx) {
         // cookie outdated? save originURL to prevent redirect to index page after login
         ctx.session().put("originURL", ctx.request().path());
-		return unauthorized(landingpage.render());
+		Form<Login> form = formFactory.form(Login.class).bindFromRequest();
+		if (Component.getFromContext(Component.ContextIdent.loginForm) != null) {
+			form = (Form<Login>) Component.getFromContext(Component.ContextIdent.loginForm);
+		}
+		return unauthorized(landingpage.render(form));
     }
 
 	/**

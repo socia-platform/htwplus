@@ -6,7 +6,6 @@ import models.base.BaseModel;
 import models.enums.EmailNotifications;
 import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
-import play.libs.F;
 
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
@@ -157,13 +156,11 @@ public class NotificationManager implements BaseManager {
      * @throws NoResultException
      */
     public static Notification findByReferenceIdAndRecipientId(Long referenceId, Long recipientId) throws NoResultException {
-        return JPA.withTransaction(() -> {
-            return JPA.em()
-                    .createQuery("FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :recipientId", Notification.class)
-                    .setParameter("referenceId", referenceId)
-                    .setParameter("recipientId", recipientId)
-                    .getSingleResult();
-        });
+        return JPA.em()
+                .createQuery("FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :recipientId", Notification.class)
+                .setParameter("referenceId", referenceId)
+                .setParameter("recipientId", recipientId)
+                .getSingleResult();
     }
 
     /**
@@ -241,6 +238,7 @@ public class NotificationManager implements BaseManager {
         return accountMap;
     }
 
+    @SuppressWarnings("unchecked")
     private List<Object[]> findRecipients() {
         return jpaApi.withTransaction(() -> {
             return jpaApi.em()

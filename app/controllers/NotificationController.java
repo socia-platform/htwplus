@@ -7,9 +7,10 @@ import managers.NotificationManager;
 import models.Account;
 import models.Notification;
 import play.Configuration;
+import play.api.i18n.Lang;
+import play.i18n.MessagesApi;
 import play.twirl.api.Html;
 import play.db.jpa.Transactional;
-import play.i18n.Messages;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Notification.view;
@@ -22,12 +23,15 @@ public class NotificationController extends BaseController {
 
     NotificationManager notificationManager;
     Configuration configuration;
+    MessagesApi messagesApi;
 
     @Inject
     public NotificationController(NotificationManager notificationManager,
-            Configuration configuration) {
+                                  Configuration configuration,
+                                  MessagesApi messagesApi) {
         this.notificationManager = notificationManager;
         this.configuration = configuration;
+        this.messagesApi = messagesApi;
 
         this.LIMIT = configuration.getInt("htwplus.notification.limit");
 
@@ -78,12 +82,12 @@ public class NotificationController extends BaseController {
 		Notification notification = notificationManager.findById(notificationId);
 
 		if (notification == null) {
-            flash("info", Messages.get("notification.obsolete_notification"));
+            flash("info", messagesApi.get(Lang.defaultLang(), "notification.obsolete_notification"));
             return Secured.nullRedirect(request());
 		}
 		
 		if (!Secured.hasAccessToNotification(notification)) {
-            flash("error", Messages.get("error.access_denied"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "error.access_denied"));
 			return redirect(controllers.routes.Application.index());
 		}
 
@@ -110,7 +114,7 @@ public class NotificationController extends BaseController {
         } catch (Throwable throwable) { throwable.printStackTrace(); }
 
         List<Integer> countedNotifications = NotificationController.countNotifications(notifications);
-        Navigation.set(Navigation.Level.NOTIFICATIONS, Messages.get("notification.title"));
+        Navigation.set(Navigation.Level.NOTIFICATIONS, messagesApi.get(Lang.defaultLang(), "notification.title"));
         return ok(view.render(notifications, LIMIT, page,
                 notificationManager.countNotificationsForAccountId(Component.currentAccount().id), countedNotifications.get(1)
         ));
@@ -157,7 +161,7 @@ public class NotificationController extends BaseController {
     @Transactional
     public Result readAll() {
         notificationManager.markAllAsRead(Component.currentAccount());
-        flash("success", Messages.get("notification.read_everything_ok"));
+        flash("success", messagesApi.get(Lang.defaultLang(), "notification.read_everything_ok"));
 
         return redirect(request().getHeader("referer"));
     }

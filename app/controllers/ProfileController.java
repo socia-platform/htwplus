@@ -11,13 +11,12 @@ import models.enums.AvatarSize;
 import models.enums.EmailNotifications;
 import play.Configuration;
 import play.Logger;
-import play.Play;
+import play.api.i18n.Lang;
 import play.data.Form;
 import play.data.FormFactory;
 import play.db.jpa.Transactional;
-import play.i18n.Messages;
+import play.i18n.MessagesApi;
 import play.libs.Json;
-import play.mvc.Call;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -43,6 +42,7 @@ public class ProfileController extends BaseController {
     FriendshipManager friendshipManager;
     Configuration configuration;
     FormFactory formFactory;
+    MessagesApi messagesApi;
 
     @Inject
     public ProfileController(AccountManager accountManager,
@@ -52,7 +52,7 @@ public class ProfileController extends BaseController {
             StudycourseManager studycourseManager,
             AvatarManager avatarManager,
             MediaManager mediaManager, FriendshipManager friendshipManager,
-            Configuration configuration,FormFactory formFactory) {
+            Configuration configuration,FormFactory formFactory, MessagesApi messagesApi) {
         this.accountManager = accountManager;
         this.groupAccountManager = groupAccountManager;
         this.postManager = postManager;
@@ -63,6 +63,7 @@ public class ProfileController extends BaseController {
         this.friendshipManager = friendshipManager;
         this.configuration = configuration;
         this.formFactory = formFactory;
+        this.messagesApi = messagesApi;
 
         this.accountForm = formFactory.form(Account.class);
         this.postForm = formFactory.form(Post.class);
@@ -349,7 +350,7 @@ public class ProfileController extends BaseController {
 
         // check account
         if (account == null) {
-            flash("info", Messages.get("Diese Person gibt es nicht."));
+            flash("info", messagesApi.get(Lang.defaultLang(), "Diese Person gibt es nicht."));
             return Secured.nullRedirect(request());
         }
 
@@ -389,7 +390,7 @@ public class ProfileController extends BaseController {
         Account current = accountManager.findById(accountId);
 
         if (!Secured.deleteAccount(current)) {
-            flash("error", Messages.get("profile.delete.nopermission"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "profile.delete.nopermission"));
             return redirect(controllers.routes.Application.index());
         }
 
@@ -397,7 +398,7 @@ public class ProfileController extends BaseController {
         Form<Login> filledForm = loginForm.bindFromRequest();
         String entered = filledForm.field("password").value();
         if (entered == null || entered.length() == 0) {
-            flash("error", Messages.get("profile.delete.nopassword"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "profile.delete.nopassword"));
             return redirect(controllers.routes.ProfileController.update(current.id));
         } else if (!accountController.checkPassword(accountId, entered)) {
             return redirect(controllers.routes.ProfileController.update(current.id));
@@ -408,7 +409,7 @@ public class ProfileController extends BaseController {
         accountManager.delete(current);
 
         // override logout message
-        flash("success", Messages.get("profile.delete.success"));
+        flash("success", messagesApi.get(Lang.defaultLang(), "profile.delete.success"));
         return redirect(controllers.routes.AccountController.logout());
     }
 
@@ -503,7 +504,7 @@ public class ProfileController extends BaseController {
         Form<Avatar> form = formFactory.form(Avatar.class).bindFromRequest();
 
         if (form.hasErrors()) {
-            result.put("error", form.errorsAsJson());
+            result.set("error", form.errorsAsJson());
             return badRequest(result);
         }
 
