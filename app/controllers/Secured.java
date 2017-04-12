@@ -4,6 +4,7 @@ import com.typesafe.config.ConfigFactory;
 import managers.*;
 import models.*;
 import models.enums.AccountRole;
+import org.springframework.util.Assert;
 import play.Configuration;
 import play.api.i18n.Lang;
 import play.data.Form;
@@ -601,7 +602,9 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in account is allowed to see the medias folder
 	 */
 	public static boolean viewMedia(Media media) {
-        return media != null && (Secured.viewFolder(media.findRoot()));
+		Assert.notNull(media);
+
+        return Secured.viewFolder(media.findRoot());
 	}
 
 	/**
@@ -611,6 +614,7 @@ public class Secured extends Security.Authenticator {
 	 * @return True, if logged in account is allowed to delete media
 	 */
 	public static boolean deleteMedia(Media media) {
+		Assert.notNull(media);
 		Account current = Component.currentAccount();
 		Group group = media.findGroup();
         
