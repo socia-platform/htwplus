@@ -3,10 +3,10 @@ package services;
 import models.services.ElasticsearchService;
 import play.Logger;
 import play.api.inject.ApplicationLifecycle;
-import play.libs.F;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Created by Iven on 02.12.2015.
@@ -14,35 +14,38 @@ import javax.inject.Singleton;
 @Singleton
 public class ElasticsearchInit implements DatabaseService {
 
-    private ElasticsearchService elasticsearchService;
+    final Logger.ALogger LOG = Logger.of(ElasticsearchInit.class);
+    final ElasticsearchService elasticsearchService;
 
     @Inject
     public ElasticsearchInit(ElasticsearchService elasticsearchService, ApplicationLifecycle lifecycle) {
         this.elasticsearchService = elasticsearchService;
+
+        // create Elasticsearch connection and do some initialization stuff
         initialization();
 
-        // close Elasticsearch connection before shutdown
+        // close Elasticsearch connection before Play shutdown
         lifecycle.addStopHook(() -> {
             elasticsearchService.closeClient();
-            return F.Promise.pure(null);
+            return CompletableFuture.completedFuture(null);
         });
     }
 
     @Override
     public void initialization() {
-        Logger.info("trying to connect to Elasticsearch");
+        LOG.info("trying to connect to Elasticsearch");
         if (elasticsearchService.isClientAvailable()) {
-            Logger.info("... success");
-            Logger.info("trying to create HTWPlus index and mapping");
+            LOG.info("... success");
+            LOG.info("trying to create HTWPlus index and mapping");
             if (!elasticsearchService.isIndexExists()) {
                 elasticsearchService.createAnalyzer();
                 elasticsearchService.createMapping();
-                Logger.info("... success");
+                LOG.info("... success");
             } else {
-                Logger.info("... failed (it already exists?)");
+                LOG.info("... failed (it already exists?)");
             }
         } else {
-            Logger.info("... failed");
+            LOG.info("... failed");
         }
     }
 
