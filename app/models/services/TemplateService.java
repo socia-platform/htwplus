@@ -32,7 +32,6 @@ public class TemplateService {
     public static TemplateService getInstance() {
         if (TemplateService.instance == null) {
             TemplateService.instance = new TemplateService();
-            Messages
         }
 
         return TemplateService.instance;

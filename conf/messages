@@ -71,6 +71,7 @@ ldap.wrongCredentials=Ungültiges Passwort und/oder Matrikelnummer.
 
 # --- notifications
 notification.title=Übersicht
+notification.news=Neuigkeiten
 notification.nothing_new=Es ist nichts Neues passiert...
 notification.show_everything=Zeige alle Nachrichten
 notification.read_everything=Markiere alle als gelesen
