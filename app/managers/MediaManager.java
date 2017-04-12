@@ -8,7 +8,6 @@ import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.Configuration;
 import play.Logger;
-import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
 
 import java.io.IOException;
@@ -50,7 +49,7 @@ public class MediaManager implements BaseManager {
         media.url = createRelativeURL() + "/" + getUniqueFileName(media.fileName);
         try {
             createFile(media);
-            JPA.em().persist(media);
+            jpaApi.em().persist(media);
             elasticsearchService.index(media);
         } catch (Exception e) {
             try {
@@ -64,7 +63,7 @@ public class MediaManager implements BaseManager {
 
     @Override
     public void update(Object model) {
-        JPA.em().merge(model);
+        jpaApi.em().merge(model);
     }
 
     @Override
@@ -76,7 +75,7 @@ public class MediaManager implements BaseManager {
             notificationManager.deleteReferences(media);
 
             deleteFile(media);
-            JPA.em().remove(media);
+            jpaApi.em().remove(media);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -84,11 +83,11 @@ public class MediaManager implements BaseManager {
 
     @SuppressWarnings("unchecked")
     public List<Media> findAll() {
-        return JPA.em().createQuery("FROM Media").getResultList();
+        return jpaApi.em().createQuery("FROM Media").getResultList();
     }
 
     public Media findById(Long id) {
-        Media media = JPA.em().find(Media.class, id);
+        Media media = jpaApi.em().find(Media.class, id);
         if (media == null) {
             return null;
         }
@@ -117,7 +116,7 @@ public class MediaManager implements BaseManager {
 
     @SuppressWarnings("unchecked")
     public List<Media> listAllOwnedBy(Long id) {
-        return JPA.em().createQuery("FROM Media m WHERE m.owner.id = " + id).getResultList();
+        return jpaApi.em().createQuery("FROM Media m WHERE m.owner.id = " + id).getResultList();
     }
 
     public boolean existsInFolder(String mediaTitle, Folder folder) {
@@ -132,7 +131,7 @@ public class MediaManager implements BaseManager {
 
 
     public boolean isOwner(Long mediaId, Account account) {
-        Media m = JPA.em().find(Media.class, mediaId);
+        Media m = jpaApi.em().find(Media.class, mediaId);
         if (m.owner.equals(account)) {
             return true;
         } else {

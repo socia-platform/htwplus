@@ -64,6 +64,32 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
     }
 
     protected CompletionStage<Result> onForbidden(Http.RequestHeader request, String message) {
-        return CompletableFuture.completedFuture(Results.forbidden("You're not allowed to access this resource."));
+        jpaApi.withTransaction(() -> {
+            Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
+            if (group != null) {
+                Post post = new Post();
+                post.content = "Request: " + request + "\nError: 403 - Forbidden (" + message + ")";
+                post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
+                post.group = group;
+                postManager.createWithoutIndex(post);
+                notificationService.createNotification(post, Post.GROUP);
+            }
+        });
+        return CompletableFuture.completedFuture(Results.redirect(controllers.routes.Application.error()));
+    }
+
+    protected CompletionStage<Result> onBadRequest(Http.RequestHeader request, String message) {
+        jpaApi.withTransaction(() -> {
+            Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
+            if (group != null) {
+                Post post = new Post();
+                post.content = "Request: " + request + "\nError: 400 - Bad Request (" + message + ")";
+                post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
+                post.group = group;
+                postManager.createWithoutIndex(post);
+                notificationService.createNotification(post, Post.GROUP);
+            }
+        });
+        return CompletableFuture.completedFuture(Results.redirect(controllers.routes.Application.error()));
     }
 }
