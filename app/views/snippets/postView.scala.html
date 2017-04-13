@@ -86,7 +86,7 @@
 
                         @if(Secured.addComment(post)) {
                         <div class="media">
-                            <a class="pull-left hp-nohref" href="@routes.ProfileController.view(currentUser.id)">
+                            <a class="pull-left hp-nohref visible-sm visible-md visible-lg" href="@routes.ProfileController.view(currentUser.id)">
                                 @if(currentUser.hasAvatar){
                                 <img alt="avatar" src="@routes.ProfileController.getAvatar(currentUser.id)" class="hp-avatar-small" />
                                 } else {

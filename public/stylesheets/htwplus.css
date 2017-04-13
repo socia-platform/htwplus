@@ -960,7 +960,7 @@ form.hp-comment-form > .hp-new-comment-content {
   box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(255, 95, 0, .6);
 }
 
-@media (max-width: 350px) {
+@media (max-width: 365px) {
     .hp-navbar li > a {
         padding-left: 10px;
         padding-right: 10px;
@@ -1366,6 +1366,10 @@ tbody.hp-optionsTable .hp-avatar-column {
 .hp-post-create-area #hp-post-submit-button {
     display: none;
 }
+.md-header .btn-group {
+    margin-bottom: 5px;
+}
+
 .md-editor > textarea {
     background: white;
     padding: 10px;
@@ -1387,6 +1391,7 @@ tbody.hp-optionsTable .hp-avatar-column {
 .md-footer button {
     float: right;
     margin-left: 10px;
+    margin-bottom: 2px;
 }
 
 .md-footer .dz-success-mark,

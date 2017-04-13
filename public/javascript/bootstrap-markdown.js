@@ -361,6 +361,7 @@
           // Register handler and callback
           handler.push(saveHandler);
           callback.push(options.onSave);
+          editorFooter.append('<div class='+options.dropZoneOptions.clickable.substring(1)+'><span class="glyphicon glyphicon-upload"></span> <a href="#">Datei anhängen</a></div>');
           editorFooter.append('<button class="btn btn-sm btn-warning" data-provider="'
                               + ns
                               + '" data-handler="'
@@ -368,7 +369,6 @@
                               + '"><span class="glyphicon glyphicon-send"></span> '
                               + this.__localize('Save')
                               + '</button>');
-          editorFooter.append('<div class='+options.dropZoneOptions.clickable.substring(1)+'><span class="glyphicon glyphicon-upload"></span><span> Dateianhang per Drag&Drop oder <a href="#">Dateiauswahl</a></span></div>');
           editorFooter.append('<div class="clear"></div>');
         }
 

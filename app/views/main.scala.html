@@ -18,7 +18,7 @@
 	</head>
 	
 	<body>
-        <a id="hp-feedback" type="button" class="btn btn-danger hidden-xs" href="@routes.Application.feedback()">
+        <a id="hp-feedback" type="button" class="btn btn-danger hidden-xs hidden-sm hidden-md" href="@routes.Application.feedback()">
             <span id="hp-feedback-icon" class="glyphicon glyphicon-bullhorn"></span><br />
             <div class="hp-easy-feedback">Feedback</div>
         </a>
@@ -57,7 +57,7 @@
         </div>
         
         <!-- 'Go to top' link -->
-        <span id="hp-top-link" class="hidden">
+        <span id="hp-top-link" class="hidden visible-md visible-lg">
             <a href="#hp-top" class="btn btn-success">
                 <i class="glyphicon glyphicon-chevron-up"></i> @Messages("mainpage.backtotop")
             </a>

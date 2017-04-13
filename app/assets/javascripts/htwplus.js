@@ -374,7 +374,7 @@ $('body').on('click', '.hp-new-comment-content', function(e) {
            var saveButton = e.$editor.find('.md-footer').find('button');
            saveButton.addClass('btn-xs');
            saveButton.after('<button type="button" class="btn btn-xs btn-default hp-post-abort"><span>Abbrechen</span></button');
-           saveButton.html('<span class="glyphicon glyphicon-send"></span> Kommentieren');
+           saveButton.html('<span class="glyphicon glyphicon-send"></span> Senden');
         },
         onPreview: function(e) {
            return md.render(e.getContent());
