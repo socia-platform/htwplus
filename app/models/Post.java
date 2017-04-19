@@ -54,6 +54,9 @@ public class Post extends BaseNotifiable implements INotifiable {
     @Transient
     public String searchContent;
 
+    @Transient
+    public String formatedDate;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     public Set<PostBookmark> postBookmarks;
 

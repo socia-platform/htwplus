@@ -20,6 +20,8 @@ import play.mvc.Results;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * Created by Iven on 08.12.2015.
@@ -45,7 +47,7 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
         this.notificationService = notificationService;
     }
 
-    protected F.Promise<Result> onProdServerError(Http.RequestHeader request, UsefulException exception) {
+    protected CompletionStage<Result> onProdServerError(Http.RequestHeader request, UsefulException exception) {
         jpaApi.withTransaction(() -> {
             Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
             if (group != null) {
@@ -58,14 +60,36 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
             }
         });
 
-        return F.Promise.<Result>pure(
-                Results.redirect(controllers.routes.Application.error())
-        );
+        return CompletableFuture.completedFuture(Results.redirect(controllers.routes.Application.error()));
     }
 
-    protected F.Promise<Result> onForbidden(Http.RequestHeader request, String message) {
-        return F.Promise.<Result>pure(
-                Results.forbidden("You're not allowed to access this resource.")
-        );
+    protected CompletionStage<Result> onForbidden(Http.RequestHeader request, String message) {
+        jpaApi.withTransaction(() -> {
+            Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
+            if (group != null) {
+                Post post = new Post();
+                post.content = "Request: " + request + "\nError: 403 - Forbidden (" + message + ")";
+                post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
+                post.group = group;
+                postManager.createWithoutIndex(post);
+                notificationService.createNotification(post, Post.GROUP);
+            }
+        });
+        return CompletableFuture.completedFuture(Results.redirect(controllers.routes.Application.error()));
+    }
+
+    protected CompletionStage<Result> onBadRequest(Http.RequestHeader request, String message) {
+        jpaApi.withTransaction(() -> {
+            Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
+            if (group != null) {
+                Post post = new Post();
+                post.content = "Request: " + request + "\nError: 400 - Bad Request (" + message + ")";
+                post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
+                post.group = group;
+                postManager.createWithoutIndex(post);
+                notificationService.createNotification(post, Post.GROUP);
+            }
+        });
+        return CompletableFuture.completedFuture(Results.redirect(controllers.routes.Application.error()));
     }
 }

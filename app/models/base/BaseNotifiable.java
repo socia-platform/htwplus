@@ -3,6 +3,7 @@ package models.base;
 import managers.GroupAccountManager;
 import models.Account;
 import models.Group;
+import models.GroupAccount;
 import models.Notification;
 import models.enums.LinkType;
 import models.services.TemplateService;
@@ -92,7 +93,13 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      * @return List of accounts of group
      */
     public List<Account> getGroupAsAccountList(final Group group) {
-        return GroupAccountManager.findAccountsByGroup2(group, LinkType.establish);
+        List<Account> accounts = new ArrayList<>();
+        for (GroupAccount groupAccount : group.groupAccounts) {
+            if (groupAccount.linkType.equals(LinkType.establish)) {
+                accounts.add(groupAccount.account);
+            }
+        }
+        return accounts;
     }
 
     /**

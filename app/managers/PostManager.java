@@ -3,11 +3,9 @@ package managers;
 import models.Account;
 import models.Group;
 import models.Post;
-import models.base.BaseNotifiable;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
-import models.services.NotificationService;
 import play.Configuration;
 import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
@@ -80,6 +78,7 @@ public class PostManager implements BaseManager {
         elasticsearchService.delete(post);
     }
 
+    @SuppressWarnings("unchecked")
     public List<Post> getCommentsForPost(Long id, int limit, int offset) {
         Query query = jpaApi.em()
                 .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
@@ -90,6 +89,7 @@ public class PostManager implements BaseManager {
         return (List<Post>) query.getResultList();
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Post> getCommentsForPost2(Long id, int limit, int offset) {
         Query query = JPA.em()
                 .createQuery("SELECT p FROM Post p WHERE p.parent.id = ?1 ORDER BY p.createdAt ASC")
@@ -100,6 +100,7 @@ public class PostManager implements BaseManager {
         return (List<Post>) query.getResultList();
     }
 
+    @SuppressWarnings("unchecked")
     public List<Post> getPostsForGroup(final Group group, final int limit, final int page) {
         Query query = jpaApi.em()
                 .createQuery("SELECT p FROM Post p WHERE p.group.id = ?1 ORDER BY p.updatedAt DESC")

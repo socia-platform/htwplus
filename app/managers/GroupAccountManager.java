@@ -157,21 +157,6 @@ public class GroupAccountManager implements BaseManager {
     /**
      * Retrieve Accounts from Group with given LinkType.
      */
-    public static List<Account> findAccountsByGroup2(final Group group, final LinkType type) {
-         return JPA.withTransaction(() -> {
-             List<Account> accounts = (List<Account>) JPA
-                .em()
-                .createQuery(
-                        "SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
-                .setParameter(1, group.id).setParameter(2, type)
-                .getResultList();
-            return accounts;
-         });
-    }
-
-    /**
-     * Retrieve Accounts from Group with given LinkType.
-     */
     public List<Account> findAccountsByGroup(final Group group, final LinkType type) {
         @SuppressWarnings("unchecked")
         List<Account> accounts = (List<Account>) jpaApi

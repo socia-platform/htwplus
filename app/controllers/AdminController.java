@@ -6,17 +6,15 @@ import models.Folder;
 import models.Post;
 import models.enums.AccountRole;
 import models.services.ElasticsearchService;
-import models.services.NotificationService;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.index.IndexNotFoundException;
 import play.Logger;
+import play.api.i18n.Lang;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.data.FormFactory;
 import play.db.jpa.Transactional;
-import play.i18n.Messages;
-import play.libs.F;
-import play.libs.F.Promise;
+import play.i18n.MessagesApi;
 import play.mvc.Result;
 import play.mvc.Security;
 import play.mvc.With;
@@ -24,11 +22,6 @@ import views.html.Admin.*;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static play.data.Form.form;
 
 @Security.Authenticated(Secured.class)
 // Action performs the authentication
@@ -41,18 +34,27 @@ public class AdminController extends BaseController {
     private final PostManager postManager;
     private final AccountManager accountManager;
     private final FolderManager folderManager;
+    private final MessagesApi messagesApi;
     FormFactory formFactory;
     Form<Account> accountForm;
     Form<Post> postForm;
 
     @Inject
-    public AdminController(ElasticsearchService elasticsearchService, MediaManager mediaManager, GroupManager groupManager, PostManager postManager, AccountManager accountManager, FolderManager folderManager, FormFactory formFactory) {
+    public AdminController(ElasticsearchService elasticsearchService,
+                           MediaManager mediaManager,
+                           GroupManager groupManager,
+                           PostManager postManager,
+                           AccountManager accountManager,
+                           FolderManager folderManager,
+                           FormFactory formFactory,
+                           MessagesApi messagesApi) {
         this.elasticsearchService = elasticsearchService;
         this.mediaManager = mediaManager;
         this.groupManager = groupManager;
         this.postManager = postManager;
         this.accountManager = accountManager;
         this.folderManager = folderManager;
+        this.messagesApi = messagesApi;
         this.formFactory = formFactory;
         this.accountForm = formFactory.form(Account.class);
         this.postForm =  formFactory.form(Post.class);
@@ -113,13 +115,13 @@ public class AdminController extends BaseController {
         Account current = accountManager.findById(accountId);
 
         if (!Secured.deleteAccount(current)) {
-            flash("error", Messages.get("profile.delete.nopermission"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "profile.delete.nopermission"));
             return redirect(controllers.routes.AdminController.listAccounts());
         }
 
         DynamicForm df = formFactory.form().bindFromRequest();
         if (!df.get("confirmText").toLowerCase().equals("account wirklich löschen")) {
-            flash("error", Messages.get("admin.delete_account.wrongconfirm"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "admin.delete_account.wrongconfirm"));
             return redirect(controllers.routes.AdminController.listAccounts());
         }
 
@@ -128,7 +130,7 @@ public class AdminController extends BaseController {
         accountManager.delete(current);
 
         // override logout message
-        flash("success", Messages.get("admin.delete_account.success"));
+        flash("success", messagesApi.get(Lang.defaultLang(), "admin.delete_account.success"));
         return redirect(routes.AdminController.listAccounts());
     }
 

@@ -6,11 +6,11 @@ import models.Login;
 import models.enums.AccountRole;
 import models.services.LdapService;
 import play.Logger;
-import play.data.DynamicForm;
+import play.api.i18n.Lang;
 import play.data.Form;
 import play.data.FormFactory;
 import play.db.jpa.Transactional;
-import play.i18n.Messages;
+import play.i18n.MessagesApi;
 import play.mvc.Result;
 import views.html.landingpage;
 
@@ -28,12 +28,14 @@ public class AccountController extends BaseController {
     AccountManager accountManager;
     FormFactory formFactory;
     LdapService ldapService;
+    MessagesApi messagesApi;
 
     @Inject
-    public AccountController(AccountManager accountManager, FormFactory formFactory, LdapService ldapService) {
+    public AccountController(AccountManager accountManager, FormFactory formFactory, LdapService ldapService, MessagesApi messagesApi) {
         this.accountManager = accountManager;
         this.formFactory = formFactory;
         this.ldapService = ldapService;
+        this.messagesApi = messagesApi;
     }
     /**
      * Defines a form wrapping the Account class.
@@ -46,7 +48,7 @@ public class AccountController extends BaseController {
      * @return Result
      */
     public Result authenticate() {
-        DynamicForm form = formFactory.form().bindFromRequest();
+        Form<Login> form = formFactory.form(Login.class).bindFromRequest();
         String username = form.field("email").value();
 
         // save originURL before clearing the session (it gets cleared in defaultAuthenticate() and LdapAuthenticate())
@@ -58,7 +60,7 @@ public class AccountController extends BaseController {
         } else if (username.length() == 0) {
             LOG.info("... no name given");
             flash("error", "Also deine Matrikelnummer brauchen wir schon!");
-            return badRequest(landingpage.render());
+            return badRequest(landingpage.render(form));
         } else {
             return ldapAuthenticate(redirect);
         }
@@ -83,7 +85,7 @@ public class AccountController extends BaseController {
         } catch (LdapService.LdapConnectorException e) {
             flash("error", e.getMessage());
             Component.addToContext(Component.ContextIdent.loginForm, form);
-            return badRequest(landingpage.render());
+            return badRequest(landingpage.render(form));
         }
 
         // try to find user in DB, set role if found (default STUDENT role)
@@ -129,7 +131,7 @@ public class AccountController extends BaseController {
             LOG.info("User not found");
             flash("error", "Bitte melde dich mit deiner Matrikelnummer an.");
             Component.addToContext(Component.ContextIdent.loginForm, loginForm);
-            return badRequest(landingpage.render());
+            return badRequest(landingpage.render(loginForm));
         } else {
             Account account = accountManager.findByEmail(login.email);
             session().clear();
@@ -155,13 +157,13 @@ public class AccountController extends BaseController {
         Account account = accountManager.findById(accountId);
 
         if (password == null || password.length() == 0) {
-            flash("error", Messages.get("Kein Passwort angegeben!"));
+            flash("error", messagesApi.get(Lang.defaultLang(), "Kein Passwort angegeben!"));
             return false;
         }
 
         if (account.loginname == null || account.loginname.length() == 0) { // not an LDAP Account
             if (accountManager.isAccountValid(account.email, password)) {
-                flash("error", Messages.get("profile.delete.wrongpassword"));
+                flash("error", messagesApi.get(Lang.defaultLang(), "profile.delete.wrongpassword"));
                 return false;
             } else {
                 return true;
@@ -182,7 +184,7 @@ public class AccountController extends BaseController {
      */
     public Result logout() {
         session().clear();
-        flash("success", Messages.get("authenticate.logout"));
+        flash("success", messagesApi.get(Lang.defaultLang(), "authenticate.logout"));
 
         return redirect(controllers.routes.Application.index());
     }

@@ -13,8 +13,8 @@ import org.apache.directory.ldap.client.api.exception.InvalidConnectionException
 
 import play.Configuration;
 import play.Logger;
-import play.Play;
-import play.i18n.Messages;
+import play.api.i18n.Lang;
+import play.i18n.MessagesApi;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -27,9 +27,11 @@ import java.io.IOException;
 public class LdapService {
 
     private Configuration configuration;
+    private MessagesApi messagesApi;
 
     @Inject
-    public LdapService(Configuration configuration) {
+    public LdapService(Configuration configuration, MessagesApi messagesApi) {
+        this.messagesApi = messagesApi;
         this.configuration = configuration;
         this.ldapServer = configuration.getString("ldap.server");
         this.ldapPort = Integer.parseInt(configuration.getString("ldap.port"));
@@ -111,7 +113,7 @@ public class LdapService {
                 .replace("%USER_ROOT%", userRoot);
         String userSearch = configuration.getString("ldap.userSearch")
                 .replace("%USER%", userName);
-        String groupSearch = Play.application().configuration().getString("ldap.groupSearch")
+        String groupSearch = configuration.getString("ldap.groupSearch")
                 .replace("%BIND%", connectionBind);
 
         // LDAP keys for values from LDAP ldapServer
@@ -136,10 +138,10 @@ public class LdapService {
             ldapConnection.bind();
         } catch (InvalidConnectionException e) {
             e.printStackTrace();
-            throw new LdapConnectorException(Messages.get("ldap.noConnection"));
+            throw new LdapConnectorException(messagesApi.get(Lang.defaultLang(), "ldap.noConnection"));
         } catch (LdapException e) {
             e.printStackTrace();
-            throw new LdapConnectorException(Messages.get("ldap.wrongCredentials"));
+            throw new LdapConnectorException(messagesApi.get(Lang.defaultLang(), "ldap.wrongCredentials"));
         }
 
         // login to LDAP successful, try to find the user data
@@ -153,7 +155,7 @@ public class LdapService {
             Logger.info("Read Account from LDAP: " + this.firstName + " " + this.lastName);
         } catch (LdapException | CursorException e) {
             e.printStackTrace();
-            throw new LdapConnectorException(Messages.get("ldap.wrongCredentials"));
+            throw new LdapConnectorException(messagesApi.get(Lang.defaultLang(), "ldap.wrongCredentials"));
         }
 
         // user data successfully set, try to find the role of the user
@@ -172,7 +174,7 @@ public class LdapService {
             }
         } catch (LdapException | CursorException e) {
             e.printStackTrace();
-            throw new LdapConnectorException(Messages.get("ldap.wrongCredentials"));
+            throw new LdapConnectorException(messagesApi.get(Lang.defaultLang(), "ldap.wrongCredentials"));
         }
 
         // close the connection

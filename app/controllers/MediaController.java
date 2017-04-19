@@ -6,6 +6,7 @@ import models.Folder;
 import models.Media;
 import models.services.NotificationService;
 import play.Configuration;
+import play.Logger;
 import play.db.jpa.Transactional;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Result;
@@ -114,6 +115,8 @@ public class MediaController extends BaseController {
 
         String[] action = request().body().asFormUrlEncoded().get("action");
         Result ret = Secured.nullRedirect(request());
+        Media media;
+        Folder folder;
 
         String[] mediaselection = request().body().asFormUrlEncoded().get("mediaSelection");
         String[] folderSelection = request().body().asFormUrlEncoded().get("folderSelection");
@@ -128,7 +131,13 @@ public class MediaController extends BaseController {
             // delete media files
             if (mediaselection != null) {
                 for (String s : mediaselection) {
-                    Media media = mediaManager.findById(Long.parseLong(s));
+                    try {
+                        media = mediaManager.findById(Long.parseLong(s));
+                    } catch (NumberFormatException nfe) {
+                        Logger.error("Unable to parse media id: " + s, nfe);
+                        return ret;
+                    }
+
                     if (Secured.deleteMedia(media)) {
                         mediaManager.delete(media);
                     }
@@ -138,7 +147,13 @@ public class MediaController extends BaseController {
             // delete folder and files
             if (folderSelection != null) {
                 for (String folderId : folderSelection) {
-                    Folder folder = folderManager.findById(Long.parseLong(folderId));
+                    try {
+                        folder = folderManager.findById(Long.parseLong(folderId));
+                    } catch (NumberFormatException nfe) {
+                        Logger.error("Unable to parse folder id: " + folderId, nfe);
+                        return ret;
+                    }
+
                     if (Secured.deleteFolder(folder)) {
                         folderManager.delete(folder);
                     }
@@ -155,7 +170,13 @@ public class MediaController extends BaseController {
             // grab media files
             if (mediaselection != null) {
                 for (String s : mediaselection) {
-                    Media media = mediaManager.findById(Long.parseLong(s));
+                    try {
+                        media = mediaManager.findById(Long.parseLong(s));
+                    } catch (NumberFormatException nfe) {
+                        Logger.error("Unable to parse media id: " + s, nfe);
+                        return ret;
+                    }
+
                     if (Secured.viewMedia(media)) {
                         mediaList.add(media);
                     }
@@ -165,7 +186,13 @@ public class MediaController extends BaseController {
             // grab folder files
             if (folderSelection != null) {
                 for (String folderId : folderSelection) {
-                    Folder folder = folderManager.findById(Long.parseLong(folderId));
+                    try {
+                        folder = folderManager.findById(Long.parseLong(folderId));
+                    } catch (NumberFormatException nfe) {
+                        Logger.error("Unable to parse folder id: " + folderId, nfe);
+                        return ret;
+                    }
+
                     if (Secured.viewFolder(folder)) {
                         mediaList.addAll(folderManager.getAllMedia(folder));
                     }
@@ -222,6 +249,7 @@ public class MediaController extends BaseController {
      * @return Result
      */
     @Transactional
+    @SuppressWarnings("unchecked")
     public Result upload(Long folderId) {
         // Get the data
         MultipartFormData body = request().body().asMultipartFormData();

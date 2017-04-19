@@ -106,6 +106,7 @@ public class ElasticsearchResponse {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void aggregationStuff() {
         lUserDocuments = new Long(0L);
         lGroupDocuments = new Long(0L);

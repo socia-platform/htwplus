@@ -13,13 +13,14 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import play.Configuration;
 import play.Logger;
-import play.Routes;
+import play.api.i18n.Lang;
 import play.data.Form;
 import play.data.FormFactory;
 import play.db.jpa.Transactional;
-import play.i18n.Messages;
+import play.i18n.MessagesApi;
 import play.mvc.Result;
 import play.mvc.Security;
+import play.routing.JavaScriptReverseRouter;
 import views.html.*;
 import views.html.snippets.streamRaw;
 
@@ -42,21 +43,24 @@ public class Application extends BaseController {
     AccountManager accountManager;
     Configuration configuration;
     FormFactory formFactory;
+    MessagesApi messagesApi;
 
     @Inject
     public Application(ElasticsearchService elasticsearchService,
-            ElasticsearchResponse elasticsearchResponse,
-            GroupManager groupManager,
-            PostManager postManager,
-            AccountManager accountManager,
-            Configuration configuration,
-            FormFactory formFactory) {
+                       ElasticsearchResponse elasticsearchResponse,
+                       GroupManager groupManager,
+                       PostManager postManager,
+                       AccountManager accountManager,
+                       Configuration configuration,
+                       FormFactory formFactory,
+                       MessagesApi messagesApi) {
         this.elasticsearchService = elasticsearchService;
         this.elasticsearchResponse = elasticsearchResponse;
         this.groupManager = groupManager;
         this. postManager = postManager;
         this.accountManager = accountManager;
         this.configuration = configuration;
+        this.messagesApi = messagesApi;
         this.formFactory = formFactory;
         this.postForm = formFactory.form(Post.class);
         this.limit = configuration.getInt("htwplus.post.limit");
@@ -67,14 +71,12 @@ public class Application extends BaseController {
     static final int PAGE = 1;
 
     public Result javascriptRoutes() {
-        response().setContentType("text/javascript");
-
         return ok(
-                Routes.javascriptRouter("jsRoutes",
+                JavaScriptReverseRouter.create("jsRoutes",
                         controllers.routes.javascript.GroupController.create(),
                         controllers.routes.javascript.GroupController.update()
                 )
-        );
+        ).as("text/javascript");
     }
 
     @Security.Authenticated(Secured.class)
@@ -178,7 +180,7 @@ public class Application extends BaseController {
 
         Navigation.set(Level.SEARCH, elasticsearchResponse.getDocumentCount() + " Ergebnisse zu \""+ keyword +"\"");
         if (!mode.isEmpty() && !mode.equals("all")) {
-            Navigation.set(Level.SEARCH, elasticsearchResponse.getDocumentCount() + " Ergebnisse zu \""+ keyword +"\"", Messages.get("search."+mode), null);
+            Navigation.set(Level.SEARCH, elasticsearchResponse.getDocumentCount() + " Ergebnisse zu \""+ keyword +"\"", messagesApi.get(Lang.defaultLang(), "search."+mode), null);
         }
 
         return ok(views.html.Search.searchresult.render(

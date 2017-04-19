@@ -11,11 +11,12 @@ import models.Post;
 import models.PostBookmark;
 import models.services.NotificationService;
 import play.Configuration;
+import play.api.i18n.Lang;
 import play.api.mvc.Call;
 import play.data.Form;
 import play.data.FormFactory;
 import play.db.jpa.Transactional;
-import play.i18n.Messages;
+import play.i18n.MessagesApi;
 import play.mvc.Result;
 import play.mvc.Security;
 import views.html.Post.view;
@@ -33,14 +34,17 @@ public class PostController extends BaseController {
     Configuration configuration;
     FormFactory formFactory;
     NotificationService notificationService;
+    MessagesApi messagesApi;
 
     @Inject
     public PostController(GroupManager groupManager,
-            PostManager postManager,
+                          PostManager postManager,
             PostBookmarkManager postBookmarkManager,
-            AccountManager accountManager,
-            Configuration configuration,
-            FormFactory formFactory, NotificationService notificationService) {
+                          AccountManager accountManager,
+                          Configuration configuration,
+                          FormFactory formFactory,
+                          NotificationService notificationService,
+                          MessagesApi messagesApi) {
         this.groupManager = groupManager;
         this.postManager = postManager;
         this.postBookmarkManager = postBookmarkManager;
@@ -48,6 +52,7 @@ public class PostController extends BaseController {
         this.configuration = configuration;
         this.formFactory = formFactory;
         this.notificationService = notificationService;
+        this.messagesApi = messagesApi;
 
         this.postForm = formFactory.form(Post.class);
     }
@@ -98,7 +103,7 @@ public class PostController extends BaseController {
             Group group = groupManager.findById(anyId);
             if (Secured.isMemberOfGroup(group, account)) {
                 if (filledForm.hasErrors()) {
-                    flash("error", Messages.get("post.try_with_content"));
+                    flash("error", messagesApi.get(Lang.defaultLang(), "post.try_with_content"));
                 } else {
                     Post post = filledForm.get();
                     post.owner = Component.currentAccount();
@@ -107,7 +112,7 @@ public class PostController extends BaseController {
                     notificationService.createNotification(post, Post.GROUP);
                 }
             } else {
-                flash("info", Messages.get("post.join_group_first"));
+                flash("info", messagesApi.get(Lang.defaultLang(), "post.join_group_first"));
             }
 
             return redirect(controllers.routes.GroupController.stream(group.id, PAGE, false));
@@ -117,7 +122,7 @@ public class PostController extends BaseController {
             Account profile = accountManager.findById(anyId);
             if (Secured.isNotNull(profile) && (Secured.isFriend(profile) || profile.equals(account) || Secured.isAdmin())) {
                 if (filledForm.hasErrors()) {
-                    flash("error", Messages.get("post.try_with_content"));
+                    flash("error", messagesApi.get(Lang.defaultLang(), "post.try_with_content"));
                 } else {
                     Post post = filledForm.get();
                     post.account = profile;
@@ -131,7 +136,7 @@ public class PostController extends BaseController {
                 return redirect(controllers.routes.ProfileController.stream(anyId, PAGE, false));
             }
 
-            flash("info", Messages.get("post.post_on_stream_only"));
+            flash("info", messagesApi.get(Lang.defaultLang(), "post.post_on_stream_only"));
             return redirect(controllers.routes.ProfileController.stream(anyId, PAGE, false));
         }
 
@@ -139,7 +144,7 @@ public class PostController extends BaseController {
             Account profile = accountManager.findById(anyId);
             if (Secured.isNotNull(profile) && profile.equals(account)) {
                 if (filledForm.hasErrors()) {
-                    flash("error", Messages.get("post.try_with_content"));
+                    flash("error", messagesApi.get(Lang.defaultLang(), "post.try_with_content"));
                 } else {
                     Post post = filledForm.get();
                     post.account = profile;
@@ -149,7 +154,7 @@ public class PostController extends BaseController {
                 return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE, false));
             }
 
-            flash("info", Messages.get("post.post_on_stream_only"));
+            flash("info", messagesApi.get(Lang.defaultLang(), "post.post_on_stream_only"));
             return redirect(controllers.routes.Application.stream(STREAM_FILTER, PAGE, false));
         }
 
