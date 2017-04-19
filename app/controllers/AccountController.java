@@ -23,6 +23,8 @@ import java.util.Random;
 @Transactional
 public class AccountController extends BaseController {
 
+    final Logger.ALogger LOG = Logger.of(AccountController.class);
+
     AccountManager accountManager;
     FormFactory formFactory;
     LdapService ldapService;
@@ -52,9 +54,11 @@ public class AccountController extends BaseController {
         // save originURL before clearing the session (it gets cleared in defaultAuthenticate() and LdapAuthenticate())
         String redirect = session().get("originURL");
 
+        LOG.info("Login attempt from: " + username);
         if (username.contains("@")) {
             return emailAuthenticate(redirect);
         } else if (username.length() == 0) {
+            LOG.info("... no name given");
             flash("error", "Also deine Matrikelnummer brauchen wir schon!");
             return badRequest(landingpage.render(form));
         } else {
@@ -93,8 +97,8 @@ public class AccountController extends BaseController {
 
         // if user is not found in DB, create new user from LDAP data, otherwise update user data
         if (account == null) {
+            LOG.info("... not found. Creating new Account for: " + matriculationNumber);
             account = new Account();
-            Logger.info("New Account for " + matriculationNumber + " will be created.");
             account.firstname = ldapService.getFirstName();
             account.lastname = ldapService.getLastName();
             account.loginname = matriculationNumber;
@@ -116,7 +120,7 @@ public class AccountController extends BaseController {
         if (rememberMe != null) {
             session("rememberMe", "1");
         }
-
+        LOG.info("Welcome, " + account.name);
         return redirect(redirect);
     }
 
@@ -124,18 +128,20 @@ public class AccountController extends BaseController {
         Form<Login> loginForm = formFactory.form(Login.class).bindFromRequest();
         Login login = loginForm.get();
         if (!accountManager.isAccountValid(login.email, login.password)) {
+            LOG.info("User not found");
             flash("error", "Bitte melde dich mit deiner Matrikelnummer an.");
             Component.addToContext(Component.ContextIdent.loginForm, loginForm);
             return badRequest(landingpage.render(loginForm));
         } else {
+            Account account = accountManager.findByEmail(login.email);
             session().clear();
             session("email", loginForm.get().email);
-            session("id", accountManager.findByEmail(login.email).id.toString());
-            session("firstname", accountManager.findByEmail(login.email).firstname);
+            session("id", account.id.toString());
+            session("firstname", account.firstname);
             if (loginForm.get().rememberMe != null) {
                 session("rememberMe", "1");
             }
-
+            LOG.info("Welcome, " + account.name);
             return redirect(redirect);
         }
     }

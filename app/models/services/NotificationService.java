@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class NotificationService {
 
+    final Logger.ALogger LOG = Logger.of(NotificationService.class);
+
     WebSocketService webSocketService;
     EmailService email;
     NotificationManager notificationManager;
@@ -122,10 +124,10 @@ public class NotificationService {
                         // if no ID is set already, persist new instance, otherwise update given instance
                         if (notification.id == null) {
                             notificationManager.create(notification);
-                            Logger.info("Created new notification for user: " + recipient.id.toString());
+                            LOG.info("Created new notification for user: " + recipient.id.toString());
                         } else {
                             notificationManager.update(notification);
-                            Logger.info("Updated notification (ID: " + notification.id.toString()
+                            LOG.info("Updated notification (ID: " + notification.id.toString()
                                     + ") for user: " + recipient.id.toString()
                             );
                         }
@@ -133,7 +135,7 @@ public class NotificationService {
                         self.webSocketPush(notification);
                         self.handleMail(notification);
                     } catch (Exception e) {
-                        Logger.error("Could not render notification. Notification will not be stored in DB" +
+                        LOG.error("Could not render notification. Notification will not be stored in DB" +
                                         " nor will the user be notified in any way." + e.getMessage()
                         );
                     }

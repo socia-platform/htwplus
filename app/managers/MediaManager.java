@@ -24,6 +24,7 @@ import java.util.*;
  */
 public class MediaManager implements BaseManager {
 
+    final Logger.ALogger LOG = Logger.of(MediaManager.class);
 
     @Inject
     NotificationManager notificationManager;
@@ -184,31 +185,31 @@ public class MediaManager implements BaseManager {
      * Cleans the temporary media directoy used for ZIP Downloads
      */
     public void cleanUpTemp() {
-        Logger.info("Cleaning the Tempory Media Directory");
+        LOG.info("Cleaning the Tempory Media Directory");
 
         String tmpPath = configuration.getString("media.tempPath");
         File dir = new File(tmpPath);
-        Logger.info("Directory: " + dir.toString());
+        LOG.debug("Directory: " + dir.toString());
         File[] files = dir.listFiles();
-        Logger.info("Absolut Path: " + dir.getAbsolutePath());
+        LOG.debug("Absolut Path: " + dir.getAbsolutePath());
 
         if (files != null) {
             // Just delete files older than 1 hour
             long hours = 1;
             long eligibleForDeletion = System.currentTimeMillis() - (hours * 60 * 60 * 1000L);
 
-            Logger.info("Found " + files.length + " Files");
+            LOG.info("Found " + files.length + " Files");
             if (files != null) {
                 for (File file : files) {
-                    Logger.info("Working on " + file.getName());
+                    LOG.info("Working on " + file.getName());
                     if (file.getName().startsWith(tempPrefix) && file.lastModified() < eligibleForDeletion) {
-                        Logger.info("Deleting: " + file.getName());
+                        LOG.info("Deleting: " + file.getName());
                         file.delete();
                     }
                 }
             }
         } else {
-            Logger.info("files is null");
+            LOG.info("files is null");
         }
 
     }
