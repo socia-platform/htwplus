@@ -152,7 +152,6 @@ public class LdapService {
             Entry entry = entCursor.get();
             this.firstName = entry.get(userFirstName).getString();
             this.lastName = entry.get(userLastName).getString();
-            Logger.info("Read Account from LDAP: " + this.firstName + " " + this.lastName);
         } catch (LdapException | CursorException e) {
             e.printStackTrace();
             throw new LdapConnectorException(messagesApi.get(Lang.defaultLang(), "ldap.wrongCredentials"));
