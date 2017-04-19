@@ -24,7 +24,6 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 @Security.Authenticated(Secured.class)
-// Action performs the authentication
 @With(AdminAction.class)
 public class AdminController extends BaseController {
 
@@ -35,9 +34,9 @@ public class AdminController extends BaseController {
     private final AccountManager accountManager;
     private final FolderManager folderManager;
     private final MessagesApi messagesApi;
-    FormFactory formFactory;
-    Form<Account> accountForm;
-    Form<Post> postForm;
+    private final FormFactory formFactory;
+    private final Form<Account> accountForm;
+    private final Form<Post> postForm;
 
     @Inject
     public AdminController(ElasticsearchService elasticsearchService,

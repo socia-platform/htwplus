@@ -25,10 +25,10 @@ public class AccountController extends BaseController {
 
     final Logger.ALogger LOG = Logger.of(AccountController.class);
 
-    AccountManager accountManager;
-    FormFactory formFactory;
-    LdapService ldapService;
-    MessagesApi messagesApi;
+    private final AccountManager accountManager;
+    private final FormFactory formFactory;
+    private final LdapService ldapService;
+    private final MessagesApi messagesApi;
 
     @Inject
     public AccountController(AccountManager accountManager, FormFactory formFactory, LdapService ldapService, MessagesApi messagesApi) {
@@ -37,10 +37,6 @@ public class AccountController extends BaseController {
         this.ldapService = ldapService;
         this.messagesApi = messagesApi;
     }
-    /**
-     * Defines a form wrapping the Account class.
-     */
-    //final Form<Account> signupForm = formFactory.form(Account.class);
 
     /**
      * Default authentication action.
@@ -121,14 +117,20 @@ public class AccountController extends BaseController {
             session("rememberMe", "1");
         }
         LOG.info("Welcome, " + account.name);
+
         return redirect(redirect);
     }
 
+    /**
+     * Mail authentication.
+     *
+     * @return Result
+     */
     private Result emailAuthenticate(final String redirect) {
         Form<Login> loginForm = formFactory.form(Login.class).bindFromRequest();
         Login login = loginForm.get();
         if (!accountManager.isAccountValid(login.email, login.password)) {
-            LOG.info("User not found");
+            LOG.info("User/Password not valid");
             flash("error", "Bitte melde dich mit deiner Matrikelnummer an.");
             Component.addToContext(Component.ContextIdent.loginForm, loginForm);
             return badRequest(landingpage.render(loginForm));
@@ -183,6 +185,7 @@ public class AccountController extends BaseController {
      * Logout and clean the session.
      */
     public Result logout() {
+        LOG.info("Bye, " + session().get("email"));
         session().clear();
         flash("success", messagesApi.get(Lang.defaultLang(), "authenticate.logout"));
 
