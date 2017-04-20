@@ -276,13 +276,15 @@ body#hp-landingpage {
 
 #hp-landingpage div#hp-about > div {
     position: relative;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 0;
 }
 
 #hp-landingpage div#hp-about > div > * {
     padding: 0 30px;
+    font-weight: bold;
+}
+
+#hp-landingpage div#hp-about > div > p {
+    font-size: 14px;
 }
 
 #hp-landingpage div#hp-about > div:last-child {
@@ -312,9 +314,7 @@ body#hp-landingpage {
     width: 100%;
     height: 90px;
     top: 0;
-    background: #f9f9f9;
     border-bottom: 1px solid #ddd;
-    border-radius: 5px 5px 0 0;
     z-index: -1;
 }
 
@@ -391,6 +391,7 @@ div[id*='hp-feature-text-'] table {
 #hp-landingpage div#hp-features .hp-feature-description {
 	margin-top: 30px;
 	margin-bottom: 0;
+	line-height: normal;
 }
 
 #hp-landingpage div.hp-feature-icon {
@@ -408,7 +409,6 @@ div[id*='hp-feature-text-'] table {
 }
 
 #hp-landingpage div[id*='hp-feature-text-']:nth-child(2n) div.hp-feature-icon {
-    left: 0;
 	-moz-transform: rotate(15deg);
 	-ms-transform: rotate(15deg);
 	-o-transform: rotate(15deg);
@@ -416,7 +416,6 @@ div[id*='hp-feature-text-'] table {
 }
 
 #hp-landingpage div[id*='hp-feature-text-']:nth-child(2n+1) div.hp-feature-icon {
-    right: 0;
 	-moz-transform: rotate(345deg);
 	-ms-transform: rotate(345deg);
 	-o-transform: rotate(345deg);
@@ -1721,5 +1720,9 @@ a.adjust {
 /*==== if content area is to short and site-nav starts floating around ==*/
 .min-height {
     min-height: 600px;
+}
+
+.min-280 {
+    min-height: 280px;
 }
 

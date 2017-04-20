@@ -44,24 +44,25 @@ authenticate.logout=Du bist nun ausgeloggt
 # --- Landingpage
 landingpage.to_login=Zum Login
 landingpage.about=Über HTWplus
-landingpage.about.title=Erlebe das Studium neu!
-landingpage.about.description=Mit HTWplus hast du nun die Möglichkeit mit deinen Kommilitonen stets in Kontakt zu bleiben und dies unabhängig von anderen sozialen Netzwerken, die du vielleicht bereits privat nutzt. Dazu sind bereits zahlreiche Funktionen enthalten, die euch bei eurem Studium unterstützen sollen.
+landingpage.about.title=Was ist HTWplus?
+landingpage.about.description=HTWplus ist ein hochschulinternes, kollaboratives Netzwek von der HTW für die HTW. Es ermöglicht Dir durch zahlreiche Funktionalitäten unabhänging anderer sozialen Netzwerke, Dich bei der täglichen Arbeit rund ums Studium zu unterstützen.
 landingpage.features=Die Funktionen
-landingpage.features.login.title=Nutze deinen HTW-Account
-landingpage.features.login.description=Die Anmeldung erfolgt unkompliziert mit deinem HTW-Account.
-landingpage.features.friends.title=Vernetze dich mit deinen Kommilitonen
-landingpage.features.friends.description=Pflege dein Hochschul-Netzwerk, indem du Kommilitonen und Dozenten deiner persönlichen Kontaktliste hinzufügst.
-landingpage.features.groups.title=Vorlesungen, Übungen und Studienprojekte organisieren
-landingpage.features.groups.description=Erstelle Gruppen, um dein Studium gemeinsam mit deinen Kommilitonen zu organisieren oder trete bestehenden Gruppen bei.
-landingpage.features.courses.title=Kommuniziere mit deinen Dozenten und Professoren
-landingpage.features.courses.description=Tausche dich mit deinen Dozenten aus, indem du an ihren virtuellen Kursen teilnimmst.
+landingpage.features.login.title=Nutze Deinen HTW-Account
+landingpage.features.login.description=Die Anmeldung erfolgt unkompliziert mit Deinem HTW-Account. Eine aufwendige Registrierung ist nicht nötig.
+landingpage.features.friends.title=Vernetze Dich mit Kommilitonen
+landingpage.features.friends.description=Verpasse keine Informationen, indem Du Kommilitonen und Dozenten Deiner persönlichen Kontaktliste hinzufügst.
+landingpage.features.groups.title=Organisiere Vorlesungen, Übungen und Studienprojekte
+landingpage.features.groups.description=Nutze Gruppen, um Dich und Dein Studium mit anderen Kommilitonen zu organisieren.
+landingpage.features.courses.title=Kommuniziere mit Deinen Dozenten und Professoren
+landingpage.features.courses.description=Tausche Dich mit Deinen Dozenten aus, indem du an ihren virtuellen Kursen teilnimmst.
 landingpage.features.filemgmt.title=Lehrmaterialen abrufen und Dateien austauschen
-landingpage.features.filemgmt.description=Nutze das Medienmanagement in Gruppen und Kursen, um Vorlesungsmaterialen, Notizen und Dokumente zu verwalten.
-landingpage.features.newsstream.title=Immer auf dem neusten Stand
-landingpage.features.newsstream.description=Dein persönlicher Newsstream hält dich immer auf dem Laufenden. Alle Posts und Kommentare deiner Gruppen, Kurse und von Kontakten werden hier zusammengefasst.
+landingpage.features.filemgmt.description=Nutze das Medienmanagement in Gruppen und Kursen, um Vorlesungsmaterialen, Notizen und Dokumente mit anderen Gruppenmitgliedern zu tauschen.
+landingpage.features.newsstream.title=Sei immer auf dem neusten Stand
+landingpage.features.newsstream.description=Dein persönlicher Newsstream hält dich immer auf dem Laufenden. Neue Posts, Kommentare oder Medien aus Deinen Gruppen, Kursen oder von Kontakten werden hier für Dich zusammengefasst.
 landingpage.features.notifications.title=Keine Neuigkeiten verpassen
-landingpage.features.notifications.description=Ob neue Posts, Kommentare, Kontaktanfragen oder Gruppeneinladungen - du wirst über alles informiert. Auf Wunsch auch per Email.
-
+landingpage.features.notifications.description=Ob neue Posts, Kommentare, Medien, Kontaktanfragen oder Gruppeneinladungen - Du wirst über alles informiert. Auf Wunsch auch per Email.
+landingpage.features.education.title=Trenne Studium von Privatem
+landingpage.features.education.description=Was auf HTWplus passiert, bleibt auf HTWplus. Auch deine Daten. Alles läuft im Rechenzentrum der HTW und benötigt keine externen Dienste.
 # --- Main page
 mainpage.backtotop=Nach oben
 

@@ -88,10 +88,10 @@
             </div>
 
                 <!-- content wrapper -->
-            <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-12 col-md-offset-0 col-lg-10 col-lg-offset-1">
+            <div class="container">
 
                 <div id="hp-about" class="hp-section row" data-scrollspy-name="hp-about">
-                    <div class="col-md-8 col-md-offset-2">
+                    <div class="col-md-10 col-md-offset-1">
                         <div class="hp-circle">
                             <img id="hp-plusi" src='@routes.Assets.at("images/Plusi/eule_unsicher.png")'>
                         </div>
@@ -103,13 +103,12 @@
 
                 <div id="hp-features-trigger"></div>
                 <div id="hp-features" class="hp-section row" data-scrollspy-name="hp-features">
-                        <!-- feature demos -->
 
-                        <!-- feature descriptions -->
-                    <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-5 col-md-offset-1">
+                    <!-- feature descriptions -->
+                    <div class="col-md-12">
 
-                            <!-- Login -->
-                        <div id="hp-feature-text-login" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <!-- Login -->
+                        <div id="hp-feature-text-login" class="min-280 col-xs-12 col-sm-6 col-md-4">
                             <div class="hp-feature-icon"><span class="glyphicon glyphicon-log-in"></span></div>
                             <table><tr><td>
                                 <h1 class="hp-feature-title">@Messages("landingpage.features.login.title")</h1>
@@ -121,8 +120,8 @@
                             </table>
                         </div>
 
-                            <!-- Friends -->
-                        <div id="hp-feature-text-friends" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <!-- Friends -->
+                        <div id="hp-feature-text-friends" class="min-280 col-xs-12 col-sm-6 col-md-4">
                             <div class="hp-feature-icon"><span class="glyphicon glyphicon-user"></span></div>
                             <table><tr><td>
                                 <h1 class="hp-feature-title">@Messages("landingpage.features.friends.title")</h1>
@@ -134,8 +133,8 @@
                             </table>
                         </div>
 
-                            <!-- Groups -->
-                        <div id="hp-feature-text-groups" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <!-- Groups -->
+                        <div id="hp-feature-text-groups" class="min-280 col-xs-12 col-sm-6 col-md-4">
                             <div class="hp-feature-icon"><span class="glyphicon glyphicon-globe"></span></div>
                             <table><tr><td>
                                 <h1 class="hp-feature-title">@Messages("landingpage.features.groups.title")</h1>
@@ -147,8 +146,8 @@
                             </table>
                         </div>
 
-                            <!-- Courses -->
-                        <div id="hp-feature-text-courses" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <!-- Courses -->
+                        <div id="hp-feature-text-courses" class="min-280 col-xs-12 col-sm-6 col-md-4">
                             <div class="hp-feature-icon"><span class="glyphicon glyphicon-briefcase"></span></div>
                             <table><tr><td>
                                 <h1 class="hp-feature-title">@Messages("landingpage.features.courses.title")</h1>
@@ -160,8 +159,8 @@
                             </table>
                         </div>
 
-                            <!-- File management -->
-                        <div id="hp-feature-text-filemgmt" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <!-- File management -->
+                        <div id="hp-feature-text-filemgmt" class="min-280 col-xs-12 col-sm-6 col-md-4">
                             <div class="hp-feature-icon"><span class="glyphicon glyphicon-file"></span></div>
                             <table><tr><td>
                                 <h1 class="hp-feature-title">@Messages("landingpage.features.filemgmt.title")</h1>
@@ -173,9 +172,9 @@
                             </table>
                         </div>
 
-                            <!-- Newsstream -->
-                        <div id="hp-feature-text-newsstream" class="col-xs-12 col-md-4 visible-xs visible-sm">
-                            <div class="hp-feature-icon"><span class="glyphicon glyphicon-home"></span></div>
+                        <!-- Newsstream -->
+                        <div id="hp-feature-text-newsstream" class="min-280 col-xs-12 col-sm-6 col-md-4">
+                            <div class="hp-feature-icon"><span class="glyphicon glyphicon-time"></span></div>
                             <table><tr><td>
                                 <h1 class="hp-feature-title">@Messages("landingpage.features.newsstream.title")</h1>
                             </td>
@@ -186,14 +185,27 @@
                             </table>
                         </div>
 
-                            <!-- Notifications -->
-                        <div id="hp-feature-text-notifications" class="col-xs-12 col-md-4 visible-xs visible-sm">
+                        <!-- Notifications -->
+                        <div id="hp-feature-text-notifications" class="min-280 col-xs-12 col-sm-6 col-md-4">
                             <div class="hp-feature-icon"><span class="glyphicon glyphicon-bell"></span></div>
                             <table><tr><td>
                                 <h1 class="hp-feature-title">@Messages("landingpage.features.notifications.title")</h1>
                             </td>
                             </tr> <tr><td>
                                 <h4 class="hp-feature-description">@Messages("landingpage.features.notifications.description")</h4>
+                            </td>
+                            </tr>
+                            </table>
+                        </div>
+
+                        <!-- Notifications -->
+                        <div id="hp-feature-text-notifications" class="min-280 col-xs-12 col-sm-6 col-md-4">
+                            <div class="hp-feature-icon"><span class="glyphicon glyphicon-education"></span></div>
+                            <table><tr><td>
+                                <h1 class="hp-feature-title">@Messages("landingpage.features.education.title")</h1>
+                            </td>
+                            </tr> <tr><td>
+                                <h4 class="hp-feature-description">@Messages("landingpage.features.education.description")</h4>
                             </td>
                             </tr>
                             </table>
