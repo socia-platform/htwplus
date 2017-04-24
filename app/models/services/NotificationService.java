@@ -175,9 +175,9 @@ public class NotificationService {
                     && !notification.isRead
                     ) {
                 // since hibernate persist and update contradictions
-                // schedule another process for email handling in 5 second from now on
+                // schedule another process for email handling in 1 second from now on
                 system.scheduler().scheduleOnce(
-                    Duration.create(5, TimeUnit.SECONDS),
+                    Duration.create(1, TimeUnit.SECONDS),
                     () -> { email.sendNotificationEmail(notification); },
                     system.dispatcher()
                 );
