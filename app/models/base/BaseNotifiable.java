@@ -93,13 +93,7 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      * @return List of accounts of group
      */
     public List<Account> getGroupAsAccountList(final Group group) {
-        List<Account> accounts = new ArrayList<>();
-        for (GroupAccount groupAccount : group.groupAccounts) {
-            if (groupAccount.linkType.equals(LinkType.establish)) {
-                accounts.add(groupAccount.account);
-            }
-        }
-        return accounts;
+        return GroupAccountManager.findAccountsByGroup2(group, LinkType.establish);
     }
 
     /**

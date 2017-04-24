@@ -9,6 +9,7 @@ import models.Group;
 import models.Post;
 import models.services.ElasticsearchResponse;
 import models.services.ElasticsearchService;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import play.Configuration;
@@ -93,6 +94,13 @@ public class Application extends BaseController {
 
     @Security.Authenticated(Secured.class)
     public Result stream(String filter, int page, boolean raw) {
+        Account currentAccount = Component.currentAccount();
+
+        // filter must be set for pagination
+        // cant do it in routes, routes.Application.stream(filter, 1).toString would truncate it
+        if(StringUtils.isEmpty(filter)) {
+            filter = "all";
+        }
 
         switch (filter) {
             case "account":
@@ -109,8 +117,8 @@ public class Application extends BaseController {
                 break;
             default:
                 Navigation.set(Level.STREAM, "Alles");
+                filter = "all";
         }
-        Account currentAccount = Component.currentAccount();
 
         if (raw) {
             return ok(streamRaw.render(postManager.getFilteredStream(currentAccount, limit, page, filter), postForm, postManager.countStream(currentAccount, filter), limit, page, filter));
@@ -119,6 +127,7 @@ public class Application extends BaseController {
         }
     }
 
+    @Security.Authenticated(Secured.class)
     public Result searchSuggestions(String query) throws ExecutionException, InterruptedException {
         Account currentAccount = Component.currentAccount();
         if (currentAccount == null) {
@@ -128,6 +137,7 @@ public class Application extends BaseController {
         return ok(response.toString());
     }
 
+    @Security.Authenticated(Secured.class)
     public Result searchHome() {
         Navigation.set(Level.SEARCH);
         return ok(views.html.Search.search.render());
@@ -194,6 +204,7 @@ public class Application extends BaseController {
         return ok(error.render());
     }
 
+    @Security.Authenticated(Secured.class)
     public Result feedback() {
         final String feedbackGroup = configuration.getString("htwplus.feedback.group");
         Group feedback = groupManager.findByTitle(feedbackGroup);
