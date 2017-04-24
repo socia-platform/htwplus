@@ -113,7 +113,9 @@ public class PostManager implements BaseManager {
     }
 
     private static Query limit(Query query, int limit, int offset) {
-        query.setMaxResults(limit);
+        if (limit > 0) {
+            query.setMaxResults(limit);
+        }
         if (offset >= 0) {
             query.setFirstResult(offset);
         }

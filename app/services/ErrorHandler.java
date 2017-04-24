@@ -1,5 +1,6 @@
 package services;
 
+import controllers.Secured;
 import managers.AccountManager;
 import managers.GroupManager;
 import managers.PostManager;
@@ -75,7 +76,7 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 notificationService.createNotification(post, Post.GROUP);
             }
         });
-        return CompletableFuture.completedFuture(Results.redirect(controllers.routes.Application.error()));
+        return CompletableFuture.completedFuture(Results.redirect(controllers.routes.Application.index()));
     }
 
     protected CompletionStage<Result> onBadRequest(Http.RequestHeader request, String message) {
@@ -90,6 +91,6 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 notificationService.createNotification(post, Post.GROUP);
             }
         });
-        return CompletableFuture.completedFuture(Results.redirect(controllers.routes.Application.error()));
+        return CompletableFuture.completedFuture(Results.redirect(controllers.routes.Application.index()));
     }
 }
