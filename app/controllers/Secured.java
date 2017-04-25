@@ -515,16 +515,6 @@ public class Secured extends Security.Authenticator {
 	}
 
 	/**
-	 * Returns true, if the currently logged in account is owner of an account by ID.
-	 *
-	 * @param accountId Account ID to check
-	 * @return True, if logged in user is owner of account
-	 */
-	public static boolean isOwnerOfAccount(final Long accountId) {
-		return AccountManager.isOwner2(accountId, Component.currentAccount());
-	}
-
-	/**
 	 * Returns true, if the currently logged in account has a friendship with a specific account.
 	 *
 	 * @param account Account to check friendship

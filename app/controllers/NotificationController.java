@@ -163,6 +163,6 @@ public class NotificationController extends BaseController {
         notificationManager.markAllAsRead(Component.currentAccount());
         flash("success", messagesApi.get(Lang.defaultLang(), "notification.read_everything_ok"));
 
-        return redirect(request().getHeader("referer"));
+        return Secured.nullRedirect(request());
     }
 }

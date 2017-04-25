@@ -11,6 +11,7 @@ import models.Post;
 import models.PostBookmark;
 import models.services.NotificationService;
 import play.Configuration;
+import play.Logger;
 import play.api.i18n.Lang;
 import play.api.mvc.Call;
 import play.data.Form;
@@ -26,6 +27,8 @@ import java.util.List;
 
 @Security.Authenticated(Secured.class)
 public class PostController extends BaseController {
+
+    final Logger.ALogger LOG = Logger.of(PostController.class);
 
     GroupManager groupManager;
     PostManager postManager;
@@ -110,6 +113,7 @@ public class PostController extends BaseController {
                     post.group = group;
                     postManager.create(post);
                     notificationService.createNotification(post, Post.GROUP);
+                    LOG.info("New post from " + post.owner.id + " in " + group.title);
                 }
             } else {
                 flash("info", messagesApi.get(Lang.defaultLang(), "post.join_group_first"));
@@ -195,7 +199,7 @@ public class PostController extends BaseController {
                     notificationService.createNotification(post, Post.COMMENT_PROFILE);
                 }
             }
-
+            LOG.info("New comment from " + post.owner.id + " for post " + post.parent.id);
             return ok(views.html.snippets.postComment.render(post));
         }
     }

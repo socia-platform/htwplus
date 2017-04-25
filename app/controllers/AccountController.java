@@ -51,6 +51,7 @@ public class AccountController extends BaseController {
         String redirect = session().get("originURL");
 
         LOG.info("Login attempt from: " + username);
+        LOG.info("Redirecting to " + redirect);
         if (username.contains("@")) {
             return emailAuthenticate(redirect);
         } else if (username.length() == 0) {

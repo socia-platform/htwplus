@@ -200,43 +200,9 @@ public class AccountManager implements BaseManager {
         }
     }
 
-    /**
-     * Retrieve a User by loginname
-     */
-    public Account findByName(String name) {
-        try{
-            return (Account) jpaApi.em()
-                    .createQuery("from Account a where a.name = :name")
-                    .setParameter("name", name).getSingleResult();
-        } catch (NoResultException exp) {
-            return null;
-        }
-    }
-
-    /**
-     * Authenticates a user by email and password.
-     * @param email of the user who wants to be authenticate
-     * @param password of the user should match to the email ;)
-     * @return Returns the current account or Null
-     */
-    public static Account authenticate2(String email, String password) {
-        Account currentAcc = null;
-        try {
-            final Account result = (Account) JPA.em()
-                    .createQuery("from Account a where a.email = :email")
-                    .setParameter("email", email).getSingleResult();
-            if (result != null && Component.md5(password).equals(result.password)) {
-                currentAcc = result;
-            }
-            return currentAcc;
-        } catch (NoResultException exp) {
-            return currentAcc;
-        }
-    }
-
     public boolean isAccountValid(String email, String password) {
         try {
-            final Account result = (Account) JPA.em()
+            final Account result = (Account) jpaApi.em()
                     .createQuery("from Account a where a.email = :email")
                     .setParameter("email", email).getSingleResult();
             if (result != null && Component.md5(password).equals(result.password)) {
@@ -255,24 +221,6 @@ public class AccountManager implements BaseManager {
     @SuppressWarnings("unchecked")
     public List<Account> all() {
         return jpaApi.em().createQuery("FROM Account").getResultList();
-    }
-
-    public static boolean isOwner2(Long accountId, Account currentUser) {
-        Account a = JPA.em().find(Account.class, accountId);
-        if(a.equals(currentUser)){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isOwner(Long accountId, Account currentUser) {
-        Account a = jpaApi.em().find(Account.class, accountId);
-        if(a.equals(currentUser)){
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**

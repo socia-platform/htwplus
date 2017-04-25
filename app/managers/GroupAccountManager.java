@@ -57,10 +57,6 @@ public class GroupAccountManager implements BaseManager {
         return jpaApi.em().find(GroupAccount.class, id);
     }
 
-    public static GroupAccount findById2(Long id) {
-        return JPA.em().find(GroupAccount.class, id);
-    }
-
     /**
      * Find all groups and courses where given account is owner or member
      */

@@ -31,6 +31,8 @@ import views.html.Media.list;
 @Security.Authenticated(Secured.class)
 public class MediaController extends BaseController {
 
+    final Logger.ALogger LOG = Logger.of(MediaController.class);
+
     MediaManager mediaManager;
     FolderManager folderManager;
     Configuration configuration;
@@ -284,6 +286,7 @@ public class MediaController extends BaseController {
             try {
                 mediaManager.create(med);
                 notificationService.createNotification(med, Media.MEDIA_NEW_MEDIA);
+                LOG.info("New media " + med.fileName + " from " + med.owner.id + " in folder " + med.folder.id);
             } catch (Exception e) {
                 return internalServerError("Während des Uploads ist etwas schiefgegangen!");
             }

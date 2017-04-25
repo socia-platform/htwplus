@@ -66,17 +66,7 @@ public class Media extends BaseNotifiable implements INotifiable {
 
     @Override
     public List<Account> getRecipients() {
-        // new media available in group, whole group must be notified (rootFolder knows the group)
-        Folder rootFolder = FolderManager.findRoot(folder);
-        List<Account> accounts = new ArrayList<>();
-        if (rootFolder.group != null) {
-            for (GroupAccount groupAccount : rootFolder.group.groupAccounts) {
-                if (groupAccount.linkType.equals(LinkType.establish)) {
-                    accounts.add(groupAccount.account);
-                }
-            }
-        }
-        return accounts;
+        return GroupAccountManager.findAccountsByGroup2(folder.group, LinkType.establish);
     }
 
     @Override

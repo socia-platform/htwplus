@@ -21,7 +21,7 @@ public class FolderManager implements BaseManager {
     JPAApi jpaApi;
 
     public Folder findById(long id) {
-        return JPA.em().find(Folder.class, id);
+        return jpaApi.em().find(Folder.class, id);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class FolderManager implements BaseManager {
 
     @Override
     public void update(Object model) {
-        JPA.em().merge(model);
+        jpaApi.em().merge(model);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class FolderManager implements BaseManager {
         for (Media media : folder.files) {
             mediaManager.delete(media);
         }
-        JPA.em().remove(folder);
+        jpaApi.em().remove(folder);
     }
 
     public List<Media> getAllMedia(Folder folder) {
