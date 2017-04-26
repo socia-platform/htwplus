@@ -1,12 +1,12 @@
 package services;
 
-import controllers.Secured;
 import managers.AccountManager;
 import managers.GroupManager;
 import managers.PostManager;
 import models.Group;
 import models.Post;
 import models.services.NotificationService;
+import org.apache.http.protocol.HTTP;
 import play.Configuration;
 import play.Environment;
 import play.api.OptionalSourceMapper;
@@ -14,10 +14,10 @@ import play.api.UsefulException;
 import play.api.routing.Router;
 import play.db.jpa.JPAApi;
 import play.http.DefaultHttpErrorHandler;
-import play.libs.F;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
+import views.html.defaultpages.badRequest;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -28,6 +28,8 @@ import java.util.concurrent.CompletionStage;
  * Created by Iven on 08.12.2015.
  */
 public class ErrorHandler extends DefaultHttpErrorHandler {
+
+    private int MAX_FILESIZE;
 
     GroupManager groupManager;
     PostManager postManager;
@@ -46,6 +48,8 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
         this.groupManager = groupManager;
         this.postManager = postManager;
         this.notificationService = notificationService;
+
+        this.MAX_FILESIZE = configuration.getInt("media.maxSize.file");
     }
 
     protected CompletionStage<Result> onProdServerError(Http.RequestHeader request, UsefulException exception) {
@@ -76,6 +80,7 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 notificationService.createNotification(post, Post.GROUP);
             }
         });
+
         return CompletableFuture.completedFuture(Results.redirect(controllers.routes.Application.index()));
     }
 
@@ -91,6 +96,27 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 notificationService.createNotification(post, Post.GROUP);
             }
         });
+
         return CompletableFuture.completedFuture(Results.redirect(controllers.routes.Application.index()));
+    }
+
+    protected CompletionStage<Result> onOtherClientError(Http.RequestHeader request, int errorCode, String message) {
+        jpaApi.withTransaction(() -> {
+            Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
+            if (group != null) {
+                Post post = new Post();
+                post.content = "Request: " + request + "\nError: " + errorCode + " - " + message;
+                post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
+                post.group = group;
+                postManager.createWithoutIndex(post);
+                notificationService.createNotification(post, Post.GROUP);
+            }
+        });
+
+        if (errorCode == Http.Status.REQUEST_ENTITY_TOO_LARGE) {
+            return CompletableFuture.completedFuture(Results.status(errorCode, "Es sind maximal "+ MAX_FILESIZE + " MByte pro Datei möglich."));
+        }
+
+        return CompletableFuture.completedFuture(Results.status(errorCode, badRequest.render(request.method(), request.uri(), message)));
     }
 }
