@@ -156,7 +156,7 @@ public class NotificationManager implements BaseManager {
      * @throws NoResultException
      */
     public static Notification findByReferenceIdAndRecipientId(Long referenceId, Long recipientId) throws NoResultException {
-        return JPA.withTransaction(() -> {
+        return JPA.createFor("defaultPersistenceUnit").withTransaction(() -> {
                 return JPA.em().createQuery("FROM Notification n WHERE n.referenceId = :referenceId AND n.recipient.id = :recipientId", Notification.class)
                     .setParameter("referenceId", referenceId)
                     .setParameter("recipientId", recipientId)

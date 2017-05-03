@@ -5,6 +5,7 @@ import models.*;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
+import play.db.jpa.DefaultJPAApi;
 import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
 import scala.concurrent.duration.Duration;
@@ -167,30 +168,16 @@ public class GroupAccountManager implements BaseManager {
     /**
      * Retrieve Accounts from Group with given LinkType.
      */
-    public static List<Account> findAccountsByGroup2(final Group group, final LinkType type) {
-        return JPA.withTransaction(() -> {
-            List<Account> accounts = (List<Account>) JPA
+    @SuppressWarnings("unchecked")
+    public static List<Account> staticFindAccountsByGroup(final Group group, final LinkType type) {
+        return JPA.createFor("defaultPersistenceUnit").withTransaction(() -> {
+            return (List<Account>) JPA
                     .em()
                     .createQuery(
                             "SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
                     .setParameter(1, group.id).setParameter(2, type)
                     .getResultList();
-            return accounts;
         });
-    }
-
-    /**
-     * Retrieve AccountsId from Group with given LinkType.
-     */
-    public static List<Long> findAccountIdsByGroup2(final Group group, final LinkType type) {
-        @SuppressWarnings("unchecked")
-        List<Long> accounts = (List<Long>) JPA
-                .em()
-                .createQuery(
-                        "SELECT ga.account.id FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
-                .setParameter(1, group.id).setParameter(2, type)
-                .getResultList();
-        return accounts;
     }
 
     public List<Long> findAccountIdsByGroup(final Group group, final LinkType type) {

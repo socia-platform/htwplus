@@ -66,7 +66,7 @@ public class Media extends BaseNotifiable implements INotifiable {
 
     @Override
     public List<Account> getRecipients() {
-        return GroupAccountManager.findAccountsByGroup2(folder.group, LinkType.establish);
+        return GroupAccountManager.staticFindAccountsByGroup(folder.group, LinkType.establish);
     }
 
     @Override

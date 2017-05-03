@@ -229,7 +229,7 @@ public class Application extends BaseController {
         return redirect(controllers.routes.Application.index());
     }
 
-    private static String[] buildUserFacetList(String parameter) {
+    private String[] buildUserFacetList(String parameter) {
         if (parameter != null) {
             return parameter.split(",");
         }
