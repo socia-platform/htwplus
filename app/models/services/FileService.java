@@ -5,7 +5,6 @@ import org.springframework.util.Assert;
 import play.Logger;
 import play.api.PlayException;
 import play.mvc.Http;
-import play.api.libs.MimeTypes;
 
 import java.io.IOException;
 
@@ -146,7 +145,6 @@ public class FileService {
      */
     public boolean validateContentType(String[] contentTypes){
         Assert.notNull(this.contentType, "Content type is not set");
-        MimeTypes.defaultTypes();
         if(Arrays.asList(contentTypes).contains(this.contentType)) {
             return true;
         } else {

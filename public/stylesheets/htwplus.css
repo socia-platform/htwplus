@@ -370,9 +370,8 @@ div[id*='hp-feature-text-'] table {
 }
 
 #hp-landingpage div#hp-features .hp-feature-title {
-	font-family: 'Swanky and Moo Moo', cursive;
-	margin-top: 0;
-	line-height: 1.1;
+	font-family: "Kristen ITC", sans-serif;
+	font-size: 22px;
 }
 
 #hp-landingpage div#hp-features .hp-feature-description {
@@ -1672,7 +1671,7 @@ a.adjust {
     min-height: 600px;
 }
 
-.min-280 {
-    min-height: 280px;
+.min-235 {
+    min-height: 235px;
 }
 

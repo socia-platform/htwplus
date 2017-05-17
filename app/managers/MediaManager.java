@@ -1,5 +1,6 @@
 package managers;
 
+import daos.GroupAccountDao;
 import models.Account;
 import models.Folder;
 import models.Media;
@@ -26,32 +27,35 @@ public class MediaManager implements BaseManager {
 
     final Logger.ALogger LOG = Logger.of(MediaManager.class);
 
-    @Inject
     NotificationManager notificationManager;
-
-    @Inject
     Configuration configuration;
-
-    @Inject
-    GroupAccountManager groupAccountManager;
-
-    @Inject
     ElasticsearchService elasticsearchService;
+    JPAApi jpaApi;
+    GroupAccountDao groupAccountDao;
 
     @Inject
-    JPAApi jpaApi;
+    public MediaManager(NotificationManager notificationManager,
+            Configuration configuration,
+            ElasticsearchService elasticsearchService,
+            JPAApi jpaApi) {
+        this.notificationManager = notificationManager;
+        this.configuration = configuration;
+        this.elasticsearchService = elasticsearchService;
+        this.jpaApi = jpaApi;
+
+    }
 
     final String tempPrefix = "htwplus_temp";
 
     @Override
     public void create(Object model) {
-        Media media = (Media) model;
-        media.size = media.file.length();
-        media.url = createRelativeURL() + "/" + getUniqueFileName(media.fileName);
+        Media medium = (Media) model;
+        medium.size = medium.file.length();
+        medium.url = createRelativeURL() + "/" + getUniqueFileName(medium.fileName);
         try {
-            createFile(media);
-            jpaApi.em().persist(media);
-            elasticsearchService.index(media);
+            createFile(medium);
+            jpaApi.em().persist(medium);
+            elasticsearchService.indexMedium(medium, isPublic(medium), findAllowedToViewAccountIds(medium));
         } catch (Exception e) {
             try {
                 throw e;
@@ -69,14 +73,14 @@ public class MediaManager implements BaseManager {
 
     @Override
     public void delete(Object model) {
-        Media media = (Media) model;
+        Media medium = (Media) model;
 
         try {
             // remove deprecated notifications
-            notificationManager.deleteReferences(media);
+            notificationManager.deleteReferences(medium);
 
-            deleteFile(media);
-            jpaApi.em().remove(media);
+            deleteFile(medium);
+            jpaApi.em().remove(medium);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -220,7 +224,7 @@ public class MediaManager implements BaseManager {
 
     public long indexAllMedia() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Media medium : findAll()) elasticsearchService.index(medium);
+        for (Media medium : findAll()) elasticsearchService.indexMedium(medium, isPublic(medium), findAllowedToViewAccountIds(medium));
         return (System.currentTimeMillis() - start) / 1000;
 
     }
@@ -243,7 +247,7 @@ public class MediaManager implements BaseManager {
 
         // medium belongs to group
         if(rootFolder.group != null) {
-            viewableIds.addAll(groupAccountManager.findAccountIdsByGroup(rootFolder.group, LinkType.establish));
+            viewableIds.addAll(groupAccountDao.findAccountIdsByGroup(rootFolder.group, LinkType.establish));
         }
 
         return viewableIds;

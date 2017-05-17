@@ -1,5 +1,6 @@
 package models;
 
+import daos.GroupDao;
 import managers.GroupManager;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
@@ -63,7 +64,7 @@ public class Group extends BaseNotifiable implements INotifiable {
 
     public List<ValidationError> validate() {
         List<ValidationError> errors = new ArrayList<>();
-        if (GroupManager.findByTitle2(this.title) != null) {
+        if (GroupDao.findByTitle2(this.title) != null) {
             errors.add(new ValidationError("title", "error.title"));
             return errors;
         }

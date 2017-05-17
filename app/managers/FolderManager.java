@@ -14,11 +14,16 @@ import java.util.List;
  */
 public class FolderManager implements BaseManager {
 
-    @Inject
     MediaManager mediaManager;
+    JPAApi jpaApi;
 
     @Inject
-    JPAApi jpaApi;
+    public FolderManager(MediaManager mediaManager,
+            JPAApi jpaApi) {
+        this.mediaManager = mediaManager;
+        this.jpaApi = jpaApi;
+
+    }
 
     public Folder findById(long id) {
         return jpaApi.em().find(Folder.class, id);

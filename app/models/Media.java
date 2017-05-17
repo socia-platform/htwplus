@@ -1,7 +1,6 @@
 package models;
 
-import managers.FolderManager;
-import managers.GroupAccountManager;
+import daos.GroupAccountDao;
 import models.base.BaseNotifiable;
 import models.base.INotifiable;
 import models.enums.LinkType;
@@ -11,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -66,7 +64,7 @@ public class Media extends BaseNotifiable implements INotifiable {
 
     @Override
     public List<Account> getRecipients() {
-        return GroupAccountManager.staticFindAccountsByGroup(folder.group, LinkType.establish);
+        return GroupAccountDao.staticFindAccountsByGroup(folder.group, LinkType.establish);
     }
 
     @Override

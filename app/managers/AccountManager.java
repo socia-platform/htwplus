@@ -1,6 +1,8 @@
 package managers;
 
 import controllers.Component;
+import daos.GroupAccountDao;
+import daos.GroupDao;
 import models.*;
 import models.base.FileOperationException;
 import models.enums.AccountRole;
@@ -23,8 +25,9 @@ public class AccountManager implements BaseManager {
 
     ElasticsearchService elasticsearchService;
     PostManager postManager;
+    GroupDao groupDao;
+    GroupAccountDao groupAccountDao;
     GroupManager groupManager;
-    GroupAccountManager groupAccountManager;
     FriendshipManager friendshipManager;
     MediaManager mediaManager;
     NotificationManager notificationManager;
@@ -36,8 +39,9 @@ public class AccountManager implements BaseManager {
     @Inject
     public AccountManager(ElasticsearchService elasticsearchService,
             PostManager postManager,
-            GroupManager groupManager,
-            GroupAccountManager groupAccountManager,
+            GroupDao groupDao,
+            GroupAccountDao groupAccountDao,
+                          GroupManager groupManager,
             FriendshipManager friendshipManager,
             MediaManager mediaManager,
             NotificationManager notificationManager,
@@ -46,8 +50,9 @@ public class AccountManager implements BaseManager {
             Configuration configuration, JPAApi jpaApi) {
             this.elasticsearchService = elasticsearchService;
         this.postManager = postManager;
+        this.groupDao = groupDao;
+        this.groupAccountDao = groupAccountDao;
         this.groupManager = groupManager;
-        this.groupAccountManager = groupAccountManager;
         this.friendshipManager = friendshipManager;
         this.mediaManager = mediaManager;
         this.notificationManager = notificationManager;
@@ -67,7 +72,7 @@ public class AccountManager implements BaseManager {
 
         jpaApi.em().persist(account);
         try {
-            elasticsearchService.index(account);
+            elasticsearchService.indexAccount(account, friendshipManager.findFriendsId(account));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -80,7 +85,7 @@ public class AccountManager implements BaseManager {
         account.name = account.firstname + " " + account.lastname;
         jpaApi.em().merge(account);
         try {
-            elasticsearchService.index(account);
+            elasticsearchService.indexAccount(account, friendshipManager.findFriendsId(account));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -112,9 +117,9 @@ public class AccountManager implements BaseManager {
         }
 
         // Anonymize created groups //
-        List<Group> groups = groupManager.listAllGroupsOwnedBy(account.id);
+        List<Group> groups = groupDao.listAllGroupsOwnedBy(account.id);
         for (Group group : groups) {
-            if (groupAccountManager.findAccountsByGroup(group, LinkType.establish).size() == 1) { // if the owner is the only member of the group
+            if (groupAccountDao.findAccountsByGroup(group, LinkType.establish).size() == 1) { // if the owner is the only member of the group
                 Logger.info("Group '" + group.title + "' is now empty, so it will be deleted!");
                 groupManager.delete(group);
             } else {
@@ -220,7 +225,7 @@ public class AccountManager implements BaseManager {
      */
     @SuppressWarnings("unchecked")
     public List<Account> all() {
-        return jpaApi.em().createQuery("FROM Account").getResultList();
+        return jpaApi.withTransaction(() -> {return jpaApi.em().createQuery("FROM Account").getResultList();});
     }
 
     /**
@@ -248,7 +253,7 @@ public class AccountManager implements BaseManager {
      */
     public void indexAccount(Account account) {
         try {
-            elasticsearchService.index(account);
+            elasticsearchService.indexAccount(account, friendshipManager.findFriendsId(account));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -262,7 +267,7 @@ public class AccountManager implements BaseManager {
 
         for (Account account: all()) {
             if(account.role != AccountRole.DUMMY)
-                elasticsearchService.index(account);
+                elasticsearchService.indexAccount(account, friendshipManager.findFriendsId(account));
         }
 
         return (System.currentTimeMillis() - start) / 1000;

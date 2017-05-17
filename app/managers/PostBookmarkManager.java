@@ -4,7 +4,9 @@ import models.Account;
 import models.Post;
 import models.PostBookmark;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 
+import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.util.List;
@@ -13,6 +15,13 @@ import java.util.List;
  * Created by Iven on 25.12.2015.
  */
 public class PostBookmarkManager implements BaseManager {
+
+    JPAApi jpaApi;
+
+    @Inject
+    public PostBookmarkManager(JPAApi jpaApi) {
+        this.jpaApi = jpaApi;
+    }
     @Override
     public void create(Object object) {
         JPA.em().persist(object);
@@ -56,7 +65,7 @@ public class PostBookmarkManager implements BaseManager {
 
     @SuppressWarnings("unchecked")
     public List<Post> findByAccount(Account account) {
-        return JPA.em().createQuery("SELECT pl.post FROM PostBookmark pl WHERE pl.owner.id = :accountId")
+        return jpaApi.em().createQuery("SELECT pl.post FROM PostBookmark pl WHERE pl.owner.id = :accountId")
                 .setParameter("accountId", account.id)
                 .getResultList();
     }

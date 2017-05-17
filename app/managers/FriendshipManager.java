@@ -1,5 +1,6 @@
 package managers;
 
+import daos.GroupAccountDao;
 import models.*;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
@@ -17,14 +18,22 @@ import java.util.List;
  */
 public class FriendshipManager implements BaseManager {
 
-    @Inject
     ElasticsearchService elasticsearchService;
-    @Inject
     NotificationManager notificationManager;
-    @Inject
-    GroupAccountManager groupAccountManager;
-    @Inject
+    GroupAccountDao groupAccountDao;
     JPAApi jpaApi;
+
+    @Inject
+    public FriendshipManager(ElasticsearchService elasticsearchService,
+            NotificationManager notificationManager,
+                             GroupAccountDao groupAccountDao,
+            JPAApi jpaApi) {
+        this.elasticsearchService = elasticsearchService;
+        this.notificationManager = notificationManager;
+        this.groupAccountDao = groupAccountDao;
+        this.jpaApi = jpaApi;
+
+    }
 
     @Override
     public void create(Object model) {
@@ -162,7 +171,7 @@ public class FriendshipManager implements BaseManager {
                 friend = it.next();
 
                 //remove account from list if there is any type of link (requests, invite, already member)
-                if (groupAccountManager.hasLinkTypes(friend, group)) {
+                if (groupAccountDao.hasLinkTypes(friend, group)) {
                     it.remove();
                 }
             }
@@ -175,8 +184,8 @@ public class FriendshipManager implements BaseManager {
         // each account document contains information about their friends
         // if a user accepts or deletes a friendship -> (re)index both user documents
         try {
-            elasticsearchService.index(friendship.account);
-            elasticsearchService.index(friendship.friend);
+            elasticsearchService.indexAccount(friendship.account, findFriendsId(friendship.account));
+            elasticsearchService.indexAccount(friendship.friend, findFriendsId(friendship.friend));
         } catch (IOException e) {
             e.printStackTrace();
         }

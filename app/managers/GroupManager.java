@@ -1,11 +1,14 @@
 package managers;
 
+import daos.GroupAccountDao;
+import daos.GroupDao;
 import models.*;
 import models.base.FileOperationException;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
+import sun.awt.image.ImageWatched;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -16,26 +19,34 @@ import java.util.List;
  */
 public class GroupManager implements BaseManager {
 
-    @Inject
     ElasticsearchService elasticsearchService;
-
-    @Inject
     GroupAccountManager groupAccountManager;
-
-    @Inject
     PostManager postManager;
-
-    @Inject
     NotificationManager notificationManager;
-
-    @Inject
     FolderManager folderManager;
-
-    @Inject
     AvatarManager avatarManager;
+    JPAApi jpaApi;
+    GroupAccountDao groupAccountDao;
+    GroupDao groupDao;
 
     @Inject
-    JPAApi jpaApi;
+    public GroupManager(ElasticsearchService elasticsearchService,
+            GroupAccountManager groupAccountManager,
+            PostManager postManager,
+            NotificationManager notificationManager,
+            FolderManager folderManager,
+            AvatarManager avatarManager,
+            JPAApi jpaApi, GroupAccountDao groupAccountDao, GroupDao groupDao) {
+        this.elasticsearchService = elasticsearchService;
+        this.groupAccountManager = groupAccountManager;
+        this.postManager = postManager;
+        this.notificationManager = notificationManager;
+        this.folderManager = folderManager;
+        this.avatarManager = avatarManager;
+        this.jpaApi = jpaApi;
+        this.groupAccountDao = groupAccountDao;
+        this.groupDao = groupDao;
+    }
 
 
     public void createWithGroupAccount(Group group, Account account) {
@@ -53,9 +64,10 @@ public class GroupManager implements BaseManager {
 
     @Override
     public void update(Object model) {
-        JPA.em().merge(model);
+        Group group = ((Group) model);
+        JPA.em().merge(group);
         try {
-            elasticsearchService.index(model);
+            elasticsearchService.indexGroup(group, groupAccountDao.findAccountIdsByGroup(group, LinkType.establish));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,43 +96,15 @@ public class GroupManager implements BaseManager {
     }
 
     public Group findById(Long id) {
-        return jpaApi.em().find(Group.class, id);
+        return findById(id);
     }
 
-    @SuppressWarnings("unchecked")
     public Group findByTitle(String title) {
-        List<Group> groups = (List<Group>) jpaApi.em()
-                .createQuery("FROM Group g WHERE g.title = ?1")
-                .setParameter(1, title).getResultList();
-
-        if (groups.isEmpty()) {
-            return null;
-        } else {
-            return groups.get(0);
-        }
+        return groupDao.findByTitle(title);
     }
 
-    @SuppressWarnings("unchecked")
-    public static Group findByTitle2(String title) {
-        List<Group> groups = (List<Group>) JPA.em()
-                .createQuery("FROM Group g WHERE g.title = ?1")
-                .setParameter(1, title).getResultList();
-
-        if (groups.isEmpty()) {
-            return null;
-        } else {
-            return groups.get(0);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<Group> all() {
-        return jpaApi.em().createQuery("FROM Group").getResultList();
-    }
-
-    @SuppressWarnings("unchecked")
     public List<Group> listAllGroupsOwnedBy(Long id) {
-        return jpaApi.em().createQuery("FROM Group g WHERE g.owner.id = " + id).getResultList();
+        return groupDao.listAllGroupsOwnedBy(id);
     }
 
     /**
@@ -144,7 +128,7 @@ public class GroupManager implements BaseManager {
 
     public long indexAllGroups() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Group group : all()) elasticsearchService.index(group);
+        for (Group group : groupDao.all()) elasticsearchService.indexGroup(group, groupAccountDao.findAccountIdsByGroup(group, LinkType.establish));
         return (System.currentTimeMillis() - start) / 1000;
 
     }

@@ -18,11 +18,13 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import play.Environment;
 import play.Logger;
 
@@ -34,6 +36,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -47,15 +50,6 @@ public class ElasticsearchService implements IElasticsearchService {
 
     final Logger.ALogger logger = Logger.of(ElasticsearchService.class);
 
-    @Inject
-    PostManager postManger;
-    @Inject
-    GroupAccountManager groupAccountManager;
-    @Inject
-    FriendshipManager friendshipManager;
-    @Inject
-    MediaManager mediaManager;
-    @Inject
     Environment environment;
 
     private Client client = null;
@@ -74,10 +68,12 @@ public class ElasticsearchService implements IElasticsearchService {
     private final String ES_POST_MAPPING = "elasticsearch/post_mapping.json";
     private final String ES_MEDIUM_MAPPING = "elasticsearch/medium_mapping.json";
 
+    @Inject
+    public ElasticsearchService(Environment environment) {
+        this.environment = environment;
 
-    public ElasticsearchService() {
         try {
-            client = TransportClient.builder().build()
+            client = new PreBuiltTransportClient(Settings.EMPTY)
                     .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(ES_SERVER), 9300));
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -132,27 +128,20 @@ public class ElasticsearchService implements IElasticsearchService {
                 .execute().actionGet();
     }
 
-    public void index(Object model) throws IOException {
-        if (model instanceof Post) indexPost(((Post) model));
-        if (model instanceof Group) indexGroup(((Group) model));
-        if (model instanceof Account) indexAccount(((Account) model));
-        if (model instanceof Media) indexMedium(((Media) model));
-    }
-
-    private void indexPost(Post post) throws IOException {
+    public void indexPost(Post post, boolean isPublic, Set<Long> allowedToViewAccountIds) throws IOException {
         if (isClientAvailable()) client.prepareIndex(ES_INDEX, ES_TYPE_POST, post.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("content", post.content)
                         .field("owner", post.owner.id)
-                        .field("public", postManger.isPublic(post))
-                        .field("viewable", postManger.findAllowedToViewAccountIds(post))
+                        .field("public", isPublic)
+                        .field("viewable", allowedToViewAccountIds)
                         .endObject())
                 .execute()
                 .actionGet();
     }
 
-    private void indexGroup(Group group) throws IOException {
+    public void indexGroup(Group group, List<Long> accountIdsByGroup) throws IOException {
         if (isClientAvailable()) client.prepareIndex(ES_INDEX, ES_TYPE_GROUP, group.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
@@ -161,13 +150,13 @@ public class ElasticsearchService implements IElasticsearchService {
                         .field("public", true)
                         .field("owner", group.owner.id)
                         .field("avatar", group.hasAvatar)
-                        .field("member", groupAccountManager.findAccountIdsByGroup(group, LinkType.establish))
+                        .field("member", accountIdsByGroup)
                         .endObject())
                 .execute()
                 .actionGet();
     }
 
-    private void indexAccount(Account account) throws IOException {
+    public void indexAccount(Account account, List<Long> friendIds) throws IOException {
         if (isClientAvailable()) client.prepareIndex(ES_INDEX, ES_TYPE_USER, account.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
@@ -179,20 +168,20 @@ public class ElasticsearchService implements IElasticsearchService {
                         .field("initial", account.getInitials())
                         .field("avatar", account.avatar)
                         .field("public", true)
-                        .field("friends", friendshipManager.findFriendsId(account))
+                        .field("friends", friendIds)
                         .endObject())
                 .execute()
                 .actionGet();
     }
 
-    private void indexMedium(Media medium) throws IOException {
+    public void indexMedium(Media medium, boolean isPublic, Set<Long> allowdToViewAccountIds) throws IOException {
         if (isClientAvailable()) client.prepareIndex(ES_INDEX, ES_TYPE_MEDIUM, medium.id.toString())
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("owner", medium.owner.id)
                         .field("filename", medium.fileName)
-                        .field("viewable", mediaManager.findAllowedToViewAccountIds(medium))
-                        .field("public", mediaManager.isPublic(medium))
+                        .field("viewable", allowdToViewAccountIds)
+                        .field("public", isPublic)
                         .endObject())
                 .execute()
                 .actionGet();
@@ -284,11 +273,11 @@ public class ElasticsearchService implements IElasticsearchService {
 
         // Add highlighting on all fields to search on
         for (String field : mustFields) {
-            searchRequest.addHighlightedField(field);
+            //searchRequest.addHighlightedField(field);
         }
 
         // Define html tags for highlighting
-        searchRequest = searchRequest.setHighlighterPreTags("[startStrong]").setHighlighterPostTags("[endStrong]").setHighlighterNumOfFragments(0);
+        //searchRequest = searchRequest.setHighlighterPreTags("[startStrong]").setHighlighterPostTags("[endStrong]").setHighlighterNumOfFragments(0);
 
         // Enable pagination
         searchRequest = searchRequest.setFrom((page * ES_RESULT_SIZE) - ES_RESULT_SIZE);

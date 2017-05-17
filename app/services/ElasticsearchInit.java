@@ -15,7 +15,8 @@ import java.util.concurrent.CompletableFuture;
 public class ElasticsearchInit implements DatabaseService {
 
     final Logger.ALogger LOG = Logger.of(ElasticsearchInit.class);
-    final ElasticsearchService elasticsearchService;
+
+    private final ElasticsearchService elasticsearchService;
 
     @Inject
     public ElasticsearchInit(ElasticsearchService elasticsearchService, ApplicationLifecycle lifecycle) {

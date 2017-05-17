@@ -19,9 +19,12 @@ import java.util.Map;
  */
 public class NotificationManager implements BaseManager {
 
+    JPAApi jpaApi;
 
     @Inject
-    JPAApi jpaApi;
+    public NotificationManager(JPAApi jpaApi) {
+        this.jpaApi = jpaApi;
+    }
 
     @Override
     public void create(Object object) {

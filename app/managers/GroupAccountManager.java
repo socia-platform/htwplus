@@ -1,38 +1,43 @@
 package managers;
 
-import akka.actor.ActorSystem;
+import daos.GroupAccountDao;
 import models.*;
-import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
-import play.db.jpa.DefaultJPAApi;
-import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
-import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
-import javax.persistence.NoResultException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Iven on 16.12.2015.
  */
 public class GroupAccountManager implements BaseManager {
 
-    @Inject
     ElasticsearchService elasticsearchService;
-    @Inject
     NotificationManager notificationManager;
-    @Inject
     PostManager postManager;
-    @Inject
     MediaManager mediaManager;
-    @Inject
     JPAApi jpaApi;
+    GroupAccountDao groupAccountDao;
+
+    @Inject
+    public GroupAccountManager(ElasticsearchService elasticsearchService,
+            NotificationManager notificationManager,
+            PostManager postManager,
+            MediaManager mediaManager,
+            JPAApi jpaApi, GroupAccountDao groupAccountDao) {
+        this.elasticsearchService = elasticsearchService;
+        this.notificationManager = notificationManager;
+        this.postManager = postManager;
+        this.mediaManager = mediaManager;
+        this.jpaApi = jpaApi;
+        this.groupAccountDao = groupAccountDao;
+
+    }
 
     @Override
     public void create(Object model) {
@@ -54,161 +59,24 @@ public class GroupAccountManager implements BaseManager {
         notificationManager.deleteReferencesForAccountId(groupAccount.group, groupAccount.account.id);
     }
 
-    public GroupAccount findById(Long id) {
-        return jpaApi.em().find(GroupAccount.class, id);
-    }
-
-    /**
-     * Find all groups and courses where given account is owner or member
-     */
-    public List<Group> findEstablished(Account account) {
-        @SuppressWarnings("unchecked")
-        List<Group> groupAccounts = jpaApi
-                .em()
-                .createQuery(
-                        "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2")
-                .setParameter(1, account.id)
-                .setParameter(2, LinkType.establish).getResultList();
-        return groupAccounts;
-    }
-
-    /**
-     * Find all groups where given account is owner or member
-     */
-    public List<Group> findGroupsEstablished(Account account) {
-        @SuppressWarnings("unchecked")
-        List<Group> groupAccounts = jpaApi
-                .em()
-                .createQuery(
-                        "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType != ?3 ORDER BY ga.group.title ASC")
-                .setParameter(1, account.id)
-                .setParameter(2, LinkType.establish)
-                .setParameter(3, GroupType.course).getResultList();
-        return groupAccounts;
-    }
-
-    /**
-     * Find all courses where given account is owner or member.
-     */
-    public List<Group> findCoursesEstablished(final Account account) {
-        @SuppressWarnings("unchecked")
-        List<Group> courseAccounts = jpaApi
-                .em()
-                .createQuery(
-                        "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType = ?3  ORDER BY ga.group.title ASC")
-                .setParameter(1, account.id)
-                .setParameter(2, LinkType.establish)
-                .setParameter(3, GroupType.course).getResultList();
-        return courseAccounts;
-    }
-
-    /**
-     * Find all open groups where given account is owner or member
-     */
-    @SuppressWarnings("unchecked")
-    public List<Group> findPublicEstablished(final Account account) {
-        return jpaApi
-                .em()
-                .createQuery(
-                        "SELECT ga.group FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.linkType = ?2 AND ga.group.groupType = ?3")
-                .setParameter(1, account.id)
-                .setParameter(2, LinkType.establish)
-                .setParameter(3, GroupType.open).getResultList();
-    }
-
-    /**
-     * Find all requests and rejects for summarization under "Offene Anfragen"
-     * for given Account
-     *
-     * @param account Account instance
-     * @return List of group accounts
-     */
     public List<GroupAccount> findRequests(Account account) {
-        @SuppressWarnings("unchecked")
-        List<GroupAccount> groupAccounts = jpaApi
-                .em()
-                .createQuery(
-                        "SELECT ga FROM GroupAccount ga WHERE ((ga.group.owner.id = ?1 OR ga.account.id = ?1) AND ga.linkType = ?2) OR (ga.account.id = ?1 AND ga.linkType = ?3) OR (ga.account.id = ?1 AND ga.linkType = ?4)")
-                .setParameter(1, account.id).setParameter(2, LinkType.request)
-                .setParameter(3, LinkType.reject).setParameter(4, LinkType.invite).getResultList();
-        return groupAccounts;
+        return groupAccountDao.findRequests(account);
     }
 
-    /**
-     * Has account any link-types to given group?
-     *
-     * @param account Account instance
-     * @param group   Group instance
-     * @return True, if an account has a link type for a group
-     */
-    public boolean hasLinkTypes(Account account, Group group) {
-        try {
-            jpaApi.em().createQuery("SELECT ga FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.group.id = ?2")
-                    .setParameter(1, account.id).setParameter(2, group.id).getSingleResult();
-        } catch (NoResultException exp) {
-            return false;
-        }
-        return true;
+    public List<Group> findGroupsEstablished(Account account) {
+        return groupAccountDao.findGroupsEstablished(account);
     }
 
-    /**
-     * Retrieve Accounts from Group with given LinkType.
-     */
-    public List<Account> findAccountsByGroup(final Group group, final LinkType type) {
-        @SuppressWarnings("unchecked")
-        List<Account> accounts = (List<Account>) jpaApi
-                .em()
-                .createQuery(
-                        "SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
-                .setParameter(1, group.id).setParameter(2, type)
-                .getResultList();
-        return accounts;
+    public List<Group> findCoursesEstablished(Account account) {
+        return groupAccountDao.findCoursesEstablished(account);
     }
 
-    /**
-     * Retrieve Accounts from Group with given LinkType.
-     */
-    @SuppressWarnings("unchecked")
-    public static List<Account> staticFindAccountsByGroup(final Group group, final LinkType type) {
-        return JPA.createFor("defaultPersistenceUnit").withTransaction(() -> {
-            return (List<Account>) JPA
-                    .em()
-                    .createQuery(
-                            "SELECT ga.account FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
-                    .setParameter(1, group.id).setParameter(2, type)
-                    .getResultList();
-        });
+    public GroupAccount findByAccountAndGroup(Account account, Group group) {
+        return groupAccountDao.find(account, group);
     }
 
-    public List<Long> findAccountIdsByGroup(final Group group, final LinkType type) {
-        @SuppressWarnings("unchecked")
-        List<Long> accounts = (List<Long>) jpaApi
-                .em()
-                .createQuery(
-                        "SELECT ga.account.id FROM GroupAccount ga WHERE ga.group.id = ?1 AND ga.linkType = ?2")
-                .setParameter(1, group.id).setParameter(2, type)
-                .getResultList();
-        return accounts;
-    }
-
-    /**
-     * Returns a groupAccount by account and group.
-     *
-     * @param account Account instance
-     * @param group   Group instance
-     * @return Group account instance
-     */
-    public GroupAccount find(Account account, Group group) {
-        try {
-            return (GroupAccount) jpaApi
-                    .em()
-                    .createQuery(
-                            "SELECT ga FROM GroupAccount ga WHERE ga.account.id = ?1 AND ga.group.id = ?2")
-                    .setParameter(1, account.id).setParameter(2, group.id)
-                    .getSingleResult();
-        } catch (NoResultException exp) {
-            return null;
-        }
+    public List<Account> findAccountsByGroup(Group group, LinkType type) {
+        return groupAccountDao.findAccountsByGroup(group, type);
     }
 
     /**
@@ -222,13 +90,13 @@ public class GroupAccountManager implements BaseManager {
         new Thread(() -> {
             jpaApi.withTransaction(() -> {
                 try {
-                    elasticsearchService.index(group);
+                    elasticsearchService.indexGroup(group, groupAccountDao.findAccountIdsByGroup(group, LinkType.establish));
                     for (Post post : postManager.getPostsForGroup(group, 0, 0)) {
-                        elasticsearchService.index(post);
+                        elasticsearchService.indexPost(post, postManager.isPublic(post), postManager.findAllowedToViewAccountIds(post));
                     }
 
                     for (Media medium : mediaManager.findByFolder(group.rootFolder.id)) {
-                        elasticsearchService.index(medium);
+                        elasticsearchService.indexMedium(medium, mediaManager.isPublic(medium), mediaManager.findAllowedToViewAccountIds(medium));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

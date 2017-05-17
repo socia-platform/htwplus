@@ -27,22 +27,20 @@ public class NotificationService {
 
     final Logger.ALogger LOG = Logger.of(NotificationService.class);
 
-    WebSocketService webSocketService;
+    @Inject
     EmailService email;
+    @Inject
     NotificationManager notificationManager;
+    @Inject
     ActorSystem system;
+    @Inject
     JPAApi jpaApi;
 
     /**
      * Private constructor for singleton instance
      */
-    @Inject
-    public NotificationService(EmailService email, NotificationManager notificationManager, JPAApi jpaApi) {
-        this.email = email;
-        this.webSocketService = webSocketService;
-        this.notificationManager = notificationManager;
+    public NotificationService() {
         this.system = ActorSystem.create();
-        this.jpaApi = jpaApi;
     }
 
     /**

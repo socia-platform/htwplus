@@ -377,7 +377,7 @@ public class GroupController extends BaseController {
         }
 
         // is already requested?
-        GroupAccount groupAccount = groupAccountManager.find(account, group);
+        GroupAccount groupAccount = groupAccountManager.findByAccountAndGroup(account, group);
         if (groupAccount != null && groupAccount.linkType.equals(LinkType.request)) {
             flash("info", "Deine Beitrittsanfrage wurde bereits verschickt!");
             return redirect(controllers.routes.GroupController.index());
@@ -421,7 +421,7 @@ public class GroupController extends BaseController {
             return redirect(controllers.routes.GroupController.index());
         }
 
-        GroupAccount groupAccount = groupAccountManager.find(account, group);
+        GroupAccount groupAccount = groupAccountManager.findByAccountAndGroup(account, group);
 
         Call defaultRedirect = controllers.routes.GroupController.index();
 
@@ -467,7 +467,7 @@ public class GroupController extends BaseController {
         }
 
         if (account != null && Secured.isOwnerOfGroup(group, Component.currentAccount())) {
-            GroupAccount groupAccount = groupAccountManager.find(account, group);
+            GroupAccount groupAccount = groupAccountManager.findByAccountAndGroup(account, group);
             if (groupAccount != null) {
                 groupAccount.linkType = LinkType.establish;
                 groupAccountManager.update(groupAccount);
@@ -502,7 +502,7 @@ public class GroupController extends BaseController {
         }
 
         if (account != null && Secured.isOwnerOfGroup(group, Component.currentAccount())) {
-            GroupAccount groupAccount = groupAccountManager.find(account, group);
+            GroupAccount groupAccount = groupAccountManager.findByAccountAndGroup(account, group);
             if (groupAccount != null) {
                 groupAccount.linkType = LinkType.reject;
             }
@@ -553,7 +553,7 @@ public class GroupController extends BaseController {
             for (String accountId : group.inviteList) {
                 try {
                     Account inviteAccount = accountManager.findById(Long.parseLong(accountId));
-                    GroupAccount groupAccount = groupAccountManager.find(inviteAccount, group);
+                    GroupAccount groupAccount = groupAccountManager.findByAccountAndGroup(inviteAccount, group);
 
                     // Create group account link to inviteAccount and add to notification recipient list
                     // if the inviteAccount is not already member, the sender and recipients are friends
@@ -588,7 +588,7 @@ public class GroupController extends BaseController {
         }
 
         Account account = accountManager.findById(accountId);
-        GroupAccount groupAccount = groupAccountManager.find(account, group);
+        GroupAccount groupAccount = groupAccountManager.findByAccountAndGroup(account, group);
 
         if (groupAccount != null && Secured.acceptInvitation(groupAccount)) {
             join(group.id);
@@ -607,7 +607,7 @@ public class GroupController extends BaseController {
         }
 
         Account account = accountManager.findById(accountId);
-        GroupAccount groupAccount = groupAccountManager.find(account, group);
+        GroupAccount groupAccount = groupAccountManager.findByAccountAndGroup(account, group);
 
         if (groupAccount != null && Secured.acceptInvitation(groupAccount)) {
             groupAccountManager.delete(groupAccount);

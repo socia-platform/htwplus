@@ -3,6 +3,7 @@ package services;
 import akka.actor.ActorSystem;
 import akka.actor.Cancellable;
 import managers.MediaManager;
+import models.Media;
 import models.services.EmailService;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
@@ -21,16 +22,16 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class ScheduleService {
 
-    private EmailService emailService;
-    private MediaManager mediaManager;
-    private ActorSystem system;
-    private ApplicationLifecycle lifecycle;
+    EmailService emailService;
+    MediaManager mediaManager;
+    ActorSystem system;
+    ApplicationLifecycle lifecycle;
 
     @Inject
     public ScheduleService(EmailService emailService, MediaManager mediaManager, ApplicationLifecycle lifecycle) {
-        system = ActorSystem.create();
         this.emailService = emailService;
         this.mediaManager = mediaManager;
+        this.system = ActorSystem.create();
         this.lifecycle = lifecycle;
         schedule();
     }

@@ -1,5 +1,6 @@
 package models.base;
 
+import daos.GroupAccountDao;
 import managers.GroupAccountManager;
 import models.Account;
 import models.Group;
@@ -93,7 +94,7 @@ public abstract class BaseNotifiable extends BaseModel implements INotifiable {
      * @return List of accounts of group
      */
     public List<Account> getGroupAsAccountList(final Group group) {
-        return GroupAccountManager.staticFindAccountsByGroup(group, LinkType.establish);
+        return GroupAccountDao.staticFindAccountsByGroup(group, LinkType.establish);
     }
 
     /**

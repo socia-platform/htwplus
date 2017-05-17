@@ -28,8 +28,6 @@ public interface IElasticsearchService {
 
     void createMapping() throws IOException;
 
-    void index(Object object) throws IOException;
-
     void delete(Object model);
 
     /**

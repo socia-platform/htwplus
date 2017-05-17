@@ -1,5 +1,7 @@
 package managers;
 
+import daos.GroupAccountDao;
+import daos.GroupDao;
 import models.Account;
 import models.Group;
 import models.Post;
@@ -9,6 +11,7 @@ import models.services.ElasticsearchService;
 import play.Configuration;
 import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
+import play.db.jpa.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.Query;
@@ -20,22 +23,32 @@ import java.util.*;
  */
 public class PostManager implements BaseManager {
 
-    @Inject
     ElasticsearchService elasticsearchService;
-    @Inject
     NotificationManager notificationManager;
-    @Inject
     FriendshipManager friendshipManager;
-    @Inject
-    GroupAccountManager groupAccountManager;
-    @Inject
     PostBookmarkManager postBookmarkManager;
-    @Inject
-    GroupManager groupManager;
-    @Inject
+    GroupDao groupDao;
     Configuration configuration;
-    @Inject
     JPAApi jpaApi;
+    GroupAccountDao groupAccountDao;
+
+    @Inject
+    public PostManager(ElasticsearchService elasticsearchService,
+            NotificationManager notificationManager,
+            FriendshipManager friendshipManager,
+            PostBookmarkManager postBookmarkManager,
+                       GroupDao groupDao,
+            Configuration configuration,
+            JPAApi jpaApi, GroupAccountDao groupAccountDao) {
+        this.elasticsearchService = elasticsearchService;
+        this.notificationManager = notificationManager;
+        this.friendshipManager = friendshipManager;
+        this.postBookmarkManager = postBookmarkManager;
+        this.groupDao = groupDao;
+        this.configuration = configuration;
+        this.jpaApi = jpaApi;
+        this.groupAccountDao = groupAccountDao;
+    }
 
 
     @Override
@@ -44,7 +57,7 @@ public class PostManager implements BaseManager {
 
         jpaApi.em().persist(post);
         try {
-            elasticsearchService.index(post);
+            elasticsearchService.indexPost(post, isPublic(post), findAllowedToViewAccountIds(post));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -273,7 +286,7 @@ public class PostManager implements BaseManager {
     public List<Post> getStream(Account account, int limit, int page) {
         // find friends and groups of given account
         List<Account> friendList = friendshipManager.findFriends(account);
-        List<Group> groupList = groupAccountManager.findEstablished(account);
+        List<Group> groupList = groupAccountDao.findEstablished(account);
         List<Post> bookmarkList = postBookmarkManager.findByAccount(account);
 
         int offset = (page * limit) - limit;
@@ -286,7 +299,7 @@ public class PostManager implements BaseManager {
      */
     public List<Post> getFilteredStream(Account account, int limit, int page, String filter) {
         int offset = (page * limit) - limit;
-        return findStreamForAccount(account, groupAccountManager.findEstablished(account), friendshipManager.findFriends(account), postBookmarkManager.findByAccount(account), filter, limit, offset);
+        return findStreamForAccount(account, groupAccountDao.findEstablished(account), friendshipManager.findFriends(account), postBookmarkManager.findByAccount(account), filter, limit, offset);
     }
 
 
@@ -295,7 +308,7 @@ public class PostManager implements BaseManager {
      * @return Number of Posts
      */
     public int countStream(Account account, String filter) {
-        return countStreamForAccount(account, groupAccountManager.findEstablished(account), friendshipManager.findFriends(account), postBookmarkManager.findByAccount(account), filter);
+        return countStreamForAccount(account, groupAccountDao.findEstablished(account), friendshipManager.findFriends(account), postBookmarkManager.findByAccount(account), filter);
     }
 
     /**
@@ -304,7 +317,7 @@ public class PostManager implements BaseManager {
      */
     public List<Post> getFriendStream(Account contact, int limit, int page) {
         int offset = (page * limit) - limit;
-        return findStreamForAccount(contact, groupAccountManager.findPublicEstablished(contact), friendshipManager.findFriends(contact), postBookmarkManager.findByAccount(contact), "visitor", limit, offset);
+        return findStreamForAccount(contact, groupAccountDao.findPublicEstablished(contact), friendshipManager.findFriends(contact), postBookmarkManager.findByAccount(contact), "visitor", limit, offset);
     }
 
     /**
@@ -312,7 +325,7 @@ public class PostManager implements BaseManager {
      * @return Number of Posts
      */
     public int countFriendStream(Account contact) {
-        return countStreamForAccount(contact, groupAccountManager.findPublicEstablished(contact), friendshipManager.findFriends(contact), postBookmarkManager.findByAccount(contact), "visitor");
+        return countStreamForAccount(contact, groupAccountDao.findPublicEstablished(contact), friendshipManager.findFriends(contact), postBookmarkManager.findByAccount(contact), "visitor");
     }
 
     public static int getCountComments(Post post) {
@@ -346,7 +359,7 @@ public class PostManager implements BaseManager {
 
         // everybody from post.group can see this post
         if (belongsToGroup(post)) {
-            viewableIds.addAll(groupAccountManager.findAccountIdsByGroup(post.group, LinkType.establish));
+            viewableIds.addAll(groupAccountDao.findAccountIdsByGroup(post.group, LinkType.establish));
         }
 
 
@@ -369,7 +382,7 @@ public class PostManager implements BaseManager {
 
             // every member from post.parent.group can see this post
             if (belongsToGroup(post.parent)) {
-                viewableIds.addAll(groupAccountManager.findAccountIdsByGroup(post.parent.group, LinkType.establish));
+                viewableIds.addAll(groupAccountDao.findAccountIdsByGroup(post.parent.group, LinkType.establish));
             }
 
             // every friend from post.parent.account can see this post
@@ -402,7 +415,7 @@ public class PostManager implements BaseManager {
 
     public long indexAllPosts() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Post post : allWithoutExceptionPosts()) elasticsearchService.index(post);
+        for (Post post : allWithoutExceptionPosts()) elasticsearchService.indexPost(post, isPublic(post), findAllowedToViewAccountIds(post));
         return (System.currentTimeMillis() - start) / 1000;
 
     }
@@ -414,7 +427,7 @@ public class PostManager implements BaseManager {
      */
     @SuppressWarnings("unchecked")
     private List<Post> allWithoutExceptionPosts() {
-        Group group = groupManager.findByTitle(configuration.getString("htwplus.admin.group"));
+        Group group = groupDao.findByTitle(configuration.getString("htwplus.admin.group"));
         Account adminAccount = group.owner;
         return jpaApi.em().createQuery("FROM Post p WHERE p.owner.id != :adminId AND p.group.id != :groupId OR p.group IS NULL")
                 .setParameter("groupId", group.id)
