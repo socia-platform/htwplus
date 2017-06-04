@@ -182,26 +182,36 @@ public class ElasticsearchResponse {
 
         if (searchMode.equals("medium")) {
             Terms termAggregation = elasticsearchResponse.getAggregations().get("ownerName");
-            buckets = termAggregation.getBuckets();
-            for (Terms.Bucket bucket : buckets) {
-                ownerNameMap.put(bucket.getKey(), bucket.getDocCount());
+            if (termAggregation != null) {
+                buckets = termAggregation.getBuckets();
+                for (Terms.Bucket bucket : buckets) {
+                    ownerNameMap.put(bucket.getKey(), bucket.getDocCount());
+                }
             }
             termAggregation = elasticsearchResponse.getAggregations().get("folderName");
-            buckets = termAggregation.getBuckets();
-            for (Terms.Bucket bucket : buckets) {
-                folderNameMap.put(bucket.getKey(), bucket.getDocCount());
+            if (termAggregation != null) {
+                buckets = termAggregation.getBuckets();
+                for (Terms.Bucket bucket : buckets) {
+                    folderNameMap.put(bucket.getKey(), bucket.getDocCount());
+                }
             }
+
+
             termAggregation = elasticsearchResponse.getAggregations().get("mimeType");
-            buckets = termAggregation.getBuckets();
-            for (Terms.Bucket bucket : buckets) {
-                mimeTypeMap.put(bucket.getKey(), bucket.getDocCount());
+            if (termAggregation != null) {
+                buckets = termAggregation.getBuckets();
+                for (Terms.Bucket bucket : buckets) {
+                    mimeTypeMap.put(bucket.getKey(), bucket.getDocCount());
+                }
             }
+
             Histogram histogramAggregation = elasticsearchResponse.getAggregations().get("createdAt");
-            for (Histogram.Bucket bucket : histogramAggregation.getBuckets()) {
-                createdAtMap.put(bucket.getKeyAsString(), bucket.getDocCount());
+            if (histogramAggregation != null) {
+                for (Histogram.Bucket bucket : histogramAggregation.getBuckets()) {
+                    createdAtMap.put(bucket.getKeyAsString(), bucket.getDocCount());
+                }
             }
         }
-
     }
 
     public long getDocumentCount() {
