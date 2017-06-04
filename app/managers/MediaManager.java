@@ -36,6 +36,9 @@ public class MediaManager implements BaseManager {
     GroupAccountManager groupAccountManager;
 
     @Inject
+    FriendshipManager friendshipManager;
+
+    @Inject
     ElasticsearchService elasticsearchService;
 
     @Inject
@@ -238,7 +241,10 @@ public class MediaManager implements BaseManager {
 
         // medium belongs to account
         if (rootFolder.account != null) {
+            // owner is allowed
             viewableIds.add(rootFolder.owner.id);
+            // friends is allowed
+            viewableIds.addAll(friendshipManager.findFriendsId(rootFolder.owner));
         }
 
         // medium belongs to group

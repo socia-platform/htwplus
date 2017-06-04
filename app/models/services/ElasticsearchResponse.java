@@ -96,9 +96,10 @@ public class ElasticsearchResponse {
                     break;
                 case "medium":
                     Media medium = mediaManager.findById(Long.parseLong(searchHit.getId()));
-                    if (medium != null)
+                    if (medium != null) {
                         medium.sizeInByte = mediaManager.bytesToString(medium.size, false);
                         resultList.add(medium);
+                    }
                     break;
                 default:
                     Logger.info("no matching case for ID: " + searchHit.getId());
