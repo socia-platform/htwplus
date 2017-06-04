@@ -11,6 +11,7 @@ import models.Post;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import play.Logger;
 
@@ -55,6 +56,10 @@ public class ElasticsearchResponse {
     public HashMap semesterMap;
     public HashMap roleMap;
     public HashMap grouptypeMap;
+    public HashMap ownerNameMap;
+    public HashMap folderNameMap;
+    public HashMap createdAtMap;
+    public HashMap mimeTypeMap;
 
     public void create(final SearchResponse response, final String keyword, final String mode) {
         this.keyword = keyword;
@@ -118,10 +123,15 @@ public class ElasticsearchResponse {
         semesterMap = new HashMap<String, Long>();
         roleMap = new HashMap<String, Long>();
         grouptypeMap = new HashMap<String, Long>();
+        ownerNameMap = new HashMap<String, Long>();
+        folderNameMap = new HashMap<String, Long>();
+        mimeTypeMap = new HashMap<String, Long>();
+        createdAtMap = new HashMap<String, Long>();
 
         Terms terms = this.elasticsearchResponse.getAggregations().get("types");
 
         Collection<Terms.Bucket> buckets = terms.getBuckets();
+
         for (Terms.Bucket bucket : buckets) {
             switch (bucket.getKey().toString()) {
                 case "user":
@@ -167,6 +177,28 @@ public class ElasticsearchResponse {
             buckets = termAggregation.getBuckets();
             for (Terms.Bucket bucket : buckets) {
                 grouptypeMap.put(bucket.getKey(), bucket.getDocCount());
+            }
+        }
+
+        if (searchMode.equals("medium")) {
+            Terms termAggregation = elasticsearchResponse.getAggregations().get("ownerName");
+            buckets = termAggregation.getBuckets();
+            for (Terms.Bucket bucket : buckets) {
+                ownerNameMap.put(bucket.getKey(), bucket.getDocCount());
+            }
+            termAggregation = elasticsearchResponse.getAggregations().get("folderName");
+            buckets = termAggregation.getBuckets();
+            for (Terms.Bucket bucket : buckets) {
+                folderNameMap.put(bucket.getKey(), bucket.getDocCount());
+            }
+            termAggregation = elasticsearchResponse.getAggregations().get("mimeType");
+            buckets = termAggregation.getBuckets();
+            for (Terms.Bucket bucket : buckets) {
+                mimeTypeMap.put(bucket.getKey(), bucket.getDocCount());
+            }
+            Histogram histogramAggregation = elasticsearchResponse.getAggregations().get("createdAt");
+            for (Histogram.Bucket bucket : histogramAggregation.getBuckets()) {
+                createdAtMap.put(bucket.getKeyAsString(), bucket.getDocCount());
             }
         }
 
