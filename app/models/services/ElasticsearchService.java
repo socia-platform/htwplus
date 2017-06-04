@@ -316,7 +316,7 @@ public class ElasticsearchService implements IElasticsearchService {
          searchRequest.setPostFilter(boolFilterBuilder2);
          }*/
 
-        //logger.info(searchRequest.toString());
+        logger.info(searchRequest.toString());
 
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
