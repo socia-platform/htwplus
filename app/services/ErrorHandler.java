@@ -61,7 +61,6 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
                 post.group = group;
                 postManager.createWithoutIndex(post);
-                notificationService.createNotification(post, Post.GROUP);
             }
         });
 
@@ -77,7 +76,6 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
                 post.group = group;
                 postManager.createWithoutIndex(post);
-                notificationService.createNotification(post, Post.GROUP);
             }
         });
 
@@ -93,7 +91,6 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
                 post.group = group;
                 postManager.createWithoutIndex(post);
-                notificationService.createNotification(post, Post.GROUP);
             }
         });
 
@@ -109,7 +106,6 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 post.owner = accountManager.findByEmail(configuration.getString("htwplus.admin.mail"));
                 post.group = group;
                 postManager.createWithoutIndex(post);
-                notificationService.createNotification(post, Post.GROUP);
             }
         });
 
