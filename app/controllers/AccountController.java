@@ -5,6 +5,7 @@ import models.Account;
 import models.Login;
 import models.enums.AccountRole;
 import models.services.LdapService;
+import org.apache.commons.lang3.StringUtils;
 import play.Logger;
 import play.api.i18n.Lang;
 import play.data.Form;
@@ -49,6 +50,7 @@ public class AccountController extends BaseController {
 
         // save originURL before clearing the session (it gets cleared in defaultAuthenticate() and LdapAuthenticate())
         String redirect = session().get("originURL");
+        if (redirect == null) redirect = "/";
 
         LOG.info("Login attempt from: " + username);
         LOG.info("Redirecting to " + redirect);
