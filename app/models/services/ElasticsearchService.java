@@ -23,6 +23,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import play.Environment;
 import play.Logger;
 
@@ -193,6 +194,10 @@ public class ElasticsearchService implements IElasticsearchService {
                         .field("filename", medium.fileName)
                         .field("viewable", mediaManager.findAllowedToViewAccountIds(medium))
                         .field("public", mediaManager.isPublic(medium))
+                        .field("ownerName", medium.owner.name)
+                        .field("folderName", medium.folder.name)
+                        .field("createdAt", medium.createdAt)
+                        .field("mimeType", medium.fileName.lastIndexOf(".") > 0 ? medium.fileName.substring(medium.fileName.lastIndexOf(".")) : "unbekannt")
                         .endObject())
                 .execute()
                 .actionGet();
@@ -273,6 +278,30 @@ public class ElasticsearchService implements IElasticsearchService {
                     boolQuery.must(QueryBuilders.termQuery("grouptype", facet));
                 }
             }
+
+            if (facets.get("ownerName").length > 0) {
+                for (String facet : facets.get("ownerName")) {
+                    boolQuery.must(QueryBuilders.termQuery("ownerName", facet));
+                }
+            }
+
+            if (facets.get("folderName").length > 0) {
+                for (String facet : facets.get("folderName")) {
+                    boolQuery.must(QueryBuilders.termQuery("folderName", facet));
+                }
+            }
+
+            if (facets.get("createdAt").length > 0) {
+                for (String facet : facets.get("createdAt")) {
+                    boolQuery.must(QueryBuilders.rangeQuery("createdAt").gt(Integer.parseInt(facet)).lt(Integer.parseInt(facet)+1));
+                }
+            }
+
+            if (facets.get("mimeType").length > 0) {
+                for (String facet : facets.get("mimeType")) {
+                    boolQuery.must(QueryBuilders.termQuery("mimeType", facet));
+                }
+            }
         }
 
         // Build completeQuery with search- and scoringQuery
@@ -309,6 +338,14 @@ public class ElasticsearchService implements IElasticsearchService {
             searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("grouptype").field("grouptype"));
         }
 
+        // Add medium aggregations
+        if (filter.equals("medium")) {
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("ownerName").field("ownerName"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("folderName").field("folderName"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("mimeType").field("mimeType"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.dateHistogram("createdAt").field("createdAt").interval(DateHistogramInterval.YEAR).format("yyyy"));
+        }
+
         // Apply PostFilter if request mode is not 'all'
         /**final BoolFilterBuilder boolFilterBuilder2 = boolFilter();
 
@@ -316,7 +353,7 @@ public class ElasticsearchService implements IElasticsearchService {
          searchRequest.setPostFilter(boolFilterBuilder2);
          }*/
 
-        logger.info(searchRequest.toString());
+        //logger.info(searchRequest.toString());
 
         // Execute searchRequest
         SearchResponse response = searchRequest.execute().get();
