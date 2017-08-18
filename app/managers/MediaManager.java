@@ -92,16 +92,7 @@ public class MediaManager implements BaseManager {
 
     public Media findById(Long id) {
         Media media = jpaApi.em().find(Media.class, id);
-        if (media == null) {
-            return null;
-        }
-        String path = configuration.getString("media.path");
-        media.file = new File(path + "/" + media.url);
-        if (media.file.exists()) {
-            return media;
-        } else {
-            return null;
-        }
+        return media;
     }
 
     @SuppressWarnings("unchecked")

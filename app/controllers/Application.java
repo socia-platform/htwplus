@@ -154,6 +154,10 @@ public class Application extends BaseController {
         String semesterParam = formFactory.form().bindFromRequest().field("semester").value();
         String roleParam = formFactory.form().bindFromRequest().field("role").value();
         String grouptypeParam = formFactory.form().bindFromRequest().field("grouptype").value();
+        String ownerNameParam = formFactory.form().bindFromRequest().field("ownerName").value();
+        String folderNameParam = formFactory.form().bindFromRequest().field("folderName").value();
+        String createdAtParam = formFactory.form().bindFromRequest().field("createdAt").value();
+        String mimeTypeParam = formFactory.form().bindFromRequest().field("mimeType").value();
 
         HashMap<String, String[]> facets = new HashMap<>();
         facets.put("studycourse", buildUserFacetList(studycourseParam));
@@ -161,6 +165,10 @@ public class Application extends BaseController {
         facets.put("semester", buildUserFacetList(semesterParam));
         facets.put("role", buildUserFacetList(roleParam));
         facets.put("grouptype", buildUserFacetList(grouptypeParam));
+        facets.put("ownerName", buildUserFacetList(ownerNameParam));
+        facets.put("folderName", buildUserFacetList(folderNameParam));
+        facets.put("createdAt", buildUserFacetList(createdAtParam));
+        facets.put("mimeType", buildUserFacetList(mimeTypeParam));
 
 
         if (keyword == null) {
