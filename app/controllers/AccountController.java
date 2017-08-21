@@ -59,6 +59,7 @@ public class AccountController extends BaseController {
 
         // save originURL before clearing the session
         String redirect = session().get("originURL");
+        if (redirect == null) redirect = "/";
         session().clear();
 
         if (loginName.isEmpty()) {

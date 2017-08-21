@@ -15,3 +15,75 @@
         </div>
     </div>
 </div>
+<div class="col-sm-3" role="complementary">
+    <div class="hp-sitenav">
+        <b><span class="glyphicon glyphicon-filter"></span> Eigentümer</b>
+        <hr>
+        @for((key, value) <- response.ownerNameMap) {
+            @if(ctx().request().uri().contains("ownerName")) {
+                <div class="hp-searchfacet-remove">
+                    <span>@if(key.equals("")) {Undefiniert} else {@key} (@value)</span>
+                    <a href='@ctx().request().uri().replace("&ownerName="+helper.urlEncode(key.toString()),"")'><span class="glyphicon glyphicon-remove"></span></a>
+                </div>
+                } else {
+                <div>
+                    <a href='@ctx().request().uri()&ownerName=@helper.urlEncode(key.toString)'>@if(key.equals("")) {Undefiniert} else {@key}</a><small> (@value)</small>
+                </div>
+            }
+        }
+    </div>
+</div>
+<div class="col-sm-3" role="complementary">
+    <div class="hp-sitenav">
+        <b><span class="glyphicon glyphicon-filter"></span> Speicherort</b>
+        <hr>
+        @for((key, value) <- response.folderNameMap) {
+        @if(ctx().request().uri().contains("folderName")) {
+        <div class="hp-searchfacet-remove">
+            <span>@if(key.equals("")) {Undefiniert} else {@key} (@value)</span>
+            <a href='@ctx().request().uri().replace("&folderName="+helper.urlEncode(key.toString()),"")'><span class="glyphicon glyphicon-remove"></span></a>
+        </div>
+        } else {
+        <div>
+            <a href='@ctx().request().uri()&folderName=@helper.urlEncode(key.toString)'>@if(key.equals("")) {Undefiniert} else {@key}</a><small> (@value)</small>
+        </div>
+        }
+        }
+    </div>
+</div>
+<div class="col-sm-3" role="complementary">
+    <div class="hp-sitenav">
+        <b><span class="glyphicon glyphicon-filter"></span> Upload-Jahr</b>
+        <hr>
+        @for((key, value) <- response.createdAtMap) {
+        @if(ctx().request().uri().contains("createdAt")) {
+        <div class="hp-searchfacet-remove">
+            <span>@if(key.equals("")) {Undefiniert} else {@key} (@value)</span>
+            <a href='@ctx().request().uri().replace("&createdAt="+helper.urlEncode(key.toString()),"")'><span class="glyphicon glyphicon-remove"></span></a>
+        </div>
+        } else {
+        <div>
+            <a href='@ctx().request().uri()&createdAt=@helper.urlEncode(key.toString)'>@if(key.equals("")) {Undefiniert} else {@key}</a><small> (@value)</small>
+        </div>
+        }
+        }
+    </div>
+</div>
+<div class="col-sm-3" role="complementary">
+    <div class="hp-sitenav">
+        <b><span class="glyphicon glyphicon-filter"></span> Dateiendung</b>
+        <hr>
+        @for((key, value) <- response.mimeTypeMap) {
+        @if(ctx().request().uri().contains("mimeType")) {
+        <div class="hp-searchfacet-remove">
+            <span>@if(key.equals("")) {Undefiniert} else {@key} (@value)</span>
+            <a href='@ctx().request().uri().replace("&mimeType="+helper.urlEncode(key.toString()),"")'><span class="glyphicon glyphicon-remove"></span></a>
+        </div>
+        } else {
+        <div>
+            <a href='@ctx().request().uri()&mimeType=@helper.urlEncode(key.toString)'>@if(key.equals("")) {Undefiniert} else {@key}</a><small> (@value)</small>
+        </div>
+        }
+        }
+    </div>
+</div>

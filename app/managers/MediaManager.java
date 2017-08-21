@@ -93,16 +93,7 @@ public class MediaManager implements BaseManager {
 
     public Media findById(Long id) {
         Media media = jpaApi.em().find(Media.class, id);
-        if (media == null) {
-            return null;
-        }
-        String path = configuration.getString("media.path");
-        media.file = new File(path + "/" + media.url);
-        if (media.file.exists()) {
-            return media;
-        } else {
-            return null;
-        }
+        return media;
     }
 
     @SuppressWarnings("unchecked")
@@ -242,7 +233,10 @@ public class MediaManager implements BaseManager {
 
         // medium belongs to account
         if (rootFolder.account != null) {
+            // owner is allowed
             viewableIds.add(rootFolder.owner.id);
+            // friends is allowed
+            viewableIds.addAll(friendshipManager.findFriendsId(rootFolder.owner));
         }
 
         // medium belongs to group
