@@ -8,15 +8,18 @@ import models.base.FileOperationException;
 import models.enums.AccountRole;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
+import models.services.LdapService;
 import play.Configuration;
 import play.Logger;
 import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
+import play.mvc.Result;
 
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Iven on 17.12.2015.

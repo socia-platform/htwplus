@@ -1,6 +1,7 @@
 package controllers;
 
 import managers.AccountManager;
+import managers.LoginManager;
 import models.Account;
 import models.Login;
 import models.enums.AccountRole;
@@ -25,128 +26,85 @@ public class AccountController extends BaseController {
 
     final Logger.ALogger LOG = Logger.of(AccountController.class);
 
-    private final AccountManager accountManager;
-    private final FormFactory formFactory;
-    private final LdapService ldapService;
-    private final MessagesApi messagesApi;
+    AccountManager accountManager;
+    FormFactory formFactory;
+    LdapService ldapService;
+    MessagesApi messagesApi;
+    LoginManager loginManager;
 
     @Inject
-    public AccountController(AccountManager accountManager, FormFactory formFactory, LdapService ldapService, MessagesApi messagesApi) {
+    public AccountController(AccountManager accountManager, FormFactory formFactory, LdapService ldapService, MessagesApi messagesApi, LoginManager loginManager) {
         this.accountManager = accountManager;
         this.formFactory = formFactory;
         this.ldapService = ldapService;
         this.messagesApi = messagesApi;
+        this.loginManager = loginManager;
     }
 
     /**
-     * Default authentication action.
+     * Default login action.
      *
      * @return Result
      */
-    public Result authenticate() {
-        Form<Login> form = formFactory.form(Login.class).bindFromRequest();
-        String username = form.field("email").value();
+    public Result login() {
 
-        // save originURL before clearing the session (it gets cleared in defaultAuthenticate() and LdapAuthenticate())
+        Form<Login> loginForm = formFactory.form(Login.class);
+        Login login = loginForm.bindFromRequest().get();
+        String loginName = login.loginName;
+        String loginPassword = login.loginPassword;
+        boolean rememberMe = login.rememberMe;
+        Account accountToLogin = null;
+
+        LOG.info("Login attempt from: " + loginName);
+
+        // save originURL before clearing the session
         String redirect = session().get("originURL");
-
-        LOG.info("Login attempt from: " + username);
-        LOG.info("Redirecting to " + redirect);
-        if (username.contains("@")) {
-            return emailAuthenticate(redirect);
-        } else if (username.length() == 0) {
-            LOG.info("... no name given");
-            flash("error", "Also deine Matrikelnummer brauchen wir schon!");
-            return badRequest(landingpage.render(form));
-        } else {
-            return ldapAuthenticate(redirect);
-        }
-    }
-
-    /**
-     * LDAP authentication.
-     *
-     * @return Result
-     */
-    private Result ldapAuthenticate(final String redirect) {
-        Form<Login> form = formFactory.form(Login.class).bindFromRequest();
-        String matriculationNumber = form.field("email").value();
-        String password = form.field("password").value();
-        String rememberMe = form.field("rememberMe").value();
-
-        // Clean the username
-        matriculationNumber = matriculationNumber.trim().toLowerCase();
-
-        try {
-            ldapService.connect(matriculationNumber, password);
-        } catch (LdapService.LdapConnectorException e) {
-            flash("error", e.getMessage());
-            Component.addToContext(Component.ContextIdent.loginForm, form);
-            return badRequest(landingpage.render(form));
-        }
-
-        // try to find user in DB, set role if found (default STUDENT role)
-        Account account = accountManager.findByLoginName(matriculationNumber);
-        AccountRole role = AccountRole.STUDENT;
-        if (ldapService.getRole() != null) {
-            role = ldapService.getRole();
-        }
-
-        // if user is not found in DB, create new user from LDAP data, otherwise update user data
-        if (account == null) {
-            LOG.info("... not found. Creating new Account for: " + matriculationNumber);
-            account = new Account();
-            account.firstname = ldapService.getFirstName();
-            account.lastname = ldapService.getLastName();
-            account.loginname = matriculationNumber;
-            account.password = "LDAP - not needed";
-            Random generator = new Random();
-            account.avatar = String.valueOf(generator.nextInt(9));
-            account.role = role;
-            accountManager.create(account);
-        } else {
-            account.firstname = ldapService.getFirstName();
-            account.lastname = ldapService.getLastName();
-            account.role = role;
-            accountManager.update(account);
-        }
-
-        // re-create session, set user
         session().clear();
-        session("id", account.id.toString());
-        if (rememberMe != null) {
-            session("rememberMe", "1");
+
+        if (loginName.isEmpty()) {
+            LOG.info("no name given");
+            flash("error", "Also deine Matrikelnummer brauchen wir schon!");
+
+            return badRequest(landingpage.render(loginName));
+
+            // E-Mail authentication
+        } else if (loginName.contains("@")) {
+            accountToLogin = loginManager.emailAuthenticate(loginName, loginPassword);
+            if (accountToLogin != null) {
+                session("id", accountToLogin.id.toString());
+                if (rememberMe) {
+                    session().put("rememberMe", "true");
+                }
+                LOG.info("Welcome, " + accountToLogin.name);
+            } else {
+                LOG.error("E-Mail not valid");
+                flash("error", "Bitte melde dich mit deiner Matrikelnummer an.");
+                Component.addToContext(Component.ContextIdent.loginForm, loginForm);
+
+                return badRequest(landingpage.render(loginName));
+            }
+
+            // LDAP authentification
+        } else if (loginName.length() > 0) {
+            try {
+                accountToLogin = loginManager.ldapAuthenticate(loginName, loginPassword);
+                session("id", accountToLogin.id.toString());
+                if (rememberMe) {
+                    session().put("rememberMe", "1");
+                }
+            } catch (LdapService.LdapConnectorException e) {
+                LOG.error("LDAP Error", e);
+                flash("error", e.getMessage());
+                Component.addToContext(Component.ContextIdent.loginForm, loginForm);
+                return badRequest(landingpage.render(loginName));
+            }
+
         }
-        LOG.info("Welcome, " + account.name);
+
+        LOG.info("Welcome, " + accountToLogin.name);
+        LOG.info("Redirecting to " + redirect);
 
         return redirect(redirect);
-    }
-
-    /**
-     * Mail authentication.
-     *
-     * @return Result
-     */
-    private Result emailAuthenticate(final String redirect) {
-        Form<Login> loginForm = formFactory.form(Login.class).bindFromRequest();
-        Login login = loginForm.get();
-        if (!accountManager.isAccountValid(login.email, login.password)) {
-            LOG.info("User/Password not valid");
-            flash("error", "Bitte melde dich mit deiner Matrikelnummer an.");
-            Component.addToContext(Component.ContextIdent.loginForm, loginForm);
-            return badRequest(landingpage.render(loginForm));
-        } else {
-            Account account = accountManager.findByEmail(login.email);
-            session().clear();
-            session("email", loginForm.get().email);
-            session("id", account.id.toString());
-            session("firstname", account.firstname);
-            if (loginForm.get().rememberMe != null) {
-                session("rememberMe", "1");
-            }
-            LOG.info("Welcome, " + account.name);
-            return redirect(redirect);
-        }
     }
 
     /**

@@ -96,7 +96,7 @@ public class GroupManager implements BaseManager {
     }
 
     public Group findById(Long id) {
-        return findById(id);
+        return groupDao.findById(id);
     }
 
     public Group findByTitle(String title) {

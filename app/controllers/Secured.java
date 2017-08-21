@@ -78,11 +78,8 @@ public class Secured extends Security.Authenticator {
     public Result onUnauthorized(Context ctx) {
         // cookie outdated? save originURL to prevent redirect to index page after login
         ctx.session().put("originURL", ctx.request().path());
-		Form<Login> form = formFactory.form(Login.class).bindFromRequest();
-		if (Component.getFromContext(Component.ContextIdent.loginForm) != null) {
-			form = (Form<Login>) Component.getFromContext(Component.ContextIdent.loginForm);
-		}
-		return unauthorized(landingpage.render(form));
+
+		return unauthorized(landingpage.render(""));
     }
 
 	/**

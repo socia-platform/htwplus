@@ -1,4 +1,4 @@
-@(loginForm: Form[Login])
+@(loginName: String)
 
 <!DOCTYPE html>
 <html lang="de">
@@ -32,12 +32,12 @@
                         <img id="hp-plusi" src='@routes.Assets.at("images/Plusi/eule_froh.png")'>
                         <h2>Anmelden</h2>
 
-                        @helper.form(routes.AccountController.authenticate) {
+                        @helper.form(routes.AccountController.login) {
                         <div class="form-group">
-                            <input type="text" class="form-control input-lg" id="loginUser" name="email" placeholder="Matrikelnummer (z.B.: s0123456)" value='@loginForm("email").value'>
+                            <input type="text" class="form-control input-lg" id="loginName" name="loginName" placeholder="Matrikelnummer (z.B.: s0123456)" value="@loginName">
                         </div>
                         <div class="form-group">
-                            <input type="password" class="form-control input-lg" id="loginPassword" name="password" placeholder="Dein HTW Passwort (LSF)">
+                            <input type="password" class="form-control input-lg" id="loginPassword" name="loginPassword" placeholder="Dein HTW Passwort (LSF)">
                         </div>
                         <div class="checkbox pull-left">
                             <label>

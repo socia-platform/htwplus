@@ -23,9 +23,10 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies += evolutions
+libraryDependencies += javaForms
 
 PlayKeys.externalizeResources := false
 
-lazy val root = (project in file(".")).enablePlugins(PlayJava)
+lazy val root = project.in(file(".")).enablePlugins(PlayJava).disablePlugins(PlayFilters)
 
 scalaVersion := "2.11.8"

@@ -16,6 +16,7 @@ HTWplus is a straightforward and lightweight social network. It offers essential
 ### Setup
 
 * Clone this repository
+* Copy conf/logback.sample.conf to conf/logback.conf
 * Copy conf/application.sample.conf to conf/application.conf
 * Edit the application.conf
  * Provide database settings

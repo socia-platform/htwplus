@@ -8,7 +8,7 @@ GET         /stream                                    controllers.Application.s
 GET         /search                                    controllers.Application.search(page: Integer ?= 1)
 GET         /searchHome                                controllers.Application.searchHome()
 GET         /suggestions                               controllers.Application.searchSuggestions(query: String)
-POST        /login                                     controllers.AccountController.authenticate()
+POST        /login                                     controllers.AccountController.login()
 GET         /logout                                    controllers.AccountController.logout()
 GET         /help                                      controllers.Application.help()
 GET         /feedback                                  controllers.Application.feedback()

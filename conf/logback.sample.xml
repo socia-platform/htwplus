@@ -28,7 +28,7 @@
     </appender>
 
     <!-- Log level for everything that is not defined -->
-    <root level="WARN">
+    <root level="INFO">
         <appender-ref ref="ASYNCFILE" />
         <appender-ref ref="ASYNCSTDOUT" />
     </root>
