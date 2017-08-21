@@ -58,12 +58,11 @@ public class AccountController extends BaseController {
         LOG.info("Login attempt from: " + loginName);
 
         // save originURL before clearing the session
-        String redirect = session().get("originURL");
-        if (redirect == null) redirect = "/";
+        String redirect = session().get("originURL") == null ? "/" : session().get("originURL");
         session().clear();
 
         if (loginName.isEmpty()) {
-            LOG.info("no name given");
+            LOG.error("no name given");
             flash("error", "Also deine Matrikelnummer brauchen wir schon!");
 
             return badRequest(landingpage.render(loginName));
@@ -71,13 +70,7 @@ public class AccountController extends BaseController {
             // E-Mail authentication
         } else if (loginName.contains("@")) {
             accountToLogin = loginManager.emailAuthenticate(loginName, loginPassword);
-            if (accountToLogin != null) {
-                session("id", accountToLogin.id.toString());
-                if (rememberMe) {
-                    session().put("rememberMe", "true");
-                }
-                LOG.info("Welcome, " + accountToLogin.name);
-            } else {
+            if (accountToLogin == null) {
                 LOG.error("E-Mail not valid");
                 flash("error", "Bitte melde dich mit deiner Matrikelnummer an.");
                 Component.addToContext(Component.ContextIdent.loginForm, loginForm);
@@ -89,10 +82,7 @@ public class AccountController extends BaseController {
         } else if (loginName.length() > 0) {
             try {
                 accountToLogin = loginManager.ldapAuthenticate(loginName, loginPassword);
-                session("id", accountToLogin.id.toString());
-                if (rememberMe) {
-                    session().put("rememberMe", "1");
-                }
+
             } catch (LdapService.LdapConnectorException e) {
                 LOG.error("LDAP Error", e);
                 flash("error", e.getMessage());
@@ -100,6 +90,11 @@ public class AccountController extends BaseController {
                 return badRequest(landingpage.render(loginName));
             }
 
+        }
+
+        session("id", accountToLogin.id.toString());
+        if (rememberMe) {
+            session().put("rememberMe", "true");
         }
 
         LOG.info("Welcome, " + accountToLogin.name);
@@ -145,7 +140,7 @@ public class AccountController extends BaseController {
      * Logout and clean the session.
      */
     public Result logout() {
-        LOG.info("Bye, " + session().get("email"));
+        LOG.info("Bye, " + session().get("id"));
         session().clear();
         flash("success", messagesApi.get(Lang.defaultLang(), "authenticate.logout"));
 

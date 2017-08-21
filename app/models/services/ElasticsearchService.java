@@ -11,7 +11,6 @@ import models.Account;
 import models.Group;
 import models.Media;
 import models.Post;
-import models.enums.LinkType;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -24,8 +23,8 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import play.Environment;
 import play.Logger;
 
@@ -51,15 +50,6 @@ public class ElasticsearchService implements IElasticsearchService {
 
     final Logger.ALogger logger = Logger.of(ElasticsearchService.class);
 
-    @Inject
-    PostManager postManger;
-    @Inject
-    GroupAccountManager groupAccountManager;
-    @Inject
-    FriendshipManager friendshipManager;
-    @Inject
-    MediaManager mediaManager;
-    @Inject
     Environment environment;
 
     private Client client = null;
@@ -341,7 +331,7 @@ public class ElasticsearchService implements IElasticsearchService {
             searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("ownerName").field("ownerName"));
             searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("folderName").field("folderName"));
             searchRequest = searchRequest.addAggregation(AggregationBuilders.terms("mimeType").field("mimeType"));
-            searchRequest = searchRequest.addAggregation(AggregationBuilders.dateHistogram("createdAt").field("createdAt").interval(DateHistogramInterval.YEAR).format("yyyy"));
+            searchRequest = searchRequest.addAggregation(AggregationBuilders.dateHistogram("createdAt").field("createdAt").dateHistogramInterval(DateHistogramInterval.YEAR).format("yyyy"));
         }
 
         // Apply PostFilter if request mode is not 'all'

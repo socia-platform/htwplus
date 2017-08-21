@@ -32,16 +32,18 @@ public class MediaManager implements BaseManager {
     ElasticsearchService elasticsearchService;
     JPAApi jpaApi;
     GroupAccountDao groupAccountDao;
+    FriendshipManager friendshipManager;
 
     @Inject
     public MediaManager(NotificationManager notificationManager,
             Configuration configuration,
             ElasticsearchService elasticsearchService,
-            JPAApi jpaApi) {
+            JPAApi jpaApi, FriendshipManager friendshipManager) {
         this.notificationManager = notificationManager;
         this.configuration = configuration;
         this.elasticsearchService = elasticsearchService;
         this.jpaApi = jpaApi;
+        this.friendshipManager = friendshipManager;
 
     }
 
