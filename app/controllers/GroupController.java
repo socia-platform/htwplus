@@ -1,6 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.typesafe.config.Config;
 import controllers.Navigation.Level;
 import managers.*;
 import models.*;
@@ -10,7 +11,6 @@ import models.enums.AvatarSize;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.NotificationService;
-import play.Configuration;
 import play.api.i18n.Lang;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -44,7 +44,7 @@ public class GroupController extends BaseController {
     FolderManager folderManager;
     AvatarManager avatarManager;
     NotificationService notificationService;
-    Configuration configuration;
+    Config configuration;
     FormFactory formFactory;
     MessagesApi messagesApi;
 
@@ -58,7 +58,7 @@ public class GroupController extends BaseController {
                            FolderManager folderManager,
                            AvatarManager avatarManager,
                            NotificationService notificationService,
-                           Configuration configuration,
+                           Config configuration,
                            FormFactory formFactory,
                            MessagesApi messagesApi) {
         this.groupManager = groupManager;

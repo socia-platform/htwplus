@@ -13,6 +13,7 @@ import play.api.i18n.Lang;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.data.FormFactory;
+import play.data.validation.ValidationError;
 import play.db.jpa.Transactional;
 import play.i18n.MessagesApi;
 import play.mvc.Result;
@@ -27,6 +28,8 @@ import java.io.IOException;
 @With(AdminAction.class)
 public class AdminController extends BaseController {
 
+    final Logger.ALogger LOG = Logger.of(AccountController.class);
+
     private final ElasticsearchService elasticsearchService;
     private final MediaManager mediaManager;
     private final GroupManager groupManager;
@@ -35,8 +38,8 @@ public class AdminController extends BaseController {
     private final FolderManager folderManager;
     private final MessagesApi messagesApi;
     private final FormFactory formFactory;
-    private final Form<Account> accountForm;
-    private final Form<Post> postForm;
+    Form<Account> accountForm;
+    Form<Post> postForm;
 
     @Inject
     public AdminController(ElasticsearchService elasticsearchService,
@@ -71,37 +74,47 @@ public class AdminController extends BaseController {
 
     @Transactional
     public Result createAccount() {
-        Form<Account> filledForm = accountForm.bindFromRequest();
-        Logger.info(filledForm.errors().toString());
+        DynamicForm formData = formFactory.form().bindFromRequest();
+        accountForm = accountForm.discardingErrors();
 
-        filledForm.errors().remove("role");
+        LOG.info("Create new Account");
 
-        if (filledForm.data().get("email").isEmpty()) {
-            filledForm.reject("email", "Bitte gib hier etwas ein!");
+        if (formData.get("firstname").isEmpty()) {
+            accountForm = accountForm.withError(new ValidationError("firstname", messagesApi.get(Lang.defaultLang(), "error.required")));
         }
 
-        if (!(accountManager.findByEmail(filledForm.data().get("email")) == null)) {
-            filledForm.reject("email", "Diese Email-Adresse wird bereits verwendet!");
+        if (formData.get("lastname").isEmpty()) {
+            accountForm = accountForm.withError(new ValidationError("lastname", messagesApi.get(Lang.defaultLang(), "error.required")));
         }
 
-        if (!filledForm.data().get("password").equals(filledForm.data().get("repeatPassword"))) {
-            filledForm.reject("repeatPassword", "Passwörter stimmen nicht überein");
+        if (formData.get("email").isEmpty()) {
+            accountForm = accountForm.withError(new ValidationError("email", messagesApi.get(Lang.defaultLang(), "error.required")));
         }
 
-        if (filledForm.data().get("password").length() < 6) {
-            filledForm.reject("password", "Das Passwort muss mindestens 6 Zeichen haben.");
+        if (!(accountManager.findByEmail(formData.get("email")) == null)) {
+            accountForm = accountForm.withError(new ValidationError("email", messagesApi.get(Lang.defaultLang(), "error.email")));
         }
 
-        if (filledForm.hasErrors()) {
-            return badRequest(createAccount.render(filledForm));
+        if (!formData.get("password").equals(formData.get("repeatPassword"))) {
+            accountForm = accountForm.withError(new ValidationError("password", messagesApi.get(Lang.defaultLang(), "error.password.duplicate")));
         }
+
+        if (formData.get("password").length() < 6) {
+            accountForm = accountForm.withError(new ValidationError("password", messagesApi.get(Lang.defaultLang(), "error.password.length")));
+        }
+
+        if (accountForm.hasErrors()) {
+            LOG.info("Failed to create a new Account");
+            return badRequest(createAccount.render(accountForm));
+        }
+
         Account account = new Account();
-        account.firstname = filledForm.data().get("firstname");
-        account.lastname = filledForm.data().get("lastname");
-        account.email = filledForm.data().get("email");
-        account.password = Component.md5(filledForm.data().get("password"));
+        account.firstname = formData.get("firstname");
+        account.lastname = formData.get("lastname");
+        account.email = formData.get("email");
+        account.password = Component.md5(formData.get("password"));
         account.avatar = "1";
-        account.role = AccountRole.values()[Integer.parseInt(filledForm.data().get("role"))];
+        account.role = AccountRole.values()[Integer.parseInt(formData.get("role"))];
         accountManager.create(account);
 
         flash("success", "User angelegt");

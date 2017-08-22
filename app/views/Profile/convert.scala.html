@@ -1,4 +1,4 @@
-@(profile: Account, profileForm: Form[Account])
+@(profile: Account, profileForm: Form[DynamicForm.Dynamic])
 @import helper._
 @import models._
 
@@ -13,18 +13,15 @@
                         profileForm("email"),
                         'class -> "form-control",
                         '_label -> "Email",
-                        '_error -> profileForm.error("email"),
                         'placeholder -> "max.mustermann@muster.de"
                     )
                     @inputPassword(
                         profileForm("password"),
-                        '_label -> "Neues Passwort",
-                        '_error -> profileForm.error("password")
+                        '_label -> "Neues Passwort"
                     )
                     @inputPassword(
                         profileForm("repeatPassword"),
-                        '_label -> "Wiederholung",
-                        '_error -> profileForm.error("repeatPassword")
+                        '_label -> "Wiederholung"
                     )
                     <div class="pull-right">
                         <input type="submit" class="btn btn-warning" value="Speichern">

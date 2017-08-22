@@ -1,5 +1,6 @@
 package managers;
 
+import com.typesafe.config.Config;
 import daos.GroupAccountDao;
 import models.Account;
 import models.Folder;
@@ -7,16 +8,14 @@ import models.Media;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
-import play.Configuration;
 import play.Logger;
 import play.db.jpa.JPAApi;
-
-import java.io.IOException;
-import java.nio.file.Files;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -28,23 +27,22 @@ public class MediaManager implements BaseManager {
     final Logger.ALogger LOG = Logger.of(MediaManager.class);
 
     NotificationManager notificationManager;
-    Configuration configuration;
+    Config configuration;
     ElasticsearchService elasticsearchService;
     JPAApi jpaApi;
     GroupAccountDao groupAccountDao;
     FriendshipManager friendshipManager;
 
     @Inject
-    public MediaManager(NotificationManager notificationManager,
-            Configuration configuration,
-            ElasticsearchService elasticsearchService,
-            JPAApi jpaApi, FriendshipManager friendshipManager) {
+    public MediaManager(NotificationManager notificationManager, Config configuration,
+                        ElasticsearchService elasticsearchService,
+                        JPAApi jpaApi, FriendshipManager friendshipManager, GroupAccountDao groupAccountDao) {
         this.notificationManager = notificationManager;
         this.configuration = configuration;
         this.elasticsearchService = elasticsearchService;
         this.jpaApi = jpaApi;
         this.friendshipManager = friendshipManager;
-
+        this.groupAccountDao = groupAccountDao;
     }
 
     final String tempPrefix = "htwplus_temp";
@@ -217,7 +215,8 @@ public class MediaManager implements BaseManager {
 
     public long indexAllMedia() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Media medium : findAll()) elasticsearchService.indexMedium(medium, isPublic(medium), findAllowedToViewAccountIds(medium));
+        for (Media medium : findAll())
+            elasticsearchService.indexMedium(medium, isPublic(medium), findAllowedToViewAccountIds(medium));
         return (System.currentTimeMillis() - start) / 1000;
 
     }
@@ -242,7 +241,7 @@ public class MediaManager implements BaseManager {
         }
 
         // medium belongs to group
-        if(rootFolder.group != null) {
+        if (rootFolder.group != null) {
             viewableIds.addAll(groupAccountDao.findAccountIdsByGroup(rootFolder.group, LinkType.establish));
         }
 
@@ -250,7 +249,7 @@ public class MediaManager implements BaseManager {
     }
 
     public boolean isPublic(Media medium) {
-        if(medium.findGroup() != null) {
+        if (medium.findGroup() != null) {
             return medium.findGroup().groupType.equals(GroupType.open);
         }
         return false;

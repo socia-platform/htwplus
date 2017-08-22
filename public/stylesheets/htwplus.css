@@ -1587,6 +1587,10 @@ form.dropzone {
     min-height: 104px;
 }
 
+#hp-profile-header .bottomline .text {
+    overflow: hidden;
+}
+
 #hp-profile-header .bottomline .hp-avatar-wrapper {
     padding: 10px 0px;
 }

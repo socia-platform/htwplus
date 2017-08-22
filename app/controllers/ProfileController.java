@@ -1,6 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.typesafe.config.Config;
 import controllers.Navigation.Level;
 import managers.*;
 import models.*;
@@ -9,11 +10,12 @@ import models.base.ValidationException;
 import models.enums.AccountRole;
 import models.enums.AvatarSize;
 import models.enums.EmailNotifications;
-import play.Configuration;
 import play.Logger;
 import play.api.i18n.Lang;
+import play.data.DynamicForm;
 import play.data.Form;
 import play.data.FormFactory;
+import play.data.validation.ValidationError;
 import play.db.jpa.Transactional;
 import play.i18n.MessagesApi;
 import play.libs.Json;
@@ -26,7 +28,9 @@ import views.html.Profile.snippets.streamRaw;
 import javax.inject.Inject;
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Transactional
 @Security.Authenticated(Secured.class)
@@ -40,7 +44,7 @@ public class ProfileController extends BaseController {
     AvatarManager avatarManager;
     MediaManager mediaManager;
     FriendshipManager friendshipManager;
-    Configuration configuration;
+    Config configuration;
     FormFactory formFactory;
     MessagesApi messagesApi;
 
@@ -51,8 +55,7 @@ public class ProfileController extends BaseController {
             AccountController accountController,
             StudycourseManager studycourseManager,
             AvatarManager avatarManager,
-            MediaManager mediaManager, FriendshipManager friendshipManager,
-            Configuration configuration,FormFactory formFactory, MessagesApi messagesApi) {
+            MediaManager mediaManager, FriendshipManager friendshipManager, Config configuration,FormFactory formFactory, MessagesApi messagesApi) {
         this.accountManager = accountManager;
         this.groupAccountManager = groupAccountManager;
         this.postManager = postManager;
@@ -151,7 +154,9 @@ public class ProfileController extends BaseController {
         }
 
         Navigation.set(Level.PROFILE, "Konvertieren");
-        return ok(convert.render(account, accountForm.fill(account)));
+        Map<String, Object> formFields = new HashMap<>();
+        formFields.put("email", account.email);
+        return ok(convert.render(account, formFactory.form().fill(formFields)));
     }
 
     public Result saveConvert(Long id) {
@@ -162,54 +167,40 @@ public class ProfileController extends BaseController {
             return redirect(controllers.routes.Application.index());
         }
 
-        // Create error switch
-        Boolean error = false;
-
         // Check Access
         if (!Secured.isAdmin()) {
             return redirect(controllers.routes.Application.index());
         }
 
         // Get data from request
-        Form<Account> filledForm = accountForm.bindFromRequest();
-
-
-        // Remove all unnecessary fields
-        filledForm.errors().remove("firstname");
-        filledForm.errors().remove("lastname");
+        Form<DynamicForm.Dynamic> formData = formFactory.form().bindFromRequest();
 
         // Store old and new password for validation
-        String email = filledForm.field("email").value();
-        String password = filledForm.field("password").value();
-        String repeatPassword = filledForm.field("repeatPassword").value();
-
-        // Perform JPA Validation
-        if (filledForm.hasErrors()) {
-            error = true;
-        }
+        String email = formData.field("email").getValue().get();
+        String password = formData.field("password").getValue().get();
+        String repeatPassword = formData.field("repeatPassword").getValue().get();
 
         if (email.isEmpty()) {
-            filledForm.reject("email", "Für einen lokalen Account ist eine EMail nötig!");
-            error = true;
+            formData = formData.withError(new ValidationError("email", "Für einen lokalen Account ist eine E-Mail nötig!"));
         }
+
         if (password.length() < 6) {
-            filledForm.reject("password", "Das Passwort muss mindestens 6 Zeichen haben.");
-            error = true;
+            formData = formData.withError(new ValidationError("password", messagesApi.get(Lang.defaultLang(), "error.password.length")));
         }
 
         if (!password.equals(repeatPassword)) {
-            filledForm.reject("repeatPassword", "Die Passwörter stimmen nicht überein.");
-            error = true;
+            formData = formData.withError(new ValidationError("repeatPassword", messagesApi.get(Lang.defaultLang(), "error.password.duplicate")));
         }
 
-        if (error) {
-            return badRequest(convert.render(account, filledForm));
+        if (formData.hasErrors()) {
+            return badRequest(convert.render(account, formData));
         } else {
             account.password = Component.md5(password);
             account.email = email;
             accountManager.update(account);
             flash("success", "Account erfolgreich konvertiert.");
         }
+
         return redirect(controllers.routes.ProfileController.view(id));
     }
 
@@ -231,102 +222,78 @@ public class ProfileController extends BaseController {
 
     public Result update(Long id) {
         // Get regarding Object
-        Account account = accountManager.findById(id);
-        if (account == null) {
+        Account currentUser = accountManager.findById(id);
+        if (currentUser == null) {
             flash("info", "Diese Person gibt es nicht.");
             return redirect(controllers.routes.Application.index());
         }
 
         // Check Access
-        if (!Secured.editAccount(account)) {
+        if (!Secured.editAccount(currentUser)) {
             return redirect(controllers.routes.Application.index());
         }
 
         // Get the data from the request
-        Form<Account> filledForm = accountForm.bindFromRequest();
+        DynamicForm filledForm = formFactory.form().bindFromRequest();
+        accountForm = accountForm.discardingErrors();
+
 
         Navigation.set(Level.PROFILE, "Editieren");
 
-        // Remove expected errors
-        filledForm.errors().remove("password");
-        filledForm.errors().remove("studycourse");
-        filledForm.errors().remove("firstname");
-        filledForm.errors().remove("lastname");
-
-        // Custom Validations
-        Account exisitingAccount = accountManager.findByEmail(filledForm.field("email").value());
-        if (exisitingAccount != null && !exisitingAccount.equals(account)) {
-            filledForm.reject("email", "Diese Mail wird bereits verwendet!");
-            return badRequest(edit.render(account, filledForm, loginForm, studycourseManager.getAll()));
-        }
-
-        // Perform JPA Validation
-        if (filledForm.hasErrors()) {
-            return badRequest(edit.render(account, filledForm, loginForm, studycourseManager.getAll()));
+        if (filledForm.get("email").isEmpty()) {
+            currentUser.email = null;
+            currentUser.emailNotifications = EmailNotifications.NONE;
+            currentUser.dailyEmailNotificationHour = null;
         } else {
-
-            // Fill an and update the model manually
-            // because the its just a partial form
-            if (!filledForm.field("email").value().isEmpty()) {
-                account.email = filledForm.field("email").value();
-            } else {
-                account.email = null;
-                account.emailNotifications = EmailNotifications.NONE;
-                account.dailyEmailNotificationHour = null;
-            }
-
-            if (filledForm.data().containsKey("degree")) {
-                if (filledForm.field("degree").value().equals("null")) {
-                    account.degree = null;
-                } else {
-                    account.degree = filledForm.field("degree").value();
-                }
-            }
-
-            if (filledForm.data().containsKey("semester")) {
-                if (filledForm.field("semester").value().equals("0")) {
-                    account.semester = null;
-                } else {
-                    account.semester = Integer.parseInt(filledForm.field("semester").value());
-                }
-            }
-
-            if (filledForm.data().containsKey("emailNotifications") && (account.email != null && !account.email.isEmpty())) {
-                account.emailNotifications = EmailNotifications.valueOf(filledForm.field("emailNotifications").value());
-                if (account.emailNotifications.equals(EmailNotifications.COLLECTED_DAILY)
-                        && filledForm.data().containsKey("dailyEmailNotificationHour")) {
-                    account.dailyEmailNotificationHour = Integer.valueOf(
-                            filledForm.field("dailyEmailNotificationHour").value()
-                    );
-                }
-            }
-
-            Long studycourseId = Long.parseLong(filledForm.field("studycourse").value());
-            Studycourse studycourse;
-            if (studycourseId != 0) {
-                studycourse = studycourseManager.findById(studycourseId);
-            } else {
-                studycourse = null;
-            }
-            account.studycourse = studycourse;
-
-            if (!filledForm.field("about").value().isEmpty()) {
-                account.about = filledForm.field("about").value();
-            } else {
-                account.about = null;
-            }
-
-            if (!filledForm.field("homepage").value().isEmpty()) {
-                account.homepage = filledForm.field("homepage").value();
-            } else {
-                account.homepage = null;
-            }
-
-            accountManager.update(account);
-
-            flash("success", "Profil erfolgreich gespeichert.");
-            return redirect(controllers.routes.ProfileController.me());
+            currentUser.email = filledForm.get("email");
         }
+
+        String degree = filledForm.get("degree");
+        if (degree != null && !degree.isEmpty()) {
+            currentUser.degree = degree;
+        }
+
+        String semester = filledForm.get("semester");
+        if (semester != null && !semester.isEmpty()) {
+            currentUser.semester = Integer.parseInt(semester);
+        }
+
+        String emailNotifications = filledForm.get("emailNotifications");
+        String dailyEmailNotificationHour = filledForm.get("dailyEmailNotificationHour");
+        if (!emailNotifications.isEmpty() && (currentUser.email != null && !currentUser.email.isEmpty())) {
+            currentUser.emailNotifications = EmailNotifications.valueOf(emailNotifications);
+            if (currentUser.emailNotifications.equals(EmailNotifications.COLLECTED_DAILY)
+                    && !dailyEmailNotificationHour.isEmpty()) {
+                currentUser.dailyEmailNotificationHour = Integer.valueOf(dailyEmailNotificationHour);
+            }
+        }
+
+        Long studycourseId = Long.parseLong(filledForm.get("studycourse"));
+        if (studycourseId != 0) {
+            currentUser.studycourse = studycourseManager.findById(studycourseId);
+        } else {
+            currentUser.studycourse = null;
+        }
+
+        String about = filledForm.get("about");
+        if (!about.isEmpty()) {
+            currentUser.about = about;
+        } else {
+            currentUser.about = null;
+        }
+
+        String homepage = filledForm.get("homepage");
+        if (!homepage.isEmpty()) {
+            currentUser.homepage = homepage;
+        } else {
+            currentUser.homepage = null;
+        }
+
+        accountManager.update(currentUser);
+
+        flash("success", "Profil erfolgreich gespeichert.");
+        return redirect(controllers.routes.ProfileController.edit(currentUser.id));
+
     }
 
     public Result groups(Long id) {
@@ -396,7 +363,7 @@ public class ProfileController extends BaseController {
 
         // Check Password //
         Form<Login> filledForm = loginForm.bindFromRequest();
-        String entered = filledForm.field("password").value();
+        String entered = filledForm.field("password").getValue().get();
         if (entered == null || entered.length() == 0) {
             flash("error", messagesApi.get(Lang.defaultLang(), "profile.delete.nopassword"));
             return redirect(controllers.routes.ProfileController.update(current.id));

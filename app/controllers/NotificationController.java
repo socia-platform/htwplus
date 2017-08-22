@@ -1,33 +1,32 @@
 package controllers;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import com.typesafe.config.Config;
 import managers.NotificationManager;
 import models.Account;
 import models.Notification;
-import play.Configuration;
 import play.api.i18n.Lang;
-import play.i18n.MessagesApi;
-import play.twirl.api.Html;
 import play.db.jpa.Transactional;
+import play.i18n.MessagesApi;
 import play.mvc.Result;
 import play.mvc.Security;
+import play.twirl.api.Html;
 import views.html.Notification.view;
 
 import javax.inject.Inject;
+import java.util.LinkedList;
+import java.util.List;
 
 @Transactional
 @Security.Authenticated(Secured.class)
 public class NotificationController extends BaseController {
 
     NotificationManager notificationManager;
-    Configuration configuration;
+    Config configuration;
     MessagesApi messagesApi;
 
     @Inject
     public NotificationController(NotificationManager notificationManager,
-                                  Configuration configuration,
+                                  Config configuration,
                                   MessagesApi messagesApi) {
         this.notificationManager = notificationManager;
         this.configuration = configuration;

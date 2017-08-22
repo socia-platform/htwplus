@@ -1,5 +1,6 @@
 package managers;
 
+import com.typesafe.config.Config;
 import controllers.Component;
 import daos.GroupAccountDao;
 import daos.GroupDao;
@@ -8,18 +9,13 @@ import models.base.FileOperationException;
 import models.enums.AccountRole;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
-import models.services.LdapService;
-import play.Configuration;
 import play.Logger;
-import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
-import play.mvc.Result;
 
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by Iven on 17.12.2015.
@@ -36,22 +32,20 @@ public class AccountManager implements BaseManager {
     NotificationManager notificationManager;
     AvatarManager avatarManager;
     FolderManager folderManager;
-    Configuration configuration;
+    Config configuration;
     JPAApi jpaApi;
 
     @Inject
     public AccountManager(ElasticsearchService elasticsearchService,
-            PostManager postManager,
-            GroupDao groupDao,
-            GroupAccountDao groupAccountDao,
-                          GroupManager groupManager,
-            FriendshipManager friendshipManager,
-            MediaManager mediaManager,
-            NotificationManager notificationManager,
-            AvatarManager avatarManager,
-            FolderManager folderManager,
-            Configuration configuration, JPAApi jpaApi) {
-            this.elasticsearchService = elasticsearchService;
+                          PostManager postManager,
+                          GroupDao groupDao,
+                          GroupAccountDao groupAccountDao, GroupManager groupManager,
+                          FriendshipManager friendshipManager,
+                          MediaManager mediaManager,
+                          NotificationManager notificationManager,
+                          AvatarManager avatarManager,
+                          FolderManager folderManager, Config configuration, JPAApi jpaApi) {
+        this.elasticsearchService = elasticsearchService;
         this.postManager = postManager;
         this.groupDao = groupDao;
         this.groupAccountDao = groupAccountDao;
@@ -70,7 +64,7 @@ public class AccountManager implements BaseManager {
         Account account = (Account) model;
 
         account.name = account.firstname + " " + account.lastname;
-        account.rootFolder = new Folder("_"+account.name, account, null, null, account);
+        account.rootFolder = new Folder("_" + account.name, account, null, null, account);
         folderManager.create(account.rootFolder);
 
         jpaApi.em().persist(account);
@@ -175,7 +169,7 @@ public class AccountManager implements BaseManager {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Account> findAll(){
+    public List<Account> findAll() {
         return jpaApi.em().createQuery("SELECT a FROM Account a ORDER BY a.name").getResultList();
     }
 
@@ -183,10 +177,10 @@ public class AccountManager implements BaseManager {
      * Retrieve a User from email.
      */
     public Account findByEmail(String email) {
-        if(email.isEmpty()) {
+        if (email.isEmpty()) {
             return null;
         }
-        try{
+        try {
             return (Account) jpaApi.em()
                     .createQuery("from Account a where a.email = :email")
                     .setParameter("email", email).getSingleResult();
@@ -199,7 +193,7 @@ public class AccountManager implements BaseManager {
      * Retrieve a User by loginname
      */
     public Account findByLoginName(String loginName) {
-        try{
+        try {
             return (Account) jpaApi.em()
                     .createQuery("from Account a where a.loginname = :loginname")
                     .setParameter("loginname", loginName).getSingleResult();
@@ -224,11 +218,14 @@ public class AccountManager implements BaseManager {
 
     /**
      * Try to get all accounts...
+     *
      * @return List of accounts.
      */
     @SuppressWarnings("unchecked")
     public List<Account> all() {
-        return jpaApi.withTransaction(() -> {return jpaApi.em().createQuery("FROM Account").getResultList();});
+        return jpaApi.withTransaction(() -> {
+            return jpaApi.em().createQuery("FROM Account").getResultList();
+        });
     }
 
     /**
@@ -268,8 +265,8 @@ public class AccountManager implements BaseManager {
     public long indexAllAccounts() throws IOException {
         final long start = System.currentTimeMillis();
 
-        for (Account account: all()) {
-            if(account.role != AccountRole.DUMMY)
+        for (Account account : all()) {
+            if (account.role != AccountRole.DUMMY)
                 elasticsearchService.indexAccount(account, friendshipManager.findFriendsId(account));
         }
 

@@ -19,6 +19,9 @@ error.required=Bitte gib hier etwas ein!
 error.title=Dieser Name ist bereits vergeben!
 error.length=Der Titel darf nicht länger als 255 Zeichen sein!
 error.homepage=Bitte wähle eine gültige URL ( http://... )
+error.email=Diese E-Mail wird bereits verwendet!
+error.password.duplicate=Die Passwörter stimmen nicht überein!
+error.password.length=Das Passwort muss mindestens 6 Zeichen haben.
 error.number=Numeric value expected
 error.real=Real number value expected
 error.real.precision=Real number value with no more than {0} digit(s) including {1} decimal(s) expected
@@ -81,7 +84,7 @@ notification.date=Neuigkeit erhalten am <span class="hp-bold">{0}</span> um <spa
 notification.date_updated=Neuigkeit erstmals am <span class="hp-bold">{0}</span> um <span class="hp-bold">{1}</span> Uhr erhalten, zuletzt aktualisiert am <span class="hp-bold">{2}</span> um <span class="hp-bold">{3}</span> Uhr
 notification.date_read=Du hast diese Neuigkeit bereits gelesen
 notification.not_read=Du hast diese Neuigkeit noch nicht angeklickt bzw. gelesen
-notification.email_notifications=Neuigkeiten per E-Mail
+notification.email_notifications=Neuigkeiten<br />per E-Mail
 notification.email_notifications.none=Keine
 notification.email_notifications.collected_daily=Täglich um ca.
 notification.email_notifications.hourly=Stündlich

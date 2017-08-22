@@ -4,7 +4,6 @@ import managers.AccountManager;
 import managers.LoginManager;
 import models.Account;
 import models.Login;
-import models.enums.AccountRole;
 import models.services.LdapService;
 import play.Logger;
 import play.api.i18n.Lang;
@@ -16,7 +15,6 @@ import play.mvc.Result;
 import views.html.landingpage;
 
 import javax.inject.Inject;
-import java.util.Random;
 
 /**
  * Controller for authenticate purposes.

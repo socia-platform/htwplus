@@ -8,20 +8,18 @@
 		<dl class="dl-horizontal">
 			@inputText(
 				accountForm("firstname"),
-				'class -> "form-control", 
+				'class -> "form-control",
 				'_label -> "Vorname *"
 	        )
 			@inputText(
 				accountForm("lastname"),
 				'class -> "form-control",
-				'_label -> "Nachname *",
-				'_error -> accountForm.globalError
+				'_label -> "Nachname *"
 			)
 			@inputText(
 				accountForm("email"),
 				'class -> "form-control",
-				'_label -> "Email *",
-				'_error -> accountForm.globalError
+				'_label -> "Email *"
 			)
 			@select(
 				accountForm("role"),
@@ -29,7 +27,7 @@
 				'class -> "form-control",
 				'_label -> "Rolle *"
 			)
-			
+
 			@inputPassword(
 				accountForm("password"),
 				'class -> "form-control",
@@ -38,14 +36,14 @@
 			)
 			@inputPassword(
 				accountForm("repeatPassword"),
-				'class -> "form-control", 
-				'_label -> "Passwort wiederholen *",
-				'_error -> accountForm.error("password")
-			)	
+				'class -> "form-control",
+				'_label -> "Passwort wiederholen *"
+			)
 		</dl>
 		<div class="pull-right">
 			<button type="submit" id="submitSignup" class="btn btn-warning">Speichern</button>
 		</div>
+		<div class="clearfix"></div>
 	}
 
 }

@@ -8,7 +8,6 @@ import models.enums.LinkType;
 import models.services.ElasticsearchService;
 import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
-import sun.awt.image.ImageWatched;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -65,7 +64,7 @@ public class GroupManager implements BaseManager {
     @Override
     public void update(Object model) {
         Group group = ((Group) model);
-        JPA.em().merge(group);
+        jpaApi.em().merge(group);
         try {
             elasticsearchService.indexGroup(group, groupAccountDao.findAccountIdsByGroup(group, LinkType.establish));
         } catch (IOException e) {

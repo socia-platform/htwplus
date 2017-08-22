@@ -2,7 +2,6 @@ package managers;
 
 import models.Folder;
 import models.Media;
-import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;

@@ -1,5 +1,6 @@
 package controllers;
 
+import com.typesafe.config.Config;
 import controllers.Navigation.Level;
 import managers.AccountManager;
 import managers.GroupManager;
@@ -12,7 +13,6 @@ import models.services.ElasticsearchService;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
-import play.Configuration;
 import play.Logger;
 import play.api.i18n.Lang;
 import play.data.Form;
@@ -42,7 +42,7 @@ public class Application extends BaseController {
     GroupManager groupManager;
     PostManager postManager;
     AccountManager accountManager;
-    Configuration configuration;
+    Config configuration;
     FormFactory formFactory;
     MessagesApi messagesApi;
 
@@ -52,7 +52,7 @@ public class Application extends BaseController {
                        GroupManager groupManager,
                        PostManager postManager,
                        AccountManager accountManager,
-                       Configuration configuration,
+                       Config configuration,
                        FormFactory formFactory,
                        MessagesApi messagesApi) {
         this.elasticsearchService = elasticsearchService;

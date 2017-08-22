@@ -22,6 +22,7 @@ public class PostBookmarkManager implements BaseManager {
     public PostBookmarkManager(JPAApi jpaApi) {
         this.jpaApi = jpaApi;
     }
+
     @Override
     public void create(Object object) {
         JPA.em().persist(object);
@@ -57,7 +58,7 @@ public class PostBookmarkManager implements BaseManager {
                 .setParameter("accountId", account.id)
                 .setParameter("postId", post.id);
 
-        if(((Number) query.getSingleResult()).intValue() > 0)
+        if (((Number) query.getSingleResult()).intValue() > 0)
             return true;
 
         return false;

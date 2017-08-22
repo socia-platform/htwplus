@@ -1,16 +1,17 @@
 package controllers;
 
+import com.typesafe.config.Config;
 import managers.FolderManager;
 import managers.MediaManager;
 import models.Folder;
 import models.Media;
 import models.services.NotificationService;
-import play.Configuration;
 import play.Logger;
 import play.db.jpa.Transactional;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Result;
 import play.mvc.Security;
+import views.html.Media.list;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -25,8 +26,6 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import views.html.Media.list;
-
 
 @Security.Authenticated(Secured.class)
 public class MediaController extends BaseController {
@@ -35,13 +34,13 @@ public class MediaController extends BaseController {
 
     MediaManager mediaManager;
     FolderManager folderManager;
-    Configuration configuration;
+    Config configuration;
     NotificationService notificationService;
 
     @Inject
     public MediaController(MediaManager mediaManager,
             FolderManager folderManager,
-            Configuration configuration, NotificationService notificationService) {
+                           Config configuration, NotificationService notificationService) {
         this.mediaManager = mediaManager;
         this.folderManager = folderManager;
         this.configuration = configuration;

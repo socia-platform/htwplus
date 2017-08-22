@@ -1,5 +1,6 @@
 package services;
 
+import com.typesafe.config.Config;
 import controllers.Component;
 import managers.AccountManager;
 import managers.GroupManager;
@@ -7,7 +8,6 @@ import models.Account;
 import models.Group;
 import models.enums.AccountRole;
 import models.enums.GroupType;
-import play.Configuration;
 import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
@@ -22,10 +22,10 @@ public class PostgresInit implements DatabaseService {
     JPAApi jpaApi;
     AccountManager accountManager;
     GroupManager groupManager;
-    Configuration configuration;
+    Config configuration;
 
     @Inject
-    public PostgresInit(JPAApi jpaApi, AccountManager accountManager, GroupManager groupManager, Configuration configuration) {
+    public PostgresInit(JPAApi jpaApi, AccountManager accountManager, GroupManager groupManager, Config configuration) {
         this.jpaApi = jpaApi;
         this.accountManager = accountManager;
         this.groupManager = groupManager;

@@ -1,5 +1,6 @@
 package managers;
 
+import com.typesafe.config.Config;
 import daos.GroupAccountDao;
 import daos.GroupDao;
 import models.Account;
@@ -8,10 +9,8 @@ import models.Post;
 import models.enums.GroupType;
 import models.enums.LinkType;
 import models.services.ElasticsearchService;
-import play.Configuration;
 import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
-import play.db.jpa.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.Query;
@@ -28,18 +27,16 @@ public class PostManager implements BaseManager {
     FriendshipManager friendshipManager;
     PostBookmarkManager postBookmarkManager;
     GroupDao groupDao;
-    Configuration configuration;
+    Config configuration;
     JPAApi jpaApi;
     GroupAccountDao groupAccountDao;
 
     @Inject
     public PostManager(ElasticsearchService elasticsearchService,
-            NotificationManager notificationManager,
-            FriendshipManager friendshipManager,
-            PostBookmarkManager postBookmarkManager,
-                       GroupDao groupDao,
-            Configuration configuration,
-            JPAApi jpaApi, GroupAccountDao groupAccountDao) {
+                       NotificationManager notificationManager,
+                       FriendshipManager friendshipManager,
+                       PostBookmarkManager postBookmarkManager, GroupDao groupDao, Config configuration,
+                       JPAApi jpaApi, GroupAccountDao groupAccountDao) {
         this.elasticsearchService = elasticsearchService;
         this.notificationManager = notificationManager;
         this.friendshipManager = friendshipManager;
@@ -415,7 +412,8 @@ public class PostManager implements BaseManager {
 
     public long indexAllPosts() throws IOException {
         final long start = System.currentTimeMillis();
-        for (Post post : allWithoutExceptionPosts()) elasticsearchService.indexPost(post, isPublic(post), findAllowedToViewAccountIds(post));
+        for (Post post : allWithoutExceptionPosts())
+            elasticsearchService.indexPost(post, isPublic(post), findAllowedToViewAccountIds(post));
         return (System.currentTimeMillis() - start) / 1000;
 
     }

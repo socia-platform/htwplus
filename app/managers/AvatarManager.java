@@ -1,12 +1,12 @@
 package managers;
 
+import com.typesafe.config.Config;
 import models.Avatar;
 import models.base.FileOperationException;
 import models.base.ValidationException;
 import models.enums.AvatarSize;
 import models.services.FileService;
 import models.services.ImageService;
-import play.Configuration;
 import play.api.i18n.Lang;
 import play.i18n.MessagesApi;
 import play.mvc.Http;
@@ -17,7 +17,7 @@ import java.io.File;
 public class AvatarManager {
 
     @Inject
-    Configuration configuration;
+    Config configuration;
 
     @Inject
     MessagesApi messagesApi;

@@ -1,5 +1,6 @@
 package controllers;
 
+import com.typesafe.config.Config;
 import controllers.Navigation.Level;
 import managers.AccountManager;
 import managers.GroupManager;
@@ -10,7 +11,6 @@ import models.Group;
 import models.Post;
 import models.PostBookmark;
 import models.services.NotificationService;
-import play.Configuration;
 import play.Logger;
 import play.api.i18n.Lang;
 import play.api.mvc.Call;
@@ -34,7 +34,7 @@ public class PostController extends BaseController {
     PostManager postManager;
     PostBookmarkManager postBookmarkManager;
     AccountManager accountManager;
-    Configuration configuration;
+    Config configuration;
     FormFactory formFactory;
     NotificationService notificationService;
     MessagesApi messagesApi;
@@ -44,7 +44,7 @@ public class PostController extends BaseController {
                           PostManager postManager,
             PostBookmarkManager postBookmarkManager,
                           AccountManager accountManager,
-                          Configuration configuration,
+                          Config configuration,
                           FormFactory formFactory,
                           NotificationService notificationService,
                           MessagesApi messagesApi) {
@@ -260,7 +260,7 @@ public class PostController extends BaseController {
         String result = "";
 
         // subtract already displayed comments
-        int limit = postManager.countCommentsForPost(id) - Integer.parseInt(configuration.getString("htwplus.comments.init"));
+        int limit = postManager.countCommentsForPost(id) - configuration.getInt("htwplus.comments.init");
 
         List<Post> comments;
         comments = postManager.getCommentsForPost(id, limit, 0);

@@ -1,7 +1,9 @@
 package managers;
 
+import com.google.inject.Inject;
 import models.Studycourse;
 import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 
 import java.util.List;
 
@@ -10,8 +12,15 @@ import java.util.List;
  */
 public class StudycourseManager {
 
+    JPAApi jpaApi;
+
+    @Inject
+    public StudycourseManager(JPAApi jpaApi) {
+        this.jpaApi = jpaApi;
+    }
+
     public Studycourse findById(Long id) {
-        return JPA.em().find(Studycourse.class, id);
+        return jpaApi.em().find(Studycourse.class, id);
     }
 
     @SuppressWarnings("unchecked")

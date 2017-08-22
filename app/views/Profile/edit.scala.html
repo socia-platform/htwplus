@@ -134,22 +134,27 @@
                             Semester
                         </option>
                     </select>
-
-                    <select class="form-control" name="degree">
-                        @if(profile.degree == null) {
-                        <option value="null" selected="selected">Keine Angabe</option>
-                        } else {
-                        <option value="null">Keine Angabe</option>
-                        }
-                        <option value="Bachelor" @if(profile.degree !=null && profile.degree.equals(
-                        "Bachelor")){selected="selected"}>Bachelor</option>
-                        <option value="Master" @if(profile.degree !=null && profile.degree.equals(
-                        "Master")){selected="selected"}>Master</option>
-                        <option value="Diplom" @if(profile.degree !=null && profile.degree.equals(
-                        "Diplom")){selected="selected"}>Diplom</option>
-                    </select>
                 </div>
             </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="semester">Akad. Grad</label>
+
+                    <div class="col-sm-10">
+                        <select class="form-control" name="degree">
+                            @if(profile.degree == null) {
+                            <option value="null" selected="selected">Keine Angabe</option>
+                            } else {
+                            <option value="null">Keine Angabe</option>
+                            }
+                            <option value="Bachelor" @if(profile.degree !=null && profile.degree.equals(
+                            "Bachelor")){selected="selected"}>Bachelor</option>
+                            <option value="Master" @if(profile.degree !=null && profile.degree.equals(
+                            "Master")){selected="selected"}>Master</option>
+                            <option value="Diplom" @if(profile.degree !=null && profile.degree.equals(
+                            "Diplom")){selected="selected"}>Diplom</option>
+                        </select>
+                    </div>
+                </div>
             }
 
             @inputText(
@@ -168,7 +173,7 @@
 
 
             <div class="form-group">
-                <label class="control-label col-sm-2">@Messages("notification.email_notifications")</label>
+                <label class="control-label col-sm-2">@Html(Messages("notification.email_notifications"))</label>
 
                 <div class="col-sm-10">
                     <label><input type="radio" name="emailNotifications" value="@models.enums.EmailNotifications.NONE"

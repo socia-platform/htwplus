@@ -1,13 +1,12 @@
 package services;
 
+import com.typesafe.config.Config;
 import managers.AccountManager;
 import managers.GroupManager;
 import managers.PostManager;
 import models.Group;
 import models.Post;
 import models.services.NotificationService;
-import org.apache.http.protocol.HTTP;
-import play.Configuration;
 import play.Environment;
 import play.api.OptionalSourceMapper;
 import play.api.UsefulException;
@@ -35,11 +34,11 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
     PostManager postManager;
     AccountManager accountManager;
     NotificationService notificationService;
-    Configuration configuration;
+    Config configuration;
     JPAApi jpaApi;
 
     @Inject
-    public ErrorHandler(JPAApi jpaApi, Configuration configuration, Environment environment, OptionalSourceMapper optionalSourceMapper, Provider<Router> provider, AccountManager accountManager, GroupManager groupManager,
+    public ErrorHandler(JPAApi jpaApi, Config configuration, Environment environment, OptionalSourceMapper optionalSourceMapper, Provider<Router> provider, AccountManager accountManager, GroupManager groupManager,
             PostManager postManager, NotificationService notificationService) {
         super(configuration, environment, optionalSourceMapper, provider);
         this.configuration = configuration;

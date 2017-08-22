@@ -1,29 +1,29 @@
 package models.services;
 
+import com.typesafe.config.Config;
 import managers.NotificationManager;
-import play.Configuration;
+import models.Account;
+import models.Notification;
+import play.Logger;
 import play.api.i18n.Lang;
 import play.db.jpa.JPAApi;
 import play.i18n.MessagesApi;
 import play.libs.mailer.Email;
 import play.libs.mailer.MailerClient;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import models.Account;
-import models.Notification;
-import play.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 /**
  * This class handles sending of emails, e.g. for notification mails.
  */
 @Singleton
 public class EmailService {
 
-    Configuration configuration;
+    Config configuration;
     MailerClient mailerClient;
     Email email;
     NotificationManager notificationManager;
@@ -31,7 +31,7 @@ public class EmailService {
     MessagesApi messagesApi;
 
     @Inject
-    public EmailService(Configuration configuration,
+    public EmailService(Config configuration,
                         MailerClient mailerClient,
                         Email email,
                         NotificationManager notificationManager,
@@ -56,10 +56,10 @@ public class EmailService {
     /**
      * Sends an email.
      *
-     * @param subject Subject of email
-     * @param recipient Recipient of email
+     * @param subject       Subject of email
+     * @param recipient     Recipient of email
      * @param mailPlainText Plain text content of the mail (allowed to be null)
-     * @param mailHtml HTML content of the mail (allowed to be null)
+     * @param mailHtml      HTML content of the mail (allowed to be null)
      */
     public void sendEmail(String subject, String recipient, String mailPlainText, String mailHtml) {
 
@@ -90,14 +90,14 @@ public class EmailService {
      * Sends a list of notifications via email.
      *
      * @param notifications List of notifications
-     * @param recipient Recipient of the email notification
+     * @param recipient     Recipient of the email notification
      */
     public void sendNotificationsEmail(final List<Notification> notifications, Account recipient) {
         try {
             String subject = notifications.size() > 1
                     ? messagesApi.get(Lang.defaultLang(), "notification.email_notifications.collected.subject", notifications.size())
                     : messagesApi.get(Lang.defaultLang(), "notification.email_notifications.single.subject_specific",
-                        notifications.get(0).rendered.replaceAll("<[^>]*>", "").replaceAll("\\r?\\n|\\r", ", "));
+                    notifications.get(0).rendered.replaceAll("<[^>]*>", "").replaceAll("\\r?\\n|\\r", ", "));
             // send the email
             this.sendEmail(subject, recipient.name + " <" + recipient.email + ">",
                     TemplateService.getInstance().getRenderedTemplate(PLAIN_TEXT_TEMPLATE, notifications, recipient),

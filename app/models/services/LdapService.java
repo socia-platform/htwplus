@@ -1,7 +1,7 @@
 package models.services;
 
+import com.typesafe.config.Config;
 import models.enums.AccountRole;
-
 import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.cursor.EntryCursor;
 import org.apache.directory.api.ldap.model.entry.Entry;
@@ -10,9 +10,6 @@ import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.directory.ldap.client.api.exception.InvalidConnectionException;
-
-import play.Configuration;
-import play.Logger;
 import play.api.i18n.Lang;
 import play.i18n.MessagesApi;
 
@@ -26,16 +23,16 @@ import java.io.IOException;
 @Singleton
 public class LdapService {
 
-    private Configuration configuration;
+    private Config configuration;
     private MessagesApi messagesApi;
 
     @Inject
-    public LdapService(Configuration configuration, MessagesApi messagesApi) {
+    public LdapService(Config configuration, MessagesApi messagesApi) {
         this.messagesApi = messagesApi;
         this.configuration = configuration;
         this.ldapServer = configuration.getString("ldap.server");
-        this.ldapPort = Integer.parseInt(configuration.getString("ldap.port"));
-        this.ldapStartTls = Boolean.parseBoolean(configuration.getString("ldap.startTls"));
+        this.ldapPort = configuration.getInt("ldap.port");
+        this.ldapStartTls = configuration.getBoolean("ldap.startTls");
     }
 
 
@@ -159,7 +156,7 @@ public class LdapService {
 
         // user data successfully set, try to find the role of the user
         try {
-            entCursor =  ldapConnection.search(groupRoot, groupSearch, SearchScope.ONELEVEL, "*");
+            entCursor = ldapConnection.search(groupRoot, groupSearch, SearchScope.ONELEVEL, "*");
             String role;
             while (entCursor.next()) {
                 Entry entry = entCursor.get();
@@ -187,7 +184,7 @@ public class LdapService {
     /**
      * Exception class for exceptions thrown in LdapConnector.
      */
-    public class LdapConnectorException extends Exception{
+    public class LdapConnectorException extends Exception {
         public LdapConnectorException(String message) {
             super(message);
         }
